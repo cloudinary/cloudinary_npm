@@ -1,0 +1,25 @@
+{
+  "author": "Cloudinary <info@cloudinary.com>",
+  "name": "cloudinary",
+  "description": "Cloudinary NPM for node.js integration",
+  "version": "0.0.1",
+  "homepage": "http://cloudinary.com",
+  "repository": {
+    "url": "https://github.com/cloudinary/cloudinary_npm.git"
+  },
+  "main" : "cloudinary.js",
+  "dependencies": {
+    "underscore.js": ""
+  },
+  "devDependencies": {
+    "mocha": ""
+    "expect.js": ""
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": ">=0.6"
+  }
+}
