@@ -198,3 +198,7 @@ exports.api_sign_request = (params_to_sign, api_secret) ->
   shasum.update(to_sign + api_secret)
   shasum.digest('hex')
 
+exports.html_attrs = (options) ->
+  keys = _.sortBy(_.keys(options), _.identity)
+  ("#{key}='#{options[key]}'" for key in keys when present(options[key])).join(" ")
+
