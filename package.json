@@ -7,18 +7,19 @@
   "repository": {
     "url": "https://github.com/cloudinary/cloudinary_npm.git"
   },
-  "main" : "cloudinary.js",
+  "main": "cloudinary.js",
   "dependencies": {
-    "underscore.js": ""
+    "underscore": ""
   },
   "devDependencies": {
-    "mocha": ""
+    "mocha": "",
     "expect.js": ""
   },
   "scripts": {
     "test": "mocha"
   },
-  "optionalDependencies": {},
+  "optionalDependencies": {
+  },
   "engines": {
     "node": ">=0.6"
   }
