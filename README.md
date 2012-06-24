@@ -109,7 +109,7 @@ Returns an html image tag pointing to Cloudinary.
 
 Usage:
 
-    cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill")
+    cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"})
 
     // <img src='http://res.cloudinary.com/demo/image/upload/c_fill,h_100,w_100/sample.png' height='100' width='100'/>
 
