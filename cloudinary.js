@@ -1,3 +1,5 @@
+require('coffee-script');
+var _ = require('underscore');
 exports.config = require("./lib/config");
 exports.utils = require("./lib/utils");
 exports.uploader = require("./lib/uploader");

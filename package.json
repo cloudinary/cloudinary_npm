@@ -9,6 +9,7 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
+    "coffee-script": "",
     "underscore": ""
   },
   "devDependencies": {
