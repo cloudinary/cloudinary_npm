@@ -80,7 +80,7 @@ call_api = (action, callback, options, get_params) ->
   params.signature = utils.api_sign_request(params, api_secret)
   params.api_key = api_key
 
-  api_url = utils.api_url(action, resource_type: options.resource_type, upload_prefix: options.upload_prefix)
+  api_url = utils.api_url(action, options)
   
   boundary = utils.random_public_id()
 
