@@ -86,8 +86,22 @@ Same goes for Twitter:
 Assuming you have your Cloudinary configuration parameters defined (`cloud_name`, `api_key`, `api_secret`), uploading to Cloudinary is very simple.
     
 The following example uploads a local JPG to the cloud: 
+ 
+ 	var cloudinary = require('cloudinary')
+ 	   
+    cloudinary.uploader.upload("my_picture.jpg", function(result) { console.log(result) })
     
-    cloudinary.uploader.upload("my_picture.jpg")
+Below is an example of an upload's result:
+
+ 	{ public_id: '4srvcynxrf5j87niqcx6w',
+ 	  version: 1340625837,
+ 	  signature: '01234567890abcdef01234567890abcdef012345',
+ 	  width: 200,
+ 	  height: 200,
+ 	  format: 'jpg',
+ 	  resource_type: 'image',
+ 	  url: 'http://res.cloudinary.com/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg',
+ 	  secure_url: 'https://d3jpl91pxevbkh.cloudfront.net/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg' } 
         
 The uploaded image is assigned a randomly generated public ID. The image is immediately available for download through a CDN:
 
@@ -97,7 +111,7 @@ The uploaded image is assigned a randomly generated public ID. The image is imme
 
 You can also specify your own public ID:    
     
-    cloudinary.uploader.upload("http://www.example.com/image.jpg", {public_id: 'sample_remote'})
+    cloudinary.uploader.upload("http://www.example.com/image.jpg", function(result) { console.log(result) }, {public_id: 'sample_remote'})
 
     cloudinary.url("sample_remote.jpg")
 
