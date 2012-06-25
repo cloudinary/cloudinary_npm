@@ -182,7 +182,7 @@ crc32 = (str) ->
 
 exports.api_url = (action = 'upload', options = {}) ->
   cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"
-  cloud_name = config().cloud_name ? throw("Must supply cloud_name")
+  cloud_name = options["cloud_name"] ? config().cloud_name ? throw("Must supply cloud_name")
   resource_type = options["resource_type"] ? "image"
   return [cloudinary, "v1_1", cloud_name, resource_type, action].join("/")
 

@@ -139,6 +139,8 @@ post = (url, post_data, boundary, callback) ->
     post_request.write(post_data[i])
   post_request.end()
 
+  true
+
 EncodeFieldPart = (boundary, name, value) ->
   return_part = "--#{boundary}\r\n";
   return_part += "Content-Disposition: form-data; name=\"#{name}\"\r\n\r\n"
