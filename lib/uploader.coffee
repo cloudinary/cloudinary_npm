@@ -114,6 +114,7 @@ call_api = (action, callback, options, get_params) ->
   else
     post_data.push(new Buffer("--" + boundary + "--"), 'ascii');
     post api_url, post_data, boundary, handle_response
+  true
 
 post = (url, post_data, boundary, callback) ->
   length = 0
@@ -138,8 +139,6 @@ post = (url, post_data, boundary, callback) ->
   for i in [0..post_data.length-1]
     post_request.write(post_data[i])
   post_request.end()
-
-  true
 
 EncodeFieldPart = (boundary, name, value) ->
   return_part = "--#{boundary}\r\n";
