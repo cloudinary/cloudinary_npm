@@ -5,6 +5,7 @@ utils = require("./utils")
 config = require("./config")
 fs = require('fs')
 path = require('path')
+temp = require('temp')
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
 
@@ -28,6 +29,24 @@ build_upload_params = (options) ->
     ).join("|")
   params
  
+exports.upload_stream = (callback, options={}) ->
+  temp_filename = temp.path()
+  temp_file = fs.createWriteStream temp_filename,
+    flags: 'w',
+    encoding: 'binary',
+    mode: 0o600 
+
+  stream = 
+    write: (data) ->
+      temp_file.write(new Buffer(data, 'binary'))
+    end: ->
+      temp_file.end()
+      finish = (result) ->
+        fs.unlink(temp_filename)
+        callback.call(null, result)
+      exports.upload(temp_filename, finish, options)
+  stream
+
 exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
@@ -101,33 +120,24 @@ call_api = (action, callback, options, get_params) ->
       callback(error: {message: "Server returned unexpected status code - #{res.statusCode}"})
 
   post_data = (new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') for key, value of params when utils.present(value))
-  if file?
-    post_data.push(new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', path.basename(file)), 'binary'));
-
-    file_reader = fs.createReadStream(file, {encoding: 'binary'});
-    file_contents = '';
-    file_reader.on 'data', (data) -> file_contents += data;
-    file_reader.on 'end', ->
-      post_data.push(new Buffer(file_contents, 'binary'))
-      post_data.push(new Buffer("\r\n--" + boundary + "--"), 'ascii');
-      post api_url, post_data, boundary, handle_response
-  else
-    post_data.push(new Buffer("--" + boundary + "--"), 'ascii');
-    post api_url, post_data, boundary, handle_response
+  post api_url, post_data, boundary, file, handle_response
   true
-
-post = (url, post_data, boundary, callback) ->
+  
+post = (url, post_data, boundary, file, callback) ->
+  finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
   length = 0
   for i in [0..post_data.length-1]
     length += post_data[i].length
+  length += finish_buffer.length
+  if file?
+    file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', path.basename(file)), 'binary')
+    length += file_header.length + 2
+    length += fs.statSync(file).size 
 
   post_options = require('url').parse(url)
   post_options = _.extend post_options,
-    port: '443',
-    #host: 'localhost', 
+    #host: 'localhost',
     #port: 8081,
-    #protocol: 'http:',
-    #path: "/",
     method: 'POST',
     headers: 
       'Content-Type': 'multipart/form-data; boundary=' + boundary,
@@ -138,7 +148,20 @@ post = (url, post_data, boundary, callback) ->
 
   for i in [0..post_data.length-1]
     post_request.write(post_data[i])
-  post_request.end()
+ 
+  done = ->
+    post_request.write(finish_buffer)
+    post_request.end()
+
+  if file?
+    post_request.write(file_header)
+    file_reader = fs.createReadStream(file, {encoding: 'binary'});
+    file_reader.on 'data', (data) -> post_request.write(new Buffer(data, 'binary'))
+    file_reader.on 'end', ->
+      post_request.write(new Buffer("\r\n", 'ascii'))
+      done()
+  else
+    done()
 
 EncodeFieldPart = (boundary, name, value) ->
   return_part = "--#{boundary}\r\n";
@@ -151,4 +174,16 @@ EncodeFilePart = (boundary,type,name,filename) ->
   return_part += "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\"\r\n";
   return_part += "Content-Type: #{type}\r\n\r\n";
   return_part
+
+exports.direct_upload = (callback_url, options) ->
+  params = build_upload_params(_.extend({callback: callback_url}, options))
+  params.signature = utils.api_sign_request(params, config().api_secret)
+  params.api_key = config().api_key
+
+  api_url = utils.api_url("upload", options)
+
+  for k, v of params when not utils.present(v)
+    delete params[k]
+
+  return hidden_fields: params, form_attrs: {action: api_url, method: "POST", enctype: "multipart/form-data"}
 

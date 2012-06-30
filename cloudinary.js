@@ -14,4 +14,3 @@ exports.image = function(source, options) {
   if ("html_height" in options) options["height"] = exports.utils.option_consume(options, "html_height")
   return "<img src='" + source + "' " + exports.utils.html_attrs(options) + "/>";
 }
-

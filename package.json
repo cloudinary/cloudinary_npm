@@ -11,7 +11,8 @@
   "main": "cloudinary.js",
   "dependencies": {
     "coffee-script": "",
-    "underscore": ""
+    "underscore": "",
+    "temp": ""
   },
   "devDependencies": {
     "mocha": "",
