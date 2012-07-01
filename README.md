@@ -117,6 +117,15 @@ You can also specify your own public ID:
 
     http://res.cloudinary.com/demo/image/upload/sample_remote.jpg
         
+### cloudinary.upload_stream
+
+You can use cloudinary.upload_stream to write to the uploader as a stream:
+
+    stream = cloudinary.uploader.upload_stream(function(result) { console.log(result); })
+    file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'});
+    file_reader.on('data', stream.write);
+    file_reader.on('end', stream.end);
+
 ### cloudinary.image
 
 Returns an html image tag pointing to Cloudinary.
