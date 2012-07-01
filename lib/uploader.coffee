@@ -19,6 +19,7 @@ build_upload_params = (options) ->
     public_id: options.public_id,
     callback: options.callback,
     format: options.format,
+    backup: options.backup,
     type: options.type,
     tags: options.tags ? utils.build_array(options.tags).join(",")
   if options.eager?
