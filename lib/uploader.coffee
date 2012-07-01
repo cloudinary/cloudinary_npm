@@ -45,7 +45,10 @@ exports.upload_stream = (callback, options={}) ->
       finish = (result) ->
         fs.unlink(temp_filename)
         callback.call(null, result)
-      exports.upload(temp_filename, finish, options)
+      try 
+        exports.upload(temp_filename, finish, options)
+      catch e 
+        finish(error: {message: e})
   stream
 
 exports.upload = (file, callback, options={}) ->
