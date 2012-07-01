@@ -121,10 +121,9 @@ You can also specify your own public ID:
 
 You can use cloudinary.upload_stream to write to the uploader as a stream:
 
-    stream = cloudinary.uploader.upload_stream(function(result) { console.log(result); })
-    file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'});
-    file_reader.on('data', stream.write);
-    file_reader.on('end', stream.end);
+    var fs = require('fs');
+    var stream = cloudinary.uploader.upload_stream(function(result) { console.log(result); });
+    var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
 
 ### cloudinary.image
 
