@@ -4,6 +4,8 @@ fs = require('fs')
 describe "uploader", ->
   beforeEach ->
     cloudinary.config(true)
+    this.timeout 5000
+
   
   it "should successfully upload file", (done) ->
     if not cloudinary.config().api_secret
