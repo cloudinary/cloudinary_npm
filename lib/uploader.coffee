@@ -55,10 +55,9 @@ exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
     if file.match(/^https?:/)
-      params.file = file
-      return params
+      return [params, file: file]
     else 
-      return [params, file]
+      return [params, {}, file]
 
 exports.destroy = (public_id, callback, options={}) ->
   call_api "destroy", callback, options, ->
@@ -98,10 +97,11 @@ call_api = (action, callback, options, get_params) ->
   api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
 
-  [params, file] = get_params.call()
+  [params, unsigned_params, file] = get_params.call()
   
   params.signature = utils.api_sign_request(params, api_secret)
   params.api_key = api_key
+  params = _.extend(params, unsigned_params)
 
   api_url = utils.api_url(action, options)
   
