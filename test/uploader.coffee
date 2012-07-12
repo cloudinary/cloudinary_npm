@@ -4,10 +4,10 @@ fs = require('fs')
 describe "uploader", ->
   beforeEach ->
     cloudinary.config(true)
-    this.timeout 5000
 
   
   it "should successfully upload file", (done) ->
+    this.timeout 5000
     if not cloudinary.config().api_secret
       console.warn "Please setup environment for upload test to run"
       return done()
@@ -17,9 +17,13 @@ describe "uploader", ->
       expect(result.height).to.eql(51)
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
-      done()
+      cloudinary.uploader.destroy result.public_id, (dresult) ->
+        return done(new Error dresult.error.message) if dresult.error?
+        expect(dresult.result).to.eql("ok")
+        done()
 
   it "should successfully upload url", (done) ->
+    this.timeout 5000
     if not cloudinary.config().api_secret
       console.warn "Please setup environment for upload test to run"
       return done()
@@ -32,6 +36,7 @@ describe "uploader", ->
       done()
 
   it  "should successfully generate text image", (done) ->
+    this.timeout 5000
     if not cloudinary.config().api_secret
       console.warn "Please setup environment for upload test to run"
       return done()
@@ -42,6 +47,7 @@ describe "uploader", ->
       done()
 
   it "should successfully upload stream", (done) ->
+    this.timeout 5000
     if not cloudinary.config().api_secret
       console.warn "Please setup environment for upload test to run"
       return done()

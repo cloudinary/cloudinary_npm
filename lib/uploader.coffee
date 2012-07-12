@@ -61,7 +61,7 @@ exports.upload = (file, callback, options={}) ->
 
 exports.destroy = (public_id, callback, options={}) ->
   call_api "destroy", callback, options, ->
-    return timestamp: timestamp(), type: options.type, public_id:  public_id
+    return [timestamp: timestamp(), type: options.type, public_id:  public_id]
 
 TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style", "background", "opacity", "text_decoration"]
 exports.text = (text, callback, options={}) ->
