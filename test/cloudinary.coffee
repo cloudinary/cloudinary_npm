@@ -143,6 +143,12 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/fetch/http://blah.com/hello%3Fa%3Db"
 
+  it "should escape http urls", ->
+    options = type: "youtube"
+    result = cloudinary.utils.url("http://www.youtube.com/watch?v=d9NF2edxy-M", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M"
+
   it "should support background", ->
     options = background: "red"
     result = cloudinary.utils.url("test", options)
@@ -219,3 +225,15 @@ describe "cloudinary", ->
       format: "jpg"
       signature: "123515adfa151"
     )).to.eql "image/upload/v1251251251/abcd.jpg#123515adfa151"
+
+  it "should support density", ->
+    options = density: 150
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/dn_150/test"
+
+  it "should support page", ->
+    options = page: 5
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/pg_5/test"

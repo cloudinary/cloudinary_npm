@@ -63,9 +63,11 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     underlay: "u"
     overlay: "l"
     fetch_format: "f"
+    density: "dn"
+    page: "pg"
 
-  for param, letter of simple_params
-    params[letter] = option_consume(options, param)
+  for param, short of simple_params
+    params[short] = option_consume(options, param)
 
   params = _.sortBy([key, value] for key, value of params, (key, value) -> key)
 
@@ -92,12 +94,12 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
       throw "secure_distribution not defined"
     else
       secure_distribution = SHARED_CDN
-  if type is "fetch"
-
-  else if public_id.match(/^https?:/)
-    return public_id
-  else public_id += "." + format  if format
-  public_id = encodeURIComponent(public_id).replace(/%3A/g, ":").replace(/%2F/g, "/")  if type is "fetch" or type is "asset"
+  if public_id.match(/^https?:/)
+    return public_id if type is "upload" or type is "asset"
+    public_id = encodeURIComponent(public_id).replace(/%3A/g, ":").replace(/%2F/g, "/") 
+  else if format
+    public_id += "." + format
+  
   prefix = (if secure then "https://" else "http://")
   subdomain = (if config().cdn_subdomain then "a#{(crc32(public_id) % 5) + 1}." else "")
   if private_cdn
