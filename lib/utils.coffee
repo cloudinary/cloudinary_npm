@@ -17,6 +17,11 @@ exports.present = present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0
 
 exports.generate_transformation_string = generate_transformation_string = (options) ->
+  if _.isArray(options)
+    result = for base_transformation in options
+      generate_transformation_string(_.clone(base_transformation))
+    return result.join("/")
+
   width = options["width"]
   height = options["height"]
   size = option_consume(options, "size")

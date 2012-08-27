@@ -23,10 +23,9 @@ build_upload_params = (options) ->
     type: options.type,
     tags: options.tags ? utils.build_array(options.tags).join(",")
   if options.eager?
-    params.eager = (for transformation, format of utils.build_array(options.eager)
+    params.eager = (for transformation in utils.build_array(options.eager)
       transformation = _.clone(transformation)
-      format = transformation.format ? format
-      _.filter([utils.generate_transformation_string(transformation), format], utils.present).join("/")
+      _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
     ).join("|")
   params
  

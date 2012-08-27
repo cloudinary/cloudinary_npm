@@ -1,0 +1,127 @@
+_ = require("underscore")
+https = require('https')
+utils = require("./utils")
+config = require("./config")
+querystring = require("querystring")
+
+
+exports.resource_types = (callback, options={}) ->
+  call_api("get", ["resources"], {}, callback, options)
+
+exports.resources = (callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"]
+  uri = ["resources", resource_type]
+  uri.push type if type?
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options)    
+
+exports.resources_by_tag = (tag, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  uri = ["resources", resource_type, "tags", tag]
+  call_api("get", uri, only(options, "next_cursor", "max_results"), callback, options)    
+
+exports.resource = (public_id, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"
+  uri = ["resources", resource_type, type, public_id]
+  call_api("get", uri, {}, callback, options)
+
+exports.delete_resources = (public_ids, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"    
+  uri = ["resources", resource_type, type]
+  call_api("delete", uri, {"public_ids[]": public_ids}, callback, options)      
+
+exports.delete_resources_by_prefix = (type, prefix, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  uri = ["resources", resource_type, type]
+  call_api("delete", uri, {prefix: prefix}, callback, options)
+
+exports.delete_derived_resources = (derived_resource_ids, callback, options={}) ->
+  uri = ["derived_resources"]
+  call_api("delete", uri, {"derived_resource_ids[]": derived_resource_ids}, callback, options)      
+
+exports.tags = (callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  uri = ["tags", resource_type]
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options)    
+
+exports.transformations = (callback, options={}) ->
+  call_api("get", ["transformations"], only(options, "next_cursor", "max_results"), callback, options)    
+
+exports.transformation = (transformation, callback, options={}) ->
+  uri = ["transformations", transformation_string(transformation)]
+  call_api("get", uri, only(options, "max_results"), callback, options)    
+
+exports.delete_transformation = (transformation, callback, options={}) ->
+  uri = ["transformations", transformation_string(transformation)]
+  call_api("delete", uri, {}, callback, options)    
+
+# updates - currently only supported update is the "allowed_for_strict" boolean flag
+exports.update_transformation = (transformation, updates, callback, options={}) ->
+  uri = ["transformations", transformation_string(transformation)]
+  call_api("put", uri, only(updates, "allowed_for_strict"), callback, options)
+
+exports.create_transformation = (name, definition, callback, options={}) ->
+  uri = ["transformations", name]
+  call_api("post", uri, {transformation: transformation_string(definition)}, callback, options)
+
+call_api = (method, uri, params, callback, options) ->
+  cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"
+  cloud_name = options["cloud_name"] ? config().cloud_name ? throw("Must supply cloud_name")
+  api_key = options["api_key"] ? config().api_key ? throw("Must supply api_key")
+  api_secret = options["api_secret"] ? config().api_secret ? throw("Must supply api_secret")
+  api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/")
+
+  query_params = querystring.stringify(params)
+  if method == "get"
+    api_url += "?" + query_params
+    
+  request_options = require('url').parse(api_url)
+  request_options = _.extend request_options,
+    method: method.toUpperCase()
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    auth: "#{api_key}:#{api_secret}"
+
+  handle_response = (res) ->
+    if _.include([200,400,401,403,404,409,420,500], res.statusCode)
+      buffer = ""
+      error = false
+      res.on "data", (d) -> buffer += d
+      res.on "end", ->
+        return if error
+        result = JSON.parse(buffer)
+        if result["error"]
+          result["error"]["http_code"] = res.statusCode
+        else
+          result["rate_limit_allowed"] = parseInt(res.headers["x-featureratelimit-limit"])
+          result["rate_limit_reset_at"] = new Date(res.headers["x-featureratelimit-reset"])
+          result["rate_limit_remaining"] = parseInt(res.headers["x-featureratelimit-remaining"])     
+        callback(result)
+      res.on "error", (e) ->
+        error = true
+        callback(error: {message: e, http_code: res.statusCode})
+    else
+      callback(error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode})
+    
+  request = https.request(request_options, handle_response)
+  request.setTimeout 60
+  
+  if method != "get"
+    request.write(query_params)
+  
+  request.end()
+
+only = (hash, keys...) ->
+  result = {}
+  for key in keys
+    result[key] = hash[key] if hash[key]?
+  result
+
+transformation_string = (transformation) ->
+  if _.isString(transformation) 
+    transformation 
+  else 
+    utils.generate_transformation_string(_.extend(transformation))
+
