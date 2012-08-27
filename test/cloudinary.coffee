@@ -44,6 +44,38 @@ describe "cloudinary", ->
 
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/test"
 
+
+  it "should not pass width and height to html in case of fit or limit crop", ->
+    options =
+      width: 100
+      height: 100
+      crop: "limit"
+
+    result = cloudinary.utils.url("test", options)
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_limit,h_100,w_100/test"
+    expect(options).to.eql {}
+
+    options =
+      width: 100
+      height: 100
+      crop: "fit"
+
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_fit,h_100,w_100/test"
+
+  it "should not pass width and height to html in case angle was used", ->
+    options =
+      width: 100
+      height: 100
+      crop: "scale"
+      angle: "auto"
+
+    result = cloudinary.utils.url("test", options)
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/a_auto,c_scale,h_100,w_100/test"
+    expect(options).to.eql {}
+
   it "should use x, y, radius, prefix, gravity and quality from options", ->
     options =
       x: 1

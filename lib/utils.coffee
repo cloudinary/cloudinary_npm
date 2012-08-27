@@ -28,9 +28,12 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   [options["width"], options["height"]] = [width, height] = size.split("x") if size
 
   has_layer = options.overlay or options.underlay
-  delete options["width"] if width and (has_layer or parseFloat(width) < 1)
-  delete options["height"] if height and (has_layer or parseFloat(height) < 1)
   crop = option_consume(options, "crop")
+  angle = build_array(option_consume(options, "angle")).join(".")
+  no_html_sizes = has_layer or present(angle) or crop == "fit" or crop == "limit"
+
+  delete options["width"] if width and (no_html_sizes or parseFloat(width) < 1)
+  delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
   width = height = undefined if not crop and not has_layer
   background = option_consume(options, "background")
   background = background and background.replace(/^#/, "rgb:")
@@ -55,6 +58,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     h: height
     b: background
     e: effect
+    a: angle
 
   simple_params =
     x: "x"
@@ -64,7 +68,6 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     quality: "q"
     prefix: "p"
     default_image: "d"
-    angle: "a"
     underlay: "u"
     overlay: "l"
     fetch_format: "f"
