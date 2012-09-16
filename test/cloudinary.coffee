@@ -269,3 +269,15 @@ describe "cloudinary", ->
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/pg_5/test"
+
+  it "should support extenal cname", ->
+    options = cname: "hello.com"
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://hello.com/test123/image/upload/test"
+
+  it "should support extenal cname with cdn_subdomain on", ->
+    options = cname: "hello.com", cdn_subdomain: true
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://a2.hello.com/test123/image/upload/test"
