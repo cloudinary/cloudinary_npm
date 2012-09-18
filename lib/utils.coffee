@@ -11,7 +11,12 @@ exports.option_consume = option_consume = (options, option_name, default_value) 
   if result? then result else default_value
 
 exports.build_array = build_array = (arg) ->
-  if _.isArray(arg) then arg else [arg]
+  if !arg?
+    []
+  else if _.isArray(arg)
+    arg 
+  else 
+    [arg]
 
 exports.present = present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0

@@ -12,6 +12,23 @@ temp = require('temp')
 timestamp = ->
   Math.floor(new Date().getTime()/1000)
 
+build_eager = (transformations) ->
+  (for transformation in utils.build_array(transformations)
+    transformation = _.clone(transformation)
+    _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
+  ).join("|")
+    
+build_custom_headers = (headers) ->
+  if !headers?
+    return undefined
+  else if _.isArray(headers) 
+    ;
+  else if _.isObject(headers)
+    headers = [k + ": " + v for k, v of headers]    
+  else
+    return headers
+  return headers.join("\n")
+
 build_upload_params = (options) ->
   params = 
     timestamp: timestamp(),
@@ -21,12 +38,9 @@ build_upload_params = (options) ->
     format: options.format,
     backup: options.backup,
     type: options.type,
+    eager: build_eager(options.eager),
+    headers: build_custom_headers(options.headers),
     tags: options.tags ? utils.build_array(options.tags).join(",")
-  if options.eager?
-    params.eager = (for transformation in utils.build_array(options.eager)
-      transformation = _.clone(transformation)
-      _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
-    ).join("|")
   params
  
 exports.upload_stream = (callback, options={}) ->
@@ -58,6 +72,18 @@ exports.upload = (file, callback, options={}) ->
     else 
       return [params, {}, file]
 
+exports.explicit = (public_id, callback, options={}) ->
+  call_api "explicit", callback, options, ->
+    return [
+      timestamp: timestamp()
+      type: options.type
+      public_id: public_id
+      callback: options.callback
+      eager: build_eager(options.eager)
+      headers: build_custom_headers(options.headers)
+      tags: options.tags ? utils.build_array(options.tags).join(",")
+    ]
+    
 exports.destroy = (public_id, callback, options={}) ->
   call_api "destroy", callback, options, ->
     return [timestamp: timestamp(), type: options.type, public_id:  public_id]
@@ -89,7 +115,7 @@ exports.replace_tag = (tag, callback, public_ids = [], options = {}) ->
 
 call_tags_api = (tag, command, callback, public_ids = [], options = {}) ->
   call_api "tags", callback, options, ->
-    return [{timestamp: timestamp, tag: tag, public_ids:  utils.build_array(public_ids), command:  command}]
+    return [{timestamp: timestamp, tag: tag, public_ids:  utils.build_array(public_ids), command:  command, type: options.type}]
    
 call_api = (action, callback, options, get_params) ->
   options = _.clone(options)

@@ -8,7 +8,7 @@ describe "api", ->
   find_by_attr = (elements, attr, value) ->
     for element in elements
       return element if element[attr] == value
-    null
+    undefined
     
   before (done) ->
     @timeout 10000
@@ -16,19 +16,23 @@ describe "api", ->
     progress = -> 
       cnt += 1
       done() if cnt == 3
-    cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", eager: [width: 100, crop: "scale"])
-    cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", eager: [width: 100, crop: "scale"]) 
-    cloudinary.api.delete_transformation("api_test_transformation", progress)
+    cloudinary.uploader.destroy "api_test", ->
+      cloudinary.uploader.destroy "api_test2", ->
+        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", eager: [width: 100, crop: "scale"])
+        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", eager: [width: 100, crop: "scale"]) 
+        cloudinary.api.delete_transformation("api_test_transformation", progress)
 
   it "should allow listing resource_types", (done) ->
     @timeout 10000
     cloudinary.api.resource_types (result) ->
+      return done(new Error result.error.message) if result.error?
       expect(result.resource_types).to.contain("image")
       done()
 
   it "should allow listing resources", (done) ->
     @timeout 10000
     cloudinary.api.resources (result) ->
+      return done(new Error result.error.message) if result.error?
       resource = find_by_attr(result.resources, "public_id", "api_test")
       expect(resource).not.to.eql(undefined)
       expect(resource.type).to.eql("upload")
@@ -37,9 +41,11 @@ describe "api", ->
   it "should allow listing resources with cursor", (done) ->
     @timeout 10000
     cloudinary.api.resources((result) ->      
+      return done(new Error result.error.message) if result.error?
       expect(result.resources).to.have.length 1
       expect(result.next_cursor).not.to.eql(undefined)
       cloudinary.api.resources((result2) ->      
+        return done(new Error result.error.message) if result.error?
         expect(result2.resources).to.have.length 1
         expect(result2.next_cursor).not.to.eql(undefined)
         expect(result.resources[0].public_id).not.to.eql result2.resources[0].public_id
@@ -50,6 +56,7 @@ describe "api", ->
   it "should allow listing resources by type", (done) ->
     @timeout 10000
     cloudinary.api.resources (result) ->
+      return done(new Error result.error.message) if result.error?
       resource = find_by_attr(result.resources, "public_id", "api_test")
       expect(resource).not.to.eql(undefined)
       expect(resource.type).to.eql("upload")
@@ -69,6 +76,7 @@ describe "api", ->
   it "should allow listing resources by tag", (done) ->
     @timeout 10000
     cloudinary.api.resources_by_tag "api_test_tag", (result) ->
+      return done(new Error result.error.message) if result.error?
       resource = find_by_attr(result.resources, "public_id", "api_test")
       expect(resource).not.to.eql(undefined)
       expect(resource.type).to.eql("upload")
@@ -118,12 +126,14 @@ describe "api", ->
   it "should allow listing tags", (done) ->
     @timeout 10000
     cloudinary.api.tags (result) ->
+      return done(new Error result.error.message) if result.error?
       expect(result.tags).to.contain("api_test_tag")
       done()
 
   it "should allow listing tag by prefix ", (done) ->
     @timeout 10000
     cloudinary.api.tags (result) ->
+      return done(new Error result.error.message) if result.error?
       expect(result.tags).to.contain("api_test_tag")
       done()
     , prefix: "api_test"
@@ -131,6 +141,7 @@ describe "api", ->
   it "should allow listing tag by prefix if not found", (done) ->
     @timeout 10000
     cloudinary.api.tags (result) ->
+      return done(new Error result.error.message) if result.error?
       expect(result.tags).to.have.length 0
       done()
     , prefix: "api_test_no_such_tag"
@@ -138,6 +149,7 @@ describe "api", ->
   it "should allow listing transformations", (done) ->
     @timeout 10000
     cloudinary.api.transformations (result) ->
+      return done(new Error result.error.message) if result.error?
       transformation = find_by_attr(result.transformations, "name", "c_scale,w_100")
       expect(transformation).not.to.eql(undefined)
       expect(transformation.used).to.be.ok
