@@ -281,3 +281,17 @@ describe "cloudinary", ->
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://a2.hello.com/test123/image/upload/test"
+
+  it "should support border", ->
+    options = border: {width: 5}
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/bo_5px_solid_black/test"
+    options = border: {width: 5, color: "#ffaabbdd"}
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/bo_5px_solid_rgb:ffaabbdd/test"
+    options = border: "1px_solid_blue"
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/bo_1px_solid_blue/test"

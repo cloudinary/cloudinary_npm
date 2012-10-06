@@ -56,6 +56,11 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     base_transformations = []
   effect = option_consume(options, "effect")
   effect = effect.join(":") if _.isArray(effect)
+
+  border = option_consume(options, "border")
+  if _.isObject(border)
+    border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
+
   params =
     c: crop
     t: named_transformation
@@ -64,6 +69,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     b: background
     e: effect
     a: angle
+    bo: border
 
   simple_params =
     x: "x"
@@ -78,6 +84,8 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     fetch_format: "f"
     density: "dn"
     page: "pg"
+    color_space: "cs"
+    delay: "dl"
 
   for param, short of simple_params
     params[short] = option_consume(options, param)
