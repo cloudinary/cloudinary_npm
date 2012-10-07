@@ -32,8 +32,9 @@ exports.delete_resources = (public_ids, callback, options={}) ->
   uri = ["resources", resource_type, type]
   call_api("delete", uri, {"public_ids[]": public_ids}, callback, options)      
 
-exports.delete_resources_by_prefix = (type, prefix, callback, options={}) ->
+exports.delete_resources_by_prefix = (prefix, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"    
   uri = ["resources", resource_type, type]
   call_api("delete", uri, {prefix: prefix}, callback, options)
 
