@@ -123,6 +123,33 @@ describe "api", ->
             done()
     , public_id: "api_test3")
 
+  it "should allow deleting resources by prefix", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload("test/logo.png", (r) ->
+      return done(new Error r.error.message) if r.error?
+      cloudinary.api.resource "api_test_by_prefix", (resource) ->
+        expect(resource).not.to.eql(undefined)
+        cloudinary.api.delete_resources_by_prefix "api_test_by", () ->
+          cloudinary.api.resource "api_test_by_prefix", (result) ->
+            expect(result.error).not.to.be undefined
+            expect(result.error.http_code).to.eql 404
+            done()
+    , public_id: "api_test_by_prefix")
+
+  it "should allow deleting resources by tags", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload("test/logo.png", (r) ->
+      return done(new Error r.error.message) if r.error?
+      cloudinary.api.resource "api_test4", (resource) ->
+        expect(resource).not.to.eql(undefined)
+        cloudinary.api.delete_resources_by_tag "api_test_tag_for_delete", (rr) ->
+          return done(new Error rr.error.message) if rr.error?
+          cloudinary.api.resource "api_test4", (result) ->
+            expect(result.error).not.to.be undefined
+            expect(result.error.http_code).to.eql 404
+            done()
+    , public_id: "api_test4", tags: ["api_test_tag_for_delete"])
+
   it "should allow listing tags", (done) ->
     @timeout 10000
     cloudinary.api.tags (result) ->

@@ -30,13 +30,18 @@ exports.delete_resources = (public_ids, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"    
   uri = ["resources", resource_type, type]
-  call_api("delete", uri, {"public_ids[]": public_ids}, callback, options)      
+  call_api("delete", uri, _.extend({"public_ids[]": public_ids}, only(options, "keep_original")), callback, options)      
 
 exports.delete_resources_by_prefix = (prefix, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"    
   uri = ["resources", resource_type, type]
-  call_api("delete", uri, {prefix: prefix}, callback, options)
+  call_api("delete", uri, _.extend({prefix: prefix}, only(options, "keep_original")), callback, options)
+
+exports.delete_resources_by_tag = (tag, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  uri = ["resources", resource_type, "tags", tag]
+  call_api("delete", uri, only(options, "keep_original"), callback, options)    
 
 exports.delete_derived_resources = (derived_resource_ids, callback, options={}) ->
   uri = ["derived_resources"]
