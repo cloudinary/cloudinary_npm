@@ -295,3 +295,13 @@ describe "cloudinary", ->
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/bo_1px_solid_blue/test"
+
+  it "should support flags", ->
+    options = flags: "abc"
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/fl_abc/test"
+    options = flags: ["abc", "def"]
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/fl_abc.def/test"

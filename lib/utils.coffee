@@ -60,6 +60,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   border = option_consume(options, "border")
   if _.isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
+  flags = build_array(option_consume(options, "flags")).join(".")
 
   params =
     c: crop
@@ -70,6 +71,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     e: effect
     a: angle
     bo: border
+    fl: flags
 
   simple_params =
     x: "x"
