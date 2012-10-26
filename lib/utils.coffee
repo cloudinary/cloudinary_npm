@@ -39,7 +39,6 @@ exports.generate_transformation_string = generate_transformation_string = (optio
 
   delete options["width"] if width and (no_html_sizes or parseFloat(width) < 1)
   delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
-  width = height = undefined if not crop and not has_layer
   background = option_consume(options, "background")
   background = background and background.replace(/^#/, "rgb:")
   base_transformations = build_array(option_consume(options, "transformation", []))

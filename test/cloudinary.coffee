@@ -27,7 +27,7 @@ describe "cloudinary", ->
       height: 100
 
     result = cloudinary.utils.url("test", options)
-    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/test"
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/h_100,w_100/test"
     expect(options).to.eql
       width: 100
       height: 100
