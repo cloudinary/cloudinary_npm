@@ -2,7 +2,7 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "homepage": "http://cloudinary.com",
   "repository": {
     "type": "git",
