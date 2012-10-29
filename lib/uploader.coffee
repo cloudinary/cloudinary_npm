@@ -44,30 +44,12 @@ build_upload_params = (options) ->
   params
  
 exports.upload_stream = (callback, options={}) ->
-  temp_filename = temp.path()
-  temp_file = fs.createWriteStream temp_filename,
-    flags: 'w',
-    encoding: 'binary',
-    mode: 0o600 
-
-  stream = 
-    write: (data) ->
-      temp_file.write(new Buffer(data, 'binary'))
-    end: ->
-      temp_file.end()
-      finish = (result) ->
-        fs.unlink(temp_filename)
-        callback.call(null, result)
-      try 
-        exports.upload(temp_filename, finish, options)
-      catch e 
-        finish(error: {message: e})
-  stream
+  exports.upload(null, callback, _.extend({stream: true}, options))
 
 exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
-    if file.match(/^https?:/)
+    if file? && file.match(/^https?:/)
       return [params, file: file]
     else 
       return [params, {}, file]
@@ -149,19 +131,13 @@ call_api = (action, callback, options, get_params) ->
       callback(error: {message: "Server returned unexpected status code - #{res.statusCode}"})
 
   post_data = (new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') for key, value of params when utils.present(value))
-  post api_url, post_data, boundary, file, handle_response
-  true
+  post api_url, post_data, boundary, file, handle_response, options.stream
   
-post = (url, post_data, boundary, file, callback) ->
+post = (url, post_data, boundary, file, callback, stream) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
-  length = 0
-  for i in [0..post_data.length-1]
-    length += post_data[i].length
-  length += finish_buffer.length
-  if file?
-    file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', path.basename(file)), 'binary')
-    length += file_header.length + 2
-    length += fs.statSync(file).size 
+  if file? || stream
+    filename = stream ? "file" : path.basename(file) 
+    file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary')
 
   post_options = require('url').parse(url)
   post_options = _.extend post_options,
@@ -170,7 +146,6 @@ post = (url, post_data, boundary, file, callback) ->
     method: 'POST',
     headers: 
       'Content-Type': 'multipart/form-data; boundary=' + boundary,
-      'Content-Length': length
 
   post_request = https.request(post_options, callback)
   post_request.setTimeout 60
@@ -182,7 +157,16 @@ post = (url, post_data, boundary, file, callback) ->
     post_request.write(finish_buffer)
     post_request.end()
 
-  if file?
+  if stream
+    post_request.write(file_header)
+    return {
+      write: (data) ->
+        post_request.write(new Buffer(data, 'binary'))
+      end: ->
+        post_request.write(new Buffer("\r\n", 'ascii'))
+        done()        
+    }
+  else if file?
     post_request.write(file_header)
     file_reader = fs.createReadStream(file, {encoding: 'binary'});
     file_reader.on 'data', (data) -> post_request.write(new Buffer(data, 'binary'))
@@ -191,6 +175,7 @@ post = (url, post_data, boundary, file, callback) ->
       done()
   else
     done()
+  true
 
 EncodeFieldPart = (boundary, name, value) ->
   return_part = "--#{boundary}\r\n";

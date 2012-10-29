@@ -4,13 +4,14 @@ module.exports = (new_config, new_value) ->
   if !cloudinary_config? || new_config == true
     cloudinary_url = process.env.CLOUDINARY_URL
     if cloudinary_url?
-      uri = require('url').parse(cloudinary_url)
+      uri = require('url').parse(cloudinary_url, true)
       cloudinary_config =
         cloud_name: uri.host,
         api_key: uri.auth and uri.auth.split(":")[0],
         api_secret: uri.auth and uri.auth.split(":")[1],
         private_cdn: uri.path?,
         secure_distribution: uri.path and uri.path.substring(1)
+      _.extend(cloudinary_config, uri.query) if uri.query?
     else
       cloudinary_config = {}
   if not _.isUndefined(new_value)
