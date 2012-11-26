@@ -70,7 +70,7 @@ exports.upload_stream = (callback, options={}) ->
 exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
-    if file.match(/^https?:/)
+    if file.match(/^https?:/) || file.match(/^data:image\/\w*;base64,([a-zA-Z0-9\/+\n=]+)$/)
       return [params, file: file]
     else 
       return [params, {}, file]
