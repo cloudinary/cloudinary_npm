@@ -24,7 +24,7 @@ exports.resource = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type, public_id]
-  call_api("get", uri, only(options, "exif", "colors", "faces", "max_results"), callback, options)
+  call_api("get", uri, only(options, "exif", "colors", "faces", "pages", "max_results"), callback, options)
 
 exports.delete_resources = (public_ids, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
