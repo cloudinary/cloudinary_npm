@@ -152,10 +152,10 @@ call_api = (action, callback, options, get_params) ->
       callback(error: {message: "Server returned unexpected status code - #{res.statusCode}"})
 
   post_data = (new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') for key, value of params when utils.present(value))
-  post api_url, post_data, boundary, file, handle_response
+  post api_url, post_data, boundary, file, handle_response, options
   true
   
-post = (url, post_data, boundary, file, callback) ->
+post = (url, post_data, boundary, file, callback, options) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
   length = 0
   for i in [0..post_data.length-1]
@@ -176,7 +176,8 @@ post = (url, post_data, boundary, file, callback) ->
       'Content-Length': length
 
   post_request = https.request(post_options, callback)
-  post_request.setTimeout 60
+  post_request.on "error", (e) -> callback(error: e)
+  post_request.setTimeout options["timeout"] ? 60
 
   for i in [0..post_data.length-1]
     post_request.write(post_data[i])

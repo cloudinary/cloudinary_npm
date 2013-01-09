@@ -112,7 +112,8 @@ call_api = (method, uri, params, callback, options) ->
       callback(error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode})
     
   request = https.request(request_options, handle_response)
-  request.setTimeout 60
+  request.on "error", (e) -> callback(error: e)
+  request.setTimeout options["timeout"] ? 60
   
   if method != "get"
     request.write(query_params)
