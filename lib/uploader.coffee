@@ -51,20 +51,22 @@ exports.upload_stream = (callback, options={}) ->
   temp_file = fs.createWriteStream temp_filename,
     flags: 'w',
     encoding: 'binary',
-    mode: 0o600 
+    mode: 0o600
 
-  stream = 
+  stream =
     write: (data) ->
       temp_file.write(new Buffer(data, 'binary'))
     end: ->
+      temp_file.on "close", ->
+        try
+          exports.upload temp_filename, finish, options
+        catch e
+          finish(error: {message: e})
       temp_file.end()
+
       finish = (result) ->
         fs.unlink(temp_filename)
         callback.call(null, result)
-      try 
-        exports.upload(temp_filename, finish, options)
-      catch e 
-        finish(error: {message: e})
   stream
 
 exports.upload = (file, callback, options={}) ->
