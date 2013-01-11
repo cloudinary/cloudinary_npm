@@ -144,8 +144,11 @@ call_api = (action, callback, options, get_params) ->
       res.on "data", (d) -> buffer += d
       res.on "end", ->
         return if error
-        result = JSON.parse(buffer)
-        result["error"]["http_code"] = res.statusCode if result["error"]
+        try
+          result = JSON.parse(buffer)
+          result["error"]["http_code"] = res.statusCode if result["error"]
+        catch e
+          error = true
         callback(result)
       res.on "error", (e) ->
         error = true
