@@ -10,9 +10,9 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
-    "coffee-script": "",
-    "underscore": "",
-    "temp": ""
+    "coffee-script": "1.4.x",
+    "underscore": "1.4.x",
+    "temp": "0.4.x"
   },
   "devDependencies": {
     "mocha": "",
