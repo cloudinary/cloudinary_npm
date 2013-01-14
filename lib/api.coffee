@@ -97,7 +97,10 @@ call_api = (method, uri, params, callback, options) ->
       res.on "data", (d) -> buffer += d
       res.on "end", ->
         return if error
-        result = JSON.parse(buffer)
+        try
+          result = JSON.parse(buffer)
+        catch e
+          result = {error: {message: "Server return invalid JSON response. Status Code #{res.statusCode}"}}
         if result["error"]
           result["error"]["http_code"] = res.statusCode
         else

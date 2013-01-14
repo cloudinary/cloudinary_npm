@@ -146,9 +146,9 @@ call_api = (action, callback, options, get_params) ->
         return if error
         try
           result = JSON.parse(buffer)
-          result["error"]["http_code"] = res.statusCode if result["error"]
         catch e
-          error = true
+          result = {error: {message: "Server return invalid JSON response. Status Code #{res.statusCode}"}}
+        result["error"]["http_code"] = res.statusCode if result["error"]
         callback(result)
       res.on "error", (e) ->
         error = true
