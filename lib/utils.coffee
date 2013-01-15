@@ -87,6 +87,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     page: "pg"
     color_space: "cs"
     delay: "dl"
+    opacity: "o"
 
   for param, short of simple_params
     params[short] = option_consume(options, param)
