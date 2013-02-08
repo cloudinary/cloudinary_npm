@@ -234,4 +234,10 @@ describe "api", ->
           expect(transformation.error.http_code).to.eql 404
           done()
 
+  it "should support the usage API call", (done) ->
+    @timeout 10000
+    cloudinary.api.usage (usage) ->
+      expect(usage.last_update).not.to.eql null
+      done()
+
 

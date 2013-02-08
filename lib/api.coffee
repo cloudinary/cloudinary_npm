@@ -5,6 +5,9 @@ config = require("./config")
 querystring = require("querystring")
 
 
+exports.usage = (callback, options={}) ->
+  call_api("get", ["usage"], {}, callback, options)
+
 exports.resource_types = (callback, options={}) ->
   call_api("get", ["resources"], {}, callback, options)
 
