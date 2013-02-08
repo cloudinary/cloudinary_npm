@@ -39,6 +39,7 @@ build_upload_params = (options) ->
     backup: options.backup,
     faces: options.faces,
     exif: options.exif,
+    image_metadata: options.image_metadata,
     colors: options.colors,
     type: options.type,
     eager: build_eager(options.eager),
