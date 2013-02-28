@@ -44,6 +44,10 @@ build_upload_params = (options) ->
     type: options.type,
     eager: build_eager(options.eager),
     headers: build_custom_headers(options.headers),
+    use_filename: options.use_filename, 
+    notification_url: options.notification_url,
+    eager_notification_url: options.eager_notification_url,
+    eager_async: options.eager_async,
     tags: options.tags ? utils.build_array(options.tags).join(",")
   params
  
@@ -105,7 +109,17 @@ exports.text = (text, callback, options={}) ->
 exports.generate_sprite = (tag, callback, options={}) ->
   call_api "sprite", callback, options, ->
     transformation = utils.generate_transformation_string(_.extend(options, fetch_format: options.format))
-    return [{timestamp: timestamp(), tag: tag, transformation: transformation}]
+    return [{timestamp: timestamp(), tag: tag, transformation: transformation, async: options.async, notification_url: options.notification_url}]
+
+exports.multi = (tag, callback, options={}) ->
+  call_api "multi", callback, options, ->
+    transformation = utils.generate_transformation_string(_.extend(options))
+    return [{timestamp: timestamp(), tag: tag, transformation: transformation, format: options.format, async: options.async, notification_url: options.notification_url}]
+
+exports.explode = (public_id, callback, options={}) ->
+  call_api "explode", callback, options, ->
+    transformation = utils.generate_transformation_string(_.extend(options))
+    return [{timestamp: timestamp(), public_id: public_id, transformation: transformation, format: options.format, type: options.type, notification_url: options.notification_url}]
 
 # options may include 'exclusive' (boolean) which causes clearing this tag from all other resources 
 exports.add_tag = (tag, callback, public_ids = [], options = {}) ->
