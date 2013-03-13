@@ -1,5 +1,6 @@
 require('coffee-script');
 var _ = require('underscore');
+
 exports.config = require("./lib/config");
 exports.utils = require("./lib/utils");
 exports.uploader = require("./lib/uploader");
@@ -15,3 +16,6 @@ exports.image = function(source, options) {
   if ("html_height" in options) options["height"] = exports.utils.option_consume(options, "html_height")
   return "<img src='" + source + "' " + exports.utils.html_attrs(options) + "/>";
 }
+exports.CF_SHARED_CDN = exports.utils.CF_SHARED_CDN;
+exports.AKAMAI_SHARED_CDN = exports.utils.AKAMAI_SHARED_CDN;
+exports.SHARED_CDN = exports.utils.SHARED_CDN;

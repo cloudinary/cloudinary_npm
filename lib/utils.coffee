@@ -2,7 +2,9 @@ _ = require("underscore")
 config = require("./config")
 crypto =  require('crypto')
 
-SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
+exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net";
+exports.AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net";
+exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
 
 exports.option_consume = option_consume = (options, option_name, default_value) ->
   result = options[option_name]
@@ -114,17 +116,13 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   secure = option_consume(options, "secure", config().secure)
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   cname = option_consume(options, "cname", config().cname)
-  if secure and not secure_distribution
-    if private_cdn
-      throw "secure_distribution not defined"
-    else
-      secure_distribution = SHARED_CDN
+  secure_distribution ?= exports.SHARED_CDN
+
   if public_id.match(/^https?:/)
     return public_id if type is "upload" or type is "asset"
     public_id = encodeURIComponent(public_id).replace(/%3A/g, ":").replace(/%2F/g, "/") 
   else if format
-    public_id += "." + format
-  
+    public_id += "." + format  
 
   if secure
     prefix = "https://#{secure_distribution}"
@@ -132,7 +130,7 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
     subdomain = (if cdn_subdomain then "a#{(crc32(public_id) % 5) + 1}." else "")
     host = cname ? "#{if private_cdn then "#{cloud_name}-" else ""}res.cloudinary.com"
     prefix = "http://#{subdomain}#{host}"
-  prefix += "/#{cloud_name}" if !private_cdn
+  prefix += "/#{cloud_name}" if !private_cdn || (secure && secure_distribution == exports.AKAMAI_SHARED_CDN)
   url = [ prefix, resource_type, type, transformation, (if version then "v" + version else ""), public_id ].join("/")
   url.replace(/([^:])\/+/g, "$1/")
 
