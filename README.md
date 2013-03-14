@@ -25,19 +25,19 @@ Accessing an uploaded image with the `sample` public ID through a CDN:
 
     http://res.cloudinary.com/demo/image/upload/sample.jpg
 
-![Sample](https://d3jpl91pxevbkh.cloudfront.net/demo/image/upload/w_0.4/sample.jpg "Sample")
+![Sample](https://cloudinary-a.akamaihd.net/demo/image/upload/w_0.4/sample.jpg "Sample")
 
 Generating a 150x100 version of the `sample` image and downloading it through a CDN:
 
     http://res.cloudinary.com/demo/image/upload/w_150,h_100,c_fill/sample.jpg
 
-![Sample 150x100](https://d3jpl91pxevbkh.cloudfront.net/demo/image/upload/w_150,h_100,c_fill/sample.jpg "Sample 150x100")
+![Sample 150x100](https://cloudinary-a.akamaihd.net/demo/image/upload/w_150,h_100,c_fill/sample.jpg "Sample 150x100")
 
 Converting to a 150x100 PNG with rounded corners of 20 pixels: 
 
     http://res.cloudinary.com/demo/image/upload/w_150,h_100,c_fill,r_20/sample.png
 
-![Sample 150x150 Rounded PNG](https://d3jpl91pxevbkh.cloudfront.net/demo/image/upload/w_150,h_100,c_fill,r_20/sample.png "Sample 150x150 Rounded PNG")
+![Sample 150x150 Rounded PNG](https://cloudinary-a.akamaihd.net/demo/image/upload/w_150,h_100,c_fill,r_20/sample.png "Sample 150x150 Rounded PNG")
 
 For plenty more transformation options, see our [image transformations documentation](http://cloudinary.com/documentation/image_transformations).
 
@@ -45,7 +45,7 @@ Generating a 120x90 thumbnail based on automatic face detection of the Facebook 
  
     http://res.cloudinary.com/demo/image/facebook/c_thumb,g_face,h_90,w_120/billclinton.jpg
     
-![Facebook 90x120](https://d3jpl91pxevbkh.cloudfront.net/demo/image/facebook/c_thumb,g_face,h_90,w_120/billclinton.jpg "Facebook 90x200")
+![Facebook 90x120](https://cloudinary-a.akamaihd.net/demo/image/facebook/c_thumb,g_face,h_90,w_120/billclinton.jpg "Facebook 90x200")
 
 For more details, see our documentation for embedding [Facebook](http://cloudinary.com/documentation/facebook_profile_pictures) and [Twitter](http://cloudinary.com/documentation/twitter_profile_pictures) profile pictures. 
 
@@ -101,7 +101,7 @@ Below is an example of an upload's result:
  	  format: 'jpg',
  	  resource_type: 'image',
  	  url: 'http://res.cloudinary.com/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg',
- 	  secure_url: 'https://d3jpl91pxevbkh.cloudfront.net/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg' } 
+ 	  secure_url: 'https://cloudinary-a.akamaihd.net/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg' } 
         
 The uploaded image is assigned a randomly generated public ID. The image is immediately available for download through a CDN:
 
