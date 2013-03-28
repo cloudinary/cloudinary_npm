@@ -9,8 +9,11 @@ module.exports = (new_config, new_value) ->
         cloud_name: uri.host,
         api_key: uri.auth and uri.auth.split(":")[0],
         api_secret: uri.auth and uri.auth.split(":")[1],
-        private_cdn: uri.path?,
-        secure_distribution: uri.path and uri.path.substring(1)
+        private_cdn: uri.pathname?,
+        secure_distribution: uri.pathname and uri.pathname.substring(1)
+      if uri.query?        
+        for k, v of require("querystring").parse(uri.query)
+          cloudinary_config[k] = v
     else
       cloudinary_config = {}
   if not _.isUndefined(new_value)
