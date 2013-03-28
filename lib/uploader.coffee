@@ -122,20 +122,20 @@ exports.explode = (public_id, callback, options={}) ->
     return [{timestamp: timestamp(), public_id: public_id, transformation: transformation, format: options.format, type: options.type, notification_url: options.notification_url}]
 
 # options may include 'exclusive' (boolean) which causes clearing this tag from all other resources 
-exports.add_tag = (tag, callback, public_ids = [], options = {}) ->
+exports.add_tag = (tag, public_ids = [], callback, options = {}) ->
   exclusive = utils.option_consume("exclusive", options)
   command = if exclusive then "set_exclusive" else "add"
-  call_tags_api(tag, command, callback, public_ids, options)
+  call_tags_api(tag, command, public_ids, callback, options)
 
-exports.remove_tag = (tag, callback, public_ids = [], options = {}) ->
-  call_tags_api(tag, "remove", callback, public_ids, options)
+exports.remove_tag = (tag, public_ids = [], callback, options = {}) ->
+  call_tags_api(tag, "remove", public_ids, callback, options)
 
-exports.replace_tag = (tag, callback, public_ids = [], options = {}) ->
-  call_tags_api(tag, "replace", callback, public_ids, options)
+exports.replace_tag = (tag, public_ids = [], callback, options = {}) ->
+  call_tags_api(tag, "replace", public_ids, callback, options)
 
-call_tags_api = (tag, command, callback, public_ids = [], options = {}) ->
+call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
   call_api "tags", callback, options, ->
-    return [{timestamp: timestamp, tag: tag, public_ids:  utils.build_array(public_ids), command:  command, type: options.type}]
+    return [{timestamp: timestamp(), tag: tag, public_ids:  utils.build_array(public_ids), command:  command, type: options.type}]
    
 call_api = (action, callback, options, get_params) ->
   options = _.clone(options)
@@ -170,8 +170,13 @@ call_api = (action, callback, options, get_params) ->
         callback(error: e)
     else
       callback(error: {message: "Server returned unexpected status code - #{res.statusCode}"})
-
-  post_data = (new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') for key, value of params when utils.present(value))
+  post_data = []
+  for key, value of params 
+    if _.isArray(value)
+      for v in value 
+        post_data.push new Buffer(EncodeFieldPart(boundary, key+"[]", v), 'ascii')
+    else if utils.present(value)
+      post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') 
   post api_url, post_data, boundary, file, handle_response, options
   true
   

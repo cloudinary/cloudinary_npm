@@ -76,4 +76,24 @@ describe "uploader", ->
     file_reader = fs.createReadStream('test/logo.png', {encoding: 'binary'});
     file_reader.on 'data', stream.write
     file_reader.on 'end', stream.end
- 
+
+  it "should successfully manipulate tags", (done) ->
+    this.timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (result1) ->
+      cloudinary.uploader.upload "test/logo.png", (result2) ->
+        return done(new Error result1.error.message) if result1.error?
+        cloudinary.uploader.add_tag "tag1", [result1.public_id, result2.public_id], (rt1) ->
+          return done(new Error rt1.error.message) if rt1.error?
+          cloudinary.api.resource result2.public_id, (r1) -> 
+            expect(r1.tags).to.eql(["tag1"])
+          cloudinary.uploader.add_tag "tag2", result1.public_id, ->
+            cloudinary.api.resource result1.public_id, (r1) -> 
+              expect(r1.tags).to.eql(["tag1", "tag2"])
+              cloudinary.uploader.remove_tag "tag1", result1.public_id, ->
+                cloudinary.api.resource result1.public_id, (r2) -> 
+                  expect(r2.tags).to.eql(["tag2"])
+                  cloudinary.uploader.replace_tag "tag3", result1.public_id, ->
+                    cloudinary.api.resource result1.public_id, (r3) -> 
+                      expect(r3.tags).to.eql(["tag3"])
+                      done()
+   
