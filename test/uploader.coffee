@@ -30,6 +30,23 @@ describe "uploader", ->
       expect(result.signature).to.eql(expected_signature)
       done()
 
+  it "should successfully rename a file", (done) ->
+    this.timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      cloudinary.uploader.rename result.public_id, result.public_id+"2", (r1) ->
+        return done(new Error r1.error.message) if r1.error?
+        cloudinary.api.resource result.public_id+"2", (r2) ->
+          expect(r2.error).to.be undefined
+          cloudinary.uploader.upload "test/favicon.ico", (result2) ->
+            cloudinary.uploader.rename result2.public_id, result.public_id+"2", (r3) ->
+              expect(r3.error).not.to.be undefined
+              cloudinary.uploader.rename result2.public_id, result.public_id+"2", (r4) ->
+                cloudinary.api.resource result.public_id+"2", (r5) ->
+                  expect(r5.format).to.eql "ico"
+                  done()
+              , overwrite: true
+  
   it "should successfully call explicit api", (done) ->
     this.timeout 5000
     cloudinary.uploader.explicit "cloudinary", (result) ->
