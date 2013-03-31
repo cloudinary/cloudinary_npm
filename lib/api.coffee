@@ -69,7 +69,9 @@ exports.delete_transformation = (transformation, callback, options={}) ->
 # updates - currently only supported update is the "allowed_for_strict" boolean flag
 exports.update_transformation = (transformation, updates, callback, options={}) ->
   uri = ["transformations", transformation_string(transformation)]
-  call_api("put", uri, only(updates, "allowed_for_strict"), callback, options)
+  params = only(updates, "allowed_for_strict")
+  params.unsafe_update = transformation_string(updates.unsafe_update) if updates.unsafe_update?
+  call_api("put", uri, params, callback, options)
 
 exports.create_transformation = (name, definition, callback, options={}) ->
   uri = ["transformations", name]
