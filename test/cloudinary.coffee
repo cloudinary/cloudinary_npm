@@ -324,3 +324,14 @@ describe "cloudinary", ->
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/fl_abc.def/test"
+
+  it "should add version if public_id contains /", ->
+    result = cloudinary.utils.url("folder/test")
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/v1/folder/test"
+    result = cloudinary.utils.url("folder/test", version: 123)
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/v123/folder/test"
+
+  it "should not add version if public_id contains version already", ->
+    result = cloudinary.utils.url("v1234/test")
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/v1234/test"
+

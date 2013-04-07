@@ -131,6 +131,9 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
     host = cname ? "#{if private_cdn then "#{cloud_name}-" else ""}res.cloudinary.com"
     prefix = "http://#{subdomain}#{host}"
   prefix += "/#{cloud_name}" if !private_cdn || (secure && secure_distribution == exports.AKAMAI_SHARED_CDN)
+
+  version ?= 1 if public_id.search("/") >= 0 && !public_id.match(/^v[0-9]+/) && !public_id.match(/^https?:\//)
+  
   url = [ prefix, resource_type, type, transformation, (if version then "v" + version else ""), public_id ].join("/")
   url.replace(/([^:])\/+/g, "$1/")
 
