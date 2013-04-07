@@ -94,7 +94,7 @@ exports.explicit = (public_id, callback, options={}) ->
     
 exports.destroy = (public_id, callback, options={}) ->
   call_api "destroy", callback, options, ->
-    return [timestamp: utils.timestamp(), type: options.type, invalidate: options.invalidate, public_id:  public_id]
+    return [timestamp: utils.timestamp(), type: options.type, invalidate: options.invalidate,public_id:  public_id]
 
 exports.rename = (from_public_id, to_public_id, callback, options={}) ->
   call_api "rename", callback, options, ->
