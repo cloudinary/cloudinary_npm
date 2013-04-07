@@ -46,7 +46,7 @@ build_upload_params = (options) ->
     eager_notification_url: options.eager_notification_url,
     eager_async: options.eager_async,
     invalidate: options.invalidate,
-    tags: options.tags ? utils.build_array(options.tags).join(",")
+    tags: options.tags && utils.build_array(options.tags).join(",")
   params
  
 exports.upload_stream = (callback, options={}) ->
