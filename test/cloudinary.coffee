@@ -335,3 +335,6 @@ describe "cloudinary", ->
     result = cloudinary.utils.url("v1234/test")
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/v1234/test"
 
+  it "should allow to shorted image/upload urls", ->
+    result = cloudinary.utils.url("test", shorten: true)
+    expect(result).to.eql "http://res.cloudinary.com/test123/iu/test"

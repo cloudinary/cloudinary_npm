@@ -116,6 +116,7 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   secure = option_consume(options, "secure", config().secure)
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   cname = option_consume(options, "cname", config().cname)
+  shorten = option_consume(options, "shorten", config().shorten)
   secure_distribution ?= exports.SHARED_CDN
 
   if public_id.match(/^https?:/)
@@ -131,6 +132,10 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
     host = cname ? "#{if private_cdn then "#{cloud_name}-" else ""}res.cloudinary.com"
     prefix = "http://#{subdomain}#{host}"
   prefix += "/#{cloud_name}" if !private_cdn || (secure && secure_distribution == exports.AKAMAI_SHARED_CDN)
+
+  if shorten && resource_type == "image" && type == "upload"
+    resource_type = "iu"
+    type = undefined
 
   version ?= 1 if public_id.search("/") >= 0 && !public_id.match(/^v[0-9]+/) && !public_id.match(/^https?:\//)
   
