@@ -1,10 +1,14 @@
 _ = require("underscore")
 config = require("./config")
 crypto =  require('crypto')
+querystring = require('querystring')
 
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net";
 exports.AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net";
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
+
+exports.timestamp = ->
+  Math.floor(new Date().getTime()/1000)
 
 exports.option_consume = option_consume = (options, option_name, default_value) ->
   result = options[option_name]
@@ -232,6 +236,27 @@ exports.api_sign_request = (params_to_sign, api_secret) ->
   shasum = crypto.createHash('sha1')
   shasum.update(to_sign + api_secret)
   shasum.digest('hex')
+
+exports.private_download_url = (public_id, format, options = {}) ->
+  api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
+  api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
+
+  params = {
+    timestamp: exports.timestamp(), 
+    public_id: public_id, 
+    format: format, 
+    type: options.type,
+    attachment: options.attachment, 
+    expires_at: options.expires_at
+  }
+  # Remove blank parameters
+  for k, v of params when not exports.present(v)
+    delete params[k]
+    
+  params.signature = exports.api_sign_request(params, api_secret)
+  params.api_key = api_key
+
+  return exports.api_url("download", options) + "?" + querystring.stringify(params)
 
 exports.html_attrs = (options) ->
   keys = _.sortBy(_.keys(options), _.identity)
