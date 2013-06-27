@@ -262,3 +262,13 @@ exports.html_attrs = (options) ->
   keys = _.sortBy(_.keys(options), _.identity)
   ("#{key}='#{options[key]}'" for key in keys when present(options[key])).join(" ")
 
+
+CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain']
+exports.cloudinary_js_config = ->  
+  params = {}
+  for param in CLOUDINARY_JS_CONFIG_PARAMS
+    value = config()[param]
+    params[param] = value if value?
+  "<script type='text/javascript'>\n" +
+      "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
+      "</script>\n";    
