@@ -121,13 +121,10 @@ call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
    
 call_api = (action, callback, options, get_params) ->
   options = _.clone(options)
-  api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
-  api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
 
   [params, unsigned_params, file] = get_params.call()
   
-  params.signature = utils.api_sign_request(params, api_secret)
-  params.api_key = api_key
+  params = utils.sign_request(params, options)
   params = _.extend(params, unsigned_params)
 
   api_url = utils.api_url(action, options)
@@ -216,15 +213,11 @@ EncodeFilePart = (boundary,type,name,filename) ->
   return_part += "Content-Type: #{type}\r\n\r\n";
   return_part
 
-exports.direct_upload = (callback_url, options) ->
+exports.direct_upload = (callback_url, options={}) ->
   params = build_upload_params(_.extend({callback: callback_url}, options))
-  params.signature = utils.api_sign_request(params, config().api_secret)
-  params.api_key = config().api_key
+  params = utils.sign_request(params, options)
 
   api_url = utils.api_url("upload", options)
-
-  for k, v of params when not utils.present(v)
-    delete params[k]
 
   return hidden_fields: params, form_attrs: {action: api_url, method: "POST", enctype: "multipart/form-data"}
 
@@ -234,16 +227,8 @@ exports.image_upload_tag = (field, options={}) ->
   options.resource_type ?= "auto"
   cloudinary_upload_url = utils.api_url("upload", options)
 
-  api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
-  api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
-
   params = build_upload_params(options)
-  params["signature"] = utils.api_sign_request(params, api_secret)
-  params["api_key"] = api_key
-
-  # Remove blank parameters
-  for k, v of params when not utils.present(v)
-    delete params[k]
+  params = utils.sign_request(params, options)
 
   tag_options = _.extend(html_options, {
       type: "file", 
