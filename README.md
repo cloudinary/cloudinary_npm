@@ -11,6 +11,10 @@ Cloudinary provides URL and HTTP based APIs that can be easily integrated with a
 
 For Node.js, Cloudinary provides an extension for simplifying the integration even further.
 
+## Getting started guide
+![](http://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png)  **Take a look at our [Getting started guide for Node.js](http://cloudinary.com/documentation/node_integration#getting_started_guide)**.
+
+
 ## Setup ######################################################################
 
 npm install cloudinary
@@ -81,6 +85,8 @@ Same goes for Twitter:
 
     cloudinary.url("billclinton.jpg", {type: "twitter_name"})
 
+![](http://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](http://cloudinary.com/documentation/node_image_manipulation) for more information about displaying and transforming images in Node.js**.                                         
+
 ### Upload
 
 Assuming you have your Cloudinary configuration parameters defined (`cloud_name`, `api_key`, `api_secret`), uploading to Cloudinary is very simple.
@@ -116,7 +122,9 @@ You can also specify your own public ID:
     cloudinary.url("sample_remote.jpg")
 
     http://res.cloudinary.com/demo/image/upload/sample_remote.jpg
-        
+
+![](http://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](http://cloudinary.com/documentation/node_image_upload) for plenty more options of uploading to the cloud from your Node.js code or directly from the browser**.
+
 ### cloudinary.upload_stream
 
 You can use cloudinary.upload_stream to write to the uploader as a stream:
@@ -135,22 +143,26 @@ Usage:
 
     // <img src='http://res.cloudinary.com/demo/image/upload/c_fill,h_100,w_100/sample.png' height='100' width='100'/>
 
+
 ## Additional resources ##########################################################
 
 Additional resources are available at:
 
 * [Website](http://cloudinary.com)
 * [Documentation](http://cloudinary.com/documentation)
+* [Knowledge Base](http://support.cloudinary.com/forums) 
+* [Documentation for Node.js integration](http://cloudinary.com/documentation/node_integration)
+* [Node.js image upload documentation](http://cloudinary.com/documentation/node_image_upload)
+* [Node.js image manipulation documentation](http://cloudinary.com/documentation/node_image_manipulation)
 * [Image transformations documentation](http://cloudinary.com/documentation/image_transformations)
-* [Upload API documentation](http://cloudinary.com/documentation/upload_images)
 
 ## Support
 
 You can [open an issue through GitHub](https://github.com/cloudinary/cloudinary_npm/issues).
 
-Contact us at [info@cloudinary.com](mailto:info@cloudinary.com)
+Contact us [http://cloudinary.com/contact](http://cloudinary.com/contact)
 
-Or via Twitter: [@cloudinary](https://twitter.com/#!/cloudinary)
+Stay tuned for updates, tips and tutorials: [Blog](http://cloudinary.com/blog), [Twitter](https://twitter.com/cloudinary), [Facebook](http://www.facebook.com/Cloudinary).
 
 ## License #######################################################################
 
