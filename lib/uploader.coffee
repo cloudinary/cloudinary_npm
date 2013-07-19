@@ -132,7 +132,9 @@ call_api = (action, callback, options, get_params) ->
   boundary = utils.random_public_id()
 
   handle_response = (res) ->
-    if _.include([200,400,401,500], res.statusCode)
+    if res.error
+      callback(res)
+    else if _.include([200,400,401,404,420,500], res.statusCode)
       buffer = ""
       error = false
       res.on "data", (d) -> buffer += d
@@ -171,8 +173,15 @@ post = (url, post_data, boundary, file, callback, options) ->
       'Content-Type': 'multipart/form-data; boundary=' + boundary
 
   post_request = https.request(post_options, callback)
-  post_request.on "error", (e) -> callback(error: e)
-  post_request.setTimeout options.timeout ? 60
+  timeout = false
+  post_request.on "error", (e) -> 
+    if timeout
+      callback(error: {message: "Request Timeout", http_code: 499})
+    else
+      callback(error: e)
+  post_request.setTimeout options.timeout ? 60000, -> 
+    timeout = true
+    post_request.abort()
 
   for i in [0..post_data.length-1]
     post_request.write(post_data[i])

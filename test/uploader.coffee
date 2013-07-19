@@ -114,3 +114,12 @@ describe "uploader", ->
                       expect(r3.tags).to.eql(["tag3"])
                       done()
    
+  it "should support timeouts", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "http://cloudinary.com/images/logo.png", (result) ->
+      expect(result.error.http_code).to.eql(499)
+      expect(result.error.message).to.eql("Request Timeout")
+      done()
+    , timeout: 1 # 1ms, nobody is that fast.
+    
+  
