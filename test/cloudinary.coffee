@@ -21,11 +21,17 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/test.jpg"
 
+  it "should use default secure distribution if secure=true", ->
+    options = secure: true
+    result = cloudinary.utils.url("test", options)
+    expect(options).to.eql {}
+    expect(result).to.eql "https://res.cloudinary.com/test123/image/upload/test"
+
   it "should default to akamai if secure is given with private_cdn and no secure_distribution", ->
     options = secure: true, private_cdn: true
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
-    expect(result).to.eql "https://cloudinary-a.akamaihd.net/test123/image/upload/test"
+    expect(result).to.eql "https://test123-res.cloudinary.com/image/upload/test"
 
   it "should not add cloud_name if secure private_cdn and secure non akamai secure_distribution", ->
     options = secure: true, private_cdn: true, secure_distribution: "something.cloudfront.net"
