@@ -5,6 +5,9 @@ config = require("./config")
 querystring = require("querystring")
 
 
+exports.ping = (callback, options={}) ->
+  call_api("get", ["ping"], {}, callback, options)
+
 exports.usage = (callback, options={}) ->
   call_api("get", ["usage"], {}, callback, options)
 
