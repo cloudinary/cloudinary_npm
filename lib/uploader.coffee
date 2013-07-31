@@ -46,6 +46,8 @@ build_upload_params = (options) ->
     eager_notification_url: options.eager_notification_url,
     eager_async: options.eager_async,
     invalidate: options.invalidate,
+    proxy: options.proxy,
+    folder: options.folder,
     tags: options.tags && utils.build_array(options.tags).join(",")
   params
  
