@@ -232,20 +232,23 @@ exports.direct_upload = (callback_url, options={}) ->
 
   return hidden_fields: params, form_attrs: {action: api_url, method: "POST", enctype: "multipart/form-data"}
 
+exports.upload_tag_params = (options={}) ->
+  params = build_upload_params(options)
+  params = utils.sign_request(params, options)
+  JSON.stringify(params)
+  
+exports.upload_url = (options={}) ->
+  options.resource_type ?= "auto"
+  utils.api_url("upload", options)
 
 exports.image_upload_tag = (field, options={}) ->
   html_options = options.html ? {}
-  options.resource_type ?= "auto"
-  cloudinary_upload_url = utils.api_url("upload", options)
-
-  params = build_upload_params(options)
-  params = utils.sign_request(params, options)
 
   tag_options = _.extend(html_options, {
       type: "file", 
       name: "file",
-      "data-url": cloudinary_upload_url,
-      "data-form-data": JSON.stringify(params),
+      "data-url": exports.upload_url(options),
+      "data-form-data": exports.upload_tag_params(options),
       "data-cloudinary-field": field,
       "class": [html_options["class"], "cloudinary-fileupload"].join(" ") 
   })
