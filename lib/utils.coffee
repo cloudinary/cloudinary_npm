@@ -126,8 +126,9 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   if public_id.match(/^https?:/)
     return public_id if type is "upload" or type is "asset"
     public_id = encodeURIComponent(public_id).replace(/%3A/g, ":").replace(/%2F/g, "/") 
-  else if format
-    public_id += "." + format  
+  else 
+    public_id = encodeURIComponent(decodeURIComponent(public_id)).replace(/%3A/g, ":").replace(/%2F/g, "/")
+    public_id += "." + format if format  
 
   shared_domain = !private_cdn
   if secure        

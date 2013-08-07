@@ -344,3 +344,14 @@ describe "cloudinary", ->
   it "should allow to shorted image/upload urls", ->
     result = cloudinary.utils.url("test", shorten: true)
     expect(result).to.eql "http://res.cloudinary.com/test123/iu/test"
+
+  it "should escape public_ids", ->
+    tests = {
+        "a b": "a%20b",
+        "a+b": "a%2Bb",
+        "a%20b": "a%20b",
+        "a-b": "a-b",
+        "a??b": "a%3F%3Fb"}
+    for source, target of tests
+      result = cloudinary.utils.url(source)
+      expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target)
