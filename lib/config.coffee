@@ -12,7 +12,7 @@ module.exports = (new_config, new_value) ->
         private_cdn: uri.pathname?,
         secure_distribution: uri.pathname and uri.pathname.substring(1)
       if uri.query?        
-        for k, v of require("querystring").parse(uri.query)
+        for k, v of uri.query
           cloudinary_config[k] = v
     else
       cloudinary_config = {}
