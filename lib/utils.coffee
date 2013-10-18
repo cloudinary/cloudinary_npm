@@ -48,6 +48,8 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
   background = option_consume(options, "background")
   background = background and background.replace(/^#/, "rgb:")
+  color = option_consume(options, "color")
+  color = color and color.replace(/^#/, "rgb:")
   base_transformations = build_array(option_consume(options, "transformation", []))
   named_transformation = []
   if _.filter(base_transformations, _.isObject).length > 0
@@ -74,6 +76,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     w: width
     h: height
     b: background
+    co: color
     e: effect
     a: angle
     bo: border
