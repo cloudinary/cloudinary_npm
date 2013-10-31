@@ -240,7 +240,7 @@ exports.signed_preloaded_image = (result) ->
   "#{result.resource_type}/upload/v#{result.version}/#{_.filter([result.public_id, result.format], present).join(".")}##{result.signature}"
 
 exports.api_sign_request = (params_to_sign, api_secret) ->
-  to_sign = _.sortBy("#{k}=#{build_array(v).join(",")}" for k, v of params_to_sign when v, _.identity).join("&")
+  to_sign = _.sortBy("#{k}=#{build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
   shasum = crypto.createHash('sha1')
   shasum.update(to_sign + api_secret)
   shasum.digest('hex')

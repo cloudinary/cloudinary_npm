@@ -26,30 +26,29 @@ build_custom_headers = (headers) ->
   return headers.join("\n")
 
 build_upload_params = (options) ->
-  params = 
-    timestamp: utils.timestamp(),
-    transformation: utils.generate_transformation_string(options),
-    public_id: options.public_id,
-    callback: options.callback,
-    format: options.format,
-    backup: options.backup,
-    faces: options.faces,
-    exif: options.exif,
-    image_metadata: options.image_metadata,
-    colors: options.colors,
-    type: options.type,
-    eager: build_eager(options.eager),
-    headers: build_custom_headers(options.headers),
-    use_filename: options.use_filename, 
-    discard_original_filename: options.discard_original_filename, 
-    notification_url: options.notification_url,
-    eager_notification_url: options.eager_notification_url,
-    eager_async: options.eager_async,
-    invalidate: options.invalidate,
-    proxy: options.proxy,
-    folder: options.folder,
-    tags: options.tags && utils.build_array(options.tags).join(",")
-  params
+  timestamp: utils.timestamp(),
+  transformation: utils.generate_transformation_string(options),
+  public_id: options.public_id,
+  callback: options.callback,
+  format: options.format,
+  backup: options.backup,
+  faces: options.faces,
+  exif: options.exif,
+  image_metadata: options.image_metadata,
+  colors: options.colors,
+  type: options.type,
+  eager: build_eager(options.eager),
+  headers: build_custom_headers(options.headers),
+  use_filename: options.use_filename, 
+  unique_filename: options.unique_filename, 
+  discard_original_filename: options.discard_original_filename, 
+  notification_url: options.notification_url,
+  eager_notification_url: options.eager_notification_url,
+  eager_async: options.eager_async,
+  invalidate: options.invalidate,
+  proxy: options.proxy,
+  folder: options.folder,
+  tags: options.tags && utils.build_array(options.tags).join(",")
  
 exports.upload_stream = (callback, options={}) ->
   exports.upload(null, callback, _.extend({stream: true}, options))
@@ -160,12 +159,13 @@ call_api = (action, callback, options, get_params) ->
         post_data.push new Buffer(EncodeFieldPart(boundary, key+"[]", v), 'ascii')
     else if utils.present(value)
       post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') 
+
   post api_url, post_data, boundary, file, handle_response, options
   
 post = (url, post_data, boundary, file, callback, options) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
   if file? || options.stream
-    filename = options.stream ? "file" : path.basename(file) 
+    filename = if options.stream then "file" else path.basename(file)
     file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary')
 
   post_options = require('url').parse(url)

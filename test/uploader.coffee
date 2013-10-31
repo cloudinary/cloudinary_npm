@@ -31,7 +31,7 @@ describe "uploader", ->
       done()
 
   it "should successfully rename a file", (done) ->
-    this.timeout 10000
+    this.timeout 15000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       return done(new Error result.error.message) if result.error?
       cloudinary.uploader.rename result.public_id, result.public_id+"2", (r1) ->
@@ -95,7 +95,7 @@ describe "uploader", ->
     file_reader.on 'end', stream.end
 
   it "should successfully manipulate tags", (done) ->
-    this.timeout 10000
+    this.timeout 15000
     cloudinary.uploader.upload "test/logo.png", (result1) ->
       cloudinary.uploader.upload "test/logo.png", (result2) ->
         return done(new Error result1.error.message) if result1.error?
@@ -122,4 +122,25 @@ describe "uploader", ->
       done()
     , timeout: 1 # 1ms, nobody is that fast.
     
-  
+  it "should upload a file and base public id on the filename if use_filename is set to true", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      expect(result.public_id).to.match /logo_[a-zA-Z0-9]{6}/
+      cloudinary.uploader.destroy result.public_id, (dresult) ->
+        return done(new Error dresult.error.message) if dresult.error?
+        expect(dresult.result).to.eql("ok")
+        done()
+    , use_filename: yes
+
+  it "should upload a file and set the filename as the public_id if use_filename is set to true and unique_filename is set to false", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      expect(result.public_id).to.eql "logo"
+      cloudinary.uploader.destroy result.public_id, (dresult) ->
+        return done(new Error dresult.error.message) if dresult.error?
+        expect(dresult.result).to.eql("ok")
+        done()
+    , use_filename: yes, unique_filename: no
+
