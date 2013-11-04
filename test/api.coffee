@@ -220,7 +220,7 @@ describe "api", ->
 
   it "should allow unsafe update of named transformation", (done) ->
     @timeout 10000
-    cloudinary.api.create_transformation "api_test_transformatio3", {crop: "scale", width: 102}, () ->
+    cloudinary.api.create_transformation "api_test_transformation3", {crop: "scale", width: 102}, () ->
       cloudinary.api.update_transformation "api_test_transformation3", {unsafe_update: {crop: "scale", width: 103}}, () ->
         cloudinary.api.transformation "api_test_transformation3", (transformation) ->
           expect(transformation).not.to.eql(undefined)
