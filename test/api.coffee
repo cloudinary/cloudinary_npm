@@ -1,5 +1,6 @@
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
+_ = require("underscore")
 
 fs = require('fs')
 describe "api", ->
@@ -11,15 +12,15 @@ describe "api", ->
     undefined
     
   before (done) ->
-    @timeout 10000
+    @timeout 20000
     cnt = 0
     progress = -> 
       cnt += 1
       done() if cnt == 3
     cloudinary.uploader.destroy "api_test", ->
       cloudinary.uploader.destroy "api_test2", ->
-        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", eager: [width: 100, crop: "scale"])
-        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", eager: [width: 100, crop: "scale"]) 
+        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"])
+        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"]) 
         cloudinary.api.delete_transformation("api_test_transformation", progress)
 
   it "should allow listing resource_types", (done) ->
@@ -77,11 +78,23 @@ describe "api", ->
     @timeout 10000
     cloudinary.api.resources_by_tag "api_test_tag", (result) ->
       return done(new Error result.error.message) if result.error?
-      resource = find_by_attr(result.resources, "public_id", "api_test")
-      expect(resource).not.to.eql(undefined)
-      expect(resource.type).to.eql("upload")
+      expect(result.resources.map((e) -> e.public_id).sort()).to.eql(["api_test","api_test2"])
+      expect(result.resources.map((e) -> e.tags[0])).to.contain("api_test_tag")
+      expect(result.resources.map((e) -> if e.context? then e.context.custom.key else null)).to.contain("value")
       done()
-
+    , context: true, tags: true
+  
+  it "should allow listing resources by public ids", (done) ->
+    @timeout 10000
+    cloudinary.api.resources_by_ids ["api_test", "api_test2"], (result) ->
+      return done(new Error result.error.message) if result.error?
+      resource = find_by_attr(result.resources, "public_id", "api_test")
+      expect(result.resources.map((e) -> e.public_id).sort()).to.eql(["api_test","api_test2"])
+      expect(result.resources.map((e) -> e.tags[0])).to.contain("api_test_tag")
+      expect(result.resources.map((e) -> e.context.custom.key)).to.contain("value")
+      done()
+    , context: true, tags: true
+  
   it "should allow get resource metadata", (done) ->
     @timeout 10000
     cloudinary.api.resource "api_test", (resource) ->
@@ -250,4 +263,15 @@ describe "api", ->
       expect(usage.last_update).not.to.eql null
       done()
 
-
+  it "should allow deleting all resources", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.resource "api_test5", (resource) ->
+        expect(resource).to.not.eql(null)
+        expect(resource.derived.length).to.eql(1)
+        cloudinary.api.delete_all_resources (delete_result) ->
+          cloudinary.api.resource "api_test5", (resource) ->
+            expect(resource.derived.length).to.eql(0)
+            done()
+        , {keep_original: yes}
+    , {public_id: "api_test5", eager: {transformation: {width: 101, crop: "scale"}}}

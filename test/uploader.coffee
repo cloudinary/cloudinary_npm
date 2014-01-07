@@ -143,4 +143,54 @@ describe "uploader", ->
         expect(dresult.result).to.eql("ok")
         done()
     , use_filename: yes, unique_filename: no
+  
+  it "should allow whitelisted formats if allowed_formats", (done) ->
+  	cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      expect(result.format).to.eql("png")
+      done()
+    , allowed_formats: ["png"]
 
+  it "should prevent non whitelisted formats from being uploaded if allowed_formats is specified", (done) ->
+  	cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error.http_code).to.eql(400)
+      done()
+    , allowed_formats: ["jpg"]
+  
+  it "should allow non whitelisted formats if type is specified and convert to that type", (done) ->
+  	cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      expect(result.format).to.eql("jpg")
+      done()
+    , allowed_formats: ["jpg"], format: "jpg"
+  
+  it "should allow sending face coordinates", (done) ->
+    this.timeout 5000
+    coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]]
+    different_coordinates = [[122, 32, 111, 152]]
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      expect(result.faces).to.eql(coordinates)
+      cloudinary.uploader.explicit result.public_id, (result2) ->
+        return done(new Error result2.error.message) if result2.error?
+        cloudinary.api.resource result2.public_id, (info) ->
+          return done(new Error info.error.message) if info.error?
+          expect(info.faces).to.eql(different_coordinates)
+          done()
+        , faces: yes
+      , face_coordinates: different_coordinates, type: "upload"
+    , face_coordinates: coordinates, faces: yes
+  
+  it "should allow sending context", (done) ->
+    this.timeout 5000
+    context = {caption: "some caption", alt: "alternative"}
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      return done(new Error result.error.message) if result.error?
+      cloudinary.api.resource result.public_id, (info) ->
+        return done(new Error info.error.message) if info.error?
+        expect(info.context.custom.caption).to.eql("some caption")
+        expect(info.context.custom.alt).to.eql("alternative")
+        done()
+      , context: true
+    , context: context
+       

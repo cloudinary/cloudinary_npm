@@ -9,7 +9,7 @@ exports.AKAMAI_SHARED_CDN = "res.cloudinary.com";
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
 
 exports.timestamp = ->
-  Math.floor(new Date().getTime()/1000)
+  Math.floor(new Date().getTime() / 1000)
 
 exports.option_consume = option_consume = (options, option_name, default_value) ->
   result = options[option_name]
@@ -24,6 +24,18 @@ exports.build_array = build_array = (arg) ->
     arg 
   else 
     [arg]
+    
+exports.encode_double_array = encode_double_array = (arg) ->
+  build_array(arg).map((e) -> build_array(e).join(",")).join("|")
+
+exports.encode_key_value = encode_key_value = (arg) ->
+  if _.isObject(arg)
+    pairs = for k, v of arg 
+      "#{k}=#{v}"
+    pairs.join("|")
+  else
+    arg
+
 
 exports.present = present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0
@@ -125,6 +137,8 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   cname = option_consume(options, "cname", config().cname)
   shorten = option_consume(options, "shorten", config().shorten)
+  sign_url = option_consume(options, "sign_url", config().sign_url)
+  api_secret = option_consume(options, "api_secret", config().api_secret)
 
   if public_id.match(/^https?:/)
     return public_id if type is "upload" or type is "asset"
@@ -151,7 +165,14 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
 
   version ?= 1 if public_id.search("/") >= 0 && !public_id.match(/^v[0-9]+/) && !public_id.match(/^https?:\//)
   
-  url = [ prefix, resource_type, type, transformation, (if version then "v" + version else ""), public_id ].join("/")
+  rest = [transformation, (if version then "v" + version else ""), public_id ].filter((part) -> part != "" and part != null).join("/")
+  if sign_url
+    shasum = crypto.createHash('sha1')
+    shasum.update(rest + api_secret)
+    signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
+    rest = "s--#{signature}--/" + rest
+    
+  url = [ prefix, resource_type, type, rest ].join("/")
   url.replace(/([^:])\/+/g, "$1/")
 
 html_only_attributes = (options) ->

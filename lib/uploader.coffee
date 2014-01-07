@@ -1,5 +1,6 @@
 _ = require("underscore")
 https = require('https')
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 #http = require('http')
 utils = require("./utils")
 config = require("./config")
@@ -48,7 +49,11 @@ build_upload_params = (options) ->
   invalidate: options.invalidate,
   proxy: options.proxy,
   folder: options.folder,
-  tags: options.tags && utils.build_array(options.tags).join(",")
+  overwrite: options.overwrite, 
+  tags: options.tags && utils.build_array(options.tags).join(","),
+  context: options.context && utils.encode_key_value(options.context),
+  face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates),
+  allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
  
 exports.upload_stream = (callback, options={}) ->
   exports.upload(null, callback, _.extend({stream: true}, options))
@@ -71,6 +76,7 @@ exports.explicit = (public_id, callback, options={}) ->
       eager: build_eager(options.eager)
       headers: build_custom_headers(options.headers)
       tags: options.tags ? utils.build_array(options.tags).join(",")
+      face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
     ]
     
 exports.destroy = (public_id, callback, options={}) ->
@@ -151,7 +157,7 @@ call_api = (action, callback, options, get_params) ->
         error = true
         callback(error: e)
     else
-      callback(error: {message: "Server returned unexpected status code - #{res.statusCode}"})
+      callback(error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode})
   post_data = []
   for key, value of params 
     if _.isArray(value)

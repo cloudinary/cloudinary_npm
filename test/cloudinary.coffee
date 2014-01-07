@@ -3,7 +3,7 @@ cloudinary = require("../cloudinary.js")
 
 describe "cloudinary", ->
   beforeEach ->
-    cloudinary.config cloud_name: "test123"
+    cloudinary.config cloud_name: "test123", api_key: 'a', api_secret: 'b'
 
   it "should use cloud_name from config", ->
     result = cloudinary.utils.url("test")
@@ -355,3 +355,16 @@ describe "cloudinary", ->
     for source, target of tests
       result = cloudinary.utils.url(source)
       expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target)
+  
+  it "should correctly sign a url", ->
+    expected = "http://res.cloudinary.com/test123/image/upload/s--MaRXzoEC--/c_crop,h_20,w_10/v1234/image.jpg"
+    actual = cloudinary.utils.url("image.jpg", version: 1234, crop: "crop", width: 10, height: 20, sign_url: true)
+    expect(actual).to.eql expected
+    
+    expected = "http://res.cloudinary.com/test123/image/upload/s--ZlgFLQcO--/v1234/image.jpg"
+    actual = cloudinary.utils.url("image.jpg", version: 1234, sign_url: true)
+    expect(actual).to.eql expected
+    
+    expected = "http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg"
+    actual = cloudinary.utils.url("image.jpg", crop: "crop", width: 10, height: 20, sign_url: true)
+    expect(actual).to.eql expected

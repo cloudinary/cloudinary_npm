@@ -19,12 +19,20 @@ exports.resources = (callback, options={}) ->
   type = options["type"]
   uri = ["resources", resource_type]
   uri.push type if type?
-  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options)    
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context"), callback, options)    
 
 exports.resources_by_tag = (tag, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "tags", tag]
-  call_api("get", uri, only(options, "next_cursor", "max_results"), callback, options)    
+  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context"), callback, options)    
+
+exports.resources_by_ids = (public_ids, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"
+  uri = ["resources", resource_type, type]
+  params = only(options, "tags", "context")
+  params["public_ids[]"] = public_ids
+  call_api("get", uri, params, callback, options)    
 
 exports.resource = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
@@ -42,12 +50,18 @@ exports.delete_resources_by_prefix = (prefix, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"    
   uri = ["resources", resource_type, type]
-  call_api("delete", uri, _.extend({prefix: prefix}, only(options, "keep_original")), callback, options)
+  call_api("delete", uri, _.extend({prefix: prefix}, only(options, "keep_original", "next_cursor")), callback, options)
 
 exports.delete_resources_by_tag = (tag, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "tags", tag]
-  call_api("delete", uri, only(options, "keep_original"), callback, options)    
+  call_api("delete", uri, only(options, "keep_original", "next_cursor"), callback, options)
+  
+exports.delete_all_resources = (callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"
+  uri = ["resources", resource_type, type]
+  call_api("delete", uri, _.extend({all: yes}, only(options, "keep_original", "next_cursor")), callback, options)
 
 exports.delete_derived_resources = (derived_resource_ids, callback, options={}) ->
   uri = ["derived_resources"]
