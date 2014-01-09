@@ -179,6 +179,7 @@ post = (url, post_data, boundary, file, callback, options) ->
     method: 'POST',
     headers: 
       'Content-Type': 'multipart/form-data; boundary=' + boundary
+      'User-Agent': utils.USER_AGENT
 
   post_request = https.request(post_options, callback)
   timeout = false

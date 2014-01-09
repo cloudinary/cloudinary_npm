@@ -110,6 +110,7 @@ call_api = (method, uri, params, callback, options) ->
     method: method.toUpperCase()
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
+      'User-Agent': utils.USER_AGENT
     auth: "#{api_key}:#{api_secret}"
 
   handle_response = (res) ->

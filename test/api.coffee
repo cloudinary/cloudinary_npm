@@ -17,11 +17,10 @@ describe "api", ->
     progress = -> 
       cnt += 1
       done() if cnt == 3
-    cloudinary.uploader.destroy "api_test", ->
-      cloudinary.uploader.destroy "api_test2", ->
-        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"])
-        cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"]) 
-        cloudinary.api.delete_transformation("api_test_transformation", progress)
+    cloudinary.api.delete_resources ["api_test", "api_test1", "api_test2"], ->
+      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"])
+      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"]) 
+      cloudinary.api.delete_transformation("api_test_transformation", progress)
 
   it "should allow listing resource_types", (done) ->
     @timeout 10000
