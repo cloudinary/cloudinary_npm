@@ -31,7 +31,7 @@ describe "uploader", ->
       done()
 
   it "should successfully rename a file", (done) ->
-    this.timeout 15000
+    this.timeout 25000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       return done(new Error result.error.message) if result.error?
       cloudinary.uploader.rename result.public_id, result.public_id+"2", (r1) ->
@@ -123,7 +123,7 @@ describe "uploader", ->
     , timeout: 1 # 1ms, nobody is that fast.
     
   it "should upload a file and base public id on the filename if use_filename is set to true", (done) ->
-    this.timeout 5000
+    this.timeout 10000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       return done(new Error result.error.message) if result.error?
       expect(result.public_id).to.match /logo_[a-zA-Z0-9]{6}/

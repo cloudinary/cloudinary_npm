@@ -1,6 +1,5 @@
 _ = require("underscore")
 https = require('https')
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 #http = require('http')
 utils = require("./utils")
 config = require("./config")
