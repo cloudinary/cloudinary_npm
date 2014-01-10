@@ -262,7 +262,7 @@ describe "api", ->
       expect(usage.last_update).not.to.eql null
       done()
 
-  it "should allow deleting all resources", (done) ->
+  it.skip "should allow deleting all resources", (done) ->
     @timeout 10000
     cloudinary.uploader.upload "test/logo.png", (upload_result) ->
       cloudinary.api.resource "api_test5", (resource) ->
