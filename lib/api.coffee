@@ -4,7 +4,6 @@ utils = require("./utils")
 config = require("./config")
 querystring = require("querystring")
 
-
 exports.ping = (callback, options={}) ->
   call_api("get", ["ping"], {}, callback, options)
 
@@ -19,12 +18,12 @@ exports.resources = (callback, options={}) ->
   type = options["type"]
   uri = ["resources", resource_type]
   uri.push type if type?
-  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context"), callback, options)    
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction"), callback, options)    
 
 exports.resources_by_tag = (tag, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "tags", tag]
-  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context"), callback, options)    
+  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction"), callback, options)    
 
 exports.resources_by_ids = (public_ids, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"

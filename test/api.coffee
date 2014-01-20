@@ -94,6 +94,19 @@ describe "api", ->
       done()
     , context: true, tags: true
   
+  it "should allow listing resources specifying direction", (done) ->
+    @timeout 10000
+    cloudinary.api.resources (result) ->
+      return done(new Error result.error.message) if result.error?
+      asc = (resource.public_id for resource in result.resources)
+      cloudinary.api.resources (result) ->
+        return done(new Error result.error.message) if result.error?
+        desc = (resource.public_id for resource in result.resources)
+        expect(asc.reverse()).to.eql(desc)
+        done()
+      , type: "upload", prefix: "api_test", direction: "desc"
+    , type: "upload", prefix: "api_test", direction: "asc"
+  
   it "should allow get resource metadata", (done) ->
     @timeout 10000
     cloudinary.api.resource "api_test", (resource) ->
