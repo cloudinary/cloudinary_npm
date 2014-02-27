@@ -194,3 +194,65 @@ describe "uploader", ->
       , context: true
     , context: context
        
+  it "should support requesting manual moderation", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.moderation[0].status).to.eql("pending")
+      expect(result.moderation[0].kind).to.eql("manual")
+      done()
+    , moderation: "manual"
+    
+  it "should support requesting ocr info", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "Illegal value"
+      done()
+    , ocr: "illegal"
+    
+  it "should support requesting raw conversion", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/docx.docx", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "Illegal value"
+      done()
+    , raw_convert: "illegal", resource_type: "raw"
+    
+  it "should support requesting categorization", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "Illegal value"
+      done()
+    , categorization: "illegal"
+    
+  it "should support requesting detection", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "Illegal value"
+      done()
+    , detection: "illegal"
+  
+  it "should support requesting similarity search", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "Illegal value"
+      done()
+    , similarity_search: "illegal"
+    
+  it "should support requesting auto_tagging", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "Must use"
+      done()
+    , auto_tagging: 0.5
+  
+  it "should support uploading large raw files", (done) ->
+    this.timeout 5000
+    fs.stat "test/docx.docx", (err, stat) -> 
+      cloudinary.uploader.upload_large "test/docx.docx", (response) ->
+        expect(response.bytes).to.eql(stat.size)
+        done()

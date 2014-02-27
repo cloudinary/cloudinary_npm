@@ -287,3 +287,97 @@ describe "api", ->
             done()
         , {keep_original: yes}
     , {public_id: "api_test5", eager: {transformation: {width: 101, crop: "scale"}}}
+    
+  it "should support setting manual moderation status", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.moderation[0].status).to.eql("approved")
+        done()
+      , moderation_status: "approved"
+    , moderation: "manual"
+    
+  it "should support requesting ocr info", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Illegal value"
+        done()
+      , ocr: "illegal"
+  
+  it "should support requesting raw conversion", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Illegal value"
+        done()
+      , raw_convert: "illegal"
+  
+  it "should support requesting categorization", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Illegal value"
+        done()
+      , categorization: "illegal"
+  
+  it "should support requesting detection", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Illegal value"
+        done()
+      , detection: "illegal"
+  
+  it "should support requesting similarity_search", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Illegal value"
+        done()
+      , similarity_search: "illegal"
+  
+  it "should support requesting auto_tagging", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Must use"
+        done()
+      , auto_tagging: "illegal"
+  
+  it "should support listing by moderation kind and value", (done) ->
+    @timeout 10000
+    ids = []
+    api_results =[]
+    lists = {}
+    after_listing = (list) ->
+      (list_result) ->
+        lists[list] = list_result.resources.map((r) -> r.public_id)
+        if _.keys(lists).length == 3
+          expect(lists.approved).to.contain(ids[0])
+          expect(lists.approved).not.to.contain(ids[1])
+          expect(lists.approved).not.to.contain(ids[2])
+          expect(lists.rejected).to.contain(ids[1])
+          expect(lists.rejected).not.to.contain(ids[0])
+          expect(lists.rejected).not.to.contain(ids[2])
+          expect(lists.pending).to.contain(ids[2])
+          expect(lists.pending).not.to.contain(ids[0])
+          expect(lists.pending).not.to.contain(ids[1])
+          done()
+
+    after_update = (api_result) ->
+      api_results.push(api_result)
+      if api_results.length == 2
+        cloudinary.api.resources_by_moderation("manual", "approved", after_listing("approved"), max_results: 1000, moderations: true)
+        cloudinary.api.resources_by_moderation("manual", "rejected", after_listing("rejected"), max_results: 1000, moderations: true)
+        cloudinary.api.resources_by_moderation("manual", "pending", after_listing("pending"), max_results: 1000, moderations: true)
+
+    after_upload = (upload_result) -> 
+      ids.push(upload_result.public_id)
+      if ids.length == 3
+        cloudinary.api.update ids[0], after_update, moderation_status: "approved"
+        cloudinary.api.update ids[1], after_update, moderation_status: "rejected"
+        
+    cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
+    cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
+    cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")

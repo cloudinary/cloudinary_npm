@@ -39,6 +39,22 @@ exports.encode_key_value = encode_key_value = (arg) ->
   else
     arg
 
+exports.build_eager = build_eager = (transformations) ->
+  (for transformation in build_array(transformations)
+    transformation = _.clone(transformation)
+    _.filter([generate_transformation_string(transformation), transformation.format], present).join("/")
+  ).join("|")
+    
+exports.build_custom_headers = build_custom_headers = (headers) ->
+  if !headers?
+    return undefined
+  else if _.isArray(headers) 
+    ;
+  else if _.isObject(headers)
+    headers = [k + ": " + v for k, v of headers]    
+  else
+    return headers
+  return headers.join("\n")
 
 exports.present = present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0
@@ -125,6 +141,19 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   base_transformations.push transformation
   _.filter(base_transformations, present).join "/"
 
+exports.updateable_resource_params = updateable_resource_params = (options, params = {}) ->
+  params.tags = build_array(options.tags).join(",") if options.tags?
+  params.context = encode_key_value(options.context) if options.context?
+  params.face_coordinates = encode_double_array(options.face_coordinates) if options.face_coordinates?
+  params.headers = build_custom_headers(options.headers) if options.headers?
+  params.ocr = options.ocr if options.ocr?
+  params.raw_convert = options.raw_convert if options.raw_convert?
+  params.categorization = options.categorization if options.categorization?
+  params.detection = options.detection if options.detection?
+  params.similarity_search = options.similarity_search if options.similarity_search?
+  params.auto_tagging = options.auto_tagging if options.auto_tagging?
+  params
+  
 exports.url = cloudinary_url = (public_id, options = {}) ->
   type = option_consume(options, "type", "upload")
   options.fetch_format ?= option_consume(options, "format") if type is "fetch"

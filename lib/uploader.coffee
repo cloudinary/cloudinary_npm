@@ -7,52 +7,33 @@ fs = require('fs')
 path = require('path')
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
-
-build_eager = (transformations) ->
-  (for transformation in utils.build_array(transformations)
-    transformation = _.clone(transformation)
-    _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
-  ).join("|")
-    
-build_custom_headers = (headers) ->
-  if !headers?
-    return undefined
-  else if _.isArray(headers) 
-    ;
-  else if _.isObject(headers)
-    headers = [k + ": " + v for k, v of headers]    
-  else
-    return headers
-  return headers.join("\n")
-
 build_upload_params = (options) ->
-  timestamp: utils.timestamp(),
-  transformation: utils.generate_transformation_string(options),
-  public_id: options.public_id,
-  callback: options.callback,
-  format: options.format,
-  backup: options.backup,
-  faces: options.faces,
-  exif: options.exif,
-  image_metadata: options.image_metadata,
-  colors: options.colors,
-  type: options.type,
-  eager: build_eager(options.eager),
-  headers: build_custom_headers(options.headers),
-  use_filename: options.use_filename, 
-  unique_filename: options.unique_filename, 
-  discard_original_filename: options.discard_original_filename, 
-  notification_url: options.notification_url,
-  eager_notification_url: options.eager_notification_url,
-  eager_async: options.eager_async,
-  invalidate: options.invalidate,
-  proxy: options.proxy,
-  folder: options.folder,
-  overwrite: options.overwrite, 
-  tags: options.tags && utils.build_array(options.tags).join(","),
-  context: options.context && utils.encode_key_value(options.context),
-  face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates),
-  allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
+  params =
+    timestamp: utils.timestamp(),
+    transformation: utils.generate_transformation_string(options),
+    public_id: options.public_id,
+    callback: options.callback,
+    format: options.format,
+    backup: options.backup,
+    faces: options.faces,
+    exif: options.exif,
+    image_metadata: options.image_metadata,
+    colors: options.colors,
+    type: options.type,
+    eager: utils.build_eager(options.eager),
+    use_filename: options.use_filename, 
+    unique_filename: options.unique_filename, 
+    discard_original_filename: options.discard_original_filename, 
+    notification_url: options.notification_url,
+    eager_notification_url: options.eager_notification_url,
+    eager_async: options.eager_async,
+    invalidate: options.invalidate,
+    proxy: options.proxy,
+    folder: options.folder,
+    overwrite: options.overwrite,
+    allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
+    moderation: options.moderation
+  utils.updateable_resource_params(options, params)
  
 exports.upload_stream = (callback, options={}) ->
   exports.upload(null, callback, _.extend({stream: true}, options))
@@ -61,10 +42,68 @@ exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
     if file? && file.match(/^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)
-      return [params, file: file]
+      [params, file: file]
     else 
-      return [params, {}, file]
+      [params, {}, file]
 
+exports.upload_large_part = (callback, options={}) ->
+  call_api "upload_large", callback, _.extend(resource_type: "raw", stream: true, options), ->
+    return [
+      timestamp: utils.timestamp()
+      type: options.type
+      public_id: options.public_id
+      backup: options.backup
+      final: options.final
+      part_number: options.part_number
+      upload_id: options.upload_id
+    ]
+
+exports.upload_large = (path, callback, options={}) ->
+  options =  _.extend(options, part_number: 0, final: false)
+  options.part_size ?= 20000000
+  start = (err, stats) ->
+    file_size = stats.size
+    part_number = 0
+    total_uploaded_size = 0
+    current_part_size = 0
+    stream = null
+    first_part = true
+    file_reader = fs.createReadStream(path)
+        
+    file_reader.on 'end', ->
+      stream.end()          
+    file_reader.on 'data', (chunk) ->
+      upload_request = ->
+        options.final = total_uploaded_size + options.part_size >= file_size
+        options.part_number += 1
+        stream = exports.upload_large_part(finished_part, options) 
+        stream.write(chunk) 
+      finished_part = (upload_large_part_result) ->
+        if options.final
+          callback(upload_large_part_result)
+        else
+          options.public_id = upload_large_part_result.public_id
+          options.upload_id = upload_large_part_result.upload_id            
+          current_part_size = chunk.length
+          if first_part
+            first_part = false  
+          else
+            file_reader.resume()         
+          upload_request()
+
+      current_part_size += chunk.length
+      total_uploaded_size += chunk.length
+      first_part = !stream?
+      if first_part || current_part_size > options.part_size        
+        if first_part
+          upload_request()
+        else
+          file_reader.pause()
+          stream.end()
+      else
+        stream.write(chunk)
+  fs.stat(path, start)
+  
 exports.explicit = (public_id, callback, options={}) ->
   call_api "explicit", callback, options, ->
     return [
@@ -72,8 +111,8 @@ exports.explicit = (public_id, callback, options={}) ->
       type: options.type
       public_id: public_id
       callback: options.callback
-      eager: build_eager(options.eager)
-      headers: build_custom_headers(options.headers)
+      eager: utils.build_eager(options.eager)
+      headers: utils.build_custom_headers(options.headers)
       tags: options.tags ? utils.build_array(options.tags).join(",")
       face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
     ]

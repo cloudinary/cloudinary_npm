@@ -18,18 +18,23 @@ exports.resources = (callback, options={}) ->
   type = options["type"]
   uri = ["resources", resource_type]
   uri.push type if type?
-  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction"), callback, options)    
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations"), callback, options)    
 
 exports.resources_by_tag = (tag, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "tags", tag]
-  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction"), callback, options)    
+  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options)    
+
+exports.resources_by_moderation = (kind, status, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  uri = ["resources", resource_type, "moderations", kind, status]
+  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options) 
 
 exports.resources_by_ids = (public_ids, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type]
-  params = only(options, "tags", "context")
+  params = only(options, "tags", "context", "moderations")
   params["public_ids[]"] = public_ids
   call_api("get", uri, params, callback, options)    
 
@@ -38,6 +43,14 @@ exports.resource = (public_id, callback, options={}) ->
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type, public_id]
   call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "max_results"), callback, options)
+
+exports.update = (public_id, callback, options={}) ->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"
+  uri = ["resources", resource_type, type, public_id]
+  params = utils.updateable_resource_params(options)
+  params.moderation_status = options.moderation_status if options.moderation_status?
+  call_api("post", uri, params, callback, options)
 
 exports.delete_resources = (public_ids, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
