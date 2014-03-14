@@ -202,6 +202,13 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   sign_url = option_consume(options, "sign_url", config().sign_url)
   api_secret = option_consume(options, "api_secret", config().api_secret)
 
+  preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
+  if preloaded
+    resource_type = preloaded[1]
+    type = preloaded[2]
+    version = preloaded[3]
+    public_id = preloaded[4]
+
   if public_id.match(/^https?:/)
     return public_id if type is "upload" or type is "asset"
     public_id = encodeURIComponent(public_id).replace(/%3A/g, ":").replace(/%2F/g, "/") 

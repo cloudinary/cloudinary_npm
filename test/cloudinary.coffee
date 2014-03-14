@@ -378,3 +378,10 @@ describe "cloudinary", ->
     expect(params).to.eql {public_id: "folder/file", version: "1234"}
     params = cloudinary.utils.process_request_params({public_id: "folder/file", version: "1234"}, {api_key: '1234', api_secret: 'b'})
     expect(params).to.eql {public_id: "folder/file", version: "1234", signature: "7a3349cbb373e4812118d625047ede50b90e7b67", api_key: "1234"}
+
+  it "should support preloaded identifier format", ->
+    result = cloudinary.utils.url("raw/private/v123456/document.docx")
+    expect(result).to.eql "http://res.cloudinary.com/test123/raw/private/v123456/document.docx"
+
+    result = cloudinary.utils.url("image/private/v123456/img.jpg", crop: "scale", width: "1.0")
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/private/c_scale,w_1.0/v123456/img.jpg"
