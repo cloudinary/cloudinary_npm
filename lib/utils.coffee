@@ -8,7 +8,7 @@ exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net";
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com";
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
 
-exports.VERSION = "1.0.8"
+exports.VERSION = "1.0.9"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
 exports.build_upload_params = build_upload_params = (options) ->
