@@ -18,7 +18,8 @@ exports.resources = (callback, options={}) ->
   type = options["type"]
   uri = ["resources", resource_type]
   uri.push type if type?
-  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations"), callback, options)    
+  options.start_at = options.start_at.toUTCString() if options.start_at? && Object.prototype.toString.call(options.start_at) == '[object Date]'
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options)    
 
 exports.resources_by_tag = (tag, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
@@ -42,7 +43,7 @@ exports.resource = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type, public_id]
-  call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "max_results"), callback, options)
+  call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "max_results"), callback, options)
 
 exports.update = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
@@ -105,6 +106,28 @@ exports.update_transformation = (transformation, updates, callback, options={}) 
 exports.create_transformation = (name, definition, callback, options={}) ->
   uri = ["transformations", name]
   call_api("post", uri, {transformation: transformation_string(definition)}, callback, options)
+
+
+exports.upload_presets = (callback, options={}) ->
+  call_api("get", ["upload_presets"], only(options, "next_cursor", "max_results"), callback, options)    
+
+exports.upload_preset = (name, callback, options={}) ->
+  uri = ["upload_presets", name]
+  call_api("get", uri, only(options, "max_results"), callback, options)    
+
+exports.delete_upload_preset = (name, callback, options={}) ->
+  uri = ["upload_presets", name]
+  call_api("delete", uri, {}, callback, options)    
+
+exports.update_upload_preset = (name, callback, options={}) ->
+  uri = ["upload_presets", name]
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id"))  
+  call_api("put", uri, params, callback, options)
+
+exports.create_upload_preset = (callback, options={}) ->
+  uri = ["upload_presets"]
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id"))  
+  call_api("post", uri, params, callback, options)
 
 call_api = (method, uri, params, callback, options) ->
   cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"

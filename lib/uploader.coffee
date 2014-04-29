@@ -8,35 +8,16 @@ path = require('path')
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
 build_upload_params = (options) ->
-  params =
-    timestamp: utils.timestamp(),
-    transformation: utils.generate_transformation_string(options),
-    public_id: options.public_id,
-    callback: options.callback,
-    format: options.format,
-    backup: options.backup,
-    faces: options.faces,
-    exif: options.exif,
-    image_metadata: options.image_metadata,
-    colors: options.colors,
-    type: options.type,
-    eager: utils.build_eager(options.eager),
-    use_filename: options.use_filename, 
-    unique_filename: options.unique_filename, 
-    discard_original_filename: options.discard_original_filename, 
-    notification_url: options.notification_url,
-    eager_notification_url: options.eager_notification_url,
-    eager_async: options.eager_async,
-    invalidate: options.invalidate,
-    proxy: options.proxy,
-    folder: options.folder,
-    overwrite: options.overwrite,
-    allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
-    moderation: options.moderation
-  utils.updateable_resource_params(options, params)
+  utils.build_upload_params(options)
+
+exports.unsigned_upload_stream = (upload_preset, callback, options={}) ->
+  exports.upload_stream(callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
  
 exports.upload_stream = (callback, options={}) ->
   exports.upload(null, callback, _.extend({stream: true}, options))
+
+exports.unsigned_upload = (file, upload_preset, callback, options={}) ->
+  exports.upload(file, callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
 
 exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
@@ -169,7 +150,7 @@ call_api = (action, callback, options, get_params) ->
 
   [params, unsigned_params, file] = get_params.call()
   
-  params = utils.sign_request(params, options)
+  params = utils.process_request_params(params, options)
   params = _.extend(params, unsigned_params)
 
   api_url = utils.api_url(action, options)
@@ -271,15 +252,14 @@ EncodeFilePart = (boundary,type,name,filename) ->
 
 exports.direct_upload = (callback_url, options={}) ->
   params = build_upload_params(_.extend({callback: callback_url}, options))
-  params = utils.sign_request(params, options)
-
+  params = utils.process_request_params(params, options)
   api_url = utils.api_url("upload", options)
 
   return hidden_fields: params, form_attrs: {action: api_url, method: "POST", enctype: "multipart/form-data"}
 
 exports.upload_tag_params = (options={}) ->
   params = build_upload_params(options)
-  params = utils.sign_request(params, options)
+  params = utils.process_request_params(params, options)
   JSON.stringify(params)
   
 exports.upload_url = (options={}) ->
@@ -299,4 +279,5 @@ exports.image_upload_tag = (field, options={}) ->
   })
   return '<input ' + utils.html_attrs(tag_options) + '/>'
 
-
+exports.unsigned_image_upload_tag = (field, upload_preset, options={}) ->
+  exports.image_upload_tag(field, utils.merge(options, unsigned: true, upload_preset: upload_preset))

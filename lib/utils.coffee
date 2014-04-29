@@ -11,6 +11,36 @@ exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
 exports.VERSION = "1.0.8"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
+exports.build_upload_params = build_upload_params = (options) ->
+  params =
+    timestamp: exports.timestamp(),
+    transformation: exports.generate_transformation_string(options),
+    public_id: options.public_id,
+    callback: options.callback,
+    format: options.format,
+    backup: options.backup,
+    faces: options.faces,
+    exif: options.exif,
+    image_metadata: options.image_metadata,
+    colors: options.colors,
+    type: options.type,
+    eager: exports.build_eager(options.eager),
+    use_filename: options.use_filename, 
+    unique_filename: options.unique_filename, 
+    discard_original_filename: options.discard_original_filename, 
+    notification_url: options.notification_url,
+    eager_notification_url: options.eager_notification_url,
+    eager_async: options.eager_async,
+    invalidate: options.invalidate,
+    proxy: options.proxy,
+    folder: options.folder,
+    overwrite: options.overwrite,
+    allowed_formats: options.allowed_formats && exports.build_array(options.allowed_formats).join(","),
+    moderation: options.moderation,
+    phash: options.phash,
+    upload_preset: options.upload_preset
+  updateable_resource_params(options, params)
+
 exports.timestamp = ->
   Math.floor(new Date().getTime() / 1000)
 
@@ -298,17 +328,36 @@ exports.api_sign_request = (params_to_sign, api_secret) ->
   shasum.update(to_sign + api_secret)
   shasum.digest('hex')
 
+exports.clear_blank = (hash) ->
+  filtered_hash = {}
+  for k, v of hash when exports.present(v)
+    filtered_hash[k] = hash[k]
+  filtered_hash
+
+exports.merge = (hash1, hash2) ->
+  result = {}
+  result[k] = hash1[k] for k, v of hash1
+  result[k] = hash2[k] for k, v of hash2
+  result 
+
 exports.sign_request = (params, options) ->
   api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
-  # Remove blank parameters
-  for k, v of params when not exports.present(v)
-    delete params[k]
-    
+
+  params = exports.clear_blank(params)
+  
   params.signature = exports.api_sign_request(params, api_secret)
   params.api_key = api_key
 
   return params
+
+exports.process_request_params = (params, options) ->
+  if options.unsigned? && options.unsigned
+    params = exports.clear_blank(params)
+    delete params["timestamp"]
+  else
+    params = exports.sign_request(params, options)
+  params
 
 exports.private_download_url = (public_id, format, options = {}) ->
   params = exports.sign_request({

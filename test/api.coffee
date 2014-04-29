@@ -1,5 +1,6 @@
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
+utils = require("../lib/utils")
 _ = require("underscore")
 
 fs = require('fs')
@@ -16,11 +17,15 @@ describe "api", ->
     cnt = 0
     progress = -> 
       cnt += 1
-      done() if cnt == 3
+      done() if cnt == 7
     cloudinary.api.delete_resources ["api_test", "api_test1", "api_test2"], ->
       cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"])
       cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"]) 
       cloudinary.api.delete_transformation("api_test_transformation", progress)
+      cloudinary.api.delete_upload_preset("api_test_upload_preset1", progress)
+      cloudinary.api.delete_upload_preset("api_test_upload_preset2", progress)
+      cloudinary.api.delete_upload_preset("api_test_upload_preset3", progress)
+      cloudinary.api.delete_upload_preset("api_test_upload_preset4", progress)
 
   it "should allow listing resource_types", (done) ->
     @timeout 10000
@@ -106,6 +111,21 @@ describe "api", ->
         done()
       , type: "upload", prefix: "api_test", direction: "desc"
     , type: "upload", prefix: "api_test", direction: "asc"
+  
+  it "should allow listing resources by start_at", (done) ->
+    @timeout 10000
+    start_at = null
+    setTimeout ->
+      start_at = new Date()
+      setTimeout ->
+        cloudinary.uploader.upload "test/logo.png", (response) ->
+          cloudinary.api.resources (resources_response) ->
+            expect(resources_response.resources).to.have.length(1)
+            expect(resources_response.resources[0].public_id).to.eql(response.public_id)
+            done()
+          ,type: "upload", start_at: start_at, direction: "asc"
+      ,2000
+    ,2000
   
   it "should allow get resource metadata", (done) ->
     @timeout 10000
@@ -268,7 +288,68 @@ describe "api", ->
         cloudinary.api.transformation "c_scale,w_100", (transformation) ->
           expect(transformation.error.http_code).to.eql 404
           done()
+  
+  it "should allow creating and listing upload_presets", (done) ->
+    @timeout 10000
+    create_names = ["api_test_upload_preset3", "api_test_upload_preset2", "api_test_upload_preset1"]
+    delete_names = []
+    after_delete = ->
+      delete_names.pop()
+      done() if delete_names.length == 0
+      
+    validate_presets = ->
+      cloudinary.api.upload_presets (response) ->
+        expect(response.presets.slice(0,3).map((p) -> p.name)).to.eql(delete_names)
+        delete_names.forEach((name) -> cloudinary.api.delete_upload_preset name, after_delete)
+        
+    after_create = ->
+      if create_names.length > 0
+        name = create_names.pop()
+        delete_names.unshift(name)
+        cloudinary.api.create_upload_preset after_create, name: name , folder: "folder"
+      else
+        validate_presets()
+    
+    after_create()
+        
+  it "should allow getting a single upload_preset", (done) ->
+    @timeout 10000
+    cloudinary.api.create_upload_preset (preset) ->
+      name = preset.name
+      cloudinary.api.upload_preset name, (preset) ->
+        expect(preset.name).to.eql(name)
+        expect(preset.unsigned).to.eql(true)
+        expect(preset.settings.folder).to.eql("folder")
+        expect(preset.settings.transformation).to.eql([{width: 100, crop: "scale"}])
+        expect(preset.settings.context).to.eql({a: "b", c: "d"})
+        expect(preset.settings.tags).to.eql(["a","b","c"])
+        cloudinary.api.delete_upload_preset(name, -> done())
+    , unsigned: true, folder: "folder", transformation: {width: 100, crop: "scale"}, tags: ["a","b","c"], context: {a: "b", c: "d"}    
 
+  it "should allow deleting upload_presets", (done) ->
+    @timeout 10000
+    cloudinary.api.create_upload_preset (preset) ->
+      cloudinary.api.upload_preset "api_test_upload_preset4", ->
+        cloudinary.api.delete_upload_preset "api_test_upload_preset4", ->
+          cloudinary.api.upload_preset "api_test_upload_preset4", (result) ->
+            expect(result.error.message).to.contain "Can't find"
+            done()
+    , name: "api_test_upload_preset4", folder: "folder"
+  
+  it "should allow updating upload_presets", (done) ->
+    @timeout 10000
+    cloudinary.api.create_upload_preset (preset) ->
+      name = preset.name
+      cloudinary.api.upload_preset name, (preset) ->
+        cloudinary.api.update_upload_preset name, (preset) ->
+          cloudinary.api.upload_preset name, (preset) ->
+            expect(preset.name).to.eql(name)
+            expect(preset.unsigned).to.eql(true)
+            expect(preset.settings).to.eql(folder: "folder", colors: true, disallow_public_id: true)
+            cloudinary.api.delete_upload_preset(name, -> done())
+        , utils.merge(preset.settings, {colors: true, unsigned: true, disallow_public_id: true})
+    , folder: "folder"
+          
   it "should support the usage API call", (done) ->
     @timeout 10000
     cloudinary.api.usage (usage) ->

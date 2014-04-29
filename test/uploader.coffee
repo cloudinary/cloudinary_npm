@@ -202,19 +202,11 @@ describe "uploader", ->
       done()
     , moderation: "manual"
     
-  it "should support requesting ocr info", (done) ->
-    this.timeout 5000
-    cloudinary.uploader.upload "test/logo.png", (result) ->
-      expect(result.error?).to.be true
-      expect(result.error.message).to.contain "Illegal value"
-      done()
-    , ocr: "illegal"
-    
   it "should support requesting raw conversion", (done) ->
     this.timeout 5000
     cloudinary.uploader.upload "test/docx.docx", (result) ->
       expect(result.error?).to.be true
-      expect(result.error.message).to.contain "Illegal value"
+      expect(result.error.message).to.contain "is not a valid"
       done()
     , raw_convert: "illegal", resource_type: "raw"
     
@@ -222,7 +214,7 @@ describe "uploader", ->
     this.timeout 5000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       expect(result.error?).to.be true
-      expect(result.error.message).to.contain "Illegal value"
+      expect(result.error.message).to.contain "is not a valid"
       done()
     , categorization: "illegal"
     
@@ -230,18 +222,10 @@ describe "uploader", ->
     this.timeout 5000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       expect(result.error?).to.be true
-      expect(result.error.message).to.contain "Illegal value"
+      expect(result.error.message).to.contain "is not a valid"
       done()
     , detection: "illegal"
-  
-  it "should support requesting similarity search", (done) ->
-    this.timeout 5000
-    cloudinary.uploader.upload "test/logo.png", (result) ->
-      expect(result.error?).to.be true
-      expect(result.error.message).to.contain "Illegal value"
-      done()
-    , similarity_search: "illegal"
-    
+      
   it "should support requesting auto_tagging", (done) ->
     this.timeout 5000
     cloudinary.uploader.upload "test/logo.png", (result) ->
@@ -256,3 +240,11 @@ describe "uploader", ->
       cloudinary.uploader.upload_large "test/docx.docx", (response) ->
         expect(response.bytes).to.eql(stat.size)
         done()
+  
+  it "should support unsigned uploading using presets", (done) ->
+    this.timeout 5000
+    cloudinary.api.create_upload_preset (preset) ->
+      cloudinary.uploader.unsigned_upload "test/logo.png", preset.name, (result) ->
+        expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
+        cloudinary.api.delete_upload_preset(preset.name, -> done())
+    , folder: "upload_folder", unsigned: true
