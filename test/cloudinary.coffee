@@ -385,3 +385,26 @@ describe "cloudinary", ->
 
     result = cloudinary.utils.url("image/private/v123456/img.jpg", crop: "scale", width: "1.0")
     expect(result).to.eql "http://res.cloudinary.com/test123/image/private/c_scale,w_1.0/v123456/img.jpg"
+
+
+  it "should add responsive width transformation", ->
+    options =
+      width: 100
+      height: 100
+      crop: "crop"
+      responsive_width: true
+
+    result = cloudinary.utils.url("test", options)
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/c_limit,w_auto/test"
+    expect(options).to.eql {responsive: true}
+
+    cloudinary.config({responsive_width_transformation: {width: "auto", crop: "pad"}})
+    options =
+      width: 100
+      height: 100
+      crop: "crop"
+      responsive_width: true
+
+    result = cloudinary.utils.url("test", options)
+    expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/c_pad,w_auto/test"
+    expect(options).to.eql {responsive: true}

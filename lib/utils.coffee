@@ -11,6 +11,8 @@ exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
 exports.VERSION = "1.0.9"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
+DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
+
 exports.build_upload_params = build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
@@ -95,6 +97,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
       generate_transformation_string(_.clone(base_transformation))
     return result.join("/")
 
+  responsive_width = option_consume(options, "responsive_width", config().responsive_width)
   width = options["width"]
   height = options["height"]
   size = option_consume(options, "size")
@@ -103,9 +106,9 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   has_layer = options.overlay or options.underlay
   crop = option_consume(options, "crop")
   angle = build_array(option_consume(options, "angle")).join(".")
-  no_html_sizes = has_layer or present(angle) or crop == "fit" or crop == "limit"
+  no_html_sizes = has_layer or present(angle) or crop == "fit" or crop == "limit" or responsive_width
 
-  delete options["width"] if width and (no_html_sizes or parseFloat(width) < 1)
+  delete options["width"] if width and (width == "auto" or no_html_sizes or parseFloat(width) < 1)
   delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
   background = option_consume(options, "background")
   background = background and background.replace(/^#/, "rgb:")
@@ -130,6 +133,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   if _.isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
   flags = build_array(option_consume(options, "flags")).join(".")
+  dpr = option_consume(options, "dpr", config().dpr)
 
   params =
     c: crop
@@ -142,6 +146,7 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     a: angle
     bo: border
     fl: flags
+    dpr: dpr
 
   simple_params =
     x: "x"
@@ -169,6 +174,13 @@ exports.generate_transformation_string = generate_transformation_string = (optio
   transformation = (param.join("_") for param in params when present(_.last(param))).join(",")
 
   base_transformations.push transformation
+  if responsive_width
+    responsive_width_transformation = config().responsive_width_transformation or DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION
+    base_transformations.push generate_transformation_string(_.clone(responsive_width_transformation))
+  if width == "auto" or responsive_width
+    options.responsive = true
+  if dpr == "auto"
+    options.hidpi = true
   _.filter(base_transformations, present).join "/"
 
 exports.updateable_resource_params = updateable_resource_params = (options, params = {}) ->
