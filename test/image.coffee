@@ -3,6 +3,7 @@ cloudinary = require('../cloudinary')
 
 describe 'image helper', ->
   beforeEach ->
+    cloudinary.config(true) # Reset
     cloudinary.config(cloud_name: "test", api_secret: "1234")
 
   it "should generate image", ->

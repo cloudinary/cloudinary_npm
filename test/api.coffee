@@ -14,13 +14,14 @@ describe "api", ->
     
   before (done) ->
     @timeout 20000
+    @timestamp_tag = "api_test_tag_" + cloudinary.utils.timestamp()
     cnt = 0
     progress = -> 
       cnt += 1
       done() if cnt == 7
-    cloudinary.api.delete_resources ["api_test", "api_test1", "api_test2"], ->
-      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"])
-      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: "api_test_tag", context: "key=value", eager: [width: 100, crop: "scale"]) 
+    cloudinary.api.delete_resources ["api_test", "api_test1", "api_test2"], =>
+      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
+      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"]) 
       cloudinary.api.delete_transformation("api_test_transformation", progress)
       cloudinary.api.delete_upload_preset("api_test_upload_preset1", progress)
       cloudinary.api.delete_upload_preset("api_test_upload_preset2", progress)
@@ -101,16 +102,16 @@ describe "api", ->
   
   it "should allow listing resources specifying direction", (done) ->
     @timeout 10000
-    cloudinary.api.resources (result) ->
+    cloudinary.api.resources_by_tag @timestamp_tag, (result) =>
       return done(new Error result.error.message) if result.error?
       asc = (resource.public_id for resource in result.resources)
-      cloudinary.api.resources (result) ->
+      cloudinary.api.resources_by_tag @timestamp_tag, (result) ->
         return done(new Error result.error.message) if result.error?
         desc = (resource.public_id for resource in result.resources)
         expect(asc.reverse()).to.eql(desc)
         done()
-      , type: "upload", prefix: "api_test", direction: "desc"
-    , type: "upload", prefix: "api_test", direction: "asc"
+      , type: "upload", direction: "desc"
+    , type: "upload", direction: "asc"
   
   it "should allow listing resources by start_at", (done) ->
     @timeout 10000
@@ -409,6 +410,14 @@ describe "api", ->
         expect(api_result.error.message).to.contain "Illegal value"
         done()
       , detection: "illegal"
+  
+  it "should support requesting background_removal", (done) ->
+    @timeout 10000
+    cloudinary.uploader.upload "test/logo.png", (upload_result) ->
+      cloudinary.api.update upload_result.public_id, (api_result) ->
+        expect(api_result.error.message).to.contain "Illegal value"
+        done()
+      , background_removal: "illegal"
   
   it "should support requesting similarity_search", (done) ->
     @timeout 10000

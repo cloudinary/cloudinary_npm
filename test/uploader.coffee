@@ -51,17 +51,17 @@ describe "uploader", ->
     this.timeout 5000
     cloudinary.uploader.explicit "cloudinary", (result) ->
       return done(new Error result.error.message) if result.error?
-      url = cloudinary.utils.url("cloudinary", type: "twitter_name", crop: "scale", width: 2.0, format: "png", version: result["version"])
+      url = cloudinary.utils.url("cloudinary", type: "twitter_name", crop: "scale", width: "2.0", format: "png", version: result["version"])
       expect(result.eager[0].url).to.eql(url)
       done()
-    , type: "twitter_name", eager: [crop: "scale", width: 2.0]
+    , type: "twitter_name", eager: [crop: "scale", width: "2.0"]
 
   it "should support eager in upload", (done) ->
     this.timeout 5000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       return done(new Error result.error.message) if result.error?
       done()
-    , eager: [crop: "scale", width: 2.0]
+    , eager: [crop: "scale", width: "2.0"]
 
   it "should support custom headers in upload", (done) ->
     this.timeout 5000
@@ -225,6 +225,14 @@ describe "uploader", ->
       expect(result.error.message).to.contain "is not a valid"
       done()
     , detection: "illegal"
+      
+  it "should support requesting background_removal", (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload "test/logo.png", (result) ->
+      expect(result.error?).to.be true
+      expect(result.error.message).to.contain "is not a valid"
+      done()
+    , background_removal: "illegal"
       
   it "should support requesting auto_tagging", (done) ->
     this.timeout 5000

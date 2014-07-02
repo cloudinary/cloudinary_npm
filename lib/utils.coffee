@@ -194,6 +194,8 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
   params.detection = options.detection if options.detection?
   params.similarity_search = options.similarity_search if options.similarity_search?
   params.auto_tagging = options.auto_tagging if options.auto_tagging?
+  params.background_removal = options.background_removal if options.background_removal?
+
   params
   
 exports.url = cloudinary_url = (public_id, options = {}) ->
