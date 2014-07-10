@@ -9,14 +9,14 @@ describe "uploader", ->
   
   it "should successfully upload file", (done) ->
     this.timeout 5000
-    cloudinary.uploader.upload "test/logo.png", (result) ->
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.uploader.upload "test/logo.png", (error, result) ->
+      return done(new Error error.message) if error?
       expect(result.width).to.eql(241)
       expect(result.height).to.eql(51)
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
-      cloudinary.uploader.destroy result.public_id, (dresult) ->
-        return done(new Error dresult.error.message) if dresult.error?
+      cloudinary.v2.uploader.destroy result.public_id, (derror, dresult) ->
+        return done(new Error derror.message) if derror?
         expect(dresult.result).to.eql("ok")
         done()
 
@@ -32,29 +32,27 @@ describe "uploader", ->
 
   it "should successfully rename a file", (done) ->
     this.timeout 25000
-    cloudinary.uploader.upload "test/logo.png", (result) ->
-      return done(new Error result.error.message) if result.error?
-      cloudinary.uploader.rename result.public_id, result.public_id+"2", (r1) ->
-        return done(new Error r1.error.message) if r1.error?
-        cloudinary.api.resource result.public_id+"2", (r2) ->
-          expect(r2.error).to.be undefined
-          cloudinary.uploader.upload "test/favicon.ico", (result2) ->
-            cloudinary.uploader.rename result2.public_id, result.public_id+"2", (r3) ->
-              expect(r3.error).not.to.be undefined
-              cloudinary.uploader.rename result2.public_id, result.public_id+"2", (r4) ->
-                cloudinary.api.resource result.public_id+"2", (r5) ->
+    cloudinary.v2.uploader.upload "test/logo.png", (error, result) ->
+      return done(new Error error.message) if error?
+      cloudinary.v2.uploader.rename result.public_id, result.public_id+"2", (e1, r1) ->
+        return done(new Error e1.message) if e1?
+        cloudinary.v2.api.resource result.public_id+"2", (e2, r2) ->
+          expect(e2).to.be undefined
+          cloudinary.v2.uploader.upload "test/favicon.ico", (error2, result2) ->
+            cloudinary.v2.uploader.rename result2.public_id, result.public_id+"2", (e3, r3) ->
+              expect(e3).not.to.be undefined
+              cloudinary.v2.uploader.rename result2.public_id, result.public_id+"2", overwrite: true, (e4, r4) ->
+                cloudinary.v2.api.resource result.public_id+"2", (e5, r5) ->
                   expect(r5.format).to.eql "ico"
                   done()
-              , overwrite: true
   
   it "should successfully call explicit api", (done) ->
     this.timeout 5000
-    cloudinary.uploader.explicit "cloudinary", (result) ->
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], (error, result) ->
+      return done(new Error error.message) if error?
       url = cloudinary.utils.url("cloudinary", type: "twitter_name", crop: "scale", width: "2.0", format: "png", version: result["version"])
       expect(result.eager[0].url).to.eql(url)
       done()
-    , type: "twitter_name", eager: [crop: "scale", width: "2.0"]
 
   it "should support eager in upload", (done) ->
     this.timeout 5000
@@ -75,16 +73,16 @@ describe "uploader", ->
 
   it  "should successfully generate text image", (done) ->
     this.timeout 5000
-    cloudinary.uploader.text "hello world", (result) ->
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.uploader.text "hello world", (error, result) ->
+      return done(new Error error.message) if error?
       expect(result.width).to.within(50,70)
       expect(result.height).to.within(5,15)
       done()
 
   it "should successfully upload stream", (done) ->
     this.timeout 5000
-    stream = cloudinary.uploader.upload_stream (result) ->
-      return done(new Error result.error.message) if result.error?
+    stream = cloudinary.v2.uploader.upload_stream (error, result) ->
+      return done(new Error error.message) if error?
       expect(result.width).to.eql(241)
       expect(result.height).to.eql(51)
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
@@ -96,23 +94,24 @@ describe "uploader", ->
 
   it "should successfully manipulate tags", (done) ->
     this.timeout 15000
-    cloudinary.uploader.upload "test/logo.png", (result1) ->
-      cloudinary.uploader.upload "test/logo.png", (result2) ->
-        return done(new Error result1.error.message) if result1.error?
-        cloudinary.uploader.add_tag "tag1", [result1.public_id, result2.public_id], (rt1) ->
-          return done(new Error rt1.error.message) if rt1.error?
+    cloudinary.v2.uploader.upload "test/logo.png", (error1, result1) ->
+      cloudinary.v2.uploader.upload "test/logo.png", (error2, result2) ->
+        return done(new Error error1.message) if error1?
+        return done(new Error error2.message) if error2?
+        cloudinary.v2.uploader.add_tag "tag1", [result1.public_id, result2.public_id], (et1, rt1) ->
+          return done(new Error et1.message) if et1?
           cloudinary.api.resource result2.public_id, (r1) -> 
             expect(r1.tags).to.eql(["tag1"])
-          cloudinary.uploader.add_tag "tag2", result1.public_id, ->
-            cloudinary.api.resource result1.public_id, (r1) -> 
-              expect(r1.tags).to.eql(["tag1", "tag2"])
-              cloudinary.uploader.remove_tag "tag1", result1.public_id, ->
-                cloudinary.api.resource result1.public_id, (r2) -> 
-                  expect(r2.tags).to.eql(["tag2"])
-                  cloudinary.uploader.replace_tag "tag3", result1.public_id, ->
-                    cloudinary.api.resource result1.public_id, (r3) -> 
-                      expect(r3.tags).to.eql(["tag3"])
-                      done()
+            cloudinary.uploader.add_tag "tag2", result1.public_id, ->
+              cloudinary.v2.api.resource result1.public_id, (e1, r1) -> 
+                expect(r1.tags).to.eql(["tag1", "tag2"])
+                cloudinary.v2.uploader.remove_tag "tag1", result1.public_id, ->
+                  cloudinary.api.resource result1.public_id, (r2) -> 
+                    expect(r2.tags).to.eql(["tag2"])
+                    cloudinary.v2.uploader.replace_tag "tag3", result1.public_id, ->
+                      cloudinary.api.resource result1.public_id, (r3) -> 
+                        expect(r3.tags).to.eql(["tag3"])
+                        done()
    
   it "should support timeouts", (done) ->
     this.timeout 5000
@@ -168,18 +167,15 @@ describe "uploader", ->
     this.timeout 5000
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]]
     different_coordinates = [[122, 32, 111, 152]]
-    cloudinary.uploader.upload "test/logo.png", (result) ->
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.uploader.upload "test/logo.png", face_coordinates: coordinates, faces: yes, (error, result) ->
+      return done(new Error error.message) if error?
       expect(result.faces).to.eql(coordinates)
-      cloudinary.uploader.explicit result.public_id, (result2) ->
-        return done(new Error result2.error.message) if result2.error?
-        cloudinary.api.resource result2.public_id, (info) ->
-          return done(new Error info.error.message) if info.error?
+      cloudinary.v2.uploader.explicit result.public_id, face_coordinates: different_coordinates, type: "upload", (error2, result2) ->
+        return done(new Error error2.message) if error2?
+        cloudinary.v2.api.resource result2.public_id, faces: yes, (ierror, info) ->
+          return done(new Error ierror.message) if ierror?
           expect(info.faces).to.eql(different_coordinates)
           done()
-        , faces: yes
-      , face_coordinates: different_coordinates, type: "upload"
-    , face_coordinates: coordinates, faces: yes
   
   it "should allow sending context", (done) ->
     this.timeout 5000
@@ -251,8 +247,8 @@ describe "uploader", ->
   
   it "should support unsigned uploading using presets", (done) ->
     this.timeout 5000
-    cloudinary.api.create_upload_preset (preset) ->
-      cloudinary.uploader.unsigned_upload "test/logo.png", preset.name, (result) ->
+    cloudinary.v2.api.create_upload_preset folder: "upload_folder", unsigned: true, (error, preset) ->
+      cloudinary.v2.uploader.unsigned_upload "test/logo.png", preset.name, (error, result) ->
         expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
         cloudinary.api.delete_upload_preset(preset.name, -> done())
-    , folder: "upload_folder", unsigned: true
+

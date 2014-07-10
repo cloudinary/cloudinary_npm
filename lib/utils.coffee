@@ -415,3 +415,30 @@ exports.cloudinary_js_config = ->
   "<script type='text/javascript'>\n" +
       "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
       "</script>\n";    
+
+v1_result_adapter = (callback) -> 
+  if callback?
+    return (result) ->
+      if result.error?
+        callback(result.error)
+      else
+        callback(undefined, result)
+  else
+    null
+
+v1_adapter = (name, num_pass_args, v1) -> 
+  return (args...) ->
+    pass_args = _.first(args, num_pass_args)
+    options = args[num_pass_args]
+    callback = args[num_pass_args+1]
+    if !callback?
+      callback = options
+      options = {}
+    callback = v1_result_adapter(callback)
+    args = pass_args.concat([callback, options])
+    return v1[name].apply(this, args)
+
+exports.v1_adapters = (exports, v1, mapping) ->
+  for name, num_pass_args of mapping
+    exports[name] = v1_adapter(name, num_pass_args, v1)
+

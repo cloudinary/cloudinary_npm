@@ -46,38 +46,34 @@ describe "api", ->
 
   it "should allow listing resources with cursor", (done) ->
     @timeout 10000
-    cloudinary.api.resources((result) ->      
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.api.resources max_results: 1, (error, result) ->      
+      return done(new Error error.message) if error?
       expect(result.resources).to.have.length 1
       expect(result.next_cursor).not.to.eql(undefined)
-      cloudinary.api.resources((result2) ->      
-        return done(new Error result.error.message) if result.error?
+      cloudinary.v2.api.resources max_results: 1, next_cursor: result.next_cursor, (error2, result2) ->      
+        return done(new Error error2.message) if error2?
         expect(result2.resources).to.have.length 1
         expect(result2.next_cursor).not.to.eql(undefined)
         expect(result.resources[0].public_id).not.to.eql result2.resources[0].public_id
         done()
-      , max_results: 1, next_cursor: result.next_cursor)
-    , max_results: 1)
 
   it "should allow listing resources by type", (done) ->
     @timeout 10000
-    cloudinary.api.resources (result) ->
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.api.resources type: "upload", (error, result) ->
+      return done(new Error error.message) if error?
       resource = find_by_attr(result.resources, "public_id", "api_test")
       expect(resource).not.to.eql(undefined)
       expect(resource.type).to.eql("upload")
       done()
-    , type: "upload"
 
   it "should allow listing resources by prefix", (done) ->
     @timeout 10000
-    cloudinary.api.resources (result) ->
-      return done(new Error result.error.message) if result.error?
+    cloudinary.v2.api.resources type: "upload", prefix: "api_test", (error, result) ->
+      return done(new Error error.message) if error?
       public_ids = (resource.public_id for resource in result.resources)        
       expect(public_ids).to.contain("api_test")   
       expect(public_ids).to.contain("api_test2")
       done()
-    , type: "upload", prefix: "api_test"
 
   it "should allow listing resources by tag", (done) ->
     @timeout 10000
