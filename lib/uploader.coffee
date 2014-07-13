@@ -181,9 +181,9 @@ call_api = (action, callback, options, get_params) ->
   for key, value of params 
     if _.isArray(value)
       for v in value 
-        post_data.push new Buffer(EncodeFieldPart(boundary, key+"[]", v), 'ascii')
+        post_data.push new Buffer(EncodeFieldPart(boundary, key+"[]", v), 'utf8')
     else if utils.present(value)
-      post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'ascii') 
+      post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'utf8') 
 
   post api_url, post_data, boundary, file, handle_response, options
   
