@@ -61,8 +61,12 @@ exports.build_array = build_array = (arg) ->
   else 
     [arg]
     
-exports.encode_double_array = encode_double_array = (arg) ->
-  build_array(arg).map((e) -> build_array(e).join(",")).join("|")
+exports.encode_double_array = encode_double_array = (array) ->
+  array = build_array(array)
+  if array.length > 0 and _.isArray(array[0])
+    array.map((e) -> build_array(e).join(",")).join("|")
+  else
+    array.join(",")
 
 exports.encode_key_value = encode_key_value = (arg) ->
   if _.isObject(arg)
@@ -188,6 +192,7 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
   params.tags = build_array(options.tags).join(",") if options.tags?
   params.context = encode_key_value(options.context) if options.context?
   params.face_coordinates = encode_double_array(options.face_coordinates) if options.face_coordinates?
+  params.custom_coordinates = encode_double_array(options.custom_coordinates) if options.custom_coordinates?
   params.headers = build_custom_headers(options.headers) if options.headers?
   params.ocr = options.ocr if options.ocr?
   params.raw_convert = options.raw_convert if options.raw_convert?

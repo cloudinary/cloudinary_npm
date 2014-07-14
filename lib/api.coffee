@@ -43,7 +43,7 @@ exports.resource = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type, public_id]
-  call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "max_results"), callback, options)
+  call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options)
 
 exports.update = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"

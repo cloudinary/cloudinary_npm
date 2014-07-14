@@ -167,14 +167,16 @@ describe "uploader", ->
     this.timeout 5000
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]]
     different_coordinates = [[122, 32, 111, 152]]
+    custom_coordinates = [1,2,3,4]
     cloudinary.v2.uploader.upload "test/logo.png", face_coordinates: coordinates, faces: yes, (error, result) ->
       return done(new Error error.message) if error?
       expect(result.faces).to.eql(coordinates)
-      cloudinary.v2.uploader.explicit result.public_id, face_coordinates: different_coordinates, type: "upload", (error2, result2) ->
+      cloudinary.v2.uploader.explicit result.public_id, face_coordinates: different_coordinates, custom_coordinates: custom_coordinates, type: "upload", (error2, result2) ->
         return done(new Error error2.message) if error2?
-        cloudinary.v2.api.resource result2.public_id, faces: yes, (ierror, info) ->
+        cloudinary.v2.api.resource result2.public_id, faces: yes, coordinates: yes, (ierror, info) ->
           return done(new Error ierror.message) if ierror?
           expect(info.faces).to.eql(different_coordinates)
+          expect(info.coordinates).to.eql(faces: different_coordinates, custom: [custom_coordinates])
           done()
   
   it "should allow sending context", (done) ->

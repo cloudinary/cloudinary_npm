@@ -96,6 +96,7 @@ exports.explicit = (public_id, callback, options={}) ->
       headers: utils.build_custom_headers(options.headers)
       tags: options.tags ? utils.build_array(options.tags).join(",")
       face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
+      custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
     ]
     
 exports.destroy = (public_id, callback, options={}) ->
