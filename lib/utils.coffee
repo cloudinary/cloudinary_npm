@@ -41,6 +41,7 @@ exports.build_upload_params = build_upload_params = (options) ->
     moderation: options.moderation,
     phash: options.phash,
     upload_preset: options.upload_preset
+    return_delete_token: options.return_delete_token
   updateable_resource_params(options, params)
 
 exports.timestamp = ->
