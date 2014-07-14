@@ -108,9 +108,9 @@ describe "uploader", ->
                 cloudinary.v2.uploader.remove_tag "tag1", result1.public_id, ->
                   cloudinary.api.resource result1.public_id, (r2) -> 
                     expect(r2.tags).to.eql(["tag2"])
-                    cloudinary.v2.uploader.replace_tag "tag3", result1.public_id, ->
+                    cloudinary.v2.uploader.replace_tag "tag3Å", result1.public_id, ->
                       cloudinary.api.resource result1.public_id, (r3) -> 
-                        expect(r3.tags).to.eql(["tag3"])
+                        expect(r3.tags).to.eql(["tag3Å"])
                         done()
    
   it "should support timeouts", (done) ->

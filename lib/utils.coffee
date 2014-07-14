@@ -251,7 +251,7 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   rest = [transformation, (if version then "v" + version else ""), public_id ].filter((part) -> part != "" and part != null).join("/")
   if sign_url
     shasum = crypto.createHash('sha1')
-    shasum.update(rest + api_secret)
+    shasum.update(utf8_encode(rest + api_secret))
     signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
     rest = "s--#{signature}--/" + rest
     
@@ -346,7 +346,7 @@ exports.signed_preloaded_image = (result) ->
 exports.api_sign_request = (params_to_sign, api_secret) ->
   to_sign = _.sortBy("#{k}=#{build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
   shasum = crypto.createHash('sha1')
-  shasum.update(to_sign + api_secret)
+  shasum.update(utf8_encode(to_sign + api_secret))
   shasum.digest('hex')
 
 exports.clear_blank = (hash) ->
