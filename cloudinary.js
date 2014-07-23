@@ -6,7 +6,7 @@ exports.utils = require("./lib/utils");
 exports.uploader = require("./lib/uploader");
 exports.api = require("./lib/api");
 exports.PreloadedFile = require("./lib/preloaded_file");
-exports.v2 = {uploader: require('./lib/v2/uploader'), api: require('./lib/v2/api')}
+exports.v2 = require('./lib/v2');
 
 exports.url = function(public_id, options) {
   options = _.extend({}, options);
