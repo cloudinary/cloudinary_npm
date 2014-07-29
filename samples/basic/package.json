@@ -1,7 +1,7 @@
 {
   "name": "basic",
   "version": "0.0.0",
-  "description": "",
+  "description": "basic node sample of cloudinary npm",
   "main": "basic.js",
   "dependencies": {
     "cloudinary": "^1.0.10",
