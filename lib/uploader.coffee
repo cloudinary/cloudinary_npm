@@ -5,6 +5,7 @@ utils = require("./utils")
 config = require("./config")
 fs = require('fs')
 path = require('path')
+Q = require('q')
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
 build_upload_params = (options) ->
@@ -147,6 +148,7 @@ call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
     return [{timestamp: utils.timestamp(), tag: tag, public_ids:  utils.build_array(public_ids), command:  command, type: options.type}]
    
 call_api = (action, callback, options, get_params) ->
+  deffered = Q.defer()
   options = _.clone(options)
 
   [params, unsigned_params, file] = get_params.call()
@@ -160,7 +162,8 @@ call_api = (action, callback, options, get_params) ->
 
   handle_response = (res) ->
     if res.error
-      callback(res)
+      deffered.reject(res)
+      callback(res) if callback?
     else if _.include([200,400,401,404,420,500], res.statusCode)
       buffer = ""
       error = false
@@ -172,12 +175,16 @@ call_api = (action, callback, options, get_params) ->
         catch e
           result = {error: {message: "Server return invalid JSON response. Status Code #{res.statusCode}"}}
         result["error"]["http_code"] = res.statusCode if result["error"]
-        callback(result)
+        deffered.resolve(result)
+        callback(result) if callback?
       res.on "error", (e) ->
         error = true
-        callback(error: e)
+        deffered.reject(e)
+        callback(error: e) if callback?
     else
-      callback(error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode})
+      error_ojb = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
+      deffered.reject(error_obj.error)
+      callback(error_obj) if callback?
   post_data = []
   for key, value of params 
     if _.isArray(value)
@@ -186,7 +193,11 @@ call_api = (action, callback, options, get_params) ->
     else if utils.present(value)
       post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'utf8') 
 
-  post api_url, post_data, boundary, file, handle_response, options
+  result = post api_url, post_data, boundary, file, handle_response, options
+  if _.isObject(result)
+    return result
+  else
+    return deffered.promise
   
 post = (url, post_data, boundary, file, callback, options) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
@@ -230,7 +241,7 @@ post = (url, post_data, boundary, file, callback, options) ->
     }
   else if file?
     post_request.write(file_header)
-    file_reader = fs.createReadStream(file, {encoding: 'binary'});
+    file_reader = fs.createReadStream(file, {encoding: 'binary'})
     file_reader.on 'data', (data) -> post_request.write(new Buffer(data, 'binary'))
     file_reader.on 'end', ->
       post_request.write(new Buffer("\r\n", 'ascii'))
@@ -240,15 +251,15 @@ post = (url, post_data, boundary, file, callback, options) ->
   true
 
 EncodeFieldPart = (boundary, name, value) ->
-  return_part = "--#{boundary}\r\n";
+  return_part = "--#{boundary}\r\n"
   return_part += "Content-Disposition: form-data; name=\"#{name}\"\r\n\r\n"
   return_part += value + "\r\n"
   return_part
 
 EncodeFilePart = (boundary,type,name,filename) ->
-  return_part = "--#{boundary}\r\n";
-  return_part += "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\"\r\n";
-  return_part += "Content-Type: #{type}\r\n\r\n";
+  return_part = "--#{boundary}\r\n"
+  return_part += "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\"\r\n"
+  return_part += "Content-Type: #{type}\r\n\r\n"
   return_part
 
 exports.direct_upload = (callback_url, options={}) ->

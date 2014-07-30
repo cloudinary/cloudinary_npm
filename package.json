@@ -11,6 +11,7 @@
   "main": "cloudinary.js",
   "dependencies": {
     "coffee-script": "1.7.x",
+    "q": "^1.0.1",
     "underscore": "1.4.x"
   },
   "devDependencies": {
@@ -20,10 +21,13 @@
   "scripts": {
     "test": "mocha"
   },
-  "optionalDependencies": {
-  },
+  "optionalDependencies": {},
   "engines": {
     "node": ">=0.6"
   },
-  "browserify": { "transform": [ "coffeeify" ] }
+  "browserify": {
+    "transform": [
+      "coffeeify"
+    ]
+  }
 }

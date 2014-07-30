@@ -437,7 +437,7 @@ v1_adapter = (name, num_pass_args, v1) ->
     pass_args = _.first(args, num_pass_args)
     options = args[num_pass_args]
     callback = args[num_pass_args+1]
-    if !callback?
+    if !callback? && _.isFunction(options)
       callback = options
       options = {}
     callback = v1_result_adapter(callback)
