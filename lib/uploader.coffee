@@ -148,7 +148,7 @@ call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
     return [{timestamp: utils.timestamp(), tag: tag, public_ids:  utils.build_array(public_ids), command:  command, type: options.type}]
    
 call_api = (action, callback, options, get_params) ->
-  deffered = Q.defer()
+  deferred = Q.defer()
   options = _.clone(options)
 
   [params, unsigned_params, file] = get_params.call()
@@ -162,7 +162,7 @@ call_api = (action, callback, options, get_params) ->
 
   handle_response = (res) ->
     if res.error
-      deffered.reject(res)
+      deferred.reject(res)
       callback(res) if callback?
     else if _.include([200,400,401,404,420,500], res.statusCode)
       buffer = ""
@@ -175,15 +175,15 @@ call_api = (action, callback, options, get_params) ->
         catch e
           result = {error: {message: "Server return invalid JSON response. Status Code #{res.statusCode}"}}
         result["error"]["http_code"] = res.statusCode if result["error"]
-        deffered.resolve(result)
+        deferred.resolve(result)
         callback(result) if callback?
       res.on "error", (e) ->
         error = true
-        deffered.reject(e)
+        deferred.reject(e)
         callback(error: e) if callback?
     else
       error_ojb = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
-      deffered.reject(error_obj.error)
+      deferred.reject(error_obj.error)
       callback(error_obj) if callback?
   post_data = []
   for key, value of params 
@@ -197,7 +197,7 @@ call_api = (action, callback, options, get_params) ->
   if _.isObject(result)
     return result
   else
-    return deffered.promise
+    return deferred.promise
   
 post = (url, post_data, boundary, file, callback, options) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
