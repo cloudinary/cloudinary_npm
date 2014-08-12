@@ -143,6 +143,12 @@ Usage:
 
     // <img src='http://res.cloudinary.com/demo/image/upload/c_fill,h_100,w_100/sample.png' height='100' width='100'/>
 
+### Samples
+
+You can find our simple and ready-to-use samples projects, along with documentation in the [samples folder](https://github.com/cloudinary/cloudinary_npm/tree/master/samples). 
+Please consult with the [README file](https://github.com/cloudinary/cloudinary_npm/blob/master/samples/README.md), for usage and explanations.
+
+
 
 ## Additional resources ##########################################################
 

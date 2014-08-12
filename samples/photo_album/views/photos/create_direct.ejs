@@ -3,7 +3,7 @@
 
 <div class="photo">
   <h2><%= photo.title %></h2>
-  <a href="<%= photo.image.url %>" target="_blank">
+  <a href="<%= photo.transformationUrl()%>" target="_blank">
     <img src="<%=photo.thumbnailUrl()%>" class="thumbnail inline"/>
   </a>
 </div>

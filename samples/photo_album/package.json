@@ -1,10 +1,10 @@
 {
   "name": "node-photo-album",
   "version": "0.0.0",
-  "description": "",
+  "description": "Cloudinary Express demo",
   "main": "server.js",
   "scripts": {
-    "start": "./node_modules/.bin/supervisor -e 'js|ejs|node|coffee' server.js"
+    "debug": "./node_modules/.bin/supervisor -e 'js|ejs|node|coffee' server.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "ejs-locals": "^1.0.2",
     "express": "^4.7.2",
     "jugglingdb": "^0.2.14",
+    "jugglingdb-mongodb": "0.0.4-4",
     "method-override": "^2.1.2",
     "promised-jugglingdb": "^0.2.15"
   },

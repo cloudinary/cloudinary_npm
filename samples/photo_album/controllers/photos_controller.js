@@ -106,7 +106,7 @@ function create_direct(req,res){
   var image = new cloudinary.PreloadedFile(req.body.image_id);
   // check that image resolved from image_id is valid
   if (image.is_valid()){
-    photo.image = image;
+    photo.image = image.toJSON();
     console.dir(photo.image)
   }
   photo.save().then(function(photo){
