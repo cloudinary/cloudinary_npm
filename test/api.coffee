@@ -1,8 +1,11 @@
+dotenv = require('dotenv')
+dotenv.load()
+
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
 _ = require("underscore")
-
+Q = require('q')
 fs = require('fs')
 describe "api", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
@@ -467,3 +470,35 @@ describe "api", ->
     cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
     cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
     cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
+
+
+  it "should list folders in cloudinary", (done)->
+    @timeout 10000
+    Q.all([
+      cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder1/item' ),
+      cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder2/item' ),
+      cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder2/item' ),
+      cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder1/test_subfolder1/item' ),
+      cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder1/test_subfolder2/item' )
+    ]).then((results)->
+      Q.all([
+        cloudinary.v2.api.root_folders(),
+        cloudinary.v2.api.sub_folders('test_folder1')
+      ])
+    ).then((results)->
+      root= results[0]
+      sub_1 = results[1]
+      expect(root.folders[0].name).to.eql('test_folder1')
+      expect(root.folders[1].name).to.eql('test_folder2')
+      expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1')
+      expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2')
+      cloudinary.v2.api.sub_folders('test_folder_not_exists')
+    ).then((result)->
+      console.log('error test_folder_not_exists should not pass to "then" handler but "catch"')
+      expect(true).to.eql(false)
+    ).catch((err)->
+      expect(err.error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
+      done()
+    )
+    
+
