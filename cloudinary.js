@@ -6,7 +6,6 @@ exports.utils = require("./lib/utils");
 exports.uploader = require("./lib/uploader");
 exports.api = require("./lib/api");
 exports.PreloadedFile = require("./lib/preloaded_file");
-exports.v2 = require('./lib/v2');
 
 exports.url = function(public_id, options) {
   options = _.extend({}, options);
@@ -42,3 +41,4 @@ exports.CF_SHARED_CDN = exports.utils.CF_SHARED_CDN;
 exports.AKAMAI_SHARED_CDN = exports.utils.AKAMAI_SHARED_CDN;
 exports.SHARED_CDN = exports.utils.SHARED_CDN;
 exports.BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+exports.v2 = require('./lib/v2');
