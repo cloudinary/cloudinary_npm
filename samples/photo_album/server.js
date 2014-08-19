@@ -1,14 +1,21 @@
 // load environment varialbes
 var dotenv = require('dotenv');
 dotenv.load();
-
+var cloudinary = require('cloudinary').v2;
+if (typeof(process.env.CLOUDINARY_URL)=='undefined'){
+  console.warn('!! cloudinary config is undefined !!')
+  console.warn('export CLOUDINARY_URL or set dotenv file')
+}else{
+  console.log('cloudinary config:')
+  console.log(cloudinary.config())
+}
+console.log('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --')
 var path = require('path');
 // start express server
 var schema = require('./config/schema');
 var express = require('express');
 var engine  = require('ejs-locals');
 var app = express(); 
-
 var bodyParser = require('body-parser')
 var methodOverride = require('method-override')
 app.use( bodyParser.json() );
@@ -30,6 +37,7 @@ app.use(function (req, res, next) {
   if (typeof(process.env.CLOUDINARY_URL)=='undefined'){
     throw new Error('Missing CLOUDINARY_URL environment variable')
   }else{
+    res.locals.cloudinary = cloudinary
     next()
   }
 })
