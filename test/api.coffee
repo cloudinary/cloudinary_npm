@@ -473,7 +473,7 @@ describe "api", ->
 
 
   it "should list folders in cloudinary", (done)->
-    @timeout 10000
+    @timeout 3000
     Q.all([
       cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder1/item' ),
       cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder2/item' ),
@@ -487,9 +487,10 @@ describe "api", ->
       ])
     ).then((results)->
       root= results[0]
+      root_folders = (folder.name for folder in root.folders)
       sub_1 = results[1]
-      expect(root.folders[0].name).to.eql('test_folder1')
-      expect(root.folders[1].name).to.eql('test_folder2')
+      expect(root_folders).to.contain('test_folder1')
+      expect(root_folders).to.contain('test_folder2')
       expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1')
       expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2')
       cloudinary.v2.api.sub_folders('test_folder_not_exists')

@@ -139,7 +139,7 @@ exports.sub_folders = (path,callback, options={}) ->
   call_api("get", uri, {}, callback, options)
 
 call_api = (method, uri, params, callback, options) ->
-  deffered  = Q.defer()
+  deferred  = Q.defer()
   cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"
   cloud_name = options["cloud_name"] ? config().cloud_name ? throw("Must supply cloud_name")
   api_key = options["api_key"] ? config().api_key ? throw("Must supply api_key")
@@ -177,18 +177,18 @@ call_api = (method, uri, params, callback, options) ->
           result["rate_limit_remaining"] = parseInt(res.headers["x-featureratelimit-remaining"])     
 
         if (result.error)
-          deffered.reject(result)
+          deferred.reject(result)
         else
-          deffered.resolve(result)
+          deferred.resolve(result)
         callback(result) if callback?
       res.on "error", (e) ->
         error = true
         err_obj = error: {message: e, http_code: res.statusCode}
-        deffered.reject(err_obj.error)
+        deferred.reject(err_obj.error)
         callback(err_obj) if callback?
     else
       err_obj = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
-      deffered.reject(err_obj.error)
+      deferred.reject(err_obj.error)
       callback(err_obj) if callback?
     
   request = https.request(request_options, handle_response)
@@ -200,7 +200,7 @@ call_api = (method, uri, params, callback, options) ->
   
   request.end()
 
-  return deffered.promise
+  return deferred.promise
 
 only = (hash, keys...) ->
   result = {}
