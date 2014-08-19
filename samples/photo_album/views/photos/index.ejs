@@ -4,7 +4,7 @@
 <div id="posterframe">
   <!-- This will render the fetched Facebook profile picture using Cloudinary according to the
   requested transformations -->
-  <img alt="Officialchucknorrispage" src="http://res.cloudinary.com/cloudinary/image/facebook/c_thumb,e_sepia,g_face,h_95,r_20,w_95/a_10/officialchucknorrispage.png" />
+  <%-cloudinary.image('officialchucknorrispage',{type:'facebook',format:'png',transformation:[{height:95,width:95,crop:'thumb',gravity:'face',effect:'sepia',radius:20},{angle:10}]})%>
 </div>
 
 <h1>Welcome!</h1>
@@ -38,8 +38,8 @@
         <% var photo =  photos[i] ; %>
         <div class="photo">
           <h2><%= photo.title %></h2>
-          <a href="<%= photo.transformationUrl()%>" target="_blank">
-            <img src="<%=photo.thumbnailUrl()%>" class="thumbnail inline"/>
+          <a href="<%= cloudinary.url(photo.image.public_id)%>" target="_blank">
+            <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: 80,class:'thumbnail inline'})%>
           </a>
 
           <div class="less_info">
@@ -61,8 +61,8 @@
 
               <td>
                 <div class="thumbnail_holder">
-                  <a target="_blank" href="<%=photo.transformationUrl(image_params)%>" > 
-                    <img src="<%=photo.transformationUrl(image_params)%>" class="thumbnail inline"/>
+                  <a target="_blank" href="<%=cloudinary.url(photo.image.public_id,image_params)%>" > 
+                    <img src="<%=cloudinary.url(photo.image.public_id,image_params)%>" class="thumbnail inline"/>
                   </a>
                 </div>
                 <table class="info">
