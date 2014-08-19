@@ -13,7 +13,7 @@ function index(req,res){
 
 
 function add_through_server(req,res){
-  // create a new photo model and set it's default title
+  // Create a new photo model and set it's default title
   var photo = new Photo();
   Photo.count().then(function(amount){
     photo.title = "My Photo #"+(amount+1);
@@ -32,15 +32,15 @@ function create_through_server(req,res){
   // and then saved to the database.
 
   var photo = new Photo(req.body);
-  // get temp file path 
+  // Get temp file path 
   var imageFile = req.files.image.path;
-  // upload file to Cloudinary
+  // Upload file to Cloudinary
   cloudinary.uploader.upload(imageFile,{tags:'express_sample'})
   .then(function(image){
     console.log('** file uploaded to Cloudinary service')
     console.dir(image)
     photo.image = image
-    // save photo with image metadata
+    // Save photo with image metadata
     return photo.save();
   })
   .then(function(photo){
@@ -52,7 +52,9 @@ function create_through_server(req,res){
 }
 
 function add_direct(req,res){
+  // Configuring cloudinary_cors direct upload to support old IE versions
   var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
+  // Create a new photo model and set it's default title
   var photo = new Photo();
   Photo.count().then(function(amount){
     photo.title = "My Photo #"+(amount+1)+" (direct)";
@@ -66,12 +68,17 @@ function add_direct(req,res){
 }
 
 function add_direct_unsigned(req,res){
+  // Configuring cloudinary_cors direct upload to support old IE versions
   var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
-  var photo = new Photo();
+
+  // Set a unique unsigned upload preset name (for demo purposes only).
+  // In 'real life' scenario the preset name will be meaningful and will be set via online console or API not related to the actual upload
   var sha1 = crypto.createHash('sha1');
   sha1.update(cloudinary.config('api_key') + cloudinary.config('api_secret'));
   var preset_name = "sample_" +sha1.digest('hex');
 
+  // Create a new photo model and set it's default title
+  var photo = new Photo();
   Photo.count().then(function(amount){
     photo.title = "My Photo #"+(amount+1)+" (direct unsigned)";
   })
@@ -84,7 +91,10 @@ function add_direct_unsigned(req,res){
     }
   })
   .catch(function(err){
-    return cloudinary.api.create_upload_preset({name: preset_name,  folder:  "preset_folder", return_delete_token:true })
+    // Creating an upload preset is done here only for demo purposes. 
+    // Ussualy it is created outside the upload flow via api or 
+    // online console (https://cloudinary.com/console/settings/upload)
+    return cloudinary.api.create_upload_preset({unsigned:true,name: preset_name,  folder:  "preset_folder", return_delete_token:true })
   })
   .finally(function(preset){
     res.render('photos/add_direct_unsigned',
