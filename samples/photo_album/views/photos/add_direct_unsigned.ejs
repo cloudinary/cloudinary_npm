@@ -16,7 +16,7 @@
       <div class="form_controls">
         <div class="upload_button_holder">
           <a href="#" class='upload_button'>Upload</a>
-          <%-cloudinary_direct_upload_tag%>
+          <%-cloudinary.uploader.image_upload_tag('image_id', { callback: cloudinary_cors })%>
         </div>
         <span class="status"></span>
 
@@ -43,7 +43,7 @@
 <div id="info"></div>
 
 <!-- Configure Cloudinary jQuery plugin -->
-<%- cloudinary_js_config %>
+<%- cloudinary.cloudinary_js_config()%>
 
 <script>
   $(document).ready(function() {

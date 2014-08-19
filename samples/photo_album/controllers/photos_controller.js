@@ -60,8 +60,7 @@ function add_direct(req,res){
   .finally(function(){
     res.render('photos/add_direct', {
       photo:photo,
-      cloudinary_js_config:cloudinary.cloudinary_js_config(),
-      cloudinary_direct_upload_tag:cloudinary.uploader.image_upload_tag('image_id', { callback: cloudinary_cors })
+      cloudinary_cors:cloudinary_cors
     });
   });
 }
@@ -91,8 +90,7 @@ function add_direct_unsigned(req,res){
     res.render('photos/add_direct_unsigned',
                {
                  photo:photo,
-                 cloudinary_js_config:cloudinary.cloudinary_js_config(),
-                 cloudinary_direct_upload_tag:cloudinary.uploader.unsigned_image_upload_tag('image_id', preset_name,{ callback: cloudinary_cors })
+                 cloudinary_cors:cloudinary_cors
                })
   })
 }
