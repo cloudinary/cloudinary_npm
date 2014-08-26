@@ -16,7 +16,8 @@
       <div class="form_controls">
         <div class="upload_button_holder">
           <a href="#" class='upload_button'>Upload</a>
-          <%-cloudinary.uploader.image_upload_tag('image_id', { callback: cloudinary_cors })%>
+          
+          <%-cloudinary.uploader.unsigned_image_upload_tag('image_id', preset_name,{ callback: cloudinary_cors })%>
         </div>
         <span class="status"></span>
 
@@ -30,6 +31,7 @@
     </div>
     <div class="form_line">
       <div class="form_controls">
+        <input name="type" type="hidden" value="direct_unsigned" />
         <input name="commit" type="submit" value="Submit Photo" />
 
       </div>

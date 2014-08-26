@@ -31,6 +31,12 @@ function create_through_server(req,res){
   // The upload metadata (e.g. image size) is then added to the photo  model (photo.image)
   // and then saved to the database.
 
+  // file was not uploaded redirecting to upload 
+  if (req.files.image.ws.bytesWritten==0) {
+    res.redirect('/photos/add')
+    return;
+  }
+
   var photo = new Photo(req.body);
   // Get temp file path 
   var imageFile = req.files.image.path;
@@ -100,7 +106,8 @@ function add_direct_unsigned(req,res){
     res.render('photos/add_direct_unsigned',
                {
                  photo:photo,
-                 cloudinary_cors:cloudinary_cors
+                 cloudinary_cors:cloudinary_cors,
+                 preset_name:preset_name
                })
   })
 }
@@ -111,6 +118,15 @@ function create_direct(req,res){
   var result = {};
   var photo = new Photo(req.body);
   result.photo = photo;
+  // image was not uploaded, returning to edit form
+  if (!req.body.image_id) {
+    if (req.body.type=='direct'){
+      res.redirect('/photos/add_direct')
+    }else{
+      res.redirect('/photos/add_direct_unsigned')
+    }
+    return;
+  }
   var image = new cloudinary.PreloadedFile(req.body.image_id);
   // check that image resolved from image_id is valid
   if (image.is_valid()){
