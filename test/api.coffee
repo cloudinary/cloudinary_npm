@@ -471,9 +471,10 @@ describe "api", ->
     cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
     cloudinary.uploader.upload("test/logo.png", after_upload, moderation: "manual")
 
-
-  it "should list folders in cloudinary", (done)->
-    @timeout 3000
+  # For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
+  # Remove '.skip' below if you want to test it.
+  it.skip "should list folders in cloudinary", (done)->
+    @timeout 20000
     Q.all([
       cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder1/item' ),
       cloudinary.v2.uploader.upload("test/logo.png", public_id: 'test_folder2/item' ),
