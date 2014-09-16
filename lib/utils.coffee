@@ -367,7 +367,7 @@ exports.merge = (hash1, hash2) ->
   result[k] = hash2[k] for k, v of hash2
   result 
 
-exports.sign_request = (params, options) ->
+exports.sign_request = (params, options = {}) ->
   api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
 
