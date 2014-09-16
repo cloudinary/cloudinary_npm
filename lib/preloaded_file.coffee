@@ -36,5 +36,13 @@ class PreloadedFile
     
   toString: -> 
     @resource_type + "/" + @type + "/v" + @version + "/" + @filename + "#" + @signature
+    
+  toJSON: -> 
+    result = {}
+    for key, val of this
+      result[key] = val if typeof(val)!='function'
+    result 
+    
+
   
 module.exports = PreloadedFile

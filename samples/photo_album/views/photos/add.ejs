@@ -1,0 +1,31 @@
+<% layout('../layouts/default') %>
+
+<!-- A standard form for uploading images to your server -->
+<div id='backend_upload'>
+  <h1>New Photo</h1>
+  <h2>Image file is uploaded through the server</h2>
+  <form action="/photos" enctype="multipart/form-data" method="post">
+    <div class="form_line">
+      <label for="photo_title">Title:</label>
+      <div class="form_controls">
+        <input id="photo_title" name="title" size="30" type="text" value="<%=photo.title%>" />
+      </div>
+    </div>
+    <div class="form_line">
+      <label for="photo_image">Image:</label>
+      <div class="form_controls">
+        <input id="photo_image" name="image" type="file" />
+        <input id="photo_image_cache" name="image_cache" type="hidden" />
+      </div>
+    </div>
+    <div class="form_line">
+      <div class="form_controls">
+        <input name="commit" type="submit" value="Submit Photo" />
+
+      </div>
+    </div>
+    <input id="direct" name="direct" type="hidden" />
+</form></div>
+
+<a href="/photos" class="back_link">Back to list</a>
+

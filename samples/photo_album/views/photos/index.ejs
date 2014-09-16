@@ -1,0 +1,90 @@
+<% layout('../layouts/default') %>
+
+
+<div id="posterframe">
+  <!-- This will render the fetched Facebook profile picture using Cloudinary according to the
+  requested transformations -->
+  <%-cloudinary.image('officialchucknorrispage',{type:'facebook',format:'png',transformation:[{height:95,width:95,crop:'thumb',gravity:'face',effect:'sepia',radius:20},{angle:10}]})%>
+</div>
+
+<h1>Welcome!</h1>
+
+<p>
+  This is the main demo page of the PhotoAlbum sample Express application of Cloudinary.<br />
+  Here you can see all images you have uploaded to this application and find some information on how
+  to implement your own Express application storing, manipulating and serving your photos using Cloudinary!
+</p>
+
+<p>
+  All of the images you see here are transformed and served by Cloudinary. 
+  For instance, the logo and the poster frame. 
+  These two pictures weren't even have to be uploaded to Cloudinary, they are retrieved by the service, transformed, cached and distributed through a CDN.
+</p>
+
+<h1>Your Photos</h1>
+
+<div class="actions">
+  <a class="upload_link" href="/photos/add">Add photo</a>
+  <a class="upload_link" href="/photos/add_direct">Add photo (direct upload)</a>
+  <a class="upload_link" href="/photos/add_direct_unsigned">Add photo (unsigned direct upload)</a>
+</div>
+
+<div class="photos">
+  <% if ( photos.length==0 ) { %>
+    <p>No photos were added yet.</p>
+  <% } else { %>
+    <ul>
+      <% for(var i=0; i<photos.length; i++) {%>
+        <% var photo =  photos[i] ; %>
+        <div class="photo">
+          <h2><%= photo.title %></h2>
+          <a href="<%= cloudinary.url(photo.image.public_id)%>" target="_blank">
+            <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: 80,format:'jpg',class:'thumbnail inline'})%>
+          </a>
+
+          <div class="less_info">
+            <a href="#" class="toggle_info">Show transformations</a>
+          </div>
+
+          <div class="more_info">
+            <a href="#" class="toggle_info">Hide transformations</a>
+            <table class="thumbnails">
+              <% var transformations = [
+                { crop : "fill", radius : 10, height : 150, width : 150 },
+                { crop : "scale", height : 150, width : 150 },
+                { crop : "fit", height : 150, width : 150 },
+                { crop : "thumb", gravity : "face", height : 150, width : 150 },
+                { format : "png", angle : 20, transformation : { 
+                  crop : "fill", gravity : "north", effect : "sepia", height : 150, width : 150 } }
+              ] %>
+            <% transformations.forEach(function(image_params) {%>
+
+              <td>
+                <div class="thumbnail_holder">
+                  <a target="_blank" href="<%=cloudinary.url(photo.image.public_id,image_params)%>" > 
+                    <img src="<%=cloudinary.url(photo.image.public_id,image_params)%>" class="thumbnail inline"/>
+                  </a>
+                </div>
+                <table class="info">
+                  <% for (var key in image_params){%>
+                    <tr>
+                      <td><%= key %></td>
+                      <td><%= JSON.stringify(image_params[key]) %></td>
+                    </tr>
+                  <% } %>  
+                </table>
+                <br/>
+              </td>
+            <% }) %>
+          </table>
+          <div class="note">              
+            Take a look at our documentation of <a href="http://cloudinary.com/documentation/image_transformations" target="_blank">Image Transformations</a> for a full list of supported transformations.
+          </div>  
+        </div>
+      </div>
+
+    <% } %>
+  </ul>
+<% } %>
+
+

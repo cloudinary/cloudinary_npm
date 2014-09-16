@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="/css/photo_album.css" media="all" rel="stylesheet" type="text/css" />
+    <title>PhotoAlbum on Express</title>
+    <link rel="shortcut icon" href="<%=cloudinary.url('http://cloudinary.com/favicon.png',{type:'fetch'})%>" />
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js" lang="text/javascript"></script>
+    <script src='/js/jquery.ui.widget.js' type='text/javascript'></script>
+    <script src='/js/jquery.iframe-transport.js' type='text/javascript'></script>
+    <script src='/js/jquery.fileupload.js' type='text/javascript'></script>
+    <script src='/js/jquery.cloudinary.js' type='text/javascript'></script>
+    <script src="/js/photo_album.js" lang="text/javascript"></script>
+  </head>
+  <body>
+    <div id="logo">
+      <!-- This will render the image fetched from a remote HTTP URL using Cloudinary -->
+      <img alt="Logo" src="<%=cloudinary.url('http://cloudinary.com/images/logo.png',{type:'fetch'})%>" />
+    </div>
+    <div class="content">
+      <%-body%>
+    </div>
+  </body>
+</html>

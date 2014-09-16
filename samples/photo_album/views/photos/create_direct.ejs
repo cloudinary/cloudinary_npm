@@ -1,0 +1,23 @@
+<% layout('../layouts/default') %>
+<h1>Your photo was uploaded sucessfully!</h1>
+
+<div class="photo">
+  <h2><%= photo.title %></h2>
+  <a href="<%= cloudinary.url(photo.image.public_id)%>" target="_blank">
+    <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: 80,crop:'fill',format:'jpg',class:'thumbnail inline'})%>
+  </a>
+</div>
+
+<a href="/photos" class="back_link">Back to list</a>
+
+<% if (upload){ %>
+  <div class="upload_details">
+    <h2>Upload metadata:</h2>
+    <table>
+      <% for (var attr in upload){%>
+        <tr><td><%= attr %></td><td><%= JSON.stringify(upload[attr])%></td></tr>
+      <% }%>
+    </table>
+  </div>
+<% } %>    
+

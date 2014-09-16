@@ -26,4 +26,6 @@ utils.v1_adapters exports, api,
   upload_preset: 1
   delete_upload_preset: 1,
   update_upload_preset: 1,
-  create_upload_preset: 0
+  create_upload_preset: 0,
+  root_folders: 0,
+  sub_folders: 1,

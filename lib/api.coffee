@@ -130,6 +130,14 @@ exports.create_upload_preset = (callback, options={}) ->
   params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id"))  
   call_api("post", uri, params, callback, options)
 
+exports.root_folders = (callback, options={}) ->
+  uri = ["folders"]
+  call_api("get", uri, {}, callback, options)
+  
+exports.sub_folders = (path,callback, options={}) ->
+  uri = ["folders",path]
+  call_api("get", uri, {}, callback, options)
+
 call_api = (method, uri, params, callback, options) ->
   deferred  = Q.defer()
   cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"
@@ -167,7 +175,11 @@ call_api = (method, uri, params, callback, options) ->
           result["rate_limit_allowed"] = parseInt(res.headers["x-featureratelimit-limit"])
           result["rate_limit_reset_at"] = new Date(res.headers["x-featureratelimit-reset"])
           result["rate_limit_remaining"] = parseInt(res.headers["x-featureratelimit-remaining"])     
-        deferred.resolve(result)
+
+        if (result.error)
+          deferred.reject(result)
+        else
+          deferred.resolve(result)
         callback(result) if callback?
       res.on "error", (e) ->
         error = true
