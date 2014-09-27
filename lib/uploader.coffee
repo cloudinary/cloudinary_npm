@@ -182,7 +182,7 @@ call_api = (action, callback, options, get_params) ->
         deferred.reject(e)
         callback(error: e) if callback?
     else
-      error_ojb = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
+      error_obj = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
       deferred.reject(error_obj.error)
       callback(error_obj) if callback?
   post_data = []
