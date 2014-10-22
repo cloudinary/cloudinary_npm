@@ -175,7 +175,10 @@ call_api = (action, callback, options, get_params) ->
         catch e
           result = {error: {message: "Server return invalid JSON response. Status Code #{res.statusCode}"}}
         result["error"]["http_code"] = res.statusCode if result["error"]
-        deferred.resolve(result)
+        if result.error
+          deferred.reject(result.error)
+        else
+          deferred.resolve(result)
         callback(result) if callback?
       res.on "error", (e) ->
         error = true
