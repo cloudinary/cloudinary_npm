@@ -257,3 +257,10 @@ describe "uploader", ->
         expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
         cloudinary.api.delete_upload_preset(preset.name, -> done())
 
+  it "should reject promise if error code is returned from the server" , (done) ->
+    this.timeout 5000
+    cloudinary.uploader.upload("test/empty.gif").catch((error)->
+      expect(error.message).to.contain "empty"
+      done()
+    )
+
