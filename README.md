@@ -135,7 +135,7 @@ You can use cloudinary.upload_stream to write to the uploader as a stream:
 #### Version 1.1 upload_stream breaking change 
 upload_stream now returns a Transform stream object , we advise to change the on('data') and on('end') to pipe api:
 
-    var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).pipe(stream);
+    var file_reader = fs.createReadStream('my_picture.jpg').pipe(stream);
 
 if you still need to use event chanining please wrap stream.write and stream.end with wrapper functions
 
