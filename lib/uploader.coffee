@@ -1,6 +1,7 @@
 _ = require("underscore")
 https = require('https')
 #http = require('http')
+UploadStream = require('./upload_stream')
 utils = require("./utils")
 config = require("./config")
 fs = require('fs')
@@ -216,6 +217,8 @@ post = (url, post_data, boundary, file, callback, options) ->
       'User-Agent': utils.USER_AGENT
 
   post_request = https.request(post_options, callback)
+  upload_stream = new UploadStream({boundary: boundary})
+  upload_stream.pipe(post_request)
   timeout = false
   post_request.on "error", (e) -> 
     if timeout
@@ -229,28 +232,17 @@ post = (url, post_data, boundary, file, callback, options) ->
   for i in [0..post_data.length-1]
     post_request.write(post_data[i])
  
-  done = ->
-    post_request.write(finish_buffer)
-    post_request.end()
-
   if options.stream
     post_request.write(file_header)
-    return {
-      write: (data) ->
-        post_request.write(new Buffer(data, 'binary'))
-      end: ->
-        post_request.write(new Buffer("\r\n", 'ascii'))
-        done()        
-    }
+    return upload_stream
   else if file?
     post_request.write(file_header)
-    file_reader = fs.createReadStream(file, {encoding: 'binary'})
-    file_reader.on 'data', (data) -> post_request.write(new Buffer(data, 'binary'))
-    file_reader.on 'end', ->
-      post_request.write(new Buffer("\r\n", 'ascii'))
-      done()
+    file_reader = fs.createReadStream(file)
+    file_reader.pipe(upload_stream)
   else
-    done()
+    post_request.write(finish_buffer)
+    post_request.end()
+    
   true
 
 EncodeFieldPart = (boundary, name, value) ->

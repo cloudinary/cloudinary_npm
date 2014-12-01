@@ -91,9 +91,9 @@ describe "uploader", ->
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
       done()
-    file_reader = fs.createReadStream('test/logo.png', {encoding: 'binary'});
-    file_reader.on 'data', stream.write
-    file_reader.on 'end', stream.end
+    file_reader = fs.createReadStream('test/logo.png', {encoding: 'binary'})
+    file_reader.on 'data', (chunk)-> stream.write(chunk,'binary')
+    file_reader.on 'end', -> stream.end()
 
   it "should successfully manipulate tags", (done) ->
     this.timeout 15000
@@ -264,3 +264,14 @@ describe "uploader", ->
       done()
     )
 
+  it "should successfully upload with pipes", (done) ->
+    this.timeout 2000
+    upload = cloudinary.v2.uploader.upload_stream (error, result) ->
+      return done(new Error error.message) if error?
+      expect(result.width).to.eql(241)
+      expect(result.height).to.eql(51)
+      expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
+      expect(result.signature).to.eql(expected_signature)
+      done()
+    file_reader = fs.createReadStream('test/logo.png')
+    file_reader.pipe(upload)
