@@ -132,14 +132,17 @@ You can use cloudinary.upload_stream to write to the uploader as a stream:
     var fs = require('fs');
     var stream = cloudinary.uploader.upload_stream(function(result) { console.log(result); });
     var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
-#### Version 1.1 upload_stream breaking change 
-upload_stream now returns a Transform stream object , we advise to change the on('data') and on('end') to pipe api:
+
+#### Version 1.1 upload_stream change notes
+The `upload_stream` method was modified to return a `Transform` stream object, we advise to change the `on('data')` and `on('end')` to pipe API:
 
     var file_reader = fs.createReadStream('my_picture.jpg').pipe(stream);
 
-if you still need to use event chanining please wrap stream.write and stream.end with wrapper functions
+if you still need to use event chanining, you can wrap `stream.write` and `stream.end` with wrapper functions
 
-    var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).on('data', function(data){stream.write(data)}).on('end', function(){stream.end()});
+    var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).
+      on('data', function(data){stream.write(data)}).on('end', function(){stream.end()});
+
 ### cloudinary.image
 
 Returns an html image tag pointing to Cloudinary.
