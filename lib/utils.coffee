@@ -378,6 +378,15 @@ exports.sign_request = (params, options = {}) ->
 
   return params
 
+exports.webhook_signature = (data, timestamp, options = {}) ->
+  throw "Must supply data"  unless data
+  throw "Must supply timestamp"  unless timestamp
+  api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
+
+  shasum = crypto.createHash('sha1')
+  shasum.update(data + timestamp + api_secret)
+  shasum.digest('hex')
+
 exports.process_request_params = (params, options) ->
   if options.unsigned? && options.unsigned
     params = exports.clear_blank(params)
