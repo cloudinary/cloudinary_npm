@@ -205,7 +205,7 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
   params
   
 exports.url = exports.cloudinary_url = (public_id, options = {}) ->
-  type = option_consume(options, "type", "upload")
+  type = option_consume(options, "type",null )
   options.fetch_format ?= option_consume(options, "format") if type is "fetch"
   transformation = generate_transformation_string(options)
   resource_type = option_consume(options, "resource_type", "image")
@@ -218,6 +218,7 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   secure = option_consume(options, "secure", config().secure)
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   secure_cdn_subdomain = option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain) 
+  force_remote =  option_consume(options, "force_remote", config().force_remote) 
 
   cname = option_consume(options, "cname", config().cname)
   shorten = option_consume(options, "shorten", config().shorten)
@@ -228,6 +229,27 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   if !private_cdn
     throw 'URL Suffix only supported in private CDN' if !!url_suffix
     throw 'Root path only supported in private CDN' if use_root_path
+
+  original_source = public_id
+  return original_source unless public_id?
+  public_id = public_id.toString()
+
+  if !force_remote
+    if (type==null || type == 'asset') && public_id.match(/^https?:\//i)
+      return original_source 
+    if public_id.indexOf("/") ==0
+      if public_id.indexOf("/images/") ==0
+        public_id= public_id.replace('/images/', '')
+      else
+        return original_source
+
+    @metadata?={}
+    if type == 'asset' && @metadata["images/#{public_id}"]
+      return original_source if !cloudinary.config.static_image_support
+      public_id= @metadata["images/#{public_id}"]["public_id"]
+      public_id+= path.extname(original_source) if !format
+    else if type == 'asset'
+      return original_source # requested asset, but no metadata - probably local file. return.
 
   [ resource_type , type ] = finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten)
   [ public_id, source_to_sign ]= finalize_source(public_id, format, url_suffix)
@@ -247,11 +269,10 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
 
   prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
   url = [prefix, resource_type, type, signature, transformation, version, public_id].filter((part) -> part? && part!='').join('/')
-  #console.log url
   url
 
 finalize_source = (source,format,url_suffix) ->
-  source = source.replace(/([^:])\//, '\\1\/')
+  source = source.replace(/([^:])\/\//, '\\1\/')
   if source.match(/^https?:\//i)
     source = smart_escape(source)
     source_to_sign = source
@@ -267,7 +288,7 @@ finalize_source = (source,format,url_suffix) ->
   [source,source_to_sign]
 
 finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) ->
-  type='upload' unless type?
+  type?='upload'
   if url_suffix?
     if resource_type.toString()=='image' && type.toString()=='upload'
       resource_type = "images"
