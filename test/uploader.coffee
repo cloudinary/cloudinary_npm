@@ -231,7 +231,7 @@ describe "uploader", ->
     this.timeout 5000
     cloudinary.uploader.upload "test/logo.png", (result) ->
       expect(result.error?).to.be true
-      expect(result.error.message).to.contain "is not a valid"
+      expect(result.error.message).to.contain "is invalid"
       done()
     , background_removal: "illegal"
       

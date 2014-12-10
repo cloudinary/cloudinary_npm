@@ -9,7 +9,7 @@ path = require('path')
 Q = require('q')
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
-build_upload_params = (options) ->
+build_upload_params = build_upload_params= (options) ->
   utils.build_upload_params(options)
 
 exports.unsigned_upload_stream = (upload_preset, callback, options={}) ->

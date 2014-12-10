@@ -13,35 +13,35 @@ exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
 
-exports.build_upload_params = build_upload_params = (options) ->
+exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
-    transformation: exports.generate_transformation_string(options),
+    transformation: exports.generate_transformation_string(_.clone(options)),
     public_id: options.public_id,
     callback: options.callback,
     format: options.format,
-    backup: options.backup,
-    faces: options.faces,
-    exif: options.exif,
-    image_metadata: options.image_metadata,
-    colors: options.colors,
+    backup: as_safe_bool(options.backup),
+    faces: as_safe_bool(options.faces),
+    exif: as_safe_bool(options.exif),
+    image_metadata: as_safe_bool(options.image_metadata),
+    colors: as_safe_bool(options.colors),
     type: options.type,
     eager: exports.build_eager(options.eager),
-    use_filename: options.use_filename, 
-    unique_filename: options.unique_filename, 
-    discard_original_filename: options.discard_original_filename, 
+    use_filename: as_safe_bool(options.use_filename),
+    unique_filename: as_safe_bool(options.unique_filename), 
+    discard_original_filename: as_safe_bool(options.discard_original_filename), 
     notification_url: options.notification_url,
     eager_notification_url: options.eager_notification_url,
-    eager_async: options.eager_async,
-    invalidate: options.invalidate,
+    eager_async: as_safe_bool(options.eager_async),
+    invalidate: as_safe_bool(options.invalidate),
     proxy: options.proxy,
     folder: options.folder,
-    overwrite: options.overwrite,
+    overwrite: as_safe_bool(options.overwrite),
     allowed_formats: options.allowed_formats && exports.build_array(options.allowed_formats).join(","),
     moderation: options.moderation,
-    phash: options.phash,
+    phash: as_safe_bool(options.phash),
     upload_preset: options.upload_preset
-    return_delete_token: options.return_delete_token
+    return_delete_token: as_safe_bool(options.return_delete_token)
   updateable_resource_params(options, params)
 
 exports.timestamp = ->
@@ -132,11 +132,18 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     named_transformation = base_transformations.join(".")
     base_transformations = []
   effect = option_consume(options, "effect")
-  effect = effect.join(":") if _.isArray(effect)
+  if _.isObject(effect) && !_.isArray(effect)
+    effect = "#{key}:#{value}" for key,value of effect
+  else if _.isArray(effect)
+    effect = effect.join(":") if _.isArray(effect)
 
   border = option_consume(options, "border")
   if _.isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
+  else if border? && border.toString().match(/^\d+$/) #fallback to html border attributes
+    options.border  = border
+    border = undefined
+
   flags = build_array(option_consume(options, "flags")).join(".")
   dpr = option_consume(options, "dpr", config().dpr)
 
@@ -203,7 +210,7 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
   params.background_removal = options.background_removal if options.background_removal?
 
   params
-  
+
 exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   type = option_consume(options, "type",null )
   options.fetch_format ?= option_consume(options, "format") if type is "fetch"
@@ -215,7 +222,10 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   throw "Unknown cloud_name"  unless cloud_name
   private_cdn = option_consume(options, "private_cdn", config().private_cdn)
   secure_distribution = option_consume(options, "secure_distribution", config().secure_distribution)
-  secure = option_consume(options, "secure", config().secure)
+  secure = option_consume(options, "secure", null)
+  ssl_detected= option_consume(options, "ssl_detected", config().ssl_detected)
+  secure = ssl_detected || config().secure if secure==null
+  
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   secure_cdn_subdomain = option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain) 
   force_remote =  option_consume(options, "force_remote", config().force_remote) 
@@ -226,6 +236,14 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   api_secret = option_consume(options, "api_secret", config().api_secret)
   url_suffix = option_consume(options, "url_suffix",config().url_suffix)
   use_root_path = option_consume(options, "use_root_path",config().use_root_path)
+
+  preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
+  if preloaded
+    resource_type = preloaded[1]
+    type = preloaded[2]
+    version = preloaded[3]
+    public_id = preloaded[4]
+
   if !private_cdn
     throw 'URL Suffix only supported in private CDN' if !!url_suffix
     throw 'Root path only supported in private CDN' if use_root_path
@@ -260,7 +278,7 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
 
   transformation = transformation.replace(/([^:])\/\//, '\\1\/')
   if sign_url
-    to_sign = [transformation, (if version then "v" + version else ""), source_to_sign].filter((part) -> part?).join('/')
+    to_sign = [transformation, source_to_sign].filter((part) -> part? && part!='').join('/')
     shasum = crypto.createHash('sha1')
     shasum.update(utf8_encode(to_sign+ api_secret))
     signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
@@ -299,13 +317,13 @@ finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) -
     else
       throw new Error("URL Suffix only supported for image/upload and raw/upload")
   if use_root_path
-    if (resource_type.toString() == 'image' && type.toString() == '') || (resource_type.toString() == 'images' && type?)
+    if (resource_type.toString() == 'image' && type.toString() == 'upload') || (resource_type.toString() == 'images' && !type?)
       resource_type = null
       type = null
     else
       throw new Error("Root path only supported for image/upload")
   if shorten && resource_type.toString() == 'image' && type.toString() == 'upload'
-    resource_type = 'ui'
+    resource_type = 'iu'
     type = null
   [resource_type,type]
 
@@ -327,7 +345,7 @@ unsigned_url_prefix = (source,cloud_name,private_cdn,cdn_subdomain,secure_cdn_su
     if secure_distribution == null || secure_distribution ==  exports.OLD_AKAMAI_SHARED_CDN
       secure_distribution = if private_cdn then cloud_name+"-res.cloudinary.com" else exports.SHARED_CDN
     shared_domain ?= secure_distribution == exports.SHARED_CDN
-    secure_cdn_subdomain = cdn_subdomain if secure_cdn_subdomain? && shared_domain
+    secure_cdn_subdomain = cdn_subdomain if !secure_cdn_subdomain? && shared_domain
 
     if secure_cdn_subdomain
       secure_distribution = secure_distribution.replace('res.cloudinary.com','res-'+((crc32(source) % 5) + 1+'.cloudinary.com'))
@@ -530,3 +548,8 @@ exports.v1_adapters = (exports, v1, mapping) ->
   for name, num_pass_args of mapping
     exports[name] = v1_adapter(name, num_pass_args, v1)
 
+as_safe_bool = (value)->
+  return undefined if !value? 
+  value = 1 if value==true || value=='true' || value == '1'
+  value = 0 if value==false || value=='false' || value =='0'
+  return value
