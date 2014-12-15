@@ -211,7 +211,7 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
 
   params
 
-exports.url = exports.cloudinary_url = (public_id, options = {}) ->
+exports.url = (public_id, options = {}) ->
   type = option_consume(options, "type",null )
   options.fetch_format ?= option_consume(options, "format") if type is "fetch"
   transformation = generate_transformation_string(options)
@@ -228,13 +228,12 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   secure_cdn_subdomain = option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain) 
-  force_remote =  option_consume(options, "force_remote", config().force_remote) 
 
   cname = option_consume(options, "cname", config().cname)
   shorten = option_consume(options, "shorten", config().shorten)
   sign_url = option_consume(options, "sign_url", config().sign_url)
   api_secret = option_consume(options, "api_secret", config().api_secret)
-  url_suffix = option_consume(options, "url_suffix",config().url_suffix)
+  url_suffix = option_consume(options, "url_suffix")
   use_root_path = option_consume(options, "use_root_path",config().use_root_path)
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
@@ -252,22 +251,8 @@ exports.url = exports.cloudinary_url = (public_id, options = {}) ->
   return original_source unless public_id?
   public_id = public_id.toString()
 
-  if !force_remote
-    if (type==null || type == 'asset') && public_id.match(/^https?:\//i)
-      return original_source 
-    if public_id.indexOf("/") ==0
-      if public_id.indexOf("/images/") ==0
-        public_id= public_id.replace('/images/', '')
-      else
-        return original_source
-
-    @metadata?={}
-    if type == 'asset' && @metadata["images/#{public_id}"]
-      return original_source if !cloudinary.config.static_image_support
-      public_id= @metadata["images/#{public_id}"]["public_id"]
-      public_id+= path.extname(original_source) if !format
-    else if type == 'asset'
-      return original_source # requested asset, but no metadata - probably local file. return.
+  if type==null && public_id.match(/^https?:\//i)
+    return original_source 
 
   [ resource_type , type ] = finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten)
   [ public_id, source_to_sign ]= finalize_source(public_id, format, url_suffix)
@@ -308,21 +293,21 @@ finalize_source = (source,format,url_suffix) ->
 finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) ->
   type?='upload'
   if url_suffix?
-    if resource_type.toString()=='image' && type.toString()=='upload'
+    if resource_type=='image' && type=='upload'
       resource_type = "images"
       type = null
-    else if resource_type.toString()== 'raw' && type.toString() == 'upload'
+    else if resource_type== 'raw' && type== 'upload'
       resource_type = 'files'
       type = null
     else
       throw new Error("URL Suffix only supported for image/upload and raw/upload")
   if use_root_path
-    if (resource_type.toString() == 'image' && type.toString() == 'upload') || (resource_type.toString() == 'images' && !type?)
+    if (resource_type== 'image' && type== 'upload') || (resource_type== 'images' && !type?)
       resource_type = null
       type = null
     else
       throw new Error("Root path only supported for image/upload")
-  if shorten && resource_type.toString() == 'image' && type.toString() == 'upload'
+  if shorten && resource_type== 'image' && type== 'upload'
     resource_type = 'iu'
     type = null
   [resource_type,type]

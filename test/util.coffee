@@ -82,16 +82,16 @@ describe "util", ->
     done()
 
   it "should disallow url_suffix in shared distribution" ,(done)->
-    expect(()-> utils.cloudinary_url("test", {url_suffix:"hello"})).to.be.throwError(/URL Suffix only supported in private CDN/)
+    expect(()-> utils.url("test", {url_suffix:"hello"})).to.be.throwError(/URL Suffix only supported in private CDN/)
     done()
 
   it "should disallow url_suffix in non upload types" ,(done)->
-    expect(()-> utils.cloudinary_url("test", {url_suffix:"hello", private_cdn:true, type:'facebook'})).to.be.throwError(/URL Suffix only supported for image\/upload and raw\/upload/)
+    expect(()-> utils.url("test", {url_suffix:"hello", private_cdn:true, type:'facebook'})).to.be.throwError(/URL Suffix only supported for image\/upload and raw\/upload/)
     done()
 
   it "should disallow url_suffix with / or ." ,(done)->
-    expect(()-> utils.cloudinary_url("test", {url_suffix:"hello/world", private_cdn:true})).to.be.throwError(/url_suffix should not include . or \//)
-    expect(()-> utils.cloudinary_url("test", {url_suffix:"hello.world", private_cdn:true})).to.be.throwError(/url_suffix should not include . or \//)
+    expect(()-> utils.url("test", {url_suffix:"hello/world", private_cdn:true})).to.be.throwError(/url_suffix should not include . or \//)
+    expect(()-> utils.url("test", {url_suffix:"hello.world", private_cdn:true})).to.be.throwError(/url_suffix should not include . or \//)
     done()
 
   it "should support url_suffix for private_cdn" ,(done)->
@@ -104,10 +104,10 @@ describe "util", ->
     done()
 
   it "should not sign the url_suffix" ,(done)->
-    expected_signture = utils.cloudinary_url("test", format:"jpg", sign_url:true).match(/s--[0-9A-Za-z_-]{8}--/).toString()
+    expected_signture = utils.url("test", format:"jpg", sign_url:true).match(/s--[0-9A-Za-z_-]{8}--/).toString()
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, format:"jpg", sign_url:true}, "http://test123-res.cloudinary.com/images/#{expected_signture}/test/hello.jpg", {})
 
-    expected_signture = utils.cloudinary_url("test", format:"jpg", angle:0, sign_url:true).match(/s--[0-9A-Za-z_-]{8}--/).toString()
+    expected_signture = utils.url("test", format:"jpg", angle:0, sign_url:true).match(/s--[0-9A-Za-z_-]{8}--/).toString()
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, format:"jpg", angle:0, sign_url:true}, "http://test123-res.cloudinary.com/images/#{expected_signture}/a_0/test/hello.jpg", {})
     done()
 
@@ -116,7 +116,7 @@ describe "util", ->
     done()
 
   it "should disllow use_root_path in shared distribution" ,(done)->
-    expect(()-> utils.cloudinary_url("test", {use_root_path:true})).to.be.throwError(/Root path only supported in private CDN/)
+    expect(()-> utils.url("test", {use_root_path:true})).to.be.throwError(/Root path only supported in private CDN/)
     done()
 
   it "should support use_root_path for private_cdn" ,(done)->
@@ -129,8 +129,8 @@ describe "util", ->
     done()
 
   it "should disllow use_root_path if not image/upload" ,(done)->
-    expect(()-> utils.cloudinary_url("test", {use_root_path:true, private_cdn:true, type:'facebook'})).to.be.throwError(/Root path only supported for image\/upload/)
-    expect(()-> utils.cloudinary_url("test", {use_root_path:true, private_cdn:true, resource_type:'raw'})).to.be.throwError(/Root path only supported for image\/upload/)
+    expect(()-> utils.url("test", {use_root_path:true, private_cdn:true, type:'facebook'})).to.be.throwError(/Root path only supported for image\/upload/)
+    expect(()-> utils.url("test", {use_root_path:true, private_cdn:true, resource_type:'raw'})).to.be.throwError(/Root path only supported for image\/upload/)
     done()
 
   it "should use width and height from options only if crop is given" ,(done)->
@@ -183,19 +183,10 @@ describe "util", ->
     test_cloudinary_url("test", {resource_type:'raw'}, "http://res.cloudinary.com/test123/raw/upload/test", {})
     done()
 
-  it "should ignore http links only if type is not given or is asset" ,(done)->
+  it "should ignore http links only if type is not given" ,(done)->
     test_cloudinary_url("http://test", {type:null}, "http://test", {})
-    test_cloudinary_url("http://test", {type:"asset"}, "http://test", {})
     test_cloudinary_url("http://test", {type:"fetch"}, "http://res.cloudinary.com/test123/image/fetch/http://test" , {})
     done()
-
-  it "should use allow absolute links to /images" ,(done)->
-    test_cloudinary_url("/images/test", {}, "http://res.cloudinary.com/test123/image/upload/test", {})
-    done() 
-
-  it "should use ignore absolute links not to /images" ,(done)->
-    test_cloudinary_url("/js/test", {}, "/js/test", {})
-    done() 
 
   it "should escape fetch urls" ,(done)->
     test_cloudinary_url("http://blah.com/hello?a=b", {type:"fetch"}, "http://res.cloudinary.com/test123/image/fetch/http://blah.com/hello%3Fa%3Db", {})
@@ -330,7 +321,7 @@ describe "util", ->
 
   it "should escape public_ids" ,(done)->
     for source, target of { "a b": "a%20b", "a+b": "a%2Bb", "a%20b": "a%20b", "a-b": "a-b", "a??b": "a%3F%3Fb", "parentheses(interject)": "parentheses(interject)" }
-      expect(utils.cloudinary_url(source)).to.eql("http://res.cloudinary.com/test123/image/upload/#{target}")
+      expect(utils.url(source)).to.eql("http://res.cloudinary.com/test123/image/upload/#{target}")
     done()
 
   it "should correctly sign URLs",(done)->

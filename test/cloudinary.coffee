@@ -180,12 +180,8 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/raw/upload/test"
 
-  it "should ignore http links only if type is not given or is asset", ->
+  it "should ignore http links only if type is not given ", ->
     options = type: null
-    result = cloudinary.utils.url("http://example.com/", options)
-    expect(options).to.eql {}
-    expect(result).to.eql "http://example.com/"
-    options = type: "asset"
     result = cloudinary.utils.url("http://example.com/", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://example.com/"
