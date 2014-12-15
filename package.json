@@ -10,17 +10,20 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
-    "coffee-script": "1.7.x",
     "q": "^1.0.1",
     "underscore": "1.4.x"
   },
   "devDependencies": {
+    "coffee-script": "1.7.x",
     "dotenv": "^0.4.0",
     "expect.js": "",
     "mocha": ""
   },
   "scripts": {
-    "test": "mocha"
+    "pretest": "npm run compile",
+    "prepublish": "npm run compile",
+    "test": "node_modules/.bin/mocha -R spec --recursive test/",
+    "compile": "node_modules/.bin/coffee -o lib -c src"
   },
   "optionalDependencies": {},
   "engines": {

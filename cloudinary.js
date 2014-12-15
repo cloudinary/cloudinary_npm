@@ -1,4 +1,3 @@
-require('coffee-script/register');
 var _ = require('underscore');
 
 exports.config = require("./lib/config");

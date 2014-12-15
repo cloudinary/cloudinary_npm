@@ -138,6 +138,12 @@ exports.sub_folders = (path,callback, options={}) ->
   uri = ["folders",path]
   call_api("get", uri, {}, callback, options)
 
+exports.only = only = (hash, keys...) ->
+  result = {}
+  for key in keys
+    result[key] = hash[key] if hash[key]?
+  result
+
 call_api = (method, uri, params, callback, options) ->
   deferred  = Q.defer()
   cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"
@@ -201,12 +207,6 @@ call_api = (method, uri, params, callback, options) ->
   request.end()
 
   return deferred.promise
-
-only = (hash, keys...) ->
-  result = {}
-  for key in keys
-    result[key] = hash[key] if hash[key]?
-  result
 
 transformation_string = (transformation) ->
   if _.isString(transformation) 

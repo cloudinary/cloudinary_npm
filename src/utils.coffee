@@ -3,45 +3,45 @@ config = require("./config")
 crypto =  require('crypto')
 querystring = require('querystring')
 
-exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net";
-exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net";
-exports.AKAMAI_SHARED_CDN = "res.cloudinary.com";
-exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
+exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
+exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
+exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
+exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN
 
 exports.VERSION = "1.1.0"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
 
-exports.build_upload_params = build_upload_params = (options) ->
+exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
-    transformation: exports.generate_transformation_string(options),
+    transformation: exports.generate_transformation_string(_.clone(options)),
     public_id: options.public_id,
     callback: options.callback,
     format: options.format,
-    backup: options.backup,
-    faces: options.faces,
-    exif: options.exif,
-    image_metadata: options.image_metadata,
-    colors: options.colors,
+    backup: as_safe_bool(options.backup),
+    faces: as_safe_bool(options.faces),
+    exif: as_safe_bool(options.exif),
+    image_metadata: as_safe_bool(options.image_metadata),
+    colors: as_safe_bool(options.colors),
     type: options.type,
     eager: exports.build_eager(options.eager),
-    use_filename: options.use_filename, 
-    unique_filename: options.unique_filename, 
-    discard_original_filename: options.discard_original_filename, 
+    use_filename: as_safe_bool(options.use_filename),
+    unique_filename: as_safe_bool(options.unique_filename), 
+    discard_original_filename: as_safe_bool(options.discard_original_filename), 
     notification_url: options.notification_url,
     eager_notification_url: options.eager_notification_url,
-    eager_async: options.eager_async,
-    invalidate: options.invalidate,
+    eager_async: as_safe_bool(options.eager_async),
+    invalidate: as_safe_bool(options.invalidate),
     proxy: options.proxy,
     folder: options.folder,
-    overwrite: options.overwrite,
+    overwrite: as_safe_bool(options.overwrite),
     allowed_formats: options.allowed_formats && exports.build_array(options.allowed_formats).join(","),
     moderation: options.moderation,
-    phash: options.phash,
+    phash: as_safe_bool(options.phash),
     upload_preset: options.upload_preset
-    return_delete_token: options.return_delete_token
+    return_delete_token: as_safe_bool(options.return_delete_token)
   updateable_resource_params(options, params)
 
 exports.timestamp = ->
@@ -132,11 +132,18 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     named_transformation = base_transformations.join(".")
     base_transformations = []
   effect = option_consume(options, "effect")
-  effect = effect.join(":") if _.isArray(effect)
+  if _.isObject(effect) && !_.isArray(effect)
+    effect = "#{key}:#{value}" for key,value of effect
+  else if _.isArray(effect)
+    effect = effect.join(":") if _.isArray(effect)
 
   border = option_consume(options, "border")
   if _.isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
+  else if border? && border.toString().match(/^\d+$/) #fallback to html border attributes
+    options.border  = border
+    border = undefined
+
   flags = build_array(option_consume(options, "flags")).join(".")
   dpr = option_consume(options, "dpr", config().dpr)
 
@@ -203,9 +210,9 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
   params.background_removal = options.background_removal if options.background_removal?
 
   params
-  
-exports.url = cloudinary_url = (public_id, options = {}) ->
-  type = option_consume(options, "type", "upload")
+
+exports.url = (public_id, options = {}) ->
+  type = option_consume(options, "type",null )
   options.fetch_format ?= option_consume(options, "format") if type is "fetch"
   transformation = generate_transformation_string(options)
   resource_type = option_consume(options, "resource_type", "image")
@@ -215,12 +222,19 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
   throw "Unknown cloud_name"  unless cloud_name
   private_cdn = option_consume(options, "private_cdn", config().private_cdn)
   secure_distribution = option_consume(options, "secure_distribution", config().secure_distribution)
-  secure = option_consume(options, "secure", config().secure)
+  secure = option_consume(options, "secure", null)
+  ssl_detected= option_consume(options, "ssl_detected", config().ssl_detected)
+  secure = ssl_detected || config().secure if secure==null
+  
   cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
+  secure_cdn_subdomain = option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain) 
+
   cname = option_consume(options, "cname", config().cname)
   shorten = option_consume(options, "shorten", config().shorten)
   sign_url = option_consume(options, "sign_url", config().sign_url)
   api_secret = option_consume(options, "api_secret", config().api_secret)
+  url_suffix = option_consume(options, "url_suffix")
+  use_root_path = option_consume(options, "use_root_path",config().use_root_path)
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
   if preloaded
@@ -229,46 +243,117 @@ exports.url = cloudinary_url = (public_id, options = {}) ->
     version = preloaded[3]
     public_id = preloaded[4]
 
-  if public_id.match(/^https?:/)
-    return public_id if type is "upload" or type is "asset"
-    public_id = encodeURIComponent(public_id).replace(/%3A/g, ":").replace(/%2F/g, "/") 
-  else 
-    public_id = encodeURIComponent(decodeURIComponent(public_id)).replace(/%3A/g, ":").replace(/%2F/g, "/")
-    public_id += "." + format if format  
+  if !private_cdn
+    throw 'URL Suffix only supported in private CDN' if !!url_suffix
+    throw 'Root path only supported in private CDN' if use_root_path
+
+  original_source = public_id
+  return original_source unless public_id?
+  public_id = public_id.toString()
+
+  if type==null && public_id.match(/^https?:\//i)
+    return original_source 
+
+  [ resource_type , type ] = finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten)
+  [ public_id, source_to_sign ]= finalize_source(public_id, format, url_suffix)
+
+
+  version ?= 1 if source_to_sign.indexOf("/")>0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)
+  version = "v#{version}" if version?
+
+  transformation = transformation.replace(/([^:])\/\//, '\\1\/')
+  if sign_url
+    to_sign = [transformation, source_to_sign].filter((part) -> part? && part!='').join('/')
+    shasum = crypto.createHash('sha1')
+    shasum.update(utf8_encode(to_sign+ api_secret))
+    signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
+    signature = "s--#{signature}--"
+    
+
+  prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
+  url = [prefix, resource_type, type, signature, transformation, version, public_id].filter((part) -> part? && part!='').join('/')
+  url
+
+finalize_source = (source,format,url_suffix) ->
+  source = source.replace(/([^:])\/\//, '\\1\/')
+  if source.match(/^https?:\//i)
+    source = smart_escape(source)
+    source_to_sign = source
+  else
+    source = smart_escape(decodeURIComponent(source))
+    source_to_sign = source
+    if !!url_suffix
+      throw new Error('url_suffix should not include . or /') if url_suffix.match(/[\.\/]/)
+      source = source+'/'+url_suffix
+    if format?
+      source = source+'.'+format
+      source_to_sign = source_to_sign+'.'+format
+  [source,source_to_sign]
+
+finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) ->
+  type?='upload'
+  if url_suffix?
+    if resource_type=='image' && type=='upload'
+      resource_type = "images"
+      type = null
+    else if resource_type== 'raw' && type== 'upload'
+      resource_type = 'files'
+      type = null
+    else
+      throw new Error("URL Suffix only supported for image/upload and raw/upload")
+  if use_root_path
+    if (resource_type== 'image' && type== 'upload') || (resource_type== 'images' && !type?)
+      resource_type = null
+      type = null
+    else
+      throw new Error("Root path only supported for image/upload")
+  if shorten && resource_type== 'image' && type== 'upload'
+    resource_type = 'iu'
+    type = null
+  [resource_type,type]
+
+# cdn_subdomain and secure_cdn_subdomain
+# 1) Customers in shared distribution (e.g. res.cloudinary.com)
+#   if cdn_domain is true uses res-[1-5].cloudinary.com for both http and https. Setting secure_cdn_subdomain to false disables this for https.
+# 2) Customers with private cdn 
+#   if cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for http
+#   if secure_cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for https (please contact support if you require this)
+# 3) Customers with cname
+#   if cdn_domain is true uses a[1-5].cname for http. For https, uses the same naming scheme as 1 for shared distribution and as 2 for private distribution.
+#
+unsigned_url_prefix = (source,cloud_name,private_cdn,cdn_subdomain,secure_cdn_subdomain,cname,secure,secure_distribution) ->
+  return '/res'+cloud_name if cloud_name.indexOf("/")==0
 
   shared_domain = !private_cdn
-  if secure        
-    if !secure_distribution || secure_distribution == exports.OLD_AKAMAI_SHARED_CDN
-      secure_distribution = (if private_cdn then "#{cloud_name}-res.cloudinary.com" else exports.SHARED_CDN)
-    shared_domain ||= secure_distribution == exports.SHARED_CDN
-    prefix = "https://#{secure_distribution}"
+
+  if secure
+    if secure_distribution == null || secure_distribution ==  exports.OLD_AKAMAI_SHARED_CDN
+      secure_distribution = if private_cdn then cloud_name+"-res.cloudinary.com" else exports.SHARED_CDN
+    shared_domain ?= secure_distribution == exports.SHARED_CDN
+    secure_cdn_subdomain = cdn_subdomain if !secure_cdn_subdomain? && shared_domain
+
+    if secure_cdn_subdomain
+      secure_distribution = secure_distribution.replace('res.cloudinary.com','res-'+((crc32(source) % 5) + 1+'.cloudinary.com'))
+
+    prefix = 'https://'+secure_distribution
+  else if cname
+    subdomain = if cdn_subdomain then 'a'+((crc32(source)%5)+1)+'.' else ''
+    prefix = 'http://'+subdomain+cname
   else
-    subdomain = (if cdn_subdomain then "a#{(crc32(public_id) % 5) + 1}." else "")
-    host = cname ? "#{if private_cdn then "#{cloud_name}-" else ""}res.cloudinary.com"
-    prefix = "http://#{subdomain}#{host}"
-  prefix += "/#{cloud_name}" if shared_domain
+    cdn_part = if private_cdn then cloud_name+'-' else ''
+    subdomain_part = if cdn_subdomain then '-'+((crc32(source)%5)+1) else ''
+    host = [cdn_part,'res', subdomain_part, '.cloudinary.com'].join('')
+    prefix = 'http://'+host
 
-  if shorten && resource_type == "image" && type == "upload"
-    resource_type = "iu"
-    type = undefined
+  prefix+= '/'+cloud_name if shared_domain
+  prefix
 
-  version ?= 1 if public_id.search("/") >= 0 && !public_id.match(/^v[0-9]+/) && !public_id.match(/^https?:\//)
-  
-  rest = [transformation, (if version then "v" + version else ""), public_id ].filter((part) -> part != "" and part != null).join("/")
-  if sign_url
-    shasum = crypto.createHash('sha1')
-    shasum.update(utf8_encode(rest + api_secret))
-    signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
-    rest = "s--#{signature}--/" + rest
-    
-  url = [ prefix, resource_type, type, rest ].join("/")
-  url.replace(/([^:])\/+/g, "$1/")
 
-html_only_attributes = (options) ->
-  width = option_consume(options, "html_width")
-  height = option_consume(options, "html_height")
-  options["width"] = width if width
-  options["height"] = height if height
+
+
+# Based on CGI::unescape. In addition does not escape / : 
+smart_escape = (string)->
+  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/") 
 
 # http://kevin.vanzonneveld.net
 # +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
@@ -281,7 +366,7 @@ html_only_attributes = (options) ->
 # +   bugfixed by: Ulrich
 # +   bugfixed by: Rafal Kukawski
 # +   improved by: kirilloid
-# *     example 1: utf8_encode('Kevin van Zonneveld');
+# *     example 1: utf8_encode('Kevin van Zonneveld')
 # *     returns 1: 'Kevin van Zonneveld'
 utf8_encode = (argString) ->
   return "" unless argString?
@@ -316,7 +401,7 @@ utf8_encode = (argString) ->
 # +   improved by: T0bsn
 # +   improved by: http://stackoverflow.com/questions/2647935/javascript-crc32-function-and-php-crc32-not-matching
 # -    depends on: utf8_encode
-# *     example 1: crc32('Kevin van Zonneveld');
+# *     example 1: crc32('Kevin van Zonneveld')
 # *     returns 1: 1249991249
 crc32 = (str) ->
   str = utf8_encode(str)
@@ -420,7 +505,7 @@ exports.cloudinary_js_config = ->
     params[param] = value if value?
   "<script type='text/javascript'>\n" +
       "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
-      "</script>\n";    
+      "</script>\n"    
 
 v1_result_adapter = (callback) -> 
   if callback?
@@ -448,3 +533,8 @@ exports.v1_adapters = (exports, v1, mapping) ->
   for name, num_pass_args of mapping
     exports[name] = v1_adapter(name, num_pass_args, v1)
 
+as_safe_bool = (value)->
+  return undefined if !value? 
+  value = 1 if value==true || value=='true' || value == '1'
+  value = 0 if value==false || value=='false' || value =='0'
+  return value

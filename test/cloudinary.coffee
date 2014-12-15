@@ -180,12 +180,8 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/raw/upload/test"
 
-  it "should ignore http links only if type is not given or is asset", ->
+  it "should ignore http links only if type is not given ", ->
     options = type: null
-    result = cloudinary.utils.url("http://example.com/", options)
-    expect(options).to.eql {}
-    expect(result).to.eql "http://example.com/"
-    options = type: "asset"
     result = cloudinary.utils.url("http://example.com/", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://example.com/"
@@ -357,11 +353,11 @@ describe "cloudinary", ->
       expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target)
   
   it "should correctly sign a url", ->
-    expected = "http://res.cloudinary.com/test123/image/upload/s--MaRXzoEC--/c_crop,h_20,w_10/v1234/image.jpg"
+    expected = "http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/v1234/image.jpg"
     actual = cloudinary.utils.url("image.jpg", version: 1234, crop: "crop", width: 10, height: 20, sign_url: true)
     expect(actual).to.eql expected
     
-    expected = "http://res.cloudinary.com/test123/image/upload/s--ZlgFLQcO--/v1234/image.jpg"
+    expected = "http://res.cloudinary.com/test123/image/upload/s----SjmNDA--/v1234/image.jpg"
     actual = cloudinary.utils.url("image.jpg", version: 1234, sign_url: true)
     expect(actual).to.eql expected
     
