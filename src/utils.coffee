@@ -327,7 +327,7 @@ unsigned_url_prefix = (source,cloud_name,private_cdn,cdn_subdomain,secure_cdn_su
   shared_domain = !private_cdn
 
   if secure
-    if secure_distribution == null || secure_distribution ==  exports.OLD_AKAMAI_SHARED_CDN
+    if !secure_distribution? || secure_distribution ==  exports.OLD_AKAMAI_SHARED_CDN
       secure_distribution = if private_cdn then cloud_name+"-res.cloudinary.com" else exports.SHARED_CDN
     shared_domain ?= secure_distribution == exports.SHARED_CDN
     secure_cdn_subdomain = cdn_subdomain if !secure_cdn_subdomain? && shared_domain
