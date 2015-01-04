@@ -29,7 +29,7 @@ cloudinary.uploader.upload('pizza.jpg',{tags:'basic_sample'},function(err,image)
 
 
 // Stream upload
-var stream = cloudinary.uploader.upload_stream({tags: 'basic_sample'},function(err,image) {
+var upload_stream= cloudinary.uploader.upload_stream({tags: 'basic_sample'},function(err,image) {
   console.log();
   console.log("** Stream Upload");
   if (err){ console.warn(err);}
@@ -38,7 +38,7 @@ var stream = cloudinary.uploader.upload_stream({tags: 'basic_sample'},function(e
   console.log("* "+image.url);
   waitForAllUploads("pizza3",err,image);
 });
-var file_reader = fs.createReadStream('pizza.jpg', {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
+var file_reader = fs.createReadStream('pizza.jpg').pipe(upload_stream);
 
 
 // File upload (example for promise api)
