@@ -217,7 +217,7 @@ post = (url, post_data, boundary, file, callback, options) ->
     headers: 
       'Content-Type': 'multipart/form-data; boundary=' + boundary
       'User-Agent': utils.USER_AGENT
-
+  post_options.agent = options.agent if options.agent != undefined
   post_request = https.request(post_options, callback)
   upload_stream = new UploadStream({boundary: boundary})
   upload_stream.pipe(post_request)
