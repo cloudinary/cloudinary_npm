@@ -1,6 +1,7 @@
 dotenv = require('dotenv')
 dotenv.load()
 https = require('https')
+http = require('http')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 fs = require('fs')
@@ -276,7 +277,16 @@ describe "uploader", ->
     file_reader = fs.createReadStream('test/logo.png')
     file_reader.pipe(upload)
 
-  it "should successfully override http agent", (done) ->
+  it "should fail with http.Agent (non secure)", (done) ->
+    this.timeout 2000
+    upload = cloudinary.v2.uploader.upload_stream {agent:new http.Agent},(error, result) ->
+      expect(error.message).to.eql('socket hang up')
+      done()
+
+    file_reader = fs.createReadStream('test/logo.png')
+    file_reader.pipe(upload)
+
+  it "should successfully override https agent", (done) ->
     this.timeout 2000
     upload = cloudinary.v2.uploader.upload_stream {agent:new https.Agent},(error, result) ->
       return done(new Error error.message) if error?
