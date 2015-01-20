@@ -1,6 +1,6 @@
 dotenv = require('dotenv')
 dotenv.load()
-
+https = require('https')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 fs = require('fs')
@@ -267,6 +267,18 @@ describe "uploader", ->
   it "should successfully upload with pipes", (done) ->
     this.timeout 2000
     upload = cloudinary.v2.uploader.upload_stream (error, result) ->
+      return done(new Error error.message) if error?
+      expect(result.width).to.eql(241)
+      expect(result.height).to.eql(51)
+      expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
+      expect(result.signature).to.eql(expected_signature)
+      done()
+    file_reader = fs.createReadStream('test/logo.png')
+    file_reader.pipe(upload)
+
+  it "should successfully override http agent", (done) ->
+    this.timeout 2000
+    upload = cloudinary.v2.uploader.upload_stream {agent:new https.Agent},(error, result) ->
       return done(new Error error.message) if error?
       expect(result.width).to.eql(241)
       expect(result.height).to.eql(51)
