@@ -348,4 +348,18 @@ describe "util", ->
     expect(utils.encode_double_array([[1,2,3,4],[5,6,7,8]])).to.eql("1,2,3,4|5,6,7,8")
     done()
 
-    
+  it "should call validate_webhook_signature", (done) ->
+    @timeout 1000
+
+    data = '{"public_id":"117e5550-7bfa-11e4-80d7-f962166bd3be","version":1417727468}'
+    timestamp = 1417727468
+
+    orig = cloudinary.config()
+    cloudinary.config({api_key:'key',api_secret:'shhh'})
+    sig = cloudinary.utils.webhook_signature(data, timestamp)
+    expect(sig).to.eql('bac927006d3ce039ef7632e2c03189348d02924a')
+
+    cloudinary.config(orig)
+    done()
+
+  
