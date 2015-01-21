@@ -163,6 +163,7 @@ call_api = (method, uri, params, callback, options) ->
       'Content-Type': 'application/x-www-form-urlencoded'
       'User-Agent': utils.USER_AGENT
     auth: "#{api_key}:#{api_secret}"
+  request_options.agent = options.agent if options.agent?
 
   handle_response = (res) ->
     if _.include([200,400,401,403,404,409,420,500], res.statusCode)

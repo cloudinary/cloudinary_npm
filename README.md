@@ -63,6 +63,18 @@ Each request to our secure APIs (e.g., image uploads, eager sprite generation) m
 
 Setting the `cloud_name`, `api_key` and `api_secret` parameters can be done either directly in each call to a Cloudinary method, by calling the cloudinary.config(), or by using the CLOUDINARY_URL environment variable.
 
+### Overriding the request agent
+To override the request agent pass the agent into any method that makes a
+request and it will be used instead of the normal https agent. e.g
+```js
+
+cloudinary.uploader.upload_stream(
+  function(result) { console.log(result); },
+  { agent: myAgent }
+);
+
+```
+
 ### Embedding and transforming images
 
 Any image uploaded to Cloudinary can be transformed and embedded using powerful view helper methods:
