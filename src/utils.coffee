@@ -83,15 +83,15 @@ exports.build_eager = build_eager = (transformations) ->
   ).join("|")
     
 exports.build_custom_headers = build_custom_headers = (headers) ->
-  if !headers?
-    return undefined
-  else if _.isArray(headers) 
-    ;
-  else if _.isObject(headers)
-    headers = [k + ": " + v for k, v of headers]    
-  else
-    return headers
-  return headers.join("\n")
+  return switch
+    when !headers?
+      undefined
+    when _.isArray headers
+      headers.join "\n"
+    when _.isObject headers
+      [k + ": " + v for k, v of headers].join "\n"
+    else
+      headers
 
 exports.present = present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0
@@ -243,9 +243,9 @@ exports.url = (public_id, options = {}) ->
     version = preloaded[3]
     public_id = preloaded[4]
 
-  if !private_cdn
-    throw 'URL Suffix only supported in private CDN' if !!url_suffix
-    throw 'Root path only supported in private CDN' if use_root_path
+  if url_suffix and not private_cdn
+    throw 'URL Suffix only supported in private CDN'
+
 
   original_source = public_id
   return original_source unless public_id?

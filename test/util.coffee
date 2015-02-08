@@ -115,8 +115,9 @@ describe "util", ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, resource_type:'raw'}, "http://test123-res.cloudinary.com/files/test/hello", {})
     done()
 
-  it "should disllow use_root_path in shared distribution" ,(done)->
-    expect(()-> utils.url("test", {use_root_path:true})).to.be.throwError(/Root path only supported in private CDN/)
+  it "should support use_root_path in shared distribution" ,(done)->
+    test_cloudinary_url("test", {use_root_path:true, private_cdn:false}, "http://res.cloudinary.com/test123/test", {})
+    test_cloudinary_url("test", {use_root_path:true, private_cdn:false, angle:0}, "http://res.cloudinary.com/test123/a_0/test", {})
     done()
 
   it "should support use_root_path for private_cdn" ,(done)->

@@ -26,7 +26,7 @@ describe "uploader", ->
 
   it "should successfully upload url", (done) ->
     this.timeout 5000
-    cloudinary.uploader.upload "http://cloudinary.com/images/logo.png", (result) ->
+    cloudinary.uploader.upload "http://cloudinary.com/images/old_logo.png", (result) ->
       return done(new Error result.error.message) if result.error?
       expect(result.width).to.eql(241)
       expect(result.height).to.eql(51)
@@ -52,11 +52,25 @@ describe "uploader", ->
   
   it "should successfully call explicit api", (done) ->
     this.timeout 5000
+    current = this
     cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], (error, result) ->
-      return done(new Error error.message) if error?
-      url = cloudinary.utils.url("cloudinary", type: "twitter_name", crop: "scale", width: "2.0", format: "png", version: result["version"])
-      expect(result.eager[0].url).to.eql(url)
-      done()
+      unless error?
+        url = cloudinary.utils.url "cloudinary",
+          type: "twitter_name",
+          crop: "scale",
+          width: "2.0",
+          format: "png",
+          version: result["version"]
+        expect(result.eager[0].url).to.eql(url)
+        done()
+      else
+        if error.code is 420
+          console.warn error.message
+          console.warn "Try running '#{current.test.title}' again in 10 minutes"
+          current.test.pending = true
+          done()
+        else
+          done(new Error error.message)
 
   it "should support eager in upload", (done) ->
     this.timeout 5000
@@ -119,7 +133,7 @@ describe "uploader", ->
    
   it "should support timeouts", (done) ->
     this.timeout 5000
-    cloudinary.uploader.upload "http://cloudinary.com/images/logo.png", (result) ->
+    cloudinary.uploader.upload "http://cloudinary.com/images/old_logo.png", (result) ->
       expect(result.error.http_code).to.eql(499)
       expect(result.error.message).to.eql("Request Timeout")
       done()
