@@ -39,7 +39,6 @@ exports.upload_large_part = (callback, options={}) ->
       final: options.final
       part_number: options.part_number
       upload_id: options.upload_id
-      upload_id: options.upload_id
       tags: options.tags && utils.build_array(options.tags).join(',')
     ]
 
