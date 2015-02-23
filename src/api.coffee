@@ -1,4 +1,4 @@
-_ = require("underscore")
+_ = require("lodash")
 https = require('https')
 utils = require("./utils")
 config = require("./config")
@@ -166,7 +166,7 @@ call_api = (method, uri, params, callback, options) ->
   request_options.agent = options.agent if options.agent?
 
   handle_response = (res) ->
-    if _.include([200,400,401,403,404,409,420,500], res.statusCode)
+    if _.includes([200,400,401,403,404,409,420,500], res.statusCode)
       buffer = ""
       error = false
       res.on "data", (d) -> buffer += d
