@@ -3,7 +3,7 @@ cloudinary = require("../cloudinary.js")
 
 describe "cloudinary", ->
   beforeEach ->
-    cloudinary.config cloud_name: "test123", api_key: 'a', api_secret: 'b'
+    cloudinary.config cloud_name: "test123", api_key: 'a', api_secret: 'b', responsive_width_transformation: null
 
   it "should use cloud_name from config", ->
     result = cloudinary.utils.url("test")

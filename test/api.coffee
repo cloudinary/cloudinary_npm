@@ -17,6 +17,7 @@ describe "api", ->
     
   before (done) ->
     @timeout 20000
+    cloudinary.config(true)
     @timestamp_tag = "api_test_tag_" + cloudinary.utils.timestamp()
     cnt = 0
     progress = -> 
