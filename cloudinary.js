@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('lodash');
 
 exports.config = require("./lib/config");
 exports.utils = require("./lib/utils");

@@ -5,7 +5,7 @@ expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
 api = require("../lib/api")
-_ = require("underscore")
+_ = require("lodash")
 Q = require('q')
 fs = require('fs')
 describe "util", ->

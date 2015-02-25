@@ -4,7 +4,7 @@ dotenv.load()
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
-_ = require("underscore")
+_ = require("lodash")
 Q = require('q')
 fs = require('fs')
 describe "api", ->
