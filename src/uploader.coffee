@@ -1,4 +1,4 @@
-_ = require("underscore")
+_ = require("lodash")
 https = require('https')
 #http = require('http')
 UploadStream = require('./upload_stream')
@@ -166,7 +166,7 @@ call_api = (action, callback, options, get_params) ->
     if res.error
       deferred.reject(res)
       callback(res) if callback?
-    else if _.include([200,400,401,404,420,500], res.statusCode)
+    else if _.includes([200,400,401,404,420,500], res.statusCode)
       buffer = ""
       error = false
       res.on "data", (d) -> buffer += d

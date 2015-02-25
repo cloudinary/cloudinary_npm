@@ -1,4 +1,4 @@
-_ = require("underscore")
+_ = require("lodash")
 cloudinary_config = undefined
 module.exports = (new_config, new_value) ->
   if !cloudinary_config? || new_config == true
