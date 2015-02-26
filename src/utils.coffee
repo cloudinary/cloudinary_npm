@@ -3,6 +3,17 @@ config = require("./config")
 crypto =  require('crypto')
 querystring = require('querystring')
 
+# underscore compatibility
+_.first = (array, n, guard) ->
+  if array is null
+    undefined
+  else if (n is null || guard)
+    array[0]
+  else 
+    _.dropRight array, array.length - n
+
+
+
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
 exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
