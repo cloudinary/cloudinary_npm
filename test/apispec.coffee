@@ -16,7 +16,7 @@ describe "api", ->
     undefined
     
   before (done) ->
-    @timeout 20000
+    @timeout 0
     @timestamp_tag = "api_test_tag_" + cloudinary.utils.timestamp()
     cnt = 0
     progress = -> 
@@ -46,6 +46,7 @@ describe "api", ->
       expect(resource).not.to.eql(undefined)
       expect(resource.type).to.eql("upload")
       done()
+
 
   it "should allow listing resources with cursor", (done) ->
     @timeout 10000

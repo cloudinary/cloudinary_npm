@@ -1,7 +1,9 @@
-_ = require("underscore")
+_ = require("lodash")
 config = require("./config")
 crypto =  require('crypto')
 querystring = require('querystring')
+
+utils = exports
 
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
 exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
@@ -12,7 +14,7 @@ exports.VERSION = "1.1.1"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
-
+DEFAULT_POSTER_OPTIONS = { format: 'jpg', resource_type: 'video' }
 exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
@@ -26,7 +28,7 @@ exports.build_upload_params = (options) ->
     image_metadata: as_safe_bool(options.image_metadata),
     colors: as_safe_bool(options.colors),
     type: options.type,
-    eager: exports.build_eager(options.eager),
+    eager: utils.build_eager(options.eager),
     use_filename: as_safe_bool(options.use_filename),
     unique_filename: as_safe_bool(options.unique_filename), 
     discard_original_filename: as_safe_bool(options.discard_original_filename), 
@@ -37,23 +39,29 @@ exports.build_upload_params = (options) ->
     proxy: options.proxy,
     folder: options.folder,
     overwrite: as_safe_bool(options.overwrite),
-    allowed_formats: options.allowed_formats && exports.build_array(options.allowed_formats).join(","),
+    allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
     moderation: options.moderation,
     phash: as_safe_bool(options.phash),
     upload_preset: options.upload_preset
     return_delete_token: as_safe_bool(options.return_delete_token)
-  updateable_resource_params(options, params)
+  utils.updateable_resource_params(options, params)
 
 exports.timestamp = ->
   Math.floor(new Date().getTime() / 1000)
-
-exports.option_consume = option_consume = (options, option_name, default_value) ->
+###*
+# Deletes `option_name` from `options` and return the value if present.
+# If `options` doesn't contain `option_name` the default value is returned.
+# @param {Object} options a collection
+# @param {String} option_name the name (key) of the desired value
+# @param [default_value] the value to return is option_name is missing
+###
+exports.option_consume = (options, option_name, default_value) ->
   result = options[option_name]
   delete options[option_name]
 
   if result? then result else default_value
 
-exports.build_array = build_array = (arg) ->
+exports.build_array = (arg) ->
   if !arg?
     []
   else if _.isArray(arg)
@@ -61,14 +69,14 @@ exports.build_array = build_array = (arg) ->
   else 
     [arg]
     
-exports.encode_double_array = encode_double_array = (array) ->
-  array = build_array(array)
+exports.encode_double_array = (array) ->
+  array = utils.build_array(array)
   if array.length > 0 and _.isArray(array[0])
-    array.map((e) -> build_array(e).join(",")).join("|")
+    array.map((e) -> utils.build_array(e).join(",")).join("|")
   else
     array.join(",")
 
-exports.encode_key_value = encode_key_value = (arg) ->
+exports.encode_key_value = (arg) ->
   if _.isObject(arg)
     pairs = for k, v of arg 
       "#{k}=#{v}"
@@ -76,13 +84,13 @@ exports.encode_key_value = encode_key_value = (arg) ->
   else
     arg
 
-exports.build_eager = build_eager = (transformations) ->
-  (for transformation in build_array(transformations)
+exports.build_eager = (transformations) ->
+  (for transformation in utils.build_array(transformations)
     transformation = _.clone(transformation)
-    _.filter([generate_transformation_string(transformation), transformation.format], present).join("/")
+    _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
   ).join("|")
     
-exports.build_custom_headers = build_custom_headers = (headers) ->
+exports.build_custom_headers = (headers) ->
   return switch
     when !headers?
       undefined
@@ -93,59 +101,65 @@ exports.build_custom_headers = build_custom_headers = (headers) ->
     else
       headers
 
-exports.present = present = (value) ->
+exports.present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0
 
-exports.generate_transformation_string = generate_transformation_string = (options) ->
+exports.generate_transformation_string = (options) ->
   if _.isArray(options)
     result = for base_transformation in options
-      generate_transformation_string(_.clone(base_transformation))
+      utils.generate_transformation_string(_.clone(base_transformation))
     return result.join("/")
 
-  responsive_width = option_consume(options, "responsive_width", config().responsive_width)
+  responsive_width = utils.option_consume(options, "responsive_width", config().responsive_width)
   width = options["width"]
   height = options["height"]
-  size = option_consume(options, "size")
+  size = utils.option_consume(options, "size")
   [options["width"], options["height"]] = [width, height] = size.split("x") if size
 
   has_layer = options.overlay or options.underlay
-  crop = option_consume(options, "crop")
-  angle = build_array(option_consume(options, "angle")).join(".")
-  no_html_sizes = has_layer or present(angle) or crop == "fit" or crop == "limit" or responsive_width
+  crop = utils.option_consume(options, "crop")
+  angle = utils.build_array(utils.option_consume(options, "angle")).join(".")
+  no_html_sizes = has_layer or utils.present(angle) or crop == "fit" or crop == "limit" or responsive_width
 
   delete options["width"] if width and (width == "auto" or no_html_sizes or parseFloat(width) < 1)
   delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
-  background = option_consume(options, "background")
+  background = utils.option_consume(options, "background")
   background = background and background.replace(/^#/, "rgb:")
-  color = option_consume(options, "color")
+  color = utils.option_consume(options, "color")
   color = color and color.replace(/^#/, "rgb:")
-  base_transformations = build_array(option_consume(options, "transformation", []))
+  base_transformations = utils.build_array(utils.option_consume(options, "transformation", []))
   named_transformation = []
   if _.filter(base_transformations, _.isObject).length > 0
     base_transformations = _.map(base_transformations, (base_transformation) ->
       if _.isObject(base_transformation) 
-        generate_transformation_string(_.clone(base_transformation)) 
+        utils.generate_transformation_string(_.clone(base_transformation))
       else 
-        generate_transformation_string(transformation: base_transformation)
+        utils.generate_transformation_string(transformation: base_transformation)
     )
   else
     named_transformation = base_transformations.join(".")
     base_transformations = []
-  effect = option_consume(options, "effect")
-  if _.isObject(effect) && !_.isArray(effect)
-    effect = "#{key}:#{value}" for key,value of effect
-  else if _.isArray(effect)
-    effect = effect.join(":") if _.isArray(effect)
 
-  border = option_consume(options, "border")
+  effect = utils.option_consume(options, "effect")
+
+  if _.isArray(effect)
+    effect = effect.join(":")
+  else if _.isObject(effect)
+    effect = "#{key}:#{value}" for key,value of effect
+
+  border = utils.option_consume(options, "border")
   if _.isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
-  else if border? && border.toString().match(/^\d+$/) #fallback to html border attributes
+  else if /^\d+$/.exec(border) #fallback to html border attributes
     options.border  = border
     border = undefined
 
-  flags = build_array(option_consume(options, "flags")).join(".")
-  dpr = option_consume(options, "dpr", config().dpr)
+  flags = utils.build_array(utils.option_consume(options, "flags")).join(".")
+  dpr = utils.option_consume(options, "dpr", config().dpr)
+
+  if options["offset"]?
+    [options["start_offset"], options["end_offset"]] = split_range( utils.option_consume(options, "offset"))
+
 
   params =
     c: crop
@@ -161,46 +175,58 @@ exports.generate_transformation_string = generate_transformation_string = (optio
     dpr: dpr
 
   simple_params =
+    audio_codec: "ac"
+    audio_frequency: "af"
+    color_space: "cs"
+    default_image: "d"
+    delay: "dl"
+    density: "dn"
+    end_offset: "eo"
+    fetch_format: "f"
+    gravity: "g"
+    opacity: "o"
+    overlay: "l"
+    page: "pg"
+    prefix: "p"
+    quality: "q"
+    radius: "r"
+    start_offset: "so"
+    underlay: "u"
+    video_codec: "vc"
+    video_sampling: "vs"
     x: "x"
     y: "y"
-    radius: "r"
-    gravity: "g"
-    quality: "q"
-    prefix: "p"
-    default_image: "d"
-    underlay: "u"
-    overlay: "l"
-    fetch_format: "f"
-    density: "dn"
-    page: "pg"
-    color_space: "cs"
-    delay: "dl"
-    opacity: "o"
+    zoom: "z"
 
   for param, short of simple_params
-    params[short] = option_consume(options, param)
+    params[short] = utils.option_consume(options, param)
+
+  params["vc"] = process_video_params( params["vc"]) if params["vc"]?
+  for range_value in ["so", "eo", "du"]
+    params[range_value] = norm_range_value( params[range_value]) if range_value of params
+
 
   params = _.sortBy([key, value] for key, value of params, (key, value) -> key)
 
-  params.push [option_consume(options, "raw_transformation")]
-  transformation = (param.join("_") for param in params when present(_.last(param))).join(",")
-
-  base_transformations.push transformation
+  params.push [utils.option_consume(options, "raw_transformation")]
+  transformations = (param.join("_") for param in params when utils.present(_.last(param))).join(",")
+  base_transformations.push transformations
+  transformations = base_transformations
   if responsive_width
     responsive_width_transformation = config().responsive_width_transformation or DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION
-    base_transformations.push generate_transformation_string(_.clone(responsive_width_transformation))
+    transformations.push utils.generate_transformation_string(_.clone(responsive_width_transformation))
   if width == "auto" or responsive_width
     options.responsive = true
   if dpr == "auto"
     options.hidpi = true
-  _.filter(base_transformations, present).join "/"
+  _.filter(transformations, utils.present).join "/"
 
-exports.updateable_resource_params = updateable_resource_params = (options, params = {}) ->
-  params.tags = build_array(options.tags).join(",") if options.tags?
-  params.context = encode_key_value(options.context) if options.context?
-  params.face_coordinates = encode_double_array(options.face_coordinates) if options.face_coordinates?
-  params.custom_coordinates = encode_double_array(options.custom_coordinates) if options.custom_coordinates?
-  params.headers = build_custom_headers(options.headers) if options.headers?
+exports.updateable_resource_params = (options, params = {}) ->
+  params.tags = utils.build_array(options.tags).join(",") if options.tags?
+  params.context = utils.encode_key_value(options.context) if options.context?
+  params.face_coordinates = utils.encode_double_array(options.face_coordinates) if options.face_coordinates?
+  params.custom_coordinates = utils.encode_double_array(options.custom_coordinates) if options.custom_coordinates?
+  params.headers = utils.build_custom_headers(options.headers) if options.headers?
   params.ocr = options.ocr if options.ocr?
   params.raw_convert = options.raw_convert if options.raw_convert?
   params.categorization = options.categorization if options.categorization?
@@ -212,29 +238,29 @@ exports.updateable_resource_params = updateable_resource_params = (options, para
   params
 
 exports.url = (public_id, options = {}) ->
-  type = option_consume(options, "type",null )
-  options.fetch_format ?= option_consume(options, "format") if type is "fetch"
-  transformation = generate_transformation_string(options)
-  resource_type = option_consume(options, "resource_type", "image")
-  version = option_consume(options, "version")
-  format = option_consume(options, "format")
-  cloud_name = option_consume(options, "cloud_name", config().cloud_name)
+  type = utils.option_consume(options, "type",null )
+  options.fetch_format ?= utils.option_consume(options, "format") if type is "fetch"
+  transformation = utils.generate_transformation_string(options)
+  resource_type = utils.option_consume(options, "resource_type", "image")
+  version = utils.option_consume(options, "version")
+  format = utils.option_consume(options, "format")
+  cloud_name = utils.option_consume(options, "cloud_name", config().cloud_name)
   throw "Unknown cloud_name"  unless cloud_name
-  private_cdn = option_consume(options, "private_cdn", config().private_cdn)
-  secure_distribution = option_consume(options, "secure_distribution", config().secure_distribution)
-  secure = option_consume(options, "secure", null)
-  ssl_detected= option_consume(options, "ssl_detected", config().ssl_detected)
+  private_cdn = utils.option_consume(options, "private_cdn", config().private_cdn)
+  secure_distribution = utils.option_consume(options, "secure_distribution", config().secure_distribution)
+  secure = utils.option_consume(options, "secure", null)
+  ssl_detected= utils.option_consume(options, "ssl_detected", config().ssl_detected)
   secure = ssl_detected || config().secure if secure==null
   
-  cdn_subdomain = option_consume(options, "cdn_subdomain", config().cdn_subdomain)
-  secure_cdn_subdomain = option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain) 
+  cdn_subdomain = utils.option_consume(options, "cdn_subdomain", config().cdn_subdomain)
+  secure_cdn_subdomain = utils.option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain)
 
-  cname = option_consume(options, "cname", config().cname)
-  shorten = option_consume(options, "shorten", config().shorten)
-  sign_url = option_consume(options, "sign_url", config().sign_url)
-  api_secret = option_consume(options, "api_secret", config().api_secret)
-  url_suffix = option_consume(options, "url_suffix")
-  use_root_path = option_consume(options, "use_root_path",config().use_root_path)
+  cname = utils.option_consume(options, "cname", config().cname)
+  shorten = utils.option_consume(options, "shorten", config().shorten)
+  sign_url = utils.option_consume(options, "sign_url", config().sign_url)
+  api_secret = utils.option_consume(options, "api_secret", config().api_secret)
+  url_suffix = utils.option_consume(options, "url_suffix")
+  use_root_path = utils.option_consume(options, "use_root_path",config().use_root_path)
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
   if preloaded
@@ -274,6 +300,10 @@ exports.url = (public_id, options = {}) ->
   url = [prefix, resource_type, type, signature, transformation, version, public_id].filter((part) -> part? && part!='').join('/')
   url
 
+exports.video_url = (public_id, options) ->
+  options = _.extend({ resource_type: 'video' }, options)
+  utils.url(public_id, options)
+
 finalize_source = (source,format,url_suffix) ->
   source = source.replace(/([^:])\/\//, '\\1\/')
   if source.match(/^https?:\//i)
@@ -289,6 +319,10 @@ finalize_source = (source,format,url_suffix) ->
       source = source+'.'+format
       source_to_sign = source_to_sign+'.'+format
   [source,source_to_sign]
+
+exports.video_thumbnail_url = (public_id, options) ->
+  options = _.extend(DEFAULT_POSTER_OPTIONS, options)
+  utils.url(public_id, options)
 
 finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) ->
   type?='upload'
@@ -432,10 +466,10 @@ exports.random_public_id = ->
   crypto.randomBytes(12).toString('base64').replace(/[^a-z0-9]/g, "")
 
 exports.signed_preloaded_image = (result) ->
-  "#{result.resource_type}/upload/v#{result.version}/#{_.filter([result.public_id, result.format], present).join(".")}##{result.signature}"
+  "#{result.resource_type}/upload/v#{result.version}/#{_.filter([result.public_id, result.format], utils.present).join(".")}##{result.signature}"
 
 exports.api_sign_request = (params_to_sign, api_secret) ->
-  to_sign = _.sortBy("#{k}=#{build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
+  to_sign = _.sortBy("#{k}=#{utils.build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
   shasum = crypto.createHash('sha1')
   shasum.update(utf8_encode(to_sign + api_secret))
   shasum.digest('hex')
@@ -503,7 +537,7 @@ exports.zip_download_url = (tag, options = {}) ->
 
 exports.html_attrs = (options) ->
   keys = _.sortBy(_.keys(options), _.identity)
-  ("#{key}='#{options[key]}'" for key in keys when present(options[key])).join(" ")
+  ("#{key}='#{options[key]}'" for key in keys when utils.present(options[key])).join(" ")
 
 
 CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain']
@@ -528,7 +562,7 @@ v1_result_adapter = (callback) ->
 
 v1_adapter = (name, num_pass_args, v1) -> 
   return (args...) ->
-    pass_args = _.first(args, num_pass_args)
+    pass_args = _.dropRight(args, num_pass_args)
     options = args[num_pass_args]
     callback = args[num_pass_args+1]
     if !callback? && _.isFunction(options)
@@ -547,3 +581,63 @@ as_safe_bool = (value)->
   value = 1 if value==true || value=='true' || value == '1'
   value = 0 if value==false || value=='false' || value =='0'
   return value
+
+#  TODO add video methods
+
+number_pattern = ->
+  "([0-9]*)\\.([0-9]+)|([0-9]+)"
+
+
+offset_any_pattern = ->
+  "(#{number_pattern})([%pP])?"
+
+
+offset_any_pattern_re = ->
+  /((([0-9]*)\.([0-9]+)|([0-9]+))([%pP])?)\.\.((([0-9]*)\.([0-9]+)|([0-9]+))([%pP])?)/
+
+
+  # Split a range into the start and end values
+split_range = (range) -> # :nodoc:
+  switch range.constructor
+    when String
+      range.split ".." if offset_any_pattern_re =~ range
+    when Array
+      [_.first(range), _.last(range)]
+    else
+      [null, null]
+
+# Normalize an offset value
+# @param [String] value a decimal value which may have a 'p' or '%' postfix. E.g. '35%', '0.4p'
+# @return [Object|String] a normalized String of the input value if possible otherwise the value itself
+norm_range_value = (value) -> # :nodoc:
+  offset = String(value).match(RegExp("^#{offset_any_pattern}$"))
+  if offset
+    modifier   = offset[5]? ? 'p' : ''
+    value  = "#{offset[1] || offset[4]}#{modifier}"
+  value
+
+
+  # A video codec parameter can be either a String or a Hash.
+  #
+  # @param [Object] param <code>vc_<codec>[ : <profile> : [<level>]]</code>
+  #                       or <code>{ codec: 'h264', profile: 'basic', level: '3.1' }</code>
+  # @return [String] <code><codec> : <profile> : [<level>]]</code> if a Hash was provided
+  #                   or the param if a String was provided.
+  #                   Returns NIL if param is not a Hash or String
+process_video_params = (param) ->
+  switch param.constructor
+    when Object
+      video = ""
+      if 'codec' of param
+        video = param['codec']
+        if 'profile' of param
+          video += ":" + param['profile']
+          if 'level' of param
+            video += ":" + param['level']
+      video
+    when String
+      param
+    else
+      nil
+
+

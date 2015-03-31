@@ -8,7 +8,7 @@ api = require("../lib/api")
 _ = require("underscore")
 Q = require('q')
 fs = require('fs')
-describe "util", ->
+describe "utils", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
 
   afterEach () ->
