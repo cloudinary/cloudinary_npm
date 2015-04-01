@@ -37,7 +37,7 @@ exports.resources_by_ids = (public_ids, callback, options={}) ->
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type]
   params = only(options, "tags", "context", "moderations")
-  params["public_ids[]"] = public_ids
+  params["public_ids"] = public_ids
   call_api("get", uri, params, callback, options)    
 
 exports.resource = (public_id, callback, options={}) ->
@@ -58,7 +58,7 @@ exports.delete_resources = (public_ids, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"    
   uri = ["resources", resource_type, type]
-  call_api("delete", uri, _.extend({"public_ids[]": public_ids}, only(options, "keep_original","invalidate")), callback, options)      
+  call_api("delete", uri, _.extend({"public_ids": public_ids}, only(options, "keep_original","invalidate")), callback, options)      
 
 exports.delete_resources_by_prefix = (prefix, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
