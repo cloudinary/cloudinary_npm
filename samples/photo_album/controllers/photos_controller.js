@@ -98,7 +98,7 @@ function add_direct_unsigned(req,res){
   })
   .catch(function(err){
     // Creating an upload preset is done here only for demo purposes. 
-    // Ussualy it is created outside the upload flow via api or 
+    // Usually it is created outside the upload flow via api or
     // online console (https://cloudinary.com/console/settings/upload)
     return cloudinary.api.create_upload_preset({unsigned:true,name: preset_name,  folder:  "preset_folder", return_delete_token:true })
   })

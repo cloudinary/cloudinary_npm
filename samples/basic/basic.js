@@ -120,11 +120,11 @@ cloudinary.uploader.upload('http://res.cloudinary.com/demo/image/upload/couple.j
    if (ids.length==6){
      console.log();
      console.log ('**  uploaded all files ('+ids.join(',')+') to cloudinary');
-     performTransfromations();
+     performTransformations();
    }
  }
 
-function performTransfromations(){
+function performTransformations(){
   console.log();
   console.log();
   console.log();
