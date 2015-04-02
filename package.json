@@ -11,13 +11,13 @@
   "main": "cloudinary.js",
   "dependencies": {
     "q": "^1.0.1",
-    "underscore": "1.8.x"
+    "lodash": "3.6.x"
   },
   "devDependencies": {
     "coffee-script": "1.9.x",
     "dotenv": "1.x",
-    "expect.js": "",
-    "mocha": ""
+    "expect.js": "0.3.x",
+    "mocha": "2.2.x"
   },
   "scripts": {
     "pretest": "npm run compile",

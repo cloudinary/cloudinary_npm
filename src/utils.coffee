@@ -22,28 +22,28 @@ exports.build_upload_params = (options) ->
     public_id: options.public_id,
     callback: options.callback,
     format: options.format,
-    backup: as_safe_bool(options.backup),
-    faces: as_safe_bool(options.faces),
-    exif: as_safe_bool(options.exif),
-    image_metadata: as_safe_bool(options.image_metadata),
-    colors: as_safe_bool(options.colors),
+    backup: utils.as_safe_bool(options.backup),
+    faces: utils.as_safe_bool(options.faces),
+    exif: utils.as_safe_bool(options.exif),
+    image_metadata: utils.as_safe_bool(options.image_metadata),
+    colors: utils.as_safe_bool(options.colors),
     type: options.type,
     eager: utils.build_eager(options.eager),
-    use_filename: as_safe_bool(options.use_filename),
-    unique_filename: as_safe_bool(options.unique_filename), 
-    discard_original_filename: as_safe_bool(options.discard_original_filename), 
+    use_filename: utils.as_safe_bool(options.use_filename),
+    unique_filename: utils.as_safe_bool(options.unique_filename),
+    discard_original_filename: utils.as_safe_bool(options.discard_original_filename),
     notification_url: options.notification_url,
     eager_notification_url: options.eager_notification_url,
-    eager_async: as_safe_bool(options.eager_async),
-    invalidate: as_safe_bool(options.invalidate),
+    eager_async: utils.as_safe_bool(options.eager_async),
+    invalidate: utils.as_safe_bool(options.invalidate),
     proxy: options.proxy,
     folder: options.folder,
-    overwrite: as_safe_bool(options.overwrite),
+    overwrite: utils.as_safe_bool(options.overwrite),
     allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
     moderation: options.moderation,
-    phash: as_safe_bool(options.phash),
+    phash: utils.as_safe_bool(options.phash),
     upload_preset: options.upload_preset
-    return_delete_token: as_safe_bool(options.return_delete_token)
+    return_delete_token: utils.as_safe_bool(options.return_delete_token)
   utils.updateable_resource_params(options, params)
 
 exports.timestamp = ->
@@ -91,7 +91,7 @@ exports.build_eager = (transformations) ->
   ).join("|")
     
 exports.build_custom_headers = (headers) ->
-  return switch
+  switch
     when !headers?
       undefined
     when _.isArray headers
@@ -160,7 +160,6 @@ exports.generate_transformation_string = (options) ->
   if options["offset"]?
     [options["start_offset"], options["end_offset"]] = split_range( utils.option_consume(options, "offset"))
 
-
   params =
     c: crop
     t: named_transformation
@@ -177,10 +176,12 @@ exports.generate_transformation_string = (options) ->
   simple_params =
     audio_codec: "ac"
     audio_frequency: "af"
+    bit_rate: 'br'
     color_space: "cs"
     default_image: "d"
     delay: "dl"
     density: "dn"
+    duration: "du"
     end_offset: "eo"
     fetch_format: "f"
     gravity: "g"
@@ -207,7 +208,6 @@ exports.generate_transformation_string = (options) ->
 
 
   params = _.sortBy([key, value] for key, value of params, (key, value) -> key)
-
   params.push [utils.option_consume(options, "raw_transformation")]
   transformations = (param.join("_") for param in params when utils.present(_.last(param))).join(",")
   base_transformations.push transformations
@@ -562,7 +562,7 @@ v1_result_adapter = (callback) ->
 
 v1_adapter = (name, num_pass_args, v1) -> 
   return (args...) ->
-    pass_args = _.dropRight(args, num_pass_args)
+    pass_args = _.take(args, num_pass_args)
     options = args[num_pass_args]
     callback = args[num_pass_args+1]
     if !callback? && _.isFunction(options)
@@ -576,27 +576,21 @@ exports.v1_adapters = (exports, v1, mapping) ->
   for name, num_pass_args of mapping
     exports[name] = v1_adapter(name, num_pass_args, v1)
 
-as_safe_bool = (value)->
+exports.as_safe_bool = (value)->
   return undefined if !value? 
   value = 1 if value==true || value=='true' || value == '1'
   value = 0 if value==false || value=='false' || value =='0'
   return value
 
-#  TODO add video methods
+number_pattern = "([0-9]*)\\.([0-9]+)|([0-9]+)"
 
-number_pattern = ->
-  "([0-9]*)\\.([0-9]+)|([0-9]+)"
+offset_any_pattern = "(#{number_pattern})([%pP])?"
 
+# Replace with ///(#{offset_any_pattern()})\.\.(#{offset_any_pattern()})///
+# After jetbrains fixes bug
+offset_any_pattern_re = RegExp("(#{offset_any_pattern})\\.\\.(#{offset_any_pattern})")
 
-offset_any_pattern = ->
-  "(#{number_pattern})([%pP])?"
-
-
-offset_any_pattern_re = ->
-  /((([0-9]*)\.([0-9]+)|([0-9]+))([%pP])?)\.\.((([0-9]*)\.([0-9]+)|([0-9]+))([%pP])?)/
-
-
-  # Split a range into the start and end values
+# Split a range into the start and end values
 split_range = (range) -> # :nodoc:
   switch range.constructor
     when String
@@ -606,24 +600,26 @@ split_range = (range) -> # :nodoc:
     else
       [null, null]
 
+###*
 # Normalize an offset value
-# @param [String] value a decimal value which may have a 'p' or '%' postfix. E.g. '35%', '0.4p'
-# @return [Object|String] a normalized String of the input value if possible otherwise the value itself
+# @param {String} value a decimal value which may have a 'p' or '%' postfix. E.g. '35%', '0.4p'
+# @return {Object|String} a normalized String of the input value if possible otherwise the value itself
+###
 norm_range_value = (value) -> # :nodoc:
   offset = String(value).match(RegExp("^#{offset_any_pattern}$"))
   if offset
-    modifier   = offset[5]? ? 'p' : ''
+    modifier   = if offset[5] then 'p' else ''
     value  = "#{offset[1] || offset[4]}#{modifier}"
   value
 
-
-  # A video codec parameter can be either a String or a Hash.
-  #
-  # @param [Object] param <code>vc_<codec>[ : <profile> : [<level>]]</code>
-  #                       or <code>{ codec: 'h264', profile: 'basic', level: '3.1' }</code>
-  # @return [String] <code><codec> : <profile> : [<level>]]</code> if a Hash was provided
-  #                   or the param if a String was provided.
-  #                   Returns NIL if param is not a Hash or String
+###*
+# A video codec parameter can be either a String or a Hash.
+# @param {Object} param <code>vc_<codec>[ : <profile> : [<level>]]</code>
+#                       or <code>{ codec: 'h264', profile: 'basic', level: '3.1' }</code>
+# @return {String} <code><codec> : <profile> : [<level>]]</code> if a Hash was provided
+#                   or the param if a String was provided.
+#                   Returns null if param is not a Hash or String
+###
 process_video_params = (param) ->
   switch param.constructor
     when Object
@@ -638,6 +634,6 @@ process_video_params = (param) ->
     when String
       param
     else
-      nil
+      null
 
 

@@ -169,13 +169,13 @@ describe "uploader", ->
     , allowed_formats: ["png"]
 
   it "should prevent non whitelisted formats from being uploaded if allowed_formats is specified", (done) ->
-  	cloudinary.uploader.upload "test/logo.png", (result) ->
+    cloudinary.uploader.upload "test/logo.png", (result) ->
       expect(result.error.http_code).to.eql(400)
       done()
     , allowed_formats: ["jpg"]
   
   it "should allow non whitelisted formats if type is specified and convert to that type", (done) ->
-  	cloudinary.uploader.upload "test/logo.png", (result) ->
+    cloudinary.uploader.upload "test/logo.png", (result) ->
       return done(new Error result.error.message) if result.error?
       expect(result.format).to.eql("jpg")
       done()
@@ -272,12 +272,15 @@ describe "uploader", ->
         expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
         cloudinary.api.delete_upload_preset(preset.name, -> done())
 
-  it "should reject promise if error code is returned from the server" , (done) ->
+  it "should reject promise if error code is returned from the server", (done) ->
     this.timeout 5000
-    cloudinary.uploader.upload("test/empty.gif").catch((error)->
+    cloudinary.uploader.upload("test/empty.gif")
+    .then ->
+      expect().fail("server should return an error when uploading an empty file")
+    .catch (error)->
       expect(error.message).to.contain "empty"
+    .finally ->
       done()
-    )
 
   it "should successfully upload with pipes", (done) ->
     this.timeout 2000
@@ -294,7 +297,7 @@ describe "uploader", ->
   it "should fail with http.Agent (non secure)", (done) ->
     this.timeout 2000
     upload = cloudinary.v2.uploader.upload_stream {agent:new http.Agent},(error, result) ->
-      expect(error.message).to.eql('socket hang up')
+      expect(error.message).to.match(/socket hang up|ECONNRESET/)
       done()
 
     file_reader = fs.createReadStream('test/logo.png')

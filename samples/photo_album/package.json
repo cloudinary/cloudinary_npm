@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.5.2",
-    "cloudinary": "^1.0.12",
+    "cloudinary": "file:../..",
     "connect-multiparty": "^1.1.0",
     "dotenv": "^0.4.0",
     "ejs": "^1.0.0",

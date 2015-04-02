@@ -114,19 +114,19 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/g_center,o_20,p_a,q_0.4,r_3,x_1,y_2/test"
 
-  it "should support named tranformation", ->
+  it "should support named transformation", ->
     options = transformation: "blip"
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/t_blip/test"
 
-  it "should support array of named tranformations", ->
+  it "should support array of named transformations", ->
     options = transformation: [ "blip", "blop" ]
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/t_blip.blop/test"
 
-  it "should support base tranformation", ->
+  it "should support base transformation", ->
     options =
       transformation:
         x: 100
@@ -140,7 +140,7 @@ describe "cloudinary", ->
     expect(options).to.eql width: 100
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_fill,x_100,y_100/c_crop,w_100/test"
 
-  it "should support array of base tranformations", ->
+  it "should support array of base transformations", ->
     options =
       transformation: [{x: 100, y: 100, width: 200, crop: "fill"} , {radius: 10} ]
       crop: "crop"
@@ -150,7 +150,7 @@ describe "cloudinary", ->
     expect(options).to.eql width: 100
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_fill,w_200,x_100,y_100/r_10/c_crop,w_100/test"
 
-  it "should not include empty tranformations", ->
+  it "should not include empty transformations", ->
     options = transformation: [ {}, {x: 100, y: 100, crop: "fill"} , {} ]
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
@@ -291,13 +291,13 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/pg_5/test"
 
-  it "should support extenal cname", ->
+  it "should support external cname", ->
     options = cname: "hello.com"
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}
     expect(result).to.eql "http://hello.com/test123/image/upload/test"
 
-  it "should support extenal cname with cdn_subdomain on", ->
+  it "should support external cname with cdn_subdomain on", ->
     options = cname: "hello.com", cdn_subdomain: true
     result = cloudinary.utils.url("test", options)
     expect(options).to.eql {}

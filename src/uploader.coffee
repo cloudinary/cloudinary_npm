@@ -1,4 +1,4 @@
-_ = require("underscore")
+_ = require("lodash")
 https = require('https')
 #http = require('http')
 UploadStream = require('./upload_stream')
@@ -7,6 +7,7 @@ config = require("./config")
 fs = require('fs')
 path = require('path')
 Q = require('q')
+
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
 build_upload_params = (options) ->
@@ -24,7 +25,7 @@ exports.unsigned_upload = (file, upload_preset, callback, options={}) ->
 exports.upload = (file, callback, options={}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
-    if file? && file.match(/^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)
+    if file? && file.match(/^ftp:|^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)
       [params, file: file]
     else 
       [params, {}, file]
@@ -96,6 +97,8 @@ exports.explicit = (public_id, callback, options={}) ->
       public_id: public_id
       callback: options.callback
       eager: utils.build_eager(options.eager)
+      eager_notification_url: options.eager_notification_url
+      eager_async: utils.as_safe_bool(options.eager_async)
       headers: utils.build_custom_headers(options.headers)
       tags: options.tags ? utils.build_array(options.tags).join(",")
       face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)

@@ -1,4 +1,4 @@
-_ = require("underscore")
+_ = require("lodash")
 https = require('https')
 utils = require("./utils")
 config = require("./config")
@@ -218,4 +218,3 @@ exports.only = (hash, keys...) ->
   for key in keys
     result[key] = hash[key] if hash[key]?
   result
-

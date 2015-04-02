@@ -4,7 +4,7 @@ dotenv.load()
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
-_ = require("underscore")
+_ = require("lodash")
 Q = require('q')
 fs = require('fs')
 describe "api", ->
@@ -18,18 +18,21 @@ describe "api", ->
   before (done) ->
     @timeout 0
     @timestamp_tag = "api_test_tag_" + cloudinary.utils.timestamp()
-    cnt = 0
-    progress = -> 
-      cnt += 1
-      done() if cnt == 7
+
+    empty_callback = ->
+      #
+
     cloudinary.api.delete_resources ["api_test", "api_test1", "api_test2"], =>
-      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
-      cloudinary.uploader.upload("test/logo.png", progress, public_id: "api_test2", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"]) 
-      cloudinary.api.delete_transformation("api_test_transformation", progress)
-      cloudinary.api.delete_upload_preset("api_test_upload_preset1", progress)
-      cloudinary.api.delete_upload_preset("api_test_upload_preset2", progress)
-      cloudinary.api.delete_upload_preset("api_test_upload_preset3", progress)
-      cloudinary.api.delete_upload_preset("api_test_upload_preset4", progress)
+      Q.all [
+        cloudinary.uploader.upload("test/logo.png", empty_callback, public_id: "api_test", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
+        cloudinary.uploader.upload("test/logo.png", empty_callback, public_id: "api_test2", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
+        cloudinary.api.delete_transformation("api_test_transformation")
+        cloudinary.api.delete_upload_preset("api_test_upload_preset1")
+        cloudinary.api.delete_upload_preset("api_test_upload_preset2")
+        cloudinary.api.delete_upload_preset("api_test_upload_preset3")
+        cloudinary.api.delete_upload_preset("api_test_upload_preset4")]
+      .finally ->
+        done()
 
   it "should allow listing resource_types", (done) ->
     @timeout 10000
@@ -357,7 +360,7 @@ describe "api", ->
       expect(usage.last_update).not.to.eql null
       done()
 
-  it.skip "should allow deleting all resources", (done) ->
+  it "should allow deleting all resources", (done) ->
     @timeout 10000
     cloudinary.uploader.upload "test/logo.png", (upload_result) ->
       cloudinary.api.resource "api_test5", (resource) ->

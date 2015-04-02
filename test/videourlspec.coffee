@@ -5,7 +5,6 @@ expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
 api = require("../lib/api")
-_ = require("underscore")
 Q = require('q')
 fs = require('fs')
 test_cloudinary_url = (public_id, options, expected_url, expected_options) ->
@@ -13,7 +12,7 @@ test_cloudinary_url = (public_id, options, expected_url, expected_options) ->
   expect(options).to.eql(expected_options)
   expect(result).to.eql(expected_url)
 
-describe "Cloudinary::Utils", ->
+describe "Cloudinary::Utils for video", ->
   beforeEach ->
     cloudinary.config
       cloud_name: "test123"
@@ -30,8 +29,10 @@ describe "Cloudinary::Utils", ->
 
   describe "utils.url", ->
     describe ":video_codec", ->
-      it 'should support a string value', ->
+      it 'Should support a string "auto"', ->
         test_cloudinary_url("video_id", { resource_type: 'video', video_codec: 'auto' }, "#{upload_path}/vc_auto/video_id", {})
+      it 'Should support a string "h264:basic:3.1"', ->
+        test_cloudinary_url("video_id", { resource_type: 'video', video_codec: 'h264:basic:3.1' }, "#{upload_path}/vc_h264:basic:3.1/video_id", {})
       it 'should support a hash value', ->
         test_cloudinary_url("video_id", { resource_type: 'video', video_codec: { codec: 'h264', profile: 'basic', level: '3.1' } },
                             "#{upload_path}/vc_h264:basic:3.1/video_id", {})
@@ -53,7 +54,7 @@ describe "Cloudinary::Utils", ->
         test_cloudinary_url("video_id", { resource_type: 'video', video_sampling: 20 }, "#{upload_path}/vs_20/video_id", {})
       it "should support an string value in the a form of \"<float>s\"", ->
         test_cloudinary_url("video_id", { resource_type: 'video', video_sampling: "2.3s" }, "#{upload_path}/vs_2.3s/video_id", {})
-    for short, long in { so: 'start_offset', eo: 'end_offset', du: 'duration' }
+    for short, long of { so: 'start_offset', eo: 'end_offset', du: 'duration' }
       describe ":#{long}", ->
         it "should support decimal seconds ", ->
           op = { resource_type: 'video'}
@@ -62,19 +63,16 @@ describe "Cloudinary::Utils", ->
         it 'should support percents of the video length as "<number>p"', ->
           op = { resource_type: 'video'}
           op[long] = '35p'
-        test_cloudinary_url("video_id", op, "#{upload_path}/#{short}_35p/video_id", {})
+          test_cloudinary_url("video_id", op, "#{upload_path}/#{short}_35p/video_id", {})
         it 'should support percents of the video length as "<number>%"', ->
           op = { resource_type: 'video'}
           op[long] = '35%'
-        test_cloudinary_url("video_id", op, "#{upload_path}/#{short}_35p/video_id", {})
+          test_cloudinary_url("video_id", op, "#{upload_path}/#{short}_35p/video_id", {})
 
     describe ":offset", ->
-      subject = (options)->
-        utils.url("video_id", options)
       params = [
         ['string range', 'so_2.66,eo_3.21', '2.66..3.21'],
         ['array', 'so_2.66,eo_3.21', [2.66, 3.21]],
-#        ['range of floats', 'so_2.66,eo_3.21', 2.66..3.21],
         ['array of % strings', 'so_35p,eo_70p', ["35%", "70%"]],
         ['array of p strings', 'so_35p,eo_70p', ["35p", "70p"]],
         ['array of float percent', 'so_35.5p,eo_70.5p', ["35.5p", "70.5p"]]
@@ -85,7 +83,6 @@ describe "Cloudinary::Utils", ->
         describe "when provided with #{name} #{range}", ->
           it "should produce a range transformation in the format of #{url_param}", ->
             options = { resource_type: 'video', offset: range }
-          #            expect( subject(options) ).to change { options }.to({})
             url = utils.url("video_id", options)
             expect( options ).to.eql( {})
             matched = /([^\/]*)\/video_id$/.exec(url)

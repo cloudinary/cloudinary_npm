@@ -33,7 +33,7 @@ exports.image = function(source, options) {
   if (source) html += "src='" + source + "' ";
   html += cloudinary.utils.html_attrs(options) + "/>";
   return html;  	
-}
+};
 exports.cloudinary_js_config =cloudinary.utils.cloudinary_js_config;
 
 exports.CF_SHARED_CDN =cloudinary.utils.CF_SHARED_CDN;

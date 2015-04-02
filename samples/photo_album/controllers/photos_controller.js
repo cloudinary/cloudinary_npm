@@ -33,7 +33,7 @@ function create_through_server(req,res){
 
   // file was not uploaded redirecting to upload 
   if (req.files.image.ws.bytesWritten==0) {
-    res.redirect('/photos/add')
+    res.redirect('/photos/add');
     return;
   }
 
@@ -43,9 +43,9 @@ function create_through_server(req,res){
   // Upload file to Cloudinary
   cloudinary.uploader.upload(imageFile,{tags:'express_sample'})
   .then(function(image){
-    console.log('** file uploaded to Cloudinary service')
-    console.dir(image)
-    photo.image = image
+    console.log('** file uploaded to Cloudinary service');
+    console.dir(image);
+    photo.image = image;
     // Save photo with image metadata
     return photo.save();
   })
@@ -138,7 +138,7 @@ function create_direct(req,res){
   })
   .catch(function(err){
     result.error =err;
-    console.log('** error while uploading file')
+    console.log('** error while uploading file');
     console.dir(err)
   }).finally(function(){
     res.render('photos/create_direct',{photo:photo,upload:photo.image});
@@ -161,4 +161,4 @@ module.exports.wire= function(app){
   app.get('/photos/add_direct',add_direct);
   app.get('/photos/add_direct_unsigned',add_direct_unsigned);
   app.post('/photos/direct', create_direct);
-}
+};
