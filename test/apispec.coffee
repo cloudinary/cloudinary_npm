@@ -50,7 +50,6 @@ describe "api", ->
       expect(resource.type).to.eql("upload")
       done()
 
-
   it "should allow listing resources with cursor", (done) ->
     @timeout 10000
     cloudinary.v2.api.resources max_results: 1, (error, result) ->      
