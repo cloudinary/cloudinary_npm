@@ -34,10 +34,75 @@ exports.image = function(source, options) {
   html += cloudinary.utils.html_attrs(options) + "/>";
   return html;  	
 };
-exports.cloudinary_js_config =cloudinary.utils.cloudinary_js_config;
+/* Creates an HTML video tag for the provided public_id
+ * Options: 
+ * - source_types - Specify which source type the tag should include. defaults to webm, mp4 and ogv.
+ * - source_transformation - specific transformations to use for a specific source type.
+ * - poster - override default thumbnail:
+ *   - url: provide an ad hoc url
+ *   - options: with specific poster transformations and/or Cloudinary public_id
+ * Examples:
+ * - cloudinary.video("mymovie.mp4")
+ * - cloudinary.video("mymovie.mp4", {source_types: 'webm'})
+ * - cloudinary.video("mymovie.ogv", {poster: "myspecialplaceholder.jpg"})
+ * - cloudinary.video("mymovie.webm", {source_types: ['webm', 'mp4'], poster: {effect: 'sepia'}})
+ */
+exports.video = function(public_id, options) {
+  options = options || {};
+  public_id = public_id.replace(/\.(mp4|ogv|webm)$/, '');
+  var source_types = cloudinary.utils.option_consume(options, 'source_types', []);
+  var source_transformation = cloudinary.utils.option_consume(options, 'source_transformation', {});
+  var fallback = cloudinary.utils.option_consume(options, 'fallback_content', '');
 
-exports.CF_SHARED_CDN =cloudinary.utils.CF_SHARED_CDN;
-exports.AKAMAI_SHARED_CDN =cloudinary.utils.AKAMAI_SHARED_CDN;
-exports.SHARED_CDN =cloudinary.utils.SHARED_CDN;
+  if (source_types.length == 0) source_types = cloudinary.utils.DEFAULT_VIDEO_SOURCE_TYPES;
+  var video_options = _.cloneDeep(options);
+
+  if (video_options.hasOwnProperty('poster')) {
+    if (_.isPlainObject(video_options.poster)) {
+      if (video_options.poster.hasOwnProperty('public_id')) {
+        video_options.poster = cloudinary.utils.url(video_options.poster.public_id, video_options.poster);
+      } else {
+        video_options.poster = cloudinary.utils.url(public_id, _.extend({}, cloudinary.utils.DEFAULT_POSTER_OPTIONS, video_options.poster));
+      }
+    }
+  } else {
+    video_options.poster = cloudinary.utils.url(public_id, _.extend({}, cloudinary.utils.DEFAULT_POSTER_OPTIONS, options));
+  }
+  
+  if (!video_options.poster) delete video_options.poster;
+
+  var html = '<video ';
+
+  if (!video_options.hasOwnProperty('resource_type')) video_options.resource_type = 'video';
+  var multi_source = _.isArray(source_types) && source_types.length > 1;
+  var source = public_id;
+  if (!multi_source){
+    source = source + '.' + cloudinary.utils.build_array(source_types)[0];
+  }
+  var src = cloudinary.utils.url(source, video_options);
+  if (!multi_source) video_options.src = src;
+  if (video_options.hasOwnProperty("html_width")) video_options.width = cloudinary.utils.option_consume(video_options, 'html_width');
+  if (video_options.hasOwnProperty("html_height")) video_options.height = cloudinary.utils.option_consume(video_options, 'html_height');
+  html = html + cloudinary.utils.html_attrs(video_options) + '>';
+  if (multi_source) {          
+    for(var i = 0; i < source_types.length; i++) {
+      var source_type = source_types[i];
+      var transformation = source_transformation[source_type] || {};
+      src = cloudinary.utils.url(source + "." + source_type, _.extend({resource_type: 'video'}, _.cloneDeep(options), _.cloneDeep(transformation)));
+      var video_type = source_type == 'ogv' ? 'ogg' : source_type;
+      var mime_type = "video/" + video_type;
+      html = html + '<source '+ cloudinary.utils.html_attrs({src: src, type: mime_type}) + '>';
+    }
+  }
+
+  html = html + fallback;
+  html = html + '</video>';
+  return html;
+};
+exports.cloudinary_js_config = cloudinary.utils.cloudinary_js_config;
+
+exports.CF_SHARED_CDN = cloudinary.utils.CF_SHARED_CDN;
+exports.AKAMAI_SHARED_CDN = cloudinary.utils.AKAMAI_SHARED_CDN;
+exports.SHARED_CDN = cloudinary.utils.SHARED_CDN;
 exports.BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 exports.v2 = require('./lib/v2');

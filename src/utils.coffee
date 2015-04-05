@@ -14,7 +14,9 @@ exports.VERSION = "1.1.2"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
-DEFAULT_POSTER_OPTIONS = { format: 'jpg', resource_type: 'video' }
+exports.DEFAULT_POSTER_OPTIONS = { format: 'jpg', resource_type: 'video' }
+exports.DEFAULT_VIDEO_SOURCE_TYPES = ['webm', 'mp4', 'ogv']
+
 exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
@@ -321,7 +323,7 @@ finalize_source = (source,format,url_suffix) ->
   [source,source_to_sign]
 
 exports.video_thumbnail_url = (public_id, options) ->
-  options = _.extend(DEFAULT_POSTER_OPTIONS, options)
+  options = _.extend({}, exports.DEFAULT_POSTER_OPTIONS, options)
   utils.url(public_id, options)
 
 finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) ->
@@ -535,10 +537,18 @@ exports.zip_download_url = (tag, options = {}) ->
 
   return exports.api_url("download_tag.zip", options) + "?" + querystring.stringify(params)
 
-exports.html_attrs = (options) ->
-  keys = _.sortBy(_.keys(options), _.identity)
-  ("#{key}='#{options[key]}'" for key in keys when utils.present(options[key])).join(" ")
+join_pair = (key, value) ->
+  if !value
+    undefined
+  else if value is true
+    return key
+  else
+    return key + "='" + value + "'";
 
+exports.html_attrs = (attrs) ->
+  pairs = _.filter(_.map(attrs, (value, key) -> return join_pair(key, value)))
+  pairs.sort()
+  return pairs.join(" ")
 
 CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain']
 exports.cloudinary_js_config = ->  
