@@ -44,7 +44,7 @@ exports.upload_large_part = (callback, options={}) ->
     ]
 
 exports.upload_large = (path, callback, options={}) ->
-  options =  _.extend(options, part_number: 0, final: false)
+  options =  _.extend({}, options, part_number: 0, final: false)
   options.part_size ?= 20000000
   start = (err, stats) ->
     file_size = stats.size
@@ -123,17 +123,17 @@ exports.text = (text, callback, options={}) ->
   
 exports.generate_sprite = (tag, callback, options={}) ->
   call_api "sprite", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend(options, fetch_format: options.format))
+    transformation = utils.generate_transformation_string(_.extend({}, options, fetch_format: options.format))
     return [{timestamp: utils.timestamp(), tag: tag, transformation: transformation, async: options.async, notification_url: options.notification_url}]
 
 exports.multi = (tag, callback, options={}) ->
   call_api "multi", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend(options))
+    transformation = utils.generate_transformation_string(_.extend({}, options))
     return [{timestamp: utils.timestamp(), tag: tag, transformation: transformation, format: options.format, async: options.async, notification_url: options.notification_url}]
 
 exports.explode = (public_id, callback, options={}) ->
   call_api "explode", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend(options))
+    transformation = utils.generate_transformation_string(_.extend({}, options))
     return [{timestamp: utils.timestamp(), public_id: public_id, transformation: transformation, format: options.format, type: options.type, notification_url: options.notification_url}]
 
 # options may include 'exclusive' (boolean) which causes clearing this tag from all other resources 

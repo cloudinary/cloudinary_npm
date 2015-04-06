@@ -76,9 +76,7 @@ transformation_string = (transformation) ->
   if _.isString(transformation)
     transformation
   else
-    utils.generate_transformation_string(_.extend(transformation))
-
-
+    utils.generate_transformation_string(_.extend({}, transformation))
 
 exports.ping = (callback, options={}) ->
   call_api("get", ["ping"], {}, callback, options)
