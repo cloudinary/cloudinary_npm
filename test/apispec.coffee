@@ -19,18 +19,15 @@ describe "api", ->
     @timeout 0
     @timestamp_tag = "api_test_tag_" + cloudinary.utils.timestamp()
 
-    empty_callback = ->
-      #
-
-    cloudinary.api.delete_resources ["api_test", "api_test1", "api_test2"], =>
+    cloudinary.v2.api.delete_resources ["api_test", "api_test1", "api_test2"], =>
       Q.all [
-        cloudinary.uploader.upload("test/logo.png", empty_callback, public_id: "api_test", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
-        cloudinary.uploader.upload("test/logo.png", empty_callback, public_id: "api_test2", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
-        cloudinary.api.delete_transformation("api_test_transformation")
-        cloudinary.api.delete_upload_preset("api_test_upload_preset1")
-        cloudinary.api.delete_upload_preset("api_test_upload_preset2")
-        cloudinary.api.delete_upload_preset("api_test_upload_preset3")
-        cloudinary.api.delete_upload_preset("api_test_upload_preset4")]
+        cloudinary.v2.uploader.upload("test/logo.png", public_id: "api_test", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
+        cloudinary.v2.uploader.upload("test/logo.png", public_id: "api_test2", tags: ["api_test_tag", @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
+        cloudinary.v2.api.delete_transformation("api_test_transformation")
+        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset1")
+        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset2")
+        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset3")
+        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset4")]
       .finally ->
         done()
 

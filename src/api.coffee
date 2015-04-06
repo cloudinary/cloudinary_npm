@@ -27,6 +27,7 @@ call_api = (method, uri, params, callback, options) ->
       'User-Agent': utils.USER_AGENT
     auth: "#{api_key}:#{api_secret}"
   request_options.agent = options.agent if options.agent?
+  request_options.headers['Content-Length'] = Buffer.byteLength(query_params) unless method == "get"
 
   handle_response = (res) ->
     if _.include([200,400,401,403,404,409,420,500], res.statusCode)
