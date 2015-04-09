@@ -47,6 +47,9 @@ exports.upload_large = (path, callback, options={}) ->
   options =  _.extend({}, options, part_number: 0, final: false)
   options.part_size ?= 20000000
   start = (err, stats) ->
+    if err?
+      callback(error: err) if callback?
+      return
     file_size = stats.size
     part_number = 0
     total_uploaded_size = 0
@@ -65,7 +68,7 @@ exports.upload_large = (path, callback, options={}) ->
         stream.write(chunk) 
       finished_part = (upload_large_part_result) ->
         if options.final
-          callback(upload_large_part_result)
+          callback(upload_large_part_result) if callback?
         else
           options.public_id = upload_large_part_result.public_id
           options.upload_id = upload_large_part_result.upload_id            
@@ -165,13 +168,16 @@ call_api = (action, callback, options, get_params) ->
   
   boundary = utils.random_public_id()
 
+  error = false
   handle_response = (res) ->
-    if res.error
+    if error
+      # Already reported
+    else if res.error
+      error = true
       deferred.reject(res)
       callback(res) if callback?
     else if _.includes([200,400,401,404,420,500], res.statusCode)
       buffer = ""
-      error = false
       res.on "data", (d) -> buffer += d
       res.on "end", ->
         return if error
@@ -241,8 +247,11 @@ post = (url, post_data, boundary, file, callback, options) ->
     return upload_stream
   else if file?
     post_request.write(file_header)
-    file_reader = fs.createReadStream(file)
-    file_reader.pipe(upload_stream)
+    fs.createReadStream(file)
+      .on('error', (error)->
+        callback(error: error)
+        post_request.abort()
+      ).pipe(upload_stream)
   else
     post_request.write(finish_buffer)
     post_request.end()
