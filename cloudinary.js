@@ -12,7 +12,7 @@ exports.url = function(public_id, options) {
 
 exports.image = function (source, options) {
   var responsive, html, current_class, classes;
-  options = options || {};
+  options = _.extend({}, options);
   source = cloudinary.utils.url(source, options);
   if ("html_width" in options) options["width"] = cloudinary.utils.option_consume(options, "html_width");
   if ("html_height" in options) options["height"] = cloudinary.utils.option_consume(options, "html_height");
@@ -55,7 +55,7 @@ exports.image = function (source, options) {
  */
 exports.video = function (public_id, options) {
   var src, video_options, fallback, source_transformation, source_types, source, multi_source, html;
-  options = options || {};
+  options = _.extend({}, options);
   public_id = public_id.replace(/\.(mp4|ogv|webm)$/, '');
   source_types = cloudinary.utils.option_consume(options, 'source_types', []);
   source_transformation = cloudinary.utils.option_consume(options, 'source_transformation', {});
