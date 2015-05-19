@@ -36,7 +36,7 @@ describe "video", ->
       start_offset: 3
     }
     expected_url = VIDEO_UPLOAD_PATH + "ac_acc,so_3,vc_h264/movie"
-    expect(cloudinary.video("movie", options)).to.eql( 
+    expect(cloudinary.video("movie", options)).to.eql(
       "<video height='100' poster='#{expected_url}.jpg' src='#{expected_url}.mp4' width='200'></video>")
 
     delete options['source_types']
@@ -111,7 +111,7 @@ describe "video", ->
 
   it "should generate video tag with configurable poster", ->
     expected_url = VIDEO_UPLOAD_PATH + "movie"
-    
+
     expected_poster_url = 'http://image/somewhere.jpg'
     expect(cloudinary.video("movie", poster: expected_poster_url, source_types: "mp4")).to.eql(
       "<video poster='#{expected_poster_url}' src='#{expected_url}.mp4'></video>")
@@ -129,3 +129,11 @@ describe "video", ->
 
     expect(cloudinary.video("movie", poster: false, source_types: "mp4")).to.eql(
       "<video src='#{expected_url}.mp4'></video>")
+
+  it "should not mutate the options arguement", ->
+    options =
+      video_codec: 'auto'
+      autoplay: true
+    cloudinary.video('hello', options)
+    expect(options.video_codec).to.eql('auto')
+    expect(options.autoplay).to.be.true
