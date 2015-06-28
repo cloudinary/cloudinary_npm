@@ -130,7 +130,7 @@ describe "video", ->
     expect(cloudinary.video("movie", poster: false, source_types: "mp4")).to.eql(
       "<video src='#{expected_url}.mp4'></video>")
 
-  it "should not mutate the options arguement", ->
+  it "should not mutate the options argument", ->
     options =
       video_codec: 'auto'
       autoplay: true
