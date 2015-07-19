@@ -194,4 +194,8 @@ Stay tuned for updates, tips and tutorials: [Blog](http://cloudinary.com/blog), 
 
 ## License #######################################################################
 
-Released under the MIT license. 
+Released under the MIT license.
+
+Test resources include the video [Cloud Book Study](https://vimeo.com/27172301) 
+which was created by [Heidi Neilson](https://vimeo.com/heidineilson) 
+and is distributed under the Creative commons - attribution license (CC BY 3.0)

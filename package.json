@@ -2,7 +2,7 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "homepage": "http://cloudinary.com",
   "repository": {
     "type": "git",
@@ -10,8 +10,8 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
-    "q": "^1.0.1",
-    "lodash": "3.6.x"
+    "q": "1.4.x",
+    "lodash": "3.10.x"
   },
   "devDependencies": {
     "coffee-script": "1.9.x",

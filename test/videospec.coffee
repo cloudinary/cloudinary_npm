@@ -1,7 +1,7 @@
 expect = require('expect.js')
 cloudinary = require('../cloudinary')
 
-describe "video", ->
+describe "video tag helper", ->
   VIDEO_UPLOAD_PATH = "http://res.cloudinary.com/test123/video/upload/"
   DEFAULT_UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload/"
 

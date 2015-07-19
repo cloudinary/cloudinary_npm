@@ -51,16 +51,16 @@ call_api = (method, uri, params, callback, options) ->
           deferred.reject(result)
         else
           deferred.resolve(result)
-        callback(result) if callback?
+        callback?(result)
       res.on "error", (e) ->
         error = true
         err_obj = error: {message: e, http_code: res.statusCode}
         deferred.reject(err_obj.error)
-        callback(err_obj) if callback?
+        callback?(err_obj)
     else
       err_obj = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
       deferred.reject(err_obj.error)
-      callback(err_obj) if callback?
+      callback?(err_obj)
 
   request = https.request(request_options, handle_response)
   request.on "error", (e) -> callback(error: e)

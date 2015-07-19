@@ -10,7 +10,7 @@ exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN
 
-exports.VERSION = "1.2.1"
+exports.VERSION = "1.2.2"
 exports.USER_AGENT = "cld-node-#{exports.VERSION}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
@@ -560,7 +560,7 @@ exports.cloudinary_js_config = ->
       "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
       "</script>\n"    
 
-v1_result_adapter = (callback) -> 
+v1_result_adapter = (callback) ->
   if callback?
     return (result) ->
       if result.error?

@@ -45,10 +45,10 @@ exports.upload_large_part = (callback, options={}) ->
 
 exports.upload_large = (path, callback, options={}) ->
   options =  _.extend({}, options, part_number: 0, final: false)
-  options.part_size ?= 20000000
+  options.chunk_size ?= options.part_size || 20000000
   start = (err, stats) ->
     if err?
-      callback(error: err) if callback?
+      callback?(error: err)
       return
     file_size = stats.size
     part_number = 0
@@ -62,13 +62,13 @@ exports.upload_large = (path, callback, options={}) ->
       stream.end()          
     file_reader.on 'data', (chunk) ->
       upload_request = ->
-        options.final = total_uploaded_size + options.part_size >= file_size
+        options.final = total_uploaded_size + options.chunk_size >= file_size
         options.part_number += 1
         stream = exports.upload_large_part(finished_part, options) 
         stream.write(chunk) 
       finished_part = (upload_large_part_result) ->
-        if options.final
-          callback(upload_large_part_result) if callback?
+        if options.final || upload_large_part_result.error?
+          callback?(upload_large_part_result)
         else
           options.public_id = upload_large_part_result.public_id
           options.upload_id = upload_large_part_result.upload_id            
@@ -82,7 +82,7 @@ exports.upload_large = (path, callback, options={}) ->
       current_part_size += chunk.length
       total_uploaded_size += chunk.length
       first_part = !stream?
-      if first_part || current_part_size > options.part_size        
+      if first_part || current_part_size > options.chunk_size
         if first_part
           upload_request()
         else
@@ -157,7 +157,7 @@ call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
    
 call_api = (action, callback, options, get_params) ->
   deferred = Q.defer()
-  options = _.clone(options)
+  options ?= {}
 
   [params, unsigned_params, file] = get_params.call()
   
@@ -175,7 +175,7 @@ call_api = (action, callback, options, get_params) ->
     else if res.error
       error = true
       deferred.reject(res)
-      callback(res) if callback?
+      callback?(res)
     else if _.includes([200,400,401,404,420,500], res.statusCode)
       buffer = ""
       res.on "data", (d) -> buffer += d
@@ -190,15 +190,15 @@ call_api = (action, callback, options, get_params) ->
           deferred.reject(result.error)
         else
           deferred.resolve(result)
-        callback(result) if callback?
+        callback?(result)
       res.on "error", (e) ->
         error = true
         deferred.reject(e)
-        callback(error: e) if callback?
+        callback?(error: e)
     else
       error_obj = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
       deferred.reject(error_obj.error)
-      callback(error_obj) if callback?
+      callback?(error_obj)
   post_data = []
   for key, value of params 
     if _.isArray(value)

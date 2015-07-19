@@ -4,8 +4,8 @@
   "description": "basic node sample of cloudinary npm",
   "main": "basic.js",
   "dependencies": {
-    "cloudinary": "^1.0.10",
-    "dotenv": "^0.4.0"
+    "cloudinary": "file:../..",
+    "dotenv": "1.x"
   },
   "devDependencies": {},
   "scripts": {
