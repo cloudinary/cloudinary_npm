@@ -1,4 +1,4 @@
 .project
-./src
-./samples
-./test
+src/
+samples/
+test/
