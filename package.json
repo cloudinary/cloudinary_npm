@@ -11,7 +11,8 @@
   "main": "cloudinary.js",
   "dependencies": {
     "q": "1.4.x",
-    "lodash": "3.10.x"
+    "lodash": "3.10.x",
+	"chunking-streams": "0.0.8"
   },
   "devDependencies": {
     "coffee-script": "1.9.x",

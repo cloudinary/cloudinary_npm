@@ -338,6 +338,7 @@ describe "uploader", ->
         cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 7000000},  (error, result) ->
           uploadedRaw.push(result.public_id)
           expect(result.bytes).to.eql(stat.size)
+          expect(result.etag).to.eql("4c13724e950abcb13ec480e10f8541f5")
           done()
 
     it "should return error if value is less than 5MB", (done)->
@@ -354,6 +355,7 @@ describe "uploader", ->
         cloudinary.v2.uploader.upload_large RAW_FILE,  (error, result) ->
           uploadedRaw.push(result.public_id)
           expect(result.bytes).to.eql(stat.size)
+          expect(result.etag).to.eql("ffc265d8d1296247972b4d478048e448")
           done()
 
     it "should support uploading large video files", (done) ->
@@ -362,6 +364,7 @@ describe "uploader", ->
         cloudinary.v2.uploader.upload_large LARGE_VIDEO, (error, result) ->
           return done(new Error error.message) if error?
           expect(result.bytes).to.eql(stat.size)
+          expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571")
           cloudinary.v2.uploader.destroy result.public_id
           done()
 

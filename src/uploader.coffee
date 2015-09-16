@@ -7,6 +7,7 @@ config = require("./config")
 fs = require('fs')
 path = require('path')
 Q = require('q')
+SizeChunker = require('chunking-streams').SizeChunker
 
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
@@ -43,54 +44,47 @@ exports.upload_large_part = (callback, options={}) ->
       tags: options.tags && utils.build_array(options.tags).join(',')
     ]
 
-exports.upload_large = (path, callback, options={}) ->
-  options =  _.extend({}, options, part_number: 0, final: false)
-  options.chunk_size ?= options.part_size || 20000000
+exports.upload_large = (path, callback, options) ->
   start = (err, stats) ->
     if err?
       callback?(error: err)
       return
-    file_size = stats.size
-    part_number = 0
-    total_uploaded_size = 0
-    current_part_size = 0
-    stream = null
-    first_part = true
     file_reader = fs.createReadStream(path)
-        
-    file_reader.on 'end', ->
-      stream.end()          
-    file_reader.on 'data', (chunk) ->
-      upload_request = ->
-        options.final = total_uploaded_size + options.chunk_size >= file_size
-        options.part_number += 1
-        stream = exports.upload_large_part(finished_part, options) 
-        stream.write(chunk) 
-      finished_part = (upload_large_part_result) ->
-        if options.final || upload_large_part_result.error?
-          callback?(upload_large_part_result)
-        else
-          options.public_id = upload_large_part_result.public_id
-          options.upload_id = upload_large_part_result.upload_id            
-          current_part_size = chunk.length
-          if first_part
-            first_part = false  
-          else
-            file_reader.resume()         
-          upload_request()
-
-      current_part_size += chunk.length
-      total_uploaded_size += chunk.length
-      first_part = !stream?
-      if first_part || current_part_size > options.chunk_size
-        if first_part
-          upload_request()
-        else
-          file_reader.pause()
-          stream.end()
-      else
-        stream.write(chunk)
+    exports.upload_large_stream(file_reader, stats.size, callback, options)
   fs.stat(path, start)
+
+exports.upload_large_stream = (in_stream, file_size, callback, options={}) ->
+  options =  _.extend({}, options, part_number: 0, final: false)
+  options.chunk_size ?= options.part_size || 20000000
+  
+  out_stream = null
+  chunker = new SizeChunker({ chunkSize : options.chunk_size, flushTail : true })
+  numChunks = Math.ceil(file_size / options.chunk_size)
+  finished_part_final = null
+  
+  finished_part = (upload_large_part_result) ->
+    if options.final || upload_large_part_result.error?
+      chunker.end()
+      callback?(upload_large_part_result)
+    else
+      options.public_id = upload_large_part_result.public_id
+      options.upload_id = upload_large_part_result.upload_id
+      finished_part_final()
+	  
+  chunker.on 'chunkStart', (id, done) ->
+    options.part_number++
+    options.final = (options.part_number == numChunks)
+    out_stream = exports.upload_large_part(finished_part, options)
+    done()
+	
+  chunker.on 'chunkEnd', (id, done) ->
+    finished_part_final = done
+    out_stream.end()
+	
+  chunker.on 'data', (chunk) ->
+    out_stream.write(chunk.data)
+  
+  in_stream.pipe(chunker)
   
 exports.explicit = (public_id, callback, options={}) ->
   call_api "explicit", callback, options, ->
