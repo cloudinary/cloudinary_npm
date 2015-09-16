@@ -50,10 +50,11 @@ exports.upload_large = (path, callback, options) ->
       callback?(error: err)
       return
     file_reader = fs.createReadStream(path)
-    exports.upload_large_stream(file_reader, stats.size, callback, options)
+    out_stream = exports.upload_large_stream(stats.size, callback, options)
+    return file_reader.pipe(out_stream)
   fs.stat(path, start)
 
-exports.upload_large_stream = (in_stream, file_size, callback, options={}) ->
+exports.upload_large_stream = (file_size, callback, options={}) ->
   options =  _.extend({}, options, part_number: 0, final: false)
   options.chunk_size ?= options.part_size || 20000000
   
@@ -84,7 +85,7 @@ exports.upload_large_stream = (in_stream, file_size, callback, options={}) ->
   chunker.on 'data', (chunk) ->
     out_stream.write(chunk.data)
   
-  in_stream.pipe(chunker)
+  return chunker
   
 exports.explicit = (public_id, callback, options={}) ->
   call_api "explicit", callback, options, ->
