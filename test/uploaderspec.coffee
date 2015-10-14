@@ -369,6 +369,7 @@ describe "uploader", ->
           done()
 
   it "should support unsigned uploading using presets", (done) ->
+    @timeout TIMEOUT_LONG
     cloudinary.v2.api.create_upload_preset folder: "upload_folder", unsigned: true, (error, preset) ->
       cloudinary.v2.uploader.unsigned_upload IMAGE_FILE, preset.name, (error, result) ->
         uploaded.push(result.public_id)
