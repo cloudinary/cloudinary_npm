@@ -64,7 +64,7 @@ call_api = (method, uri, params, callback, options) ->
 
   request = https.request(request_options, handle_response)
   request.on "error", (e) -> callback(error: e)
-  request.setTimeout options["timeout"] ? 60
+  request.setTimeout options["timeout"] ? 60000
 
   if method != "get"
     request.write(query_params)

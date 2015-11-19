@@ -365,16 +365,16 @@ describe "uploader", ->
           return done(new Error error.message) if error?
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571")
-          cloudinary.v2.uploader.destroy result.public_id
-          done()
+          cloudinary.v2.uploader.destroy result.public_id, ()->
+            done()
 
   it "should support unsigned uploading using presets", (done) ->
     @timeout TIMEOUT_LONG
     cloudinary.v2.api.create_upload_preset folder: "upload_folder", unsigned: true, (error, preset) ->
       cloudinary.v2.uploader.unsigned_upload IMAGE_FILE, preset.name, (error, result) ->
         uploaded.push(result.public_id)
-        expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
-        cloudinary.v2.api.delete_upload_preset preset.name, -> # FIXME will this be called if expect fails?
+        cloudinary.v2.api.delete_upload_preset preset.name, ->
+          expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
           done()
 
   it "should reject promise if error code is returned from the server", (done) ->
