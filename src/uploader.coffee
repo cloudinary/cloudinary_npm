@@ -3,11 +3,12 @@ https = require('https')
 #http = require('http')
 UploadStream = require('./upload_stream')
 utils = require("./utils")
+util = require("util")
 config = require("./config")
 fs = require('fs')
 path = require('path')
 Q = require('q')
-SizeChunker = require('chunking-streams').SizeChunker
+Writable = require("stream").Writable
 
 
 # Multipart support based on http://onteria.wordpress.com/2011/05/30/multipartform-data-uploads-using-node-js-and-http-request/
@@ -31,62 +32,66 @@ exports.upload = (file, callback, options={}) ->
     else 
       [params, {}, file]
 
-exports.upload_large_part = (callback, options={}) ->
-  call_api "upload_large", callback, _.extend(resource_type: "raw", stream: true, options), ->
-    return [
-      timestamp: utils.timestamp()
-      type: options.type
-      public_id: options.public_id
-      backup: options.backup
-      final: options.final
-      part_number: options.part_number
-      upload_id: options.upload_id
-      tags: options.tags && utils.build_array(options.tags).join(',')
-    ]
+exports.upload_large = (path, callback, options={}) ->
+  exports.upload_chunked(path, callback, _.extend({resource_type: 'raw'}, options))
 
-exports.upload_large = (path, callback, options) ->
-  start = (err, stats) ->
-    if err?
-      callback?(error: err)
-      return
-    file_reader = fs.createReadStream(path)
-    out_stream = exports.upload_large_stream(stats.size, callback, options)
-    return file_reader.pipe(out_stream)
-  fs.stat(path, start)
+exports.upload_chunked = (path, callback, options) ->
+  file_reader = fs.createReadStream(path)
+  out_stream = exports.upload_chunked_stream(callback, options)
+  return file_reader.pipe(out_stream)
 
-exports.upload_large_stream = (file_size, callback, options={}) ->
-  options =  _.extend({}, options, part_number: 0, final: false)
-  options.chunk_size ?= options.part_size || 20000000
-  
-  out_stream = null
-  chunker = new SizeChunker({ chunkSize : options.chunk_size, flushTail : true })
-  numChunks = Math.ceil(file_size / options.chunk_size)
-  finished_part_final = null
-  
-  finished_part = (upload_large_part_result) ->
-    if options.final || upload_large_part_result.error?
-      chunker.end()
-      callback?(upload_large_part_result)
-    else
-      options.public_id = upload_large_part_result.public_id
-      options.upload_id = upload_large_part_result.upload_id
-      finished_part_final()
-	  
-  chunker.on 'chunkStart', (id, done) ->
-    options.part_number++
-    options.final = (options.part_number == numChunks)
-    out_stream = exports.upload_large_part(finished_part, options)
+MyChunker = (options)-> 
+  @chunk_size = options.chunk_size
+  @buffer = new Buffer(0)
+  @active = true
+  Writable.call this, options
+  this.on 'finish', () =>
+    this.emit('ready', @buffer, true, ->) if @active
+
+util.inherits MyChunker, Writable
+
+MyChunker::_write = (data, encoding, done) -> 
+  return done() unless @active
+  if @buffer.length + data.length <= @chunk_size
+    @buffer = Buffer.concat([@buffer, data], @buffer.length + data.length);  
     done()
+  else
+    grab = @chunk_size - @buffer.length
+    @buffer = Buffer.concat([@buffer, data.slice(0, grab)], @buffer.length + grab)
+    this.emit 'ready', @buffer, false, (@active) =>
+      if @active
+        @buffer = data.slice(grab)
+        done()
+
+
+exports.upload_large_stream = (_unused_, callback, options={}) ->
+  exports.upload_chunked_stream(callback, _.extend({resource_type: 'raw'}, options))
+
+exports.upload_chunked_stream = (callback, options={}) ->
+  options =  _.extend({}, options, stream: true)  
+  options.x_unique_upload_id = utils.random_public_id()
+  params = build_upload_params(options)
+
+  chunk_size = options.chunk_size ? options.part_size ? 20000000
+  chunker = new MyChunker(chunk_size: chunk_size)
+  sent = 0
+  	  
+  chunker.on 'ready', (buffer, is_last, done) ->
+    chunk_start = sent
+    sent += buffer.length
+    options.content_range = util.format("bytes %d-%d/%d", chunk_start, sent - 1, if is_last then sent else -1)
+    finished_part = (result) -> 
+      if result.error? || is_last
+        callback?(result)
+        done(false)
+      else
+        done(true)
+    stream = call_api "upload", finished_part, options, ->
+      [params, {}, buffer]
+    stream.write(buffer, 'buffer', -> stream.end())
 	
-  chunker.on 'chunkEnd', (id, done) ->
-    finished_part_final = done
-    out_stream.end()
-	
-  chunker.on 'data', (chunk) ->
-    out_stream.write(chunk.data)
-  
-  return chunker
-  
+  return chunker  
+
 exports.explicit = (public_id, callback, options={}) ->
   call_api "explicit", callback, options, ->
     return [
@@ -215,11 +220,14 @@ post = (url, post_data, boundary, file, callback, options) ->
     file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary')
 
   post_options = require('url').parse(url)
-  post_options = _.extend post_options,
-    method: 'POST',
-    headers: 
+  headers = 
       'Content-Type': 'multipart/form-data; boundary=' + boundary
       'User-Agent': utils.USER_AGENT
+  headers['Content-Range'] = options.content_range if options.content_range?
+  headers['X-Unique-Upload-Id'] = options.x_unique_upload_id if options.x_unique_upload_id?
+  post_options = _.extend post_options,
+    method: 'POST',
+    headers: headers
   post_options.agent = options.agent if options.agent?
   post_request = https.request(post_options, callback)
   upload_stream = new UploadStream({boundary: boundary})

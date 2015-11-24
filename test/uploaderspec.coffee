@@ -17,9 +17,9 @@ describe "uploader", ->
   EMPTY_IMAGE     = "test/resources/empty.gif"
   RAW_FILE        = "test/resources/docx.docx"
   ICON_FILE       = "test/resources/favicon.ico"
-  TIMEOUT_SHORT   = 5000
-  TIMEOUT_MEDIUM  = 20000
-  TIMEOUT_LONG    = 120000
+  TIMEOUT_SHORT   = 5 * 1000
+  TIMEOUT_MEDIUM  = 20 * 1000
+  TIMEOUT_LONG    = 120 * 1000
 
   @timeout TIMEOUT_SHORT
 
@@ -55,8 +55,6 @@ describe "uploader", ->
     Q.allSettled(operations)
     .finally ()->
       done()
-
-
 
   it "should successfully upload file", (done) ->
     upload_image (result) ->
@@ -331,7 +329,7 @@ describe "uploader", ->
       done()
 
 
-  describe "chunk_size:", ->
+  describe "upload_chunked", ()->
     @timeout TIMEOUT_LONG
     it "should specify chunk size", (done) ->
       fs.stat LARGE_RAW_FILE, (err, stat) ->
@@ -347,9 +345,6 @@ describe "uploader", ->
           expect(error.message).to.eql("All parts except last must be larger than 5mb")
           done()
 
-
-  describe "upload_large", ()->
-    @timeout TIMEOUT_LONG
     it "should support uploading a small raw file", (done) ->
       fs.stat RAW_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_large RAW_FILE,  (error, result) ->
@@ -358,10 +353,18 @@ describe "uploader", ->
           expect(result.etag).to.eql("ffc265d8d1296247972b4d478048e448")
           done()
 
+    it "should support uploading a small image file", (done) ->
+      fs.stat IMAGE_FILE, (err, stat) ->
+        cloudinary.v2.uploader.upload_chunked IMAGE_FILE,  (error, result) ->
+          uploaded.push(result.public_id)
+          expect(result.bytes).to.eql(stat.size)
+          expect(result.etag).to.eql("7dc60722d4653261648038b579fdb89e")
+          done()
+
     it "should support uploading large video files", (done) ->
       fs.stat LARGE_VIDEO, (err, stat) ->
         return done(new Error err.message) if err?
-        cloudinary.v2.uploader.upload_large LARGE_VIDEO, (error, result) ->
+        cloudinary.v2.uploader.upload_chunked LARGE_VIDEO,  {resource_type: 'video', timeout: TIMEOUT_LONG}, (error, result) ->
           return done(new Error error.message) if error?
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571")
