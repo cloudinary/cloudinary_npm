@@ -67,10 +67,10 @@ exports.build_array = (arg) ->
   if !arg?
     []
   else if _.isArray(arg)
-    arg 
-  else 
+    arg
+  else
     [arg]
-    
+
 exports.encode_double_array = (array) ->
   array = utils.build_array(array)
   if array.length > 0 and _.isArray(array[0])
@@ -80,7 +80,7 @@ exports.encode_double_array = (array) ->
 
 exports.encode_key_value = (arg) ->
   if _.isObject(arg)
-    pairs = for k, v of arg 
+    pairs = for k, v of arg
       "#{k}=#{v}"
     pairs.join("|")
   else
@@ -91,7 +91,7 @@ exports.build_eager = (transformations) ->
     transformation = _.clone(transformation)
     _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
   ).join("|")
-    
+
 exports.build_custom_headers = (headers) ->
   switch
     when !headers?
@@ -133,9 +133,9 @@ exports.generate_transformation_string = (options) ->
   named_transformation = []
   if _.filter(base_transformations, _.isObject).length > 0
     base_transformations = _.map(base_transformations, (base_transformation) ->
-      if _.isObject(base_transformation) 
+      if _.isObject(base_transformation)
         utils.generate_transformation_string(_.clone(base_transformation))
-      else 
+      else
         utils.generate_transformation_string(transformation: base_transformation)
     )
   else
@@ -160,7 +160,7 @@ exports.generate_transformation_string = (options) ->
   dpr = utils.option_consume(options, "dpr", config().dpr)
 
   if options["offset"]?
-    [options["start_offset"], options["end_offset"]] = split_range( utils.option_consume(options, "offset"))
+    [options["start_offset"], options["end_offset"]] = split_range(utils.option_consume(options, "offset"))
 
   params =
     c: crop
@@ -204,9 +204,9 @@ exports.generate_transformation_string = (options) ->
   for param, short of simple_params
     params[short] = utils.option_consume(options, param)
 
-  params["vc"] = process_video_params( params["vc"]) if params["vc"]?
+  params["vc"] = process_video_params(params["vc"]) if params["vc"]?
   for range_value in ["so", "eo", "du"]
-    params[range_value] = norm_range_value( params[range_value]) if range_value of params
+    params[range_value] = norm_range_value(params[range_value]) if range_value of params
 
 
   params = _.sortBy([key, value] for key, value of params, (key, value) -> key)
@@ -253,7 +253,7 @@ exports.url = (public_id, options = {}) ->
   secure = utils.option_consume(options, "secure", null)
   ssl_detected= utils.option_consume(options, "ssl_detected", config().ssl_detected)
   secure = ssl_detected || config().secure if secure==null
-  
+
   cdn_subdomain = utils.option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   secure_cdn_subdomain = utils.option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain)
 
@@ -280,7 +280,7 @@ exports.url = (public_id, options = {}) ->
   public_id = public_id.toString()
 
   if type==null && public_id.match(/^https?:\//i)
-    return original_source 
+    return original_source
 
   [ resource_type , type ] = finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten)
   [ public_id, source_to_sign ]= finalize_source(public_id, format, url_suffix)
@@ -296,7 +296,7 @@ exports.url = (public_id, options = {}) ->
     shasum.update(utf8_encode(to_sign+ api_secret))
     signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
     signature = "s--#{signature}--"
-    
+
 
   prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
   url = [prefix, resource_type, type, signature, transformation, version, public_id].filter((part) -> part? && part!='').join('/')
@@ -351,7 +351,7 @@ finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) -
 # cdn_subdomain and secure_cdn_subdomain
 # 1) Customers in shared distribution (e.g. res.cloudinary.com)
 #   if cdn_domain is true uses res-[1-5].cloudinary.com for both http and https. Setting secure_cdn_subdomain to false disables this for https.
-# 2) Customers with private cdn 
+# 2) Customers with private cdn
 #   if cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for http
 #   if secure_cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for https (please contact support if you require this)
 # 3) Customers with cname
@@ -387,9 +387,9 @@ unsigned_url_prefix = (source,cloud_name,private_cdn,cdn_subdomain,secure_cdn_su
 
 
 
-# Based on CGI::unescape. In addition does not escape / : 
+# Based on CGI::unescape. In addition does not escape / :
 smart_escape = (string)->
-  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/") 
+  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/")
 
 # http://kevin.vanzonneveld.net
 # +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
@@ -486,14 +486,14 @@ exports.merge = (hash1, hash2) ->
   result = {}
   result[k] = hash1[k] for k, v of hash1
   result[k] = hash2[k] for k, v of hash2
-  result 
+  result
 
 exports.sign_request = (params, options = {}) ->
   api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
 
   params = exports.clear_blank(params)
-  
+
   params.signature = exports.api_sign_request(params, api_secret)
   params.api_key = api_key
 
@@ -518,11 +518,11 @@ exports.process_request_params = (params, options) ->
 
 exports.private_download_url = (public_id, format, options = {}) ->
   params = exports.sign_request({
-    timestamp: exports.timestamp(), 
-    public_id: public_id, 
-    format: format, 
+    timestamp: exports.timestamp(),
+    public_id: public_id,
+    format: format,
     type: options.type,
-    attachment: options.attachment, 
+    attachment: options.attachment,
     expires_at: options.expires_at
   }, options)
 
@@ -530,7 +530,7 @@ exports.private_download_url = (public_id, format, options = {}) ->
 
 exports.zip_download_url = (tag, options = {}) ->
   params = exports.sign_request({
-    timestamp: exports.timestamp(), 
+    timestamp: exports.timestamp(),
     tag: tag,
     transformation: exports.generate_transformation_string(options)
   }, options)
@@ -551,14 +551,14 @@ exports.html_attrs = (attrs) ->
   return pairs.join(" ")
 
 CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain']
-exports.cloudinary_js_config = ->  
+exports.cloudinary_js_config = ->
   params = {}
   for param in CLOUDINARY_JS_CONFIG_PARAMS
     value = config()[param]
     params[param] = value if value?
   "<script type='text/javascript'>\n" +
       "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
-      "</script>\n"    
+      "</script>\n"
 
 v1_result_adapter = (callback) ->
   if callback?
@@ -570,7 +570,7 @@ v1_result_adapter = (callback) ->
   else
     null
 
-v1_adapter = (name, num_pass_args, v1) -> 
+v1_adapter = (name, num_pass_args, v1) ->
   return (args...) ->
     pass_args = _.take(args, num_pass_args)
     options = args[num_pass_args]
@@ -587,7 +587,7 @@ exports.v1_adapters = (exports, v1, mapping) ->
     exports[name] = v1_adapter(name, num_pass_args, v1)
 
 exports.as_safe_bool = (value)->
-  return undefined if !value? 
+  return undefined if !value?
   value = 1 if value==true || value=='true' || value == '1'
   value = 0 if value==false || value=='false' || value =='0'
   return value
