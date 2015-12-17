@@ -180,7 +180,7 @@ describe "utils", ->
     test_cloudinary_url("test", {effect:{sepia:10}}, "http://res.cloudinary.com/test123/image/upload/e_sepia:10/test", {})
 
   it "should support effect with array param" , ->
-    test_cloudinary_url("test", {effect:["sepia", 10]}, "http://res.cloudinary.com/test123/image/upload/e_sepia:10/test", {}) 
+    test_cloudinary_url("test", {effect:["sepia", 10]}, "http://res.cloudinary.com/test123/image/upload/e_sepia:10/test", {})
 
   for param,letter of {overlay:"l", underlay:"u"}
     it "should support #{param}" , ->
@@ -231,6 +231,7 @@ describe "utils", ->
   it "should support flags" , ->
     test_cloudinary_url("test", {flags:"abc"}, "http://res.cloudinary.com/test123/image/upload/fl_abc/test", {})
     test_cloudinary_url("test", {flags:["abc", "def"]}, "http://res.cloudinary.com/test123/image/upload/fl_abc.def/test", {})
+    test_cloudinary_url("image.jpg", {transformation: {overlay: 'watermark', flags: ['relative', 'tiled']}}, "http://res.cloudinary.com/test123/image/upload/fl_relative.tiled,l_watermark/image.jpg", {})
 
   it "build_upload_params should not destroy options" , ->
     options = {width:100, crop:"scale"}
