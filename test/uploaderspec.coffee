@@ -19,7 +19,7 @@ describe "uploader", ->
   ICON_FILE       = "test/resources/favicon.ico"
   TIMEOUT_SHORT   = 5 * 1000
   TIMEOUT_MEDIUM  = 20 * 1000
-  TIMEOUT_LONG    = 120 * 1000
+  TIMEOUT_LONG    = 300 * 1000
 
   @timeout TIMEOUT_SHORT
 
@@ -28,7 +28,7 @@ describe "uploader", ->
 
   ###*
   # Upload an image to be tested on.
-  # @callback the callback recieves the public_id of the uploaded image
+  # @callback the callback receives the public_id of the uploaded image
   ###
   upload_image = (callback)->
     cloudinary.v2.uploader.upload IMAGE_FILE, (error, result) ->
@@ -106,6 +106,7 @@ describe "uploader", ->
               done()
 
   describe "destroy", ()->
+    @timeout TIMEOUT_MEDIUM
     it "should delete a resource", (done)->
       upload_image (result)->
         public_id = result.public_id
@@ -333,7 +334,8 @@ describe "uploader", ->
     @timeout TIMEOUT_LONG
     it "should specify chunk size", (done) ->
       fs.stat LARGE_RAW_FILE, (err, stat) ->
-        cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 7000000},  (error, result) ->
+        cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 7000000, timeout: TIMEOUT_LONG},  (error, result) ->
+          return done(new Error error.message) if error?
           uploadedRaw.push(result.public_id)
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("4c13724e950abcb13ec480e10f8541f5")
@@ -348,6 +350,7 @@ describe "uploader", ->
     it "should support uploading a small raw file", (done) ->
       fs.stat RAW_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_large RAW_FILE,  (error, result) ->
+          return done(new Error error.message) if error?
           uploadedRaw.push(result.public_id)
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("ffc265d8d1296247972b4d478048e448")
@@ -356,6 +359,7 @@ describe "uploader", ->
     it "should support uploading a small image file", (done) ->
       fs.stat IMAGE_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_chunked IMAGE_FILE,  (error, result) ->
+          return done(new Error error.message) if error?
           uploaded.push(result.public_id)
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("7dc60722d4653261648038b579fdb89e")
@@ -375,6 +379,7 @@ describe "uploader", ->
     @timeout TIMEOUT_LONG
     cloudinary.v2.api.create_upload_preset folder: "upload_folder", unsigned: true, (error, preset) ->
       cloudinary.v2.uploader.unsigned_upload IMAGE_FILE, preset.name, (error, result) ->
+        return done(new Error error.message) if error?
         uploaded.push(result.public_id)
         cloudinary.v2.api.delete_upload_preset preset.name, ->
           expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/

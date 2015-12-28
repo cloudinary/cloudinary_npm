@@ -40,29 +40,27 @@ exports.upload_chunked = (path, callback, options) ->
   out_stream = exports.upload_chunked_stream(callback, options)
   return file_reader.pipe(out_stream)
 
-MyChunker = (options)-> 
-  @chunk_size = options.chunk_size
-  @buffer = new Buffer(0)
-  @active = true
-  Writable.call this, options
-  this.on 'finish', () =>
-    this.emit('ready', @buffer, true, ->) if @active
+class Chunkable extends Writable
+  constructor: (options)->
+    @chunk_size = options.chunk_size  ? 20000000
+    @buffer = new Buffer(0)
+    @active = true
+    super(options)
+    @on 'finish', () =>
+      @emit('ready', @buffer, true, ->) if @active
 
-util.inherits MyChunker, Writable
-
-MyChunker::_write = (data, encoding, done) -> 
-  return done() unless @active
-  if @buffer.length + data.length <= @chunk_size
-    @buffer = Buffer.concat([@buffer, data], @buffer.length + data.length);  
-    done()
-  else
-    grab = @chunk_size - @buffer.length
-    @buffer = Buffer.concat([@buffer, data.slice(0, grab)], @buffer.length + grab)
-    this.emit 'ready', @buffer, false, (@active) =>
-      if @active
-        @buffer = data.slice(grab)
-        done()
-
+  _write: (data, encoding, done) ->
+    return done() unless @active
+    if @buffer.length + data.length <= @chunk_size
+      @buffer = Buffer.concat([@buffer, data], @buffer.length + data.length);
+      done()
+    else
+      grab = @chunk_size - @buffer.length
+      @buffer = Buffer.concat([@buffer, data.slice(0, grab)], @buffer.length + grab)
+      @emit 'ready', @buffer, false, (@active) =>
+        if @active
+          @buffer = data.slice(grab)
+          done()
 
 exports.upload_large_stream = (_unused_, callback, options={}) ->
   exports.upload_chunked_stream(callback, _.extend({resource_type: 'raw'}, options))
@@ -72,10 +70,10 @@ exports.upload_chunked_stream = (callback, options={}) ->
   options.x_unique_upload_id = utils.random_public_id()
   params = build_upload_params(options)
 
-  chunk_size = options.chunk_size ? options.part_size ? 20000000
-  chunker = new MyChunker(chunk_size: chunk_size)
+  chunk_size = options.chunk_size ? options.part_size
+  chunker = new Chunkable(chunk_size: chunk_size)
   sent = 0
-  	  
+
   chunker.on 'ready', (buffer, is_last, done) ->
     chunk_start = sent
     sent += buffer.length
@@ -89,8 +87,8 @@ exports.upload_chunked_stream = (callback, options={}) ->
     stream = call_api "upload", finished_part, options, ->
       [params, {}, buffer]
     stream.write(buffer, 'buffer', -> stream.end())
-	
-  return chunker  
+
+  return chunker
 
 exports.explicit = (public_id, callback, options={}) ->
   call_api "explicit", callback, options, ->
