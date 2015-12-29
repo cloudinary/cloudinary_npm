@@ -3,10 +3,12 @@ dotenv.load()
 https = require('https')
 http = require('http')
 expect = require("expect.js")
+sinon = require('sinon')
 cloudinary = require("../cloudinary")
 fs = require('fs')
 Q = require('q')
 _ = require("lodash")
+ClientRequest = require('_http_client').ClientRequest
 
 describe "uploader", ->
   return console.warn("**** Please setup environment for uploader test to run!") if !cloudinary.config().api_secret?
@@ -20,7 +22,7 @@ describe "uploader", ->
   TIMEOUT_SHORT   = 5 * 1000
   TIMEOUT_MEDIUM  = 20 * 1000
   TIMEOUT_LONG    = 300 * 1000
-
+  TEST_TAG        = "cloudinary_npm_test"
   @timeout TIMEOUT_SHORT
 
   uploaded  = []
@@ -436,3 +438,20 @@ describe "uploader", ->
       done()
     file_reader = fs.createReadStream(IMAGE_FILE)
     file_reader.pipe(upload)
+
+  describe "explicit", ->
+    spy = undefined
+    before ->
+      spy = sinon.spy(ClientRequest.prototype, 'write')
+    after ->
+      spy.restore()
+
+    context ":invalidate", ->
+      it "should should pass the invalidate value to the server", (done)->
+        cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG],(error, result) ->
+          done(error.message) if error?
+          expect(spy.calledWith(sinon.match((arg)-> arg.toString().match(/name="invalidate"/)))).to.be.ok()
+          done()
+
+
+
