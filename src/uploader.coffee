@@ -113,7 +113,7 @@ exports.destroy = (public_id, callback, options={}) ->
 
 exports.rename = (from_public_id, to_public_id, callback, options={}) ->
   call_api "rename", callback, options, ->
-    return [timestamp: utils.timestamp(), type: options.type, from_public_id: from_public_id, to_public_id: to_public_id, overwrite: options.overwrite]
+    return [timestamp: utils.timestamp(), type: options.type, from_public_id: from_public_id, to_public_id: to_public_id, overwrite: options.overwrite, invalidate: options.invalidate]
 
 TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style", "background", "opacity", "text_decoration"]
 exports.text = (text, callback, options={}) ->

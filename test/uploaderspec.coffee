@@ -108,6 +108,20 @@ describe "uploader", ->
               expect(result.format).to.eql "png"
               done()
 
+    context ":invalidate", ->
+      spy = undefined
+      xhr = undefined
+      before ->
+        spy = sinon.spy(ClientRequest.prototype, 'write')
+        xhr = sinon.useFakeXMLHttpRequest()
+      after ->
+        spy.restore()
+        xhr.restore()
+      it "should should pass the invalidate value to the server", (done)->
+        cloudinary.v2.uploader.rename "first_id", "second_id", invalidate: true, (error, result) ->
+          expect(spy.calledWith(sinon.match((arg)-> arg.toString().match(/name="invalidate"/)))).to.be.ok()
+          done()
+
   describe "destroy", ()->
     @timeout TIMEOUT_MEDIUM
     it "should delete a resource", (done)->
