@@ -120,6 +120,12 @@ exports.resource = (public_id, callback, options={}) ->
   uri = ["resources", resource_type, type, public_id]
   call_api("get", uri, api.only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options)
 
+exports.restore = (public_ids, callback, options={})->
+  resource_type = options["resource_type"] ? "image"
+  type = options["type"] ? "upload"
+  uri = ["resources", resource_type, type, "restore"]
+  call_api("post", uri, {public_ids: public_ids}, callback, options)
+
 exports.update = (public_id, callback, options={}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"

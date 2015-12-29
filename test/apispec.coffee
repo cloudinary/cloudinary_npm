@@ -7,6 +7,9 @@ utils = require("../lib/utils")
 _ = require("lodash")
 Q = require('q')
 fs = require('fs')
+
+IMAGE_FILE      = "test/resources/logo.png"
+
 describe "api", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
 
@@ -557,5 +560,33 @@ describe "api", ->
       expect(err.error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
       done()
     )
-    
+
+  describe '.restore', ->
+    @timeout TIMEOUT_MEDIUM
+    before (done)->
+      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_restore", backup: true, tags: [TEST_TAG], (error, result)->
+        return done(new Error error.message) if error?
+        cloudinary.v2.api.resource "api_test_restore", (error, resource)->
+          return done(new Error error.message) if error?
+          expect(resource).not.to.be(null)
+          expect(resource["bytes"]).to.eql(3381)
+          cloudinary.v2.api.delete_resources "api_test_restore", (error, resource)->
+            return done(new Error error.message) if error?
+            cloudinary.v2.api.resource "api_test_restore", (error, resource)->
+              return done(new Error error.message) if error?
+              expect(resource).not.to.be(null)
+              expect(resource["bytes"]).to.eql(0)
+              expect(resource["placeholder"]).to.eql(true)
+              done()
+
+    it 'should restore a deleted resource' , (done)->
+      cloudinary.v2.api.restore "api_test_restore", (error, response)->
+        info = response["api_test_restore"]
+        expect(info).not.to.be(null)
+        expect(info["bytes"]).to.eql(3381)
+        cloudinary.v2.api.resource "api_test_restore", (error, resource)->
+          expect(resource).not.to.be(null)
+          expect(resource["bytes"]).to.eql(3381)
+          done()
+
 
