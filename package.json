@@ -4,6 +4,7 @@
   "description": "Cloudinary NPM for node.js integration",
   "version": "1.2.6",
   "homepage": "http://cloudinary.com",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/cloudinary/cloudinary_npm.git"
@@ -17,7 +18,8 @@
     "coffee-script": "^1.10.0",
     "dotenv": "1.x",
     "expect.js": "0.3.x",
-    "mocha": "2.2.x"
+    "mocha": "2.3.x",
+    "sinon": "^1.17.2"
   },
   "scripts": {
     "pretest": "npm run compile",
