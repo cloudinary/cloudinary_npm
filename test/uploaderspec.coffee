@@ -10,6 +10,7 @@ Q = require('q')
 _ = require("lodash")
 ClientRequest = require('_http_client').ClientRequest
 
+
 describe "uploader", ->
   return console.warn("**** Please setup environment for uploader test to run!") if !cloudinary.config().api_secret?
 
@@ -441,15 +442,17 @@ describe "uploader", ->
 
   describe "explicit", ->
     spy = undefined
+    xhr = undefined
     before ->
       spy = sinon.spy(ClientRequest.prototype, 'write')
+      xhr = sinon.useFakeXMLHttpRequest()
     after ->
       spy.restore()
+      xhr.restore()
 
     context ":invalidate", ->
       it "should should pass the invalidate value to the server", (done)->
         cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG],(error, result) ->
-          done(error.message) if error?
           expect(spy.calledWith(sinon.match((arg)-> arg.toString().match(/name="invalidate"/)))).to.be.ok()
           done()
 

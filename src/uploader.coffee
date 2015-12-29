@@ -221,7 +221,7 @@ post = (url, post_data, boundary, file, callback, options) ->
   post_options = require('url').parse(url)
   headers = 
       'Content-Type': 'multipart/form-data; boundary=' + boundary
-      'User-Agent': utils.USER_AGENT
+      'User-Agent': utils.getUserAgent()
   headers['Content-Range'] = options.content_range if options.content_range?
   headers['X-Unique-Upload-Id'] = options.x_unique_upload_id if options.x_unique_upload_id?
   post_options = _.extend post_options,

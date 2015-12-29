@@ -404,3 +404,16 @@ describe "cloudinary", ->
     result = cloudinary.utils.url("test", options)
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/c_pad,w_auto/test"
     expect(options).to.eql {responsive: true}
+
+  describe "getUserAgent", ->
+    platform = ""
+    before ->
+      platform = cloudinary.utils.userPlatform
+      cloudinary.utils.userPlatform = ""
+    after ->
+      cloudinary.utils.userPlatform = platform
+    it "should add a user platform to USER_AGENT", ->
+      cloudinary.utils.userPlatform = "Spec/1.0 (Test)"
+      expect(cloudinary.utils.getUserAgent()).to.match( /Spec\/1.0 \(Test\) CloudinaryNodeJS\/[\d.]+/)
+
+    

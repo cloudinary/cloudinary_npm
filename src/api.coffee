@@ -24,7 +24,7 @@ call_api = (method, uri, params, callback, options) ->
     method: method.toUpperCase()
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
-      'User-Agent': utils.USER_AGENT
+      'User-Agent': utils.getUserAgent()
     auth: "#{api_key}:#{api_secret}"
   request_options.agent = options.agent if options.agent?
   request_options.headers['Content-Length'] = Buffer.byteLength(query_params) unless method == "get"

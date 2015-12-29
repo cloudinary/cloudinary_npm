@@ -252,7 +252,7 @@ describe "api", ->
 
     it "should allow listing tag by prefix ", (done) =>
       @timeout TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags prefix: "api_test", (error, result) =>
+      cloudinary.v2.api.tags prefix: TEST_TAG.slice(0,6), (error, result) =>
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()

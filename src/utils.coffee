@@ -11,7 +11,15 @@ exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN
 
 exports.VERSION = "1.2.6"
-exports.USER_AGENT = "cld-node-#{exports.VERSION}"
+exports.USER_AGENT = "CloudinaryNodeJS/#{exports.VERSION}"
+# Add platform information to the USER_AGENT header
+# This is intended for platform information and not individual applications!
+exports.userPlatform = ""
+exports.getUserAgent = ()->
+  if _.isEmpty(utils.userPlatform)
+    "#{utils.USER_AGENT}"
+  else
+    "#{utils.userPlatform} #{utils.USER_AGENT}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
 exports.DEFAULT_POSTER_OPTIONS = { format: 'jpg', resource_type: 'video' }
