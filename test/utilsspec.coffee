@@ -232,6 +232,10 @@ describe "utils", ->
     test_cloudinary_url("test", {flags:"abc"}, "http://res.cloudinary.com/test123/image/upload/fl_abc/test", {})
     test_cloudinary_url("test", {flags:["abc", "def"]}, "http://res.cloudinary.com/test123/image/upload/fl_abc.def/test", {})
 
+  it "should support aspect ratio", ->
+    test_cloudinary_url("test", { "aspect_ratio": "1.0" }, "http://res.cloudinary.com/test123/image/upload/ar_1.0/test", {})
+    test_cloudinary_url("test", { "aspect_ratio": "3:2" }, "http://res.cloudinary.com/test123/image/upload/ar_3:2/test", {})
+
   it "build_upload_params should not destroy options" , ->
     options = {width:100, crop:"scale"}
     expect(utils.build_upload_params(options)['transformation']).to.eql("c_scale,w_100")

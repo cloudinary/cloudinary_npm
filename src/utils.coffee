@@ -184,6 +184,7 @@ exports.generate_transformation_string = (options) ->
     dpr: dpr
 
   simple_params =
+    aspect_ratio: "ar"
     audio_codec: "ac"
     audio_frequency: "af"
     bit_rate: 'br'
