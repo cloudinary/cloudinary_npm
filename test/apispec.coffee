@@ -590,3 +590,36 @@ describe "api", ->
           done()
 
 
+  describe 'mapping', ->
+    mapping = "api_test_upload_mapping#{Math.floor(Math.random() *100000)}"
+    deleteMapping = false
+    after (done)->
+      if(deleteMapping)
+        cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
+          done()
+      else
+        done()
+
+    it 'should create mapping', (done)->
+      @timeout TIMEOUT_LONG
+      cloudinary.v2.api.create_upload_mapping mapping, template: "http://cloudinary.com", tags: [TEST_TAG], (error, result)->
+        return done(new Error error.message) if error?
+        deleteMapping = true
+        cloudinary.v2.api.upload_mapping mapping, (error, result)->
+          return done(new Error error.message) if error?
+          expect(result['template']).to.eql("http://cloudinary.com")
+          cloudinary.v2.api.update_upload_mapping mapping, template: "http://res.cloudinary.com", (error, result)->
+            return done(new Error error.message) if error?
+            cloudinary.v2.api.upload_mapping mapping, (error, result)->
+              return done(new Error error.message) if error?
+              expect(result["template"]).to.eql("http://res.cloudinary.com")
+              cloudinary.v2.api.upload_mappings (error, result)->
+                return done(new Error error.message) if error?
+                expect(_.find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com" })).to.be.ok()
+                cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
+                  return done(new Error error.message) if error?
+                  deleteMapping = false
+                  cloudinary.v2.api.upload_mappings  (error, result)->
+                    return done(new Error error.message) if error?
+                    expect(_.find(result["mappings"], _.matchesProperty('folder', mapping))).not.to.be.ok()
+                    done()

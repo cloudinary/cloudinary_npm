@@ -218,6 +218,26 @@ exports.sub_folders = (path,callback, options={}) ->
   uri = ["folders",path]
   call_api("get", uri, {}, callback, options)
 
+exports.upload_mappings = (callback, options={})->
+  params = api.only(options, "next_cursor", "max_results")
+  call_api("get", "upload_mappings", params, callback, options)
+
+exports.upload_mapping = (name=nil, callback, options={})->
+  call_api( "get", 'upload_mappings', {folder: name}, callback, options)
+
+exports.delete_upload_mapping = (name, callback, options={})->
+  call_api( "delete", 'upload_mappings', {folder: name}, callback, options)
+
+exports.update_upload_mapping = (name, callback, options={})->
+  params = api.only(options, "template")
+  params["folder"] = name
+  call_api( "put", 'upload_mappings', params, callback, options)
+
+exports.create_upload_mapping = (name, callback, options={})->
+  params = api.only(options, "template")
+  params["folder"] = name
+  call_api( "post", 'upload_mappings', params, callback, options)
+
 exports.only = (hash, keys...) ->
   result = {}
   for key in keys
