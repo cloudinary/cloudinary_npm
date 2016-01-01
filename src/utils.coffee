@@ -25,6 +25,73 @@ DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
 exports.DEFAULT_POSTER_OPTIONS = { format: 'jpg', resource_type: 'video' }
 exports.DEFAULT_VIDEO_SOURCE_TYPES = ['webm', 'mp4', 'ogv']
 
+
+LAYER_KEYWORD_PARAMS =
+  font_weight: "normal"
+  font_style: "normal"
+  text_decoration: "none"
+  text_align: null
+  stroke: "none"
+
+textStyle= (layer)->
+  font_family = layer["font_family"]
+  font_size   = layer["font_size"]
+  keywords    = []
+  for attr, default_value of LAYER_KEYWORD_PARAMS
+    attr_value = layer[attr] || default_value
+    keywords.push(attr_value) unless attr_value == default_value
+  letter_spacing = layer["letter_spacing"]
+  keywords.push("letter_spacing_#{letter_spacing}") if letter_spacing
+  line_spacing = layer["line_spacing"]
+  keywords.push("line_spacing_#{line_spacing}") if line_spacing
+  if font_size || font_family || !_.isEmpty(keywords)
+    raise(CloudinaryException, "Must supply font_family for text in overlay/underlay") unless font_family
+    raise(CloudinaryException, "Must supply font_size for text in overlay/underlay") unless font_size
+    keywords.unshift(font_size)
+    keywords.unshift(font_family)
+    _.compact(keywords).join("_")
+
+# Parse layer options
+# @return [string] layer transformation string
+# @private
+process_layer = (layer)->
+  if _.isPlainObject(layer)
+    public_id = layer["public_id"]
+    format = layer["format"]
+    resource_type = layer["resource_type"] || "image"
+    type = layer["type"] || "upload"
+    text = layer["text"]
+    style = null
+    components = []
+
+    unless _.isEmpty(public_id)
+      public_id = public_id.replace(new RegExp("/", 'g'), ":")
+      public_id = "#{public_id}.#{format}" if format?
+
+    if _.isEmpty(text) && resource_type != "text"
+      if _.isEmpty(public_id)
+        throw "Must supply public_id for resource_type layer_parameter"
+      if resource_type == "subtitles"
+        style = textStyle(layer)
+
+    else
+      resource_type = "text"
+      type = null
+      # // type is ignored for text layers
+      style = textStyle(layer)
+      unless _.isEmpty(text)
+        unless _.isEmpty(public_id) ^ _.isEmpty(style)
+          throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay"
+        text = smart_escape(text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}"))
+
+    components.push(resource_type) if resource_type != "image"
+    components.push(type) if type != "upload"
+    components.push(style)
+    components.push(public_id)
+    components.push(text)
+    layer = _.compact(components).join(":")
+  layer
+
 exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
@@ -170,18 +237,23 @@ exports.generate_transformation_string = (options) ->
   if options["offset"]?
     [options["start_offset"], options["end_offset"]] = split_range( utils.option_consume(options, "offset"))
 
+  overlay = process_layer(utils.option_consume(options, "overlay"))
+  underlay = process_layer(utils.option_consume(options, "underlay"))
+
   params =
-    c: crop
-    t: named_transformation
-    w: width
-    h: height
-    b: background
-    co: color
-    e: effect
     a: angle
+    b: background
     bo: border
-    fl: flags
+    c: crop
+    co: color
     dpr: dpr
+    e: effect
+    fl: flags
+    h: height
+    l: overlay
+    t: named_transformation
+    u: underlay
+    w: width
 
   simple_params =
     aspect_ratio: "ar"
@@ -197,13 +269,11 @@ exports.generate_transformation_string = (options) ->
     fetch_format: "f"
     gravity: "g"
     opacity: "o"
-    overlay: "l"
     page: "pg"
     prefix: "p"
     quality: "q"
     radius: "r"
     start_offset: "so"
-    underlay: "u"
     video_codec: "vc"
     video_sampling: "vs"
     x: "x"
