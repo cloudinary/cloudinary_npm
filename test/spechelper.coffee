@@ -51,7 +51,7 @@ class sharedExamples
 
 exports.sharedExamples = sharedExamples
 exports.itBehavesLike = (name, args...)->
-  context name, ->
+  context "behaves like #{name}", ->
     sharedExamples(name).apply(this, args)
 
 exports.TIMEOUT_SHORT   = 5000
@@ -59,3 +59,8 @@ exports.TIMEOUT_MEDIUM  = 20000
 exports.TIMEOUT_LONG    = 50000
 exports.TEST_TAG        = "cloudinary_npm_test"
 exports.IMAGE_FILE      = "test/resources/logo.png"
+exports.LARGE_RAW_FILE  = "test/resources/TheCompleteWorksOfShakespeare.mobi"
+exports.LARGE_VIDEO     = "test/resources/CloudBookStudy-HD.mp4"
+exports.EMPTY_IMAGE     = "test/resources/empty.gif"
+exports.RAW_FILE        = "test/resources/docx.docx"
+exports.ICON_FILE       = "test/resources/favicon.ico"

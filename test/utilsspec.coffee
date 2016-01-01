@@ -1,5 +1,4 @@
-dotenv = require('dotenv')
-dotenv.load()
+require('dotenv').load()
 http = require('http')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
@@ -9,23 +8,16 @@ _ = require("lodash")
 Q = require('q')
 fs = require('fs')
 os = require('os')
-TEST_TAG        = "cloudinary_npm_test"
-TIMEOUT_SHORT   = 5000
-TIMEOUT_MEDIUM  = 20000
-TIMEOUT_LONG    = 50000
+
+helper = require("./spechelper")
+TEST_TAG        = helper.TEST_TAG
+sharedExamples = helper.sharedExamples
+itBehavesLike = helper.itBehavesLike
+test_cloudinary_url = helper.test_cloudinary_url
+
+# Defined globals
 cloud_name = ''
 root_path = ''
-class sharedExamples
-  constructor: (name, examples)->
-    @allExamples ?= {}
-    if _.isFunction(examples)
-      @allExamples[name] = examples
-    else
-      return @allExamples[name]
-
-itBehavesLike = (name, args...)->
-  context name, ->
-    sharedExamples(name).apply(this, args)
 
 describe "utils", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
@@ -44,44 +36,6 @@ describe "utils", ->
     for element in elements
       return element if element[attr] == value
     undefined
-
-  test_cloudinary_url = (public_id,options,expected_url,expected_options) ->
-    url = utils.url(public_id,options)
-    expect(url).to.eql(expected_url)
-    expect(options).to.eql(expected_options)
-    url
-
-  expect.Assertion::produceUrl = (url)->
-    [public_id, options] = @obj
-#    console.log("Cloudinary::Utils.cloudinary_url('#{public_id}', #{JSON.stringify(_.merge(cloudinary.config(), options))})\n")
-    actualOptions = _.cloneDeep(options)
-    actual = utils.url(public_id, actualOptions)
-    @assert(
-      true || actual.match(url),
-      ()-> "expected '#{public_id}' and #{JSON.stringify(options)} to produce '#{url}' but got '#{actual}'",
-      ()-> "expected '#{public_id}' and #{JSON.stringify(options)} not to produce '#{url}' but got '#{actual}'")
-    @
-
-  expect.Assertion::emptyOptions = ()->
-    [public_id, options] = @obj
-    actual = _.cloneDeep(options)
-    utils.url(public_id,actual)
-    @assert(
-      _.isEmpty(actual),
-      ()-> "expected '#{public_id}' and #{JSON.stringify(options)} to produce empty options but got #{JSON.stringify(actual)}",
-      ()-> "expected '#{public_id}' and #{JSON.stringify(options)} not to produce empty options")
-    @
-
-  expect.Assertion::beServedByCloudinary = (done)->
-    [public_id, options] = @obj
-    actualOptions = _.cloneDeep(options)
-    actual = utils.url(public_id, actualOptions)
-    http.get actual, (res)=>
-      @assert res.statusCode == 200,
-        ()-> "Expected to get #{actual} but server responded with \"#{res.statusCode}: #{res.headers['x-cld-error']}\"",
-        ()-> "Expeted not to get #{actual}."
-      done()
-    @
 
   it "should use cloud_name from config" , ->
     test_cloudinary_url("test", {}, "http://res.cloudinary.com/#{cloud_name}/image/upload/test", {})
@@ -237,34 +191,34 @@ describe "utils", ->
     test_cloudinary_url("test", {effect:["sepia", 10]}, "http://res.cloudinary.com/#{cloud_name}/image/upload/e_sepia:10/test", {})
 
 
-  for param,letter of { 'overlay': 'l' }
-
-    describe param, ->
-      layers_options= [
-      # [name,                    options,                                          result]
-        ["string",                "text:hello",                                     "text:hello"],
-        ["public_id",             { "public_id": "logo" },                          "logo"],
-        ["public_id with folder", { "public_id": "folder/logo" },                   "folder:logo"],
-        ["private",               { "public_id": "logo", "type": "private" },       "private:logo"],
-        ["format",                { "public_id": "logo", "format": "png" },         "logo.png"],
-        ["video",                 { "resource_type": "video", "public_id": "cat" }, "video:cat"],
-      ]
-      it "should support #{param}", ->
-        for layer in layers_options
-          [name, options, result] = layer
-          opt = {}
-          opt[param] = options
-          expect(["test", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/#{letter}_#{result}/test")
-            .and.emptyOptions()
-
-      it "should not pass width/height to html for #{param}", ->
-        opt = {'height': 100, 'width': 100 }
-        opt[param] = "text:hello"
-        expect(["test", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/h_100,#{letter}_text:hello,w_100/test")
+  describe "overlay and underlay", ->
+    param = 'overlay'
+    letter = 'l'
+    layers_options= [
+    # [name,                    options,                                          result]
+      ["string",                "text:hello",                                     "text:hello"],
+      ["public_id",             { "public_id": "logo" },                          "logo"],
+      ["public_id with folder", { "public_id": "folder/logo" },                   "folder:logo"],
+      ["private",               { "public_id": "logo", "type": "private" },       "private:logo"],
+      ["format",                { "public_id": "logo", "format": "png" },         "logo.png"],
+      ["video",                 { "resource_type": "video", "public_id": "cat" }, "video:cat"],
+    ]
+    it "should support #{param}", ->
+      for layer in layers_options
+        [name, options, result] = layer
+        opt = {}
+        opt[param] = options
+        expect(["test", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/#{letter}_#{result}/test")
           .and.emptyOptions()
 
+    it "should not pass width/height to html for #{param}", ->
+      opt = {'height': 100, 'width': 100 }
+      opt[param] = "text:hello"
+      expect(["test", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/h_100,#{letter}_text:hello,w_100/test")
+        .and.emptyOptions()
+
   sharedExamples "a signed url", (specific_options = {}, specific_transformation = "")->
-    @timeout TIMEOUT_LONG
+    @timeout helper.TIMEOUT_LONG
     expected_transformation =
       if (specific_transformation.blank? || specific_transformation.match(/\/$/)) then specific_transformation else "#{specific_transformation}/"
     authenticated_path = ''
@@ -297,21 +251,19 @@ describe "utils", ->
         .to.produceUrl(new RegExp("#{authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/#{expected_transformation}v#{authenticated_image['version']}/#{authenticated_image['public_id']}.jpg"))
               .and.emptyOptions()
                 .and.beServedByCloudinary(done)
-    it "should correctly sign URL with transformation", ->
+    it "should correctly sign URL with transformation", (done)->
       options["transformation"] = { crop: "crop", width: 10, height: 20 } # TODO duplicate?
       delete options.version
       expect(["#{authenticated_image['public_id']}.jpg", options])
         .to.produceUrl(new RegExp("#{authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/#{expected_transformation}v#{authenticated_image['version']}/#{authenticated_image['public_id']}.jpg"))
-#              .and.emptyOptions()
-##                     .and be_served_by_cloudinary
+              .and.emptyOptions()
+                     .and.beServedByCloudinary(done)
     it "should correctly sign fetch URL", (done)->
       options["type"] = "fetch"
       expect(["http://res.cloudinary.com/demo/sample.png", options])
         .to.produceUrl(new RegExp("^#{root_path}/image/fetch/s--[\\w-]+--/#{expected_transformation}v#{authenticated_image['version']}/http://res.cloudinary.com/demo/sample.png$"))
               .and.emptyOptions()
-                .and.beServedByCloudinary(done)
-
-
+                     .and.beServedByCloudinary(done)
 
   describe "text", ->
 
@@ -358,12 +310,12 @@ describe "utils", ->
         for layer in LAYERS_OPTIONS
           [name, options, result] = layer
 
-          it "should support #{name}", ->
+          it "should support #{name}", (done)->
             opt = {}
             opt[param] = options
             expect(["sample", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/#{short}_#{result}/sample")
               .and.emptyOptions()
-#            expect("#{upload_path}/#{short}_#{result}/sample").to be_served_by_cloudinary
+                .and.beServedByCloudinary(done)
           unless _.isString(options)
             op        = {}
             op[param] = options
