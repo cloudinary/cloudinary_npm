@@ -2,7 +2,6 @@ _ = require("lodash")
 config = require("./config")
 crypto =  require('crypto')
 querystring = require('querystring')
-
 utils = exports
 
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
@@ -95,7 +94,7 @@ process_layer = (layer)->
 exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp(),
-    transformation: exports.generate_transformation_string(_.clone(options)),
+    transformation: utils.generate_transformation_string(_.clone(options)),
     public_id: options.public_id,
     callback: options.callback,
     format: options.format,
@@ -604,17 +603,61 @@ exports.private_download_url = (public_id, format, options = {}) ->
     attachment: options.attachment, 
     expires_at: options.expires_at
   }, options)
+  exports.api_url("download", options) + "?" + querystring.stringify(params)
 
-  return exports.api_url("download", options) + "?" + querystring.stringify(params)
-
+###*
+# Utility method that uses the deprecated ZIP download API.
+# @deprecated Replaced by {download_zip_url} that uses the more advanced and robust archive generation and download API
+###
 exports.zip_download_url = (tag, options = {}) ->
   params = exports.sign_request({
     timestamp: exports.timestamp(), 
     tag: tag,
-    transformation: exports.generate_transformation_string(options)
+    transformation: utils.generate_transformation_string(options)
   }, options)
+  exports.api_url("download_tag.zip", options) + "?" + querystring.stringify(params)
 
-  return exports.api_url("download_tag.zip", options) + "?" + querystring.stringify(params)
+# TODO add archive tests
+# TODO rearrange private methods at the end of the file
+# TODO consider CamelCase
+###*
+# Returns a URL that when invokes creates an archive and returns it.
+# @param options [Hash]
+# @option options [String|Symbol] :resource_type  The resource type of files to include in the archive. Must be one of :image | :video | :raw
+# @option options [String|Symbol] :type (:upload) The specific file type of resources: :upload|:private|:authenticated
+# @option options [String|Symbol|Array] :tags (nil) list of tags to include in the archive
+# @option options [String|Array<String>] :public_ids (nil) list of public_ids to include in the archive
+# @option options [String|Array<String>] :prefixes (nil) Optional list of prefixes of public IDs (e.g., folders).
+# @option options [String|Array<String>] :transformations Optional list of transformations.
+#   The derived images of the given transformations are included in the archive. Using the string representation of
+#   multiple chained transformations as we use for the 'eager' upload parameter.
+# @option options [String|Symbol] :mode (:create) return the generated archive file or to store it as a raw resource and
+#   return a JSON with URLs for accessing the archive. Possible values: :download, :create
+# @option options [String|Symbol] :target_format (:zip)
+# @option options [String] :target_public_id Optional public ID of the generated raw resource.
+#   Relevant only for the create mode. If not specified, random public ID is generated.
+# @option options [boolean] :flatten_folders (false) If true, flatten public IDs with folders to be in the root of the archive.
+#   Add numeric counter to the file name in case of a name conflict.
+# @option options [boolean] :flatten_transformations (false) If true, and multiple transformations are given,
+#   flatten the folder structure of derived images and store the transformation details on the file name instead.
+# @option options [boolean] :use_original_filename Use the original file name of included images (if available) instead of the public ID.
+# @option options [boolean] :async (false) If true, return immediately and perform the archive creation in the background.
+#   Relevant only for the create mode.
+# @option options [String] :notification_url Optional URL to send an HTTP post request (webhook) when the archive creation is completed.
+# @option options [String|Array<String] :target_tags Optional array. Allows assigning one or more tag to the generated archive file (for later housekeeping via the admin API).
+# @option options [String] :keep_derived (false) keep the derived images used for generating the archive
+# @return [String] archive url
+###
+exports.download_archive_url = (options = {})->
+  cloudinary_params = exports.sign_request(exports.archive_params(_.merge(options, mode: "download")), options)
+  exports.api_url("generate_archive", options) + "?" + hash_query_params(cloudinary_params)
+
+###*
+# Returns a URL that when invokes creates an zip archive and returns it.
+# @see download_archive_url
+###
+exports.download_zip_url = (options = {})->
+  exports.download_archive_url(_.merge(options, target_format: "zip"))
 
 join_pair = (key, value) ->
   if !value
@@ -725,4 +768,51 @@ process_video_params = (param) ->
     else
       null
 
+###*
+# Returns a Hash of parameters used to create an archive
+# @param [Hash] options
+# @private
+###
+exports.archive_params = (options = {})->
+  timestamp: (options.timestamp || exports.timestamp())
+  type: options.type
+  mode:  options.mode
+  target_format:  options.target_format
+  target_public_id:  options.target_public_id
+  flatten_folders: exports.as_safe_bool(options.flatten_folders)
+  flatten_transformations: exports.as_safe_bool(options.flatten_transformations)
+  use_original_filename: exports.as_safe_bool(options.use_original_filename)
+  async: exports.as_safe_bool(options.async)
+  notification_url: options.notification_url
+  target_tags: options.target_tags && exports.build_array(options.target_tags)
+  keep_derived: exports.as_safe_bool(options.keep_derived)
+  tags: options.tags && exports.build_array(options.tags)
+  public_ids: options.public_ids && exports.build_array(options.public_ids)
+  prefixes: options.prefixes && exports.build_array(options.prefixes)
+  transformations: build_eager(options.transformations)
+
+###*
+# @private
+###
+build_eager = (eager)->
+  return undefined unless eager?
+  (for transformation, format of Array(eager)
+    transformation = _.clone(transformation)
+    format = transformation.format || format
+    delete transformation.format
+    _.compact([utils.generate_transformation_string(transformation, true), format]).join("/")
+  ).join("|")
+
+
+hashToQuery = (hash)->
+  _.compact(for key, value of hash
+    if _.isArray(value)
+      (for v in value
+        "#{querystring.escape("#{key}[]")}=#{querystring.escape(v)}"
+      ).join("&")
+    else
+      "#{querystring.escape(key)}=#{querystring.escape(value)}"
+  ).sort().join('&')
+
+hash_query_params = hashToQuery
 

@@ -19,7 +19,9 @@ utils.v1_adapters exports, uploader,
   explode: 1,
   add_tag: 2,
   remove_tag: 2,
-  replace_tag: 2
+  replace_tag: 2,
+  create_archive: 0,
+  create_zip: 0
 
 exports.direct_upload = uploader.direct_upload
 exports.upload_tag_params = uploader.upload_tag_params

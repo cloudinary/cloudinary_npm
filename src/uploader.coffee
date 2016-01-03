@@ -106,7 +106,19 @@ exports.explicit = (public_id, callback, options={}) ->
       face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
       custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
     ]
-    
+
+
+# Creates a new archive in the server and returns information in JSON format
+exports.create_archive = (callback, options={}, target_format = null)->
+  call_api "generate_archive", callback, options, ->
+    opt               = utils.archive_params(options)
+    opt.target_format = target_format if target_format
+    [opt]
+
+# Creates a new zip archive in the server and returns information in JSON format
+exports.create_zip = (callback, options={})->
+  exports.create_archive(callback, options, "zip")
+
 exports.destroy = (public_id, callback, options={}) ->
   call_api "destroy", callback, options, ->
     return [timestamp: utils.timestamp(), type: options.type, invalidate: options.invalidate,public_id:  public_id]

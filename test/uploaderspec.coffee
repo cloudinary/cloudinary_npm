@@ -379,6 +379,7 @@ describe "uploader", ->
           done()
 
     it "should support uploading large video files", (done) ->
+      @timeout helper.TIMEOUT_LONG * 10
       fs.stat LARGE_VIDEO, (err, stat) ->
         return done(new Error err.message) if err?
         cloudinary.v2.uploader.upload_chunked LARGE_VIDEO, {resource_type: 'video', timeout: helper.TIMEOUT_LONG, tags: TEST_TAG}, (error, result) ->

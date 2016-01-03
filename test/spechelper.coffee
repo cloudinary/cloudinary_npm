@@ -53,6 +53,8 @@ exports.sharedExamples = sharedExamples
 exports.itBehavesLike = (name, args...)->
   context "behaves like #{name}", ->
     sharedExamples(name).apply(this, args)
+exports.includeContext = (name, args...)->
+  sharedExamples(name).apply(this, args)
 
 exports.TIMEOUT_SHORT   = 5000
 exports.TIMEOUT_MEDIUM  = 20000
