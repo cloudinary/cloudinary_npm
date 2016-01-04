@@ -92,20 +92,7 @@ exports.upload_chunked_stream = (callback, options={}) ->
 
 exports.explicit = (public_id, callback, options={}) ->
   call_api "explicit", callback, options, ->
-    return [
-      timestamp: utils.timestamp()
-      type: options.type
-      public_id: public_id
-      callback: options.callback
-      eager: utils.build_eager(options.eager)
-      eager_notification_url: options.eager_notification_url
-      eager_async: utils.as_safe_bool(options.eager_async)
-      headers: utils.build_custom_headers(options.headers)
-      invalidate: utils.as_safe_bool(options.invalidate)
-      tags: options.tags ? utils.build_array(options.tags).join(",")
-      face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
-      custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
-    ]
+    utils.build_explicit_api_params(public_id, options)
 
 
 # Creates a new archive in the server and returns information in JSON format

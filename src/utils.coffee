@@ -93,32 +93,33 @@ process_layer = (layer)->
 
 exports.build_upload_params = (options) ->
   params =
-    timestamp: exports.timestamp(),
-    transformation: utils.generate_transformation_string(_.clone(options)),
-    public_id: options.public_id,
-    callback: options.callback,
-    format: options.format,
-    backup: utils.as_safe_bool(options.backup),
-    faces: utils.as_safe_bool(options.faces),
-    exif: utils.as_safe_bool(options.exif),
-    image_metadata: utils.as_safe_bool(options.image_metadata),
-    colors: utils.as_safe_bool(options.colors),
-    type: options.type,
-    eager: utils.build_eager(options.eager),
-    use_filename: utils.as_safe_bool(options.use_filename),
-    unique_filename: utils.as_safe_bool(options.unique_filename),
-    discard_original_filename: utils.as_safe_bool(options.discard_original_filename),
-    notification_url: options.notification_url,
-    eager_notification_url: options.eager_notification_url,
-    eager_async: utils.as_safe_bool(options.eager_async),
-    invalidate: utils.as_safe_bool(options.invalidate),
-    proxy: options.proxy,
-    folder: options.folder,
-    overwrite: utils.as_safe_bool(options.overwrite),
-    allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
-    moderation: options.moderation,
-    phash: utils.as_safe_bool(options.phash),
+    timestamp: exports.timestamp()
+    transformation: utils.generate_transformation_string(_.clone(options))
+    public_id: options.public_id
+    callback: options.callback
+    format: options.format
+    backup: utils.as_safe_bool(options.backup)
+    faces: utils.as_safe_bool(options.faces)
+    exif: utils.as_safe_bool(options.exif)
+    image_metadata: utils.as_safe_bool(options.image_metadata)
+    colors: utils.as_safe_bool(options.colors)
+    type: options.type
+    eager: utils.build_eager(options.eager)
+    use_filename: utils.as_safe_bool(options.use_filename)
+    unique_filename: utils.as_safe_bool(options.unique_filename)
+    discard_original_filename: utils.as_safe_bool(options.discard_original_filename)
+    notification_url: options.notification_url
+    eager_notification_url: options.eager_notification_url
+    eager_async: utils.as_safe_bool(options.eager_async)
+    invalidate: utils.as_safe_bool(options.invalidate)
+    proxy: options.proxy
+    folder: options.folder
+    overwrite: utils.as_safe_bool(options.overwrite)
+    allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(",")
+    moderation: options.moderation
+    phash: utils.as_safe_bool(options.phash)
     upload_preset: options.upload_preset
+    responsive_breakpoints: utils.generate_responsive_breakpoints_string(options["responsive_breakpoints"])
     return_delete_token: utils.as_safe_bool(options.return_delete_token)
   utils.updateable_resource_params(options, params)
 
@@ -199,6 +200,7 @@ exports.generate_transformation_string = (options) ->
 
   delete options["width"] if width and (width == "auto" or no_html_sizes or parseFloat(width) < 1)
   delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
+
   background = utils.option_consume(options, "background")
   background = background and background.replace(/^#/, "rgb:")
   color = utils.option_consume(options, "color")
@@ -603,7 +605,7 @@ exports.private_download_url = (public_id, format, options = {}) ->
     attachment: options.attachment, 
     expires_at: options.expires_at
   }, options)
-  exports.api_url("download", options) + "?" + querystring.stringify(params)
+  exports.api_url("download", options) + "?" + hashToQuery(params)
 
 ###*
 # Utility method that uses the deprecated ZIP download API.
@@ -615,7 +617,7 @@ exports.zip_download_url = (tag, options = {}) ->
     tag: tag,
     transformation: utils.generate_transformation_string(options)
   }, options)
-  exports.api_url("download_tag.zip", options) + "?" + querystring.stringify(params)
+  exports.api_url("download_tag.zip", options) + "?" + hashToQuery(params)
 
 # TODO add archive tests
 # TODO rearrange private methods at the end of the file
@@ -650,7 +652,7 @@ exports.zip_download_url = (tag, options = {}) ->
 ###
 exports.download_archive_url = (options = {})->
   cloudinary_params = exports.sign_request(exports.archive_params(_.merge(options, mode: "download")), options)
-  exports.api_url("generate_archive", options) + "?" + hash_query_params(cloudinary_params)
+  exports.api_url("generate_archive", options) + "?" + hashToQuery(cloudinary_params)
 
 ###*
 # Returns a URL that when invokes creates an zip archive and returns it.
@@ -774,7 +776,7 @@ process_video_params = (param) ->
 # @private
 ###
 exports.archive_params = (options = {})->
-  timestamp: (options.timestamp || exports.timestamp())
+  timestamp: (options.timestamp ? exports.timestamp())
   type: options.type
   mode:  options.mode
   target_format:  options.target_format
@@ -791,17 +793,61 @@ exports.archive_params = (options = {})->
   prefixes: options.prefixes && exports.build_array(options.prefixes)
   transformations: build_eager(options.transformations)
 
+build_custom_headers = (headers)->
+  (for a in Array(headers) when a?.join?
+    a.join(": ")
+  ).join("\n")
+
+exports.build_explicit_api_params = (public_id, options = {})->
+  console.log("option.eager %j", options.eager)
+  opt = [
+    timestamp: (options.timestamp || exports.timestamp())
+    type: options.type
+    public_id: public_id
+    callback: options.callback
+    eager: build_eager(options.eager)
+    eager_notification_url: options.eager_notification_url
+    eager_async: utils.as_safe_bool(options.eager_async)
+    headers: build_custom_headers(options.headers)
+    tags: options.tags && utils.build_array(options.tags).join(",")
+    face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
+    responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints)
+  ]
+  console.dir(opt)
+  opt
+
+exports.generate_responsive_breakpoints_string = (breakpoints)->
+  console.log("generate_responsive_breakpoints_string")
+  console.dir(breakpoints)
+  return unless breakpoints?
+  breakpoints = _.clone(breakpoints)
+  unless _.isArray(breakpoints)
+    breakpoints = [breakpoints]
+
+  for breakpoint_settings in breakpoints
+    if breakpoint_settings?
+      console.log(breakpoint_settings)
+      transformation =  breakpoint_settings.transformation
+      delete breakpoint_settings.transformation
+      if transformation
+        console.log("transformation %o", transformation)
+        breakpoint_settings.transformation = utils.generate_transformation_string(_.clone(transformation))
+        console.log("After: %o", breakpoint_settings.transformation )
+  JSON.stringify( breakpoints)
+
 ###*
 # @private
 ###
 build_eager = (eager)->
   return undefined unless eager?
-  (for transformation, format of Array(eager)
+  ret = (for transformation in Array(eager)
     transformation = _.clone(transformation)
-    format = transformation.format || format
+    format = transformation.format if transformation.format?
     delete transformation.format
-    _.compact([utils.generate_transformation_string(transformation, true), format]).join("/")
+    _.compact([utils.generate_transformation_string(transformation), format]).join("/")
   ).join("|")
+  console.log("build_eager", ret)
+  ret
 
 
 hashToQuery = (hash)->

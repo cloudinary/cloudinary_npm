@@ -451,6 +451,14 @@ describe "uploader", ->
     file_reader = fs.createReadStream(IMAGE_FILE)
     file_reader.pipe(upload)
 
+  context ":responsive_breakpoints", ->
+    context ":create_derived", ->
+      it 'should return a responsive_breakpoints in the response', (done)->
+        cloudinary.v2.uploader.upload IMAGE_FILE, responsive_breakpoints: {create_derived: false }, tags: TEST_TAG, (error, result)->
+          return done(new Error error.message) if error?
+          expect(result).to.have.key('responsive_breakpoints')
+          done()
+
   describe "explicit", ->
     spy = undefined
     xhr = undefined
@@ -464,6 +472,7 @@ describe "uploader", ->
     context ":invalidate", ->
       it "should should pass the invalidate value to the server", (done)->
         cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG],(error, result) ->
+          console.log(spy.lastCall)
           expect(spy.calledWith(sinon.match((arg)-> arg.toString().match(/name="invalidate"/)))).to.be.ok()
           done()
 

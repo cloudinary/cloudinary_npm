@@ -516,6 +516,7 @@ describe "api", ->
         cloudinary.v2.api.resources_by_moderation("manual", "pending", max_results: 1000, moderations: true, after_listing("pending"))
 
     after_upload = (error, upload_result) ->
+      return done(new Error error.message) if error?
       ids.push(upload_result.public_id)
       if ids.length == 3
         cloudinary.v2.api.update ids[0], moderation_status: "approved", after_update

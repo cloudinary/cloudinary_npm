@@ -32,6 +32,7 @@ ARCHIVE_TAG = "archive_test_tag_#{Math.floor(Math.random()*10000)}"
 
 sharedExamples 'archive', ->
   before (done)=>
+    console.dir(this)
     console.log("before")
     @timeout helper.TIMEOUT_LONG
     Q.all [
@@ -54,7 +55,7 @@ sharedExamples 'archive', ->
       console.log("finally")
       done()
 
-describe "Utils", ->
+describe "utils", ->
   includeContext.call @,  'archive'
 
   describe '.generate_zip_download_url', ->
@@ -92,7 +93,7 @@ describe "Utils", ->
               expect(list).to.contain("tag_samplebw.jpg")
               done()
 
-describe "Uploader", ->
+describe "uploader", ->
 
   includeContext.call @, 'archive'
   describe '.create_archive', ->
