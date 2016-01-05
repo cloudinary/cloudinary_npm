@@ -14,6 +14,9 @@ IMAGE_FILE      = helper.IMAGE_FILE
 describe "api", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
 
+  after ->
+    cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+
   PUBLIC_ID = "api_test"
   find_by_attr = (elements, attr, value) ->
     for element in elements
@@ -31,7 +34,6 @@ describe "api", ->
     cloudinary.v2.uploader.upload IMAGE_FILE, (error, result) ->
       expect(error).to.be undefined
       expect(result).to.be.an(Object)
-      uploaded.push(result.public_id)
       callback(result)
 
   before (done) ->
@@ -51,17 +53,17 @@ describe "api", ->
       .finally ->
         done()
 
-  after (done) ->
-    @timeout helper.TIMEOUT_LONG
-    operations = []
-    operations.push cloudinary.v2.api.delete_resources_by_tag @timestamp_tag, keep_original: false
-    unless _.isEmpty(uploaded)
-      operations.push cloudinary.v2.api.delete_resources uploaded
-    unless _.isEmpty(uploadedRaw)
-      operations.push cloudinary.v2.api.delete_resources uploadedRaw, resource_type: "raw"
-    Q.allSettled(operations)
-    .finally ()->
-      done()
+#  after (done) ->
+#    @timeout helper.TIMEOUT_LONG
+#    operations = []
+#    operations.push cloudinary.v2.api.delete_resources_by_tag @timestamp_tag, keep_original: false
+#    unless _.isEmpty(uploaded)
+#      operations.push cloudinary.v2.api.delete_resources uploaded
+#    unless _.isEmpty(uploadedRaw)
+#      operations.push cloudinary.v2.api.delete_resources uploadedRaw, resource_type: "raw"
+#    Q.allSettled(operations)
+#    .finally ()->
+#      done()
 
   describe "resources", ()->
     it "should allow listing resource_types", (done) ->
@@ -76,7 +78,6 @@ describe "api", ->
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], (error, result)->
         done(new Error error.message) if error?
         public_id = result.public_id
-        uploaded.push public_id
         cloudinary.v2.api.resources (error, result) ->
           return done(new Error error.message) if error?
           resource = find_by_attr(result.resources, "public_id", public_id)
@@ -102,7 +103,6 @@ describe "api", ->
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], (error, result)->
         return done(new Error error.message) if error?
         public_id = result.public_id
-        uploaded.push public_id
         cloudinary.v2.api.resources type: "upload", (error, result) ->
           return done(new Error error.message) if error?
           resource = find_by_attr(result.resources, "public_id", public_id)
@@ -170,7 +170,6 @@ describe "api", ->
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], eager: [width: 100, crop: "scale"], (error, result)->
         done(new Error error.message) if error?
         public_id = result.public_id
-        uploaded.push public_id
         cloudinary.v2.api.resource public_id, (error, resource) ->
           done(new Error error.message) if error?
           expect(resource).not.to.eql(undefined)
@@ -185,7 +184,6 @@ describe "api", ->
       cloudinary.v2.uploader.upload IMAGE_FILE, eager: [width: 101, crop: "scale"], (error, r) ->
         return done(new Error error.message) if error?
         public_id = r.public_id
-        uploaded.push public_id
         cloudinary.v2.api.resource public_id, (error, resource) ->
           return done(new Error error.message) if error?
           expect(resource).not.to.eql(undefined)
@@ -433,7 +431,6 @@ describe "api", ->
     it "should support setting manual moderation status", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->
-        uploaded.push upload_result.public_id
         cloudinary.v2.api.update upload_result.public_id, moderation_status: "approved", (error, api_result) ->
           expect(api_result.moderation[0].status).to.eql("approved")
           done()

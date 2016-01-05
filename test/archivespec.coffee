@@ -31,9 +31,7 @@ root_path = ''
 ARCHIVE_TAG = "archive_test_tag_#{Math.floor(Math.random()*10000)}"
 
 sharedExamples 'archive', ->
-  before (done)=>
-    console.dir(this)
-    console.log("before")
+  before (done)->
     @timeout helper.TIMEOUT_LONG
     Q.all [
       uploader.upload(
@@ -52,8 +50,10 @@ sharedExamples 'archive', ->
         }
       )]
     .finally ->
-      console.log("finally")
       done()
+
+  after ->
+    cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
 
 describe "utils", ->
   includeContext.call @,  'archive'
@@ -65,7 +65,6 @@ describe "utils", ->
           target_public_id:  'gem_archive_test'
           public_ids:  ["tag_sample", "tag_samplebw"]
           tags:  ARCHIVE_TAG
-    console.log(archive_result)
     describe 'public_ids', ->
       it 'should generate a valid url', ->
         expect(archive_result).not.to.be.empty()
@@ -73,21 +72,15 @@ describe "utils", ->
         filename = "#{os.tmpdir()}/deleteme-#{Math.floor(Math.random()*100000)}.zip"
         https.get archive_result, (res)->
           file = fs.createWriteStream(filename)
-          console.log("zip file is #{filename}")
           if(res.statusCode == 200)
-            console.log("Writing to file")
             res.pipe(file)
           else
-            console.log(res.headers['status'] + ' ' + res.headers['x-cld-error'])
-            done(new Error res.statusCode)
+            done(new Error "#{res.statusCode}: #{res.headers['x-cld-error']}")
           res.on 'end', ->
-            console.log("zip - end")
             file.on 'close', ->
               list = execSync("unzip -l #{filename}")
-              console.dir(list.toString())
               list = list.toString().split('\n').slice(3, -3)
               list = (_.last(i.split(/[ ]+/)) for i in list) # keep only filenames
-              console.log(list)
               expect(list.length).to.eql(2)
               expect(list).to.contain("tag_sample.jpg")
               expect(list).to.contain("tag_samplebw.jpg")
@@ -140,5 +133,4 @@ describe "uploader", ->
       spy.reset()
     it 'should call create_archive with "zip" format', ->
       uploader.create_zip({ tags:  TEST_TAG })
-      console.dir(spy.lastCall)
       expect(spy.calledWith(null, { tags:  TEST_TAG }, "zip")).to.be.ok()

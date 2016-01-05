@@ -225,18 +225,16 @@ describe "utils", ->
     authenticated_image = {}
     options = {}
     before (done)->
-
       cloudinary.v2.config(true)
-      cloudinary.v2.uploader.upload( "http://res.cloudinary.com/demo/image/upload/sample.jpg",
-                                    type: 'authenticated',
-                                    tags: TEST_TAG,
+      cloudinary.v2.uploader.upload "http://res.cloudinary.com/demo/image/upload/sample.jpg",
+        type: 'authenticated',
+        tags: TEST_TAG,
         (error, result)->
           return done(new Error error.message) if error?
           authenticated_image = result
-
           authenticated_path =  "#{root_path}/image/authenticated"
           done()
-      )
+
     beforeEach ->
       options =  _.merge({ version: authenticated_image['version'], sign_url: true, type: "authenticated" }, specific_options)
 
@@ -295,39 +293,39 @@ describe "utils", ->
 
 #    include_context "cleanup"
 
-    for param, short of { 'overlay': 'l'}
-      describe param, ->
-        # [name, options, result]
-        LAYERS_OPTIONS= [
-          ["string", "text:test_text:hello", "text:test_text:hello"],
-          ["explicit layer parameter", "text:test_text:#{text_encoded}", "text:test_text:#{text_encoded}"],
-          ["text parameter", { public_id: "test_text", text: text_layer }, "text:test_text:#{text_encoded}"],
-          ["text with font family and size parameters", { text: text_layer, font_family: "Arial", font_size: "18" }, "text:Arial_18:#{text_encoded}"],
-          ["text with text style parameter", { text: text_layer, font_family: "Arial", font_size: "18", font_weight: "bold", font_style: "italic", letter_spacing: 4, line_spacing: 2 }, "text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2:#{text_encoded}"],
-          ["subtitles", { resource_type: "subtitles", public_id: "subtitles.srt" }, "subtitles:subtitles.srt"],
-          ["subtitles with font family and size", { resource_type: "subtitles", public_id: "subtitles.srt", font_family: "Arial", font_size: "40" }, "subtitles:Arial_40:subtitles.srt"]
-        ]
-        for layer in LAYERS_OPTIONS
-          [name, options, result] = layer
+    # Overlay and underlay have the same code, so we test overlay only
+    describe 'overlay', ->
+      # [name, options, result]
+      LAYERS_OPTIONS= [
+        ["string", "text:test_text:hello", "text:test_text:hello"],
+        ["explicit layer parameter", "text:test_text:#{text_encoded}", "text:test_text:#{text_encoded}"],
+        ["text parameter", { public_id: "test_text", text: text_layer }, "text:test_text:#{text_encoded}"],
+        ["text with font family and size parameters", { text: text_layer, font_family: "Arial", font_size: "18" }, "text:Arial_18:#{text_encoded}"],
+        ["text with text style parameter", { text: text_layer, font_family: "Arial", font_size: "18", font_weight: "bold", font_style: "italic", letter_spacing: 4, line_spacing: 2 }, "text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2:#{text_encoded}"],
+        ["subtitles", { resource_type: "subtitles", public_id: "subtitles.srt" }, "subtitles:subtitles.srt"],
+        ["subtitles with font family and size", { resource_type: "subtitles", public_id: "subtitles.srt", font_family: "Arial", font_size: "40" }, "subtitles:Arial_40:subtitles.srt"]
+      ]
+      for layer in LAYERS_OPTIONS
+        [name, options, result] = layer
 
-          it "should support #{name}", (done)->
-            opt = {}
-            opt[param] = options
-            expect(["sample", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/#{short}_#{result}/sample")
-              .and.emptyOptions()
-                .and.beServedByCloudinary(done)
-          unless _.isString(options)
-            op        = {}
-            op[param] = options
-            itBehavesLike "a signed url", op, "#{short}_#{result}"
-
-        it "should not pass width/height to html for #{param}", ->
+        it "should support #{name}", (done)->
           opt = {}
-          opt[param]= "text:test_text"
-          opt["height"]= 100
-          opt["width"]= 100
-          expect(["sample", opt]).produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/h_100,#{short}_text:test_text,w_100/sample")
+          opt['overlay'] = options
+          expect(["sample", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/l_#{result}/sample")
             .and.emptyOptions()
+              .and.beServedByCloudinary(done)
+        unless _.isString(options)
+          op        = {}
+          op['overlay'] = options
+          itBehavesLike "a signed url", op, "l_#{result}"
+
+      it "should not pass width/height to html for overlay", ->
+        opt = {}
+        opt['overlay']= "text:test_text"
+        opt["height"]= 100
+        opt["width"]= 100
+        expect(["sample", opt]).produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample")
+          .and.emptyOptions()
 
   it "should use ssl_detected if secure is not given as parameter and not set to true in configuration" , ->
     test_cloudinary_url("test", {ssl_detected:true}, "https://res.cloudinary.com/#{cloud_name}/image/upload/test", {})

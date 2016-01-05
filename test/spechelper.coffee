@@ -3,6 +3,17 @@ _ = require("lodash")
 utils = require("../lib/utils")
 http = require('http')
 
+exports.TIMEOUT_SHORT   = 5000
+exports.TIMEOUT_MEDIUM  = 20000
+exports.TIMEOUT_LONG    = 50000
+exports.TEST_TAG        = "cloudinary_npm_test"
+exports.IMAGE_FILE      = "test/resources/logo.png"
+exports.LARGE_RAW_FILE  = "test/resources/TheCompleteWorksOfShakespeare.mobi"
+exports.LARGE_VIDEO     = "test/resources/CloudBookStudy-HD.mp4"
+exports.EMPTY_IMAGE     = "test/resources/empty.gif"
+exports.RAW_FILE        = "test/resources/docx.docx"
+exports.ICON_FILE       = "test/resources/favicon.ico"
+
 exports.test_cloudinary_url = (public_id,options,expected_url,expected_options) ->
   url = utils.url(public_id,options)
   expect(url).to.eql(expected_url)
@@ -11,7 +22,6 @@ exports.test_cloudinary_url = (public_id,options,expected_url,expected_options) 
 
 expect.Assertion::produceUrl = (url)->
   [public_id, options] = @obj
-  #    console.log("Cloudinary::Utils.cloudinary_url('#{public_id}', #{JSON.stringify(_.merge(cloudinary.config(), options))})\n")
   actualOptions = _.cloneDeep(options)
   actual = utils.url(public_id, actualOptions)
   @assert(
@@ -46,23 +56,19 @@ class sharedExamples
     @allExamples ?= {}
     if _.isFunction(examples)
       @allExamples[name] = examples
+      examples
     else
-      return @allExamples[name]
+      if @allExamples[name]?
+        return @allExamples[name]
+      else
+        return ->
+          console.log("Shared example #{name} was not found!")
 
-exports.sharedExamples = sharedExamples
+
+exports.sharedExamples = exports.sharedContext = sharedExamples
+
 exports.itBehavesLike = (name, args...)->
   context "behaves like #{name}", ->
     sharedExamples(name).apply(this, args)
 exports.includeContext = (name, args...)->
   sharedExamples(name).apply(this, args)
-
-exports.TIMEOUT_SHORT   = 5000
-exports.TIMEOUT_MEDIUM  = 20000
-exports.TIMEOUT_LONG    = 50000
-exports.TEST_TAG        = "cloudinary_npm_test"
-exports.IMAGE_FILE      = "test/resources/logo.png"
-exports.LARGE_RAW_FILE  = "test/resources/TheCompleteWorksOfShakespeare.mobi"
-exports.LARGE_VIDEO     = "test/resources/CloudBookStudy-HD.mp4"
-exports.EMPTY_IMAGE     = "test/resources/empty.gif"
-exports.RAW_FILE        = "test/resources/docx.docx"
-exports.ICON_FILE       = "test/resources/favicon.ico"
