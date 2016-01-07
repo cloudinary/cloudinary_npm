@@ -1,6 +1,6 @@
 _ = require("lodash")
 config = require("./config")
-crypto =  require('crypto')
+crypto = require('crypto')
 querystring = require('querystring')
 utils = exports
 
@@ -21,7 +21,7 @@ exports.getUserAgent = ()->
     "#{utils.userPlatform} #{utils.USER_AGENT}"
 
 DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
-exports.DEFAULT_POSTER_OPTIONS = { format: 'jpg', resource_type: 'video' }
+exports.DEFAULT_POSTER_OPTIONS = {format: 'jpg', resource_type: 'video'}
 exports.DEFAULT_VIDEO_SOURCE_TYPES = ['webm', 'mp4', 'ogv']
 
 
@@ -32,10 +32,10 @@ LAYER_KEYWORD_PARAMS =
   text_align: null
   stroke: "none"
 
-textStyle= (layer)->
+textStyle = (layer)->
   font_family = layer["font_family"]
-  font_size   = layer["font_size"]
-  keywords    = []
+  font_size = layer["font_size"]
+  keywords = []
   for attr, default_value of LAYER_KEYWORD_PARAMS
     attr_value = layer[attr] || default_value
     keywords.push(attr_value) unless attr_value == default_value
@@ -142,10 +142,10 @@ exports.build_array = (arg) ->
   if !arg?
     []
   else if _.isArray(arg)
-    arg 
-  else 
+    arg
+  else
     [arg]
-    
+
 exports.encode_double_array = (array) ->
   array = utils.build_array(array)
   if array.length > 0 and _.isArray(array[0])
@@ -155,7 +155,7 @@ exports.encode_double_array = (array) ->
 
 exports.encode_key_value = (arg) ->
   if _.isObject(arg)
-    pairs = for k, v of arg 
+    pairs = for k, v of arg
       "#{k}=#{v}"
     pairs.join("|")
   else
@@ -166,7 +166,7 @@ exports.build_eager = (transformations) ->
     transformation = _.clone(transformation)
     _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
   ).join("|")
-    
+
 exports.build_custom_headers = (headers) ->
   switch
     when !headers?
@@ -209,9 +209,9 @@ exports.generate_transformation_string = (options) ->
   named_transformation = []
   if _.filter(base_transformations, _.isObject).length > 0
     base_transformations = _.map(base_transformations, (base_transformation) ->
-      if _.isObject(base_transformation) 
+      if _.isObject(base_transformation)
         utils.generate_transformation_string(_.clone(base_transformation))
-      else 
+      else
         utils.generate_transformation_string(transformation: base_transformation)
     )
   else
@@ -229,14 +229,14 @@ exports.generate_transformation_string = (options) ->
   if _.isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
   else if /^\d+$/.exec(border) #fallback to html border attributes
-    options.border  = border
+    options.border = border
     border = undefined
 
   flags = utils.build_array(utils.option_consume(options, "flags")).join(".")
   dpr = utils.option_consume(options, "dpr", config().dpr)
 
   if options["offset"]?
-    [options["start_offset"], options["end_offset"]] = split_range( utils.option_consume(options, "offset"))
+    [options["start_offset"], options["end_offset"]] = split_range(utils.option_consume(options, "offset"))
 
   overlay = process_layer(utils.option_consume(options, "overlay"))
   underlay = process_layer(utils.option_consume(options, "underlay"))
@@ -284,10 +284,9 @@ exports.generate_transformation_string = (options) ->
   for param, short of simple_params
     params[short] = utils.option_consume(options, param)
 
-  params["vc"] = process_video_params( params["vc"]) if params["vc"]?
+  params["vc"] = process_video_params(params["vc"]) if params["vc"]?
   for range_value in ["so", "eo", "du"]
-    params[range_value] = norm_range_value( params[range_value]) if range_value of params
-
+    params[range_value] = norm_range_value(params[range_value]) if range_value of params
 
   params = _.sortBy([key, value] for key, value of params, (key, value) -> key)
   params.push [utils.option_consume(options, "raw_transformation")]
@@ -320,7 +319,7 @@ exports.updateable_resource_params = (options, params = {}) ->
   params
 
 exports.url = (public_id, options = {}) ->
-  type = utils.option_consume(options, "type",null )
+  type = utils.option_consume(options, "type", null)
   options.fetch_format ?= utils.option_consume(options, "format") if type is "fetch"
   transformation = utils.generate_transformation_string(options)
   resource_type = utils.option_consume(options, "resource_type", "image")
@@ -331,18 +330,16 @@ exports.url = (public_id, options = {}) ->
   private_cdn = utils.option_consume(options, "private_cdn", config().private_cdn)
   secure_distribution = utils.option_consume(options, "secure_distribution", config().secure_distribution)
   secure = utils.option_consume(options, "secure", null)
-  ssl_detected= utils.option_consume(options, "ssl_detected", config().ssl_detected)
-  secure = ssl_detected || config().secure if secure==null
-  
+  ssl_detected = utils.option_consume(options, "ssl_detected", config().ssl_detected)
+  secure = ssl_detected || config().secure if secure == null
   cdn_subdomain = utils.option_consume(options, "cdn_subdomain", config().cdn_subdomain)
   secure_cdn_subdomain = utils.option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain)
-
   cname = utils.option_consume(options, "cname", config().cname)
   shorten = utils.option_consume(options, "shorten", config().shorten)
   sign_url = utils.option_consume(options, "sign_url", config().sign_url)
   api_secret = utils.option_consume(options, "api_secret", config().api_secret)
   url_suffix = utils.option_consume(options, "url_suffix")
-  use_root_path = utils.option_consume(options, "use_root_path",config().use_root_path)
+  use_root_path = utils.option_consume(options, "use_root_path", config().use_root_path)
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
   if preloaded
@@ -359,34 +356,35 @@ exports.url = (public_id, options = {}) ->
   return original_source unless public_id?
   public_id = public_id.toString()
 
-  if type==null && public_id.match(/^https?:\//i)
-    return original_source 
+  if type == null && public_id.match(/^https?:\//i)
+    return original_source
 
   [ resource_type , type ] = finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten)
   [ public_id, source_to_sign ]= finalize_source(public_id, format, url_suffix)
 
 
-  version ?= 1 if source_to_sign.indexOf("/")>0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)
+  version ?= 1 if source_to_sign.indexOf("/") > 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)
   version = "v#{version}" if version?
 
   transformation = transformation.replace(/([^:])\/\//, '\\1\/')
   if sign_url
-    to_sign = [transformation, source_to_sign].filter((part) -> part? && part!='').join('/')
+    to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     shasum = crypto.createHash('sha1')
-    shasum.update(utf8_encode(to_sign+ api_secret))
-    signature = shasum.digest('base64').replace(/\//g,'_').replace(/\+/g,'-').substring(0, 8)
+    shasum.update(utf8_encode(to_sign + api_secret))
+    signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, 8)
     signature = "s--#{signature}--"
-    
+
 
   prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
-  url = [prefix, resource_type, type, signature, transformation, version, public_id].filter((part) -> part? && part!='').join('/')
+  url = [prefix, resource_type, type, signature, transformation, version,
+    public_id].filter((part) -> part? && part != '').join('/')
   url
 
 exports.video_url = (public_id, options) ->
-  options = _.extend({ resource_type: 'video' }, options)
+  options = _.extend({resource_type: 'video'}, options)
   utils.url(public_id, options)
 
-finalize_source = (source,format,url_suffix) ->
+finalize_source = (source, format, url_suffix) ->
   source = source.replace(/([^:])\/\//, '\\1\/')
   if source.match(/^https?:\//i)
     source = smart_escape(source)
@@ -396,37 +394,37 @@ finalize_source = (source,format,url_suffix) ->
     source_to_sign = source
     if !!url_suffix
       throw new Error('url_suffix should not include . or /') if url_suffix.match(/[\.\/]/)
-      source = source+'/'+url_suffix
+      source = source + '/' + url_suffix
     if format?
-      source = source+'.'+format
-      source_to_sign = source_to_sign+'.'+format
-  [source,source_to_sign]
+      source = source + '.' + format
+      source_to_sign = source_to_sign + '.' + format
+  [source, source_to_sign]
 
 exports.video_thumbnail_url = (public_id, options) ->
   options = _.extend({}, exports.DEFAULT_POSTER_OPTIONS, options)
   utils.url(public_id, options)
 
-finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) ->
+finalize_resource_type = (resource_type, type, url_suffix, use_root_path, shorten) ->
   type?='upload'
   if url_suffix?
-    if resource_type=='image' && type=='upload'
+    if resource_type == 'image' && type == 'upload'
       resource_type = "images"
       type = null
-    else if resource_type== 'raw' && type== 'upload'
+    else if resource_type == 'raw' && type == 'upload'
       resource_type = 'files'
       type = null
     else
       throw new Error("URL Suffix only supported for image/upload and raw/upload")
   if use_root_path
-    if (resource_type== 'image' && type== 'upload') || (resource_type== 'images' && !type?)
+    if (resource_type == 'image' && type == 'upload') || (resource_type == 'images' && !type?)
       resource_type = null
       type = null
     else
       throw new Error("Root path only supported for image/upload")
-  if shorten && resource_type== 'image' && type== 'upload'
+  if shorten && resource_type == 'image' && type == 'upload'
     resource_type = 'iu'
     type = null
-  [resource_type,type]
+  [resource_type, type]
 
 # cdn_subdomain and secure_cdn_subdomain
 # 1) Customers in shared distribution (e.g. res.cloudinary.com)
@@ -437,39 +435,37 @@ finalize_resource_type = (resource_type,type,url_suffix,use_root_path,shorten) -
 # 3) Customers with cname
 #   if cdn_domain is true uses a[1-5].cname for http. For https, uses the same naming scheme as 1 for shared distribution and as 2 for private distribution.
 #
-unsigned_url_prefix = (source,cloud_name,private_cdn,cdn_subdomain,secure_cdn_subdomain,cname,secure,secure_distribution) ->
-  return '/res'+cloud_name if cloud_name.indexOf("/")==0
+unsigned_url_prefix = (source, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution) ->
+  return '/res' + cloud_name if cloud_name.indexOf("/") == 0
 
   shared_domain = !private_cdn
 
   if secure
-    if !secure_distribution? || secure_distribution ==  exports.OLD_AKAMAI_SHARED_CDN
-      secure_distribution = if private_cdn then cloud_name+"-res.cloudinary.com" else exports.SHARED_CDN
+    if !secure_distribution? || secure_distribution == exports.OLD_AKAMAI_SHARED_CDN
+      secure_distribution = if private_cdn then cloud_name + "-res.cloudinary.com" else exports.SHARED_CDN
     shared_domain ?= secure_distribution == exports.SHARED_CDN
     secure_cdn_subdomain = cdn_subdomain if !secure_cdn_subdomain? && shared_domain
 
     if secure_cdn_subdomain
-      secure_distribution = secure_distribution.replace('res.cloudinary.com','res-'+((crc32(source) % 5) + 1+'.cloudinary.com'))
+      secure_distribution = secure_distribution.replace('res.cloudinary.com', 'res-' + ((crc32(source) % 5) + 1 + '.cloudinary.com'))
 
-    prefix = 'https://'+secure_distribution
+    prefix = 'https://' + secure_distribution
   else if cname
-    subdomain = if cdn_subdomain then 'a'+((crc32(source)%5)+1)+'.' else ''
-    prefix = 'http://'+subdomain+cname
+    subdomain = if cdn_subdomain then 'a' + ((crc32(source) % 5) + 1) + '.' else ''
+    prefix = 'http://' + subdomain + cname
   else
-    cdn_part = if private_cdn then cloud_name+'-' else ''
-    subdomain_part = if cdn_subdomain then '-'+((crc32(source)%5)+1) else ''
-    host = [cdn_part,'res', subdomain_part, '.cloudinary.com'].join('')
-    prefix = 'http://'+host
+    cdn_part = if private_cdn then cloud_name + '-' else ''
+    subdomain_part = if cdn_subdomain then '-' + ((crc32(source) % 5) + 1) else ''
+    host = [cdn_part, 'res', subdomain_part, '.cloudinary.com'].join('')
+    prefix = 'http://' + host
 
-  prefix+= '/'+cloud_name if shared_domain
+  prefix += '/' + cloud_name if shared_domain
   prefix
 
 
-
-
-# Based on CGI::unescape. In addition does not escape / : 
+# Based on CGI::unescape. In addition does not escape / :
 smart_escape = (string)->
-  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/") 
+  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/")
 
 # http://kevin.vanzonneveld.net
 # +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
@@ -548,7 +544,8 @@ exports.random_public_id = ->
   crypto.randomBytes(12).toString('base64').replace(/[^a-z0-9]/g, "")
 
 exports.signed_preloaded_image = (result) ->
-  "#{result.resource_type}/upload/v#{result.version}/#{_.filter([result.public_id, result.format], utils.present).join(".")}##{result.signature}"
+  "#{result.resource_type}/upload/v#{result.version}/#{_.filter([result.public_id,
+    result.format], utils.present).join(".")}##{result.signature}"
 
 exports.api_sign_request = (params_to_sign, api_secret) ->
   to_sign = _.sortBy("#{k}=#{utils.build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
@@ -566,14 +563,12 @@ exports.merge = (hash1, hash2) ->
   result = {}
   result[k] = hash1[k] for k, v of hash1
   result[k] = hash2[k] for k, v of hash2
-  result 
+  result
 
 exports.sign_request = (params, options = {}) ->
   api_key = options.api_key ? config().api_key ? throw("Must supply api_key")
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
-
   params = exports.clear_blank(params)
-  
   params.signature = exports.api_sign_request(params, api_secret)
   params.api_key = api_key
 
@@ -583,7 +578,6 @@ exports.webhook_signature = (data, timestamp, options = {}) ->
   throw "Must supply data"  unless data
   throw "Must supply timestamp"  unless timestamp
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
-
   shasum = crypto.createHash('sha1')
   shasum.update(data + timestamp + api_secret)
   shasum.digest('hex')
@@ -598,11 +592,11 @@ exports.process_request_params = (params, options) ->
 
 exports.private_download_url = (public_id, format, options = {}) ->
   params = exports.sign_request({
-    timestamp: exports.timestamp(), 
-    public_id: public_id, 
-    format: format, 
+    timestamp: exports.timestamp(),
+    public_id: public_id,
+    format: format,
     type: options.type,
-    attachment: options.attachment, 
+    attachment: options.attachment,
     expires_at: options.expires_at
   }, options)
   exports.api_url("download", options) + "?" + querystring.stringify(params)
@@ -613,7 +607,7 @@ exports.private_download_url = (public_id, format, options = {}) ->
 ###
 exports.zip_download_url = (tag, options = {}) ->
   params = exports.sign_request({
-    timestamp: exports.timestamp(), 
+    timestamp: exports.timestamp(),
     tag: tag,
     transformation: utils.generate_transformation_string(options)
   }, options)
@@ -672,14 +666,14 @@ exports.html_attrs = (attrs) ->
   return pairs.join(" ")
 
 CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain']
-exports.cloudinary_js_config = ->  
+exports.cloudinary_js_config = ->
   params = {}
   for param in CLOUDINARY_JS_CONFIG_PARAMS
     value = config()[param]
     params[param] = value if value?
   "<script type='text/javascript'>\n" +
-      "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
-      "</script>\n"    
+    "$.cloudinary.config(" + JSON.stringify(params) + ");\n" +
+    "</script>\n"
 
 v1_result_adapter = (callback) ->
   if callback?
@@ -691,11 +685,11 @@ v1_result_adapter = (callback) ->
   else
     null
 
-v1_adapter = (name, num_pass_args, v1) -> 
+v1_adapter = (name, num_pass_args, v1) ->
   return (args...) ->
     pass_args = _.take(args, num_pass_args)
     options = args[num_pass_args]
-    callback = args[num_pass_args+1]
+    callback = args[num_pass_args + 1]
     if !callback? && _.isFunction(options)
       callback = options
       options = {}
@@ -708,9 +702,9 @@ exports.v1_adapters = (exports, v1, mapping) ->
     exports[name] = v1_adapter(name, num_pass_args, v1)
 
 exports.as_safe_bool = (value)->
-  return undefined if !value? 
-  value = 1 if value==true || value=='true' || value == '1'
-  value = 0 if value==false || value=='false' || value =='0'
+  return undefined if !value?
+  value = 1 if value == true || value == 'true' || value == '1'
+  value = 0 if value == false || value == 'false' || value == '0'
   return value
 
 number_pattern = "([0-9]*)\\.([0-9]+)|([0-9]+)"
@@ -725,7 +719,7 @@ offset_any_pattern_re = RegExp("(#{offset_any_pattern})\\.\\.(#{offset_any_patte
 split_range = (range) -> # :nodoc:
   switch range.constructor
     when String
-      range.split ".." if offset_any_pattern_re =~ range
+      range.split ".." if offset_any_pattern_re = ~range
     when Array
       [_.first(range), _.last(range)]
     else
@@ -739,8 +733,8 @@ split_range = (range) -> # :nodoc:
 norm_range_value = (value) -> # :nodoc:
   offset = String(value).match(RegExp("^#{offset_any_pattern}$"))
   if offset
-    modifier   = if offset[5] then 'p' else ''
-    value  = "#{offset[1] || offset[4]}#{modifier}"
+    modifier = if offset[5] then 'p' else ''
+    value = "#{offset[1] || offset[4]}#{modifier}"
   value
 
 ###*
@@ -775,9 +769,9 @@ process_video_params = (param) ->
 exports.archive_params = (options = {})->
   timestamp: (options.timestamp ? exports.timestamp())
   type: options.type
-  mode:  options.mode
-  target_format:  options.target_format
-  target_public_id:  options.target_public_id
+  mode: options.mode
+  target_format: options.target_format
+  target_public_id: options.target_public_id
   flatten_folders: exports.as_safe_bool(options.flatten_folders)
   flatten_transformations: exports.as_safe_bool(options.flatten_transformations)
   use_original_filename: exports.as_safe_bool(options.use_original_filename)
@@ -821,11 +815,11 @@ exports.generate_responsive_breakpoints_string = (breakpoints)->
 
   for breakpoint_settings in breakpoints
     if breakpoint_settings?
-      transformation =  breakpoint_settings.transformation
+      transformation = breakpoint_settings.transformation
       delete breakpoint_settings.transformation
       if transformation
         breakpoint_settings.transformation = utils.generate_transformation_string(_.clone(transformation))
-  JSON.stringify( breakpoints)
+  JSON.stringify(breakpoints)
 
 ###*
 # @private

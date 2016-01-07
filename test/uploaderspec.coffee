@@ -36,7 +36,6 @@ describe "uploader", ->
   beforeEach ->
     cloudinary.config(true)
 
-
   it "should successfully upload file", (done) ->
     upload_image (result) ->
       expect(result.width).to.eql(241)
@@ -138,9 +137,7 @@ describe "uploader", ->
       return done(new Error error.message) if error?
       done()
 
-
   describe "custom headers", ()->
-
     it "should support custom headers in object format e.g. {Link: \"1\"}", (done) ->
       cloudinary.v2.uploader.upload IMAGE_FILE, headers: {Link: "1"}, tags: TEST_TAG, (error, result) ->
         return done(new Error error.message) if error?
@@ -151,7 +148,7 @@ describe "uploader", ->
         return done(new Error error.message) if error?
         done()
 
-  it  "should successfully generate text image", (done) ->
+  it "should successfully generate text image", (done) ->
     cloudinary.v2.uploader.text "hello world", tags: TEST_TAG, (error, result) ->
       return done(new Error error.message) if error?
       expect(result.width).to.within(50,70)

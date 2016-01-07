@@ -23,9 +23,6 @@ describe "api", ->
       return element if element[attr] == value
     undefined
 
-  uploaded  = []
-  uploadedRaw = []
-
   ###*
   # Upload an image to be tested on.
   # @callback the callback recieves the public_id of the uploaded image
@@ -39,7 +36,6 @@ describe "api", ->
   before (done) ->
     @timeout 0
     @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
-    uploaded = []
 
     cloudinary.v2.api.delete_resources [PUBLIC_ID, "api_test1", "api_test2"], (error, result)->
       Q.all [
@@ -52,18 +48,6 @@ describe "api", ->
         cloudinary.v2.api.delete_upload_preset("api_test_upload_preset4")]
       .finally ->
         done()
-
-#  after (done) ->
-#    @timeout helper.TIMEOUT_LONG
-#    operations = []
-#    operations.push cloudinary.v2.api.delete_resources_by_tag @timestamp_tag, keep_original: false
-#    unless _.isEmpty(uploaded)
-#      operations.push cloudinary.v2.api.delete_resources uploaded
-#    unless _.isEmpty(uploadedRaw)
-#      operations.push cloudinary.v2.api.delete_resources uploadedRaw, resource_type: "raw"
-#    Q.allSettled(operations)
-#    .finally ()->
-#      done()
 
   describe "resources", ()->
     it "should allow listing resource_types", (done) ->
@@ -198,7 +182,6 @@ describe "api", ->
               expect(resource.derived).to.have.length(0)
               done()
 
-
     it "should allow deleting resources", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test3", (error, r) ->
@@ -237,7 +220,6 @@ describe "api", ->
               expect(error).to.be.an(Object)
               expect(error.http_code).to.eql 404
               done()
-
 
   describe "tags", ()->
     it "should allow listing tags", (done) ->
@@ -371,7 +353,6 @@ describe "api", ->
           cloudinary.v2.api.delete_upload_preset name, ->
             done()
 
-
     it "should allow deleting upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.create_upload_preset name: "api_test_upload_preset4", folder: "folder", (error, preset) ->
@@ -380,7 +361,6 @@ describe "api", ->
             cloudinary.v2.api.upload_preset "api_test_upload_preset4", (error, result) ->
               expect(error.message).to.contain "Can't find"
               done()
-
 
     it "should allow updating upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -394,8 +374,6 @@ describe "api", ->
               expect(preset.settings).to.eql(folder: "folder", colors: true, disallow_public_id: true)
               cloudinary.v2.api.delete_upload_preset name, ->
                 done()
-
-
 
   it "should support the usage API call", (done) ->
     @timeout helper.TIMEOUT_MEDIUM
@@ -484,7 +462,6 @@ describe "api", ->
           expect(error.message).to.contain "Must use"
           done()
 
-
   it "should support listing by moderation kind and value", (done) ->
     @timeout helper.TIMEOUT_MEDIUM
     ids = []
@@ -518,7 +495,7 @@ describe "api", ->
       if ids.length == 3
         cloudinary.v2.api.update ids[0], moderation_status: "approved", after_update
         cloudinary.v2.api.update ids[1], moderation_status: "rejected", after_update
-        
+
     cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", after_upload)
     cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", after_upload)
     cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", after_upload)
@@ -573,7 +550,7 @@ describe "api", ->
               expect(resource["placeholder"]).to.eql(true)
               done()
 
-    it 'should restore a deleted resource' , (done)->
+    it 'should restore a deleted resource', (done)->
       cloudinary.v2.api.restore "api_test_restore", (error, response)->
         info = response["api_test_restore"]
         expect(info).not.to.be(null)
@@ -585,7 +562,7 @@ describe "api", ->
 
 
   describe 'mapping', ->
-    mapping = "api_test_upload_mapping#{Math.floor(Math.random() *100000)}"
+    mapping = "api_test_upload_mapping#{Math.floor(Math.random() * 100000)}"
     deleteMapping = false
     after (done)->
       if(deleteMapping)
@@ -609,11 +586,11 @@ describe "api", ->
               expect(result["template"]).to.eql("http://res.cloudinary.com")
               cloudinary.v2.api.upload_mappings (error, result)->
                 return done(new Error error.message) if error?
-                expect(_.find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com" })).to.be.ok()
+                expect(_.find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com"})).to.be.ok()
                 cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
                   return done(new Error error.message) if error?
                   deleteMapping = false
-                  cloudinary.v2.api.upload_mappings  (error, result)->
+                  cloudinary.v2.api.upload_mappings (error, result)->
                     return done(new Error error.message) if error?
                     expect(_.find(result["mappings"], _.matchesProperty('folder', mapping))).not.to.be.ok()
                     done()

@@ -64,7 +64,6 @@ class sharedExamples
         return ->
           console.log("Shared example #{name} was not found!")
 
-
 exports.sharedExamples = exports.sharedContext = sharedExamples
 
 exports.itBehavesLike = (name, args...)->

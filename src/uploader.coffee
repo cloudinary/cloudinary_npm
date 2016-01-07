@@ -15,24 +15,24 @@ Writable = require("stream").Writable
 build_upload_params = (options) ->
   utils.build_upload_params(options)
 
-exports.unsigned_upload_stream = (upload_preset, callback, options={}) ->
+exports.unsigned_upload_stream = (upload_preset, callback, options = {}) ->
   exports.upload_stream(callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
- 
-exports.upload_stream = (callback, options={}) ->
+
+exports.upload_stream = (callback, options = {}) ->
   exports.upload(null, callback, _.extend({stream: true}, options))
 
-exports.unsigned_upload = (file, upload_preset, callback, options={}) ->
+exports.unsigned_upload = (file, upload_preset, callback, options = {}) ->
   exports.upload(file, callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
 
-exports.upload = (file, callback, options={}) ->
+exports.upload = (file, callback, options = {}) ->
   call_api "upload", callback, options, ->
     params = build_upload_params(options)
     if file? && file.match(/^ftp:|^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)
       [params, file: file]
-    else 
+    else
       [params, {}, file]
 
-exports.upload_large = (path, callback, options={}) ->
+exports.upload_large = (path, callback, options = {}) ->
   exports.upload_chunked(path, callback, _.extend({resource_type: 'raw'}, options))
 
 exports.upload_chunked = (path, callback, options) ->
@@ -62,11 +62,11 @@ class Chunkable extends Writable
           @buffer = data.slice(grab)
           done()
 
-exports.upload_large_stream = (_unused_, callback, options={}) ->
+exports.upload_large_stream = (_unused_, callback, options = {}) ->
   exports.upload_chunked_stream(callback, _.extend({resource_type: 'raw'}, options))
 
-exports.upload_chunked_stream = (callback, options={}) ->
-  options =  _.extend({}, options, stream: true)  
+exports.upload_chunked_stream = (callback, options = {}) ->
+  options = _.extend({}, options, stream: true)
   options.x_unique_upload_id = utils.random_public_id()
   params = build_upload_params(options)
 
@@ -78,7 +78,7 @@ exports.upload_chunked_stream = (callback, options={}) ->
     chunk_start = sent
     sent += buffer.length
     options.content_range = util.format("bytes %d-%d/%d", chunk_start, sent - 1, if is_last then sent else -1)
-    finished_part = (result) -> 
+    finished_part = (result) ->
       if result.error? || is_last
         callback?(result)
         done(false)
@@ -90,52 +90,79 @@ exports.upload_chunked_stream = (callback, options={}) ->
 
   return chunker
 
-exports.explicit = (public_id, callback, options={}) ->
+exports.explicit = (public_id, callback, options = {}) ->
   call_api "explicit", callback, options, ->
     utils.build_explicit_api_params(public_id, options)
 
 
 # Creates a new archive in the server and returns information in JSON format
-exports.create_archive = (callback, options={}, target_format = null)->
+exports.create_archive = (callback, options = {}, target_format = null)->
   call_api "generate_archive", callback, options, ->
-    opt               = utils.archive_params(options)
+    opt = utils.archive_params(options)
     opt.target_format = target_format if target_format
     [opt]
 
 # Creates a new zip archive in the server and returns information in JSON format
-exports.create_zip = (callback, options={})->
+exports.create_zip = (callback, options = {})->
   exports.create_archive(callback, options, "zip")
 
-exports.destroy = (public_id, callback, options={}) ->
+exports.destroy = (public_id, callback, options = {}) ->
   call_api "destroy", callback, options, ->
-    return [timestamp: utils.timestamp(), type: options.type, invalidate: options.invalidate,public_id:  public_id]
+    return [timestamp: utils.timestamp(), type: options.type, invalidate: options.invalidate, public_id: public_id]
 
-exports.rename = (from_public_id, to_public_id, callback, options={}) ->
+exports.rename = (from_public_id, to_public_id, callback, options = {}) ->
   call_api "rename", callback, options, ->
-    return [timestamp: utils.timestamp(), type: options.type, from_public_id: from_public_id, to_public_id: to_public_id, overwrite: options.overwrite, invalidate: options.invalidate]
+    return [
+      timestamp: utils.timestamp(),
+      type: options.type,
+      from_public_id: from_public_id,
+      to_public_id: to_public_id,
+      overwrite: options.overwrite,
+      invalidate: options.invalidate]
 
-TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style", "background", "opacity", "text_decoration"]
-exports.text = (text, callback, options={}) ->
+TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style",
+  "background", "opacity", "text_decoration"]
+exports.text = (text, callback, options = {}) ->
   call_api "text", callback, options, ->
     params = {timestamp: utils.timestamp(), text: text}
     for k in TEXT_PARAMS when options[k]?
       params[k] = options[k]
     [params]
-  
-exports.generate_sprite = (tag, callback, options={}) ->
+
+exports.generate_sprite = (tag, callback, options = {}) ->
   call_api "sprite", callback, options, ->
     transformation = utils.generate_transformation_string(_.extend({}, options, fetch_format: options.format))
-    return [{timestamp: utils.timestamp(), tag: tag, transformation: transformation, async: options.async, notification_url: options.notification_url}]
+    return [{
+      timestamp: utils.timestamp(),
+      tag: tag,
+      transformation: transformation,
+      async: options.async,
+      notification_url: options.notification_url
+    }]
 
-exports.multi = (tag, callback, options={}) ->
+exports.multi = (tag, callback, options = {}) ->
   call_api "multi", callback, options, ->
     transformation = utils.generate_transformation_string(_.extend({}, options))
-    return [{timestamp: utils.timestamp(), tag: tag, transformation: transformation, format: options.format, async: options.async, notification_url: options.notification_url}]
+    return [{
+      timestamp: utils.timestamp(),
+      tag: tag,
+      transformation: transformation,
+      format: options.format,
+      async: options.async,
+      notification_url: options.notification_url
+    }]
 
-exports.explode = (public_id, callback, options={}) ->
+exports.explode = (public_id, callback, options = {}) ->
   call_api "explode", callback, options, ->
     transformation = utils.generate_transformation_string(_.extend({}, options))
-    return [{timestamp: utils.timestamp(), public_id: public_id, transformation: transformation, format: options.format, type: options.type, notification_url: options.notification_url}]
+    return [{
+      timestamp: utils.timestamp(),
+      public_id: public_id,
+      transformation: transformation,
+      format: options.format,
+      type: options.type,
+      notification_url: options.notification_url
+    }]
 
 # options may include 'exclusive' (boolean) which causes clearing this tag from all other resources 
 exports.add_tag = (tag, public_ids = [], callback, options = {}) ->
@@ -151,30 +178,36 @@ exports.replace_tag = (tag, public_ids = [], callback, options = {}) ->
 
 call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
   call_api "tags", callback, options, ->
-    return [{timestamp: utils.timestamp(), tag: tag, public_ids:  utils.build_array(public_ids), command:  command, type: options.type}]
-   
+    return [{
+      timestamp: utils.timestamp(),
+      tag: tag,
+      public_ids: utils.build_array(public_ids),
+      command: command,
+      type: options.type
+    }]
+
 call_api = (action, callback, options, get_params) ->
   deferred = Q.defer()
   options ?= {}
 
   [params, unsigned_params, file] = get_params.call()
-  
+
   params = utils.process_request_params(params, options)
   params = _.extend(params, unsigned_params)
 
   api_url = utils.api_url(action, options)
-  
+
   boundary = utils.random_public_id()
 
   error = false
   handle_response = (res) ->
     if error
-      # Already reported
+# Already reported
     else if res.error
       error = true
       deferred.reject(res)
       callback?(res)
-    else if _.includes([200,400,401,404,420,500], res.statusCode)
+    else if _.includes([200, 400, 401, 404, 420, 500], res.statusCode)
       buffer = ""
       res.on "data", (d) -> buffer += d
       res.on "end", ->
@@ -194,23 +227,24 @@ call_api = (action, callback, options, get_params) ->
         deferred.reject(e)
         callback?(error: e)
     else
-      error_obj = error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
+      error_obj =
+        error: {message: "Server returned unexpected status code - #{res.statusCode}", http_code: res.statusCode}
       deferred.reject(error_obj.error)
       callback?(error_obj)
   post_data = []
-  for key, value of params 
+  for key, value of params
     if _.isArray(value)
-      for v in value 
-        post_data.push new Buffer(EncodeFieldPart(boundary, key+"[]", v), 'utf8')
+      for v in value
+        post_data.push new Buffer(EncodeFieldPart(boundary, key + "[]", v), 'utf8')
     else if utils.present(value)
-      post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'utf8') 
+      post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'utf8')
 
   result = post api_url, post_data, boundary, file, handle_response, options
   if _.isObject(result)
     return result
   else
     return deferred.promise
-  
+
 post = (url, post_data, boundary, file, callback, options) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
   if file? || options.stream
@@ -218,9 +252,9 @@ post = (url, post_data, boundary, file, callback, options) ->
     file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary')
 
   post_options = require('url').parse(url)
-  headers = 
-      'Content-Type': 'multipart/form-data; boundary=' + boundary
-      'User-Agent': utils.getUserAgent()
+  headers =
+    'Content-Type': 'multipart/form-data; boundary=' + boundary
+    'User-Agent': utils.getUserAgent()
   headers['Content-Range'] = options.content_range if options.content_range?
   headers['X-Unique-Upload-Id'] = options.x_unique_upload_id if options.x_unique_upload_id?
   post_options = _.extend post_options,
@@ -231,32 +265,32 @@ post = (url, post_data, boundary, file, callback, options) ->
   upload_stream = new UploadStream({boundary: boundary})
   upload_stream.pipe(post_request)
   timeout = false
-  post_request.on "error", (e) -> 
+  post_request.on "error", (e) ->
     if timeout
       callback(error: {message: "Request Timeout", http_code: 499})
     else
       callback(error: e)
-  post_request.setTimeout options.timeout ? 60000, -> 
+  post_request.setTimeout options.timeout ? 60000, ->
     timeout = true
     post_request.abort()
 
-  for i in [0..post_data.length-1]
+  for i in [0..post_data.length - 1]
     post_request.write(post_data[i])
- 
+
   if options.stream
     post_request.write(file_header)
     return upload_stream
   else if file?
     post_request.write(file_header)
     fs.createReadStream(file)
-      .on('error', (error)->
-        callback(error: error)
-        post_request.abort()
-      ).pipe(upload_stream)
+    .on('error', (error)->
+      callback(error: error)
+      post_request.abort()
+    ).pipe(upload_stream)
   else
     post_request.write(finish_buffer)
     post_request.end()
-    
+
   true
 
 EncodeFieldPart = (boundary, name, value) ->
@@ -265,40 +299,40 @@ EncodeFieldPart = (boundary, name, value) ->
   return_part += value + "\r\n"
   return_part
 
-EncodeFilePart = (boundary,type,name,filename) ->
+EncodeFilePart = (boundary, type, name, filename) ->
   return_part = "--#{boundary}\r\n"
   return_part += "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\"\r\n"
   return_part += "Content-Type: #{type}\r\n\r\n"
   return_part
 
-exports.direct_upload = (callback_url, options={}) ->
+exports.direct_upload = (callback_url, options = {}) ->
   params = build_upload_params(_.extend({callback: callback_url}, options))
   params = utils.process_request_params(params, options)
   api_url = utils.api_url("upload", options)
 
   return hidden_fields: params, form_attrs: {action: api_url, method: "POST", enctype: "multipart/form-data"}
 
-exports.upload_tag_params = (options={}) ->
+exports.upload_tag_params = (options = {}) ->
   params = build_upload_params(options)
   params = utils.process_request_params(params, options)
   JSON.stringify(params)
-  
-exports.upload_url = (options={}) ->
+
+exports.upload_url = (options = {}) ->
   options.resource_type ?= "auto"
   utils.api_url("upload", options)
 
-exports.image_upload_tag = (field, options={}) ->
+exports.image_upload_tag = (field, options = {}) ->
   html_options = options.html ? {}
 
   tag_options = _.extend(html_options, {
-      type: "file", 
-      name: "file",
-      "data-url": exports.upload_url(options),
-      "data-form-data": exports.upload_tag_params(options),
-      "data-cloudinary-field": field,
-      "class": [html_options["class"], "cloudinary-fileupload"].join(" ") 
+    type: "file",
+    name: "file",
+    "data-url": exports.upload_url(options),
+    "data-form-data": exports.upload_tag_params(options),
+    "data-cloudinary-field": field,
+    "class": [html_options["class"], "cloudinary-fileupload"].join(" ")
   })
   return '<input ' + utils.html_attrs(tag_options) + '/>'
 
-exports.unsigned_image_upload_tag = (field, upload_preset, options={}) ->
+exports.unsigned_image_upload_tag = (field, upload_preset, options = {}) ->
   exports.image_upload_tag(field, utils.merge(options, unsigned: true, upload_preset: upload_preset))
