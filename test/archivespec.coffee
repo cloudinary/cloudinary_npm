@@ -64,7 +64,7 @@ describe "utils", ->
       utils.download_zip_url
           target_public_id:  'gem_archive_test'
           public_ids:  ["tag_sample", "tag_samplebw"]
-          tags:  ARCHIVE_TAG
+          target_tags:  ARCHIVE_TAG
     describe 'public_ids', ->
       it 'should generate a valid url', ->
         expect(archive_result).not.to.be.empty()
@@ -98,7 +98,7 @@ describe "uploader", ->
       uploader.create_archive(
             target_public_id:  'gem_archive_test'
             public_ids:  ["tag_sample", "tag_samplebw"]
-            tags:  ARCHIVE_TAG
+            target_tags:  [TEST_TAG, ARCHIVE_TAG]
             mode: 'create'
           ,
           (error, result)->
