@@ -1,4 +1,31 @@
 
+1.3.0 / 2016-01-08
+==================
+
+New functionality
+-----------------
+
+  * Add Archive functionality
+  * Add responsive breakpoints.
+  * Add structured text layers
+  * Add upload mapping API
+  * Add Restore API
+  * Add new USER_AGENT format - CloudinaryNodeJS/ver
+  * Add Support for `aspect_ratio` transformation parameter
+  * Add invalidate to explicit. Encode public_ids array with `[]` in URL. Replace cleanup code with TEST_TAG.
+  * Add "invalidate" flag to rename
+  * Add support invalidate=>true in explicit for social resources
+  * Support uploading large files using the new Content-Range based upload API.
+
+Other changes
+-------------
+  * Use `target_tags` instead of `tags` in tests.
+  * Utilize spechelper
+  * Add license to package, add Sinon.JS, update mocha
+  * Increase timeout in tests.
+  * Merge pull request #77 from joneslee85/consolidate-test-runner
+  * get rid of Cakefile
+
 1.2.6 / 2015-11-19
 ==================
 
@@ -9,7 +36,7 @@
 
   * Add timeout to test. Compiled CoffeeScript and whitespace changes
   * Add dev dependency on `coffee-script`
-  * Updated upload_large_stream to return a stream and let the caller control the piping to it, similar to upload_stream.
+  * Updated upload_large_stream tols return a stream and let the caller control the piping to it, similar to upload_stream.
   * fixes #65 - upload_large using chunk_size is corrupting data - also adds the very useful upload_large_stream function. upload_large tests now verify data integrity.
   * Add bower to the photo_album sample project.
   * Add CHANGELOG.md
