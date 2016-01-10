@@ -16,10 +16,9 @@
     "ejs": "^1.0.0",
     "ejs-locals": "^1.0.2",
     "express": "^4.7.2",
-    "jugglingdb": "^0.2.14",
-    "jugglingdb-mongodb": "0.0.4-4",
-    "method-override": "^2.1.2",
-    "promised-jugglingdb": "^0.2.15"
+    "jugglingdb": "^1.0.1",
+    "jugglingdb-mongodb": "^0.1.1",
+    "method-override": "^2.1.2"
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",

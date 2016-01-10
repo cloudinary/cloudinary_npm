@@ -1,4 +1,4 @@
-var Schema = require('promised-jugglingdb').Schema;
+var Schema = require('jugglingdb').Schema;
 var schema = new Schema('memory');
 // Uncomment if you want to use mongodb adapter
 // var schema = new Schema('mongodb');
