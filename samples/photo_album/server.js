@@ -24,8 +24,9 @@ app.use( bodyParser.urlencoded({extended: false}) );
 app.use( methodOverride() );
 
 
-app.set('views', path.normalize(__dirname)+ '/views/');
-app.use(express.static(path.normalize(__dirname) + '/public'));
+app.use(express.static(path.join(__dirname, '/public')));
+app.set('views', path.join(__dirname, '/views/'));
+app.use('/bower_components', express.static(path.join(__dirname, '/bower_components')));
 app.engine('ejs', engine);
 app.set('view engine','ejs');
 

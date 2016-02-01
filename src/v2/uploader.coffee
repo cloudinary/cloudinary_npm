@@ -8,6 +8,8 @@ utils.v1_adapters exports, uploader,
   upload: 1,
   upload_large_part: 0,
   upload_large: 1,
+  upload_chunked: 1,
+  upload_chunked_stream: 0,
   explicit: 1,
   destroy: 1,
   rename: 2,
@@ -17,7 +19,9 @@ utils.v1_adapters exports, uploader,
   explode: 1,
   add_tag: 2,
   remove_tag: 2,
-  replace_tag: 2
+  replace_tag: 2,
+  create_archive: 0,
+  create_zip: 0
 
 exports.direct_upload = uploader.direct_upload
 exports.upload_tag_params = uploader.upload_tag_params

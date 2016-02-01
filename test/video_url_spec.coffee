@@ -71,10 +71,10 @@ describe "Cloudinary::Utils for video", ->
 
     describe ":offset", ->
       params = [
-        ['string range', 'so_2.66,eo_3.21', '2.66..3.21'],
-        ['array', 'so_2.66,eo_3.21', [2.66, 3.21]],
-        ['array of % strings', 'so_35p,eo_70p', ["35%", "70%"]],
-        ['array of p strings', 'so_35p,eo_70p', ["35p", "70p"]],
+        ['string range',           'so_2.66,eo_3.21',   '2.66..3.21'],
+        ['array',                  'so_2.66,eo_3.21',   [2.66, 3.21]],
+        ['array of % strings',     'so_35p,eo_70p',     ["35%", "70%"]],
+        ['array of p strings',     'so_35p,eo_70p',     ["35p", "70p"]],
         ['array of float percent', 'so_35.5p,eo_70.5p', ["35.5p", "70.5p"]]
       ]
       for test in params

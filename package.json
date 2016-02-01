@@ -2,8 +2,9 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
-  "version": "1.2.4",
+  "version": "1.3.0",
   "homepage": "http://cloudinary.com",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/cloudinary/cloudinary_npm.git"
@@ -11,14 +12,14 @@
   "main": "cloudinary.js",
   "dependencies": {
     "q": "1.4.x",
-    "lodash": "3.10.x",
-	"chunking-streams": "0.0.8"
+    "lodash": "3.10.x"
   },
   "devDependencies": {
-    "coffee-script": "1.9.x",
+    "coffee-script": "^1.10.0",
     "dotenv": "1.x",
     "expect.js": "0.3.x",
-    "mocha": "2.2.x"
+    "mocha": "2.3.x",
+    "sinon": "^1.17.2"
   },
   "scripts": {
     "pretest": "npm run compile",
