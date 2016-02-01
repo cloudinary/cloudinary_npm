@@ -207,7 +207,7 @@ exports.generate_transformation_string = (options) ->
   color = color and color.replace(/^#/, "rgb:")
   base_transformations = utils.build_array(utils.option_consume(options, "transformation", []))
   named_transformation = []
-  if _.filter(base_transformations, _.isObject).length > 0
+  if base_transformations.length != 0 and _.filter(base_transformations, _.isObject).length > 0
     base_transformations = _.map(base_transformations, (base_transformation) ->
       if _.isObject(base_transformation)
         utils.generate_transformation_string(_.clone(base_transformation))
@@ -288,9 +288,17 @@ exports.generate_transformation_string = (options) ->
   for range_value in ["so", "eo", "du"]
     params[range_value] = norm_range_value(params[range_value]) if range_value of params
 
-  params = _.sortBy([key, value] for key, value of params, (key, value) -> key)
-  params.push [utils.option_consume(options, "raw_transformation")]
-  transformations = (param.join("_") for param in params when utils.present(_.last(param))).join(",")
+  sortedParams = []
+  keys = Object.keys(params)
+  keys.sort()
+  keys.push 'raw_transformation'
+  params['raw_transformation'] = utils.option_consume(options, 'raw_transformation')
+  keys.forEach (key) ->
+    if utils.present(params[key])
+      sortedParams.push key + '_' + params[key]
+    return
+  transformations = sortedParams.join(',')
+  
   base_transformations.push transformations
   transformations = base_transformations
   if responsive_width
