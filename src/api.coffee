@@ -30,7 +30,7 @@ call_api = (method, uri, params, callback, options) ->
   request_options.headers['Content-Length'] = Buffer.byteLength(query_params) unless method == "get"
 
   handle_response = (res) ->
-    if _.include([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)
+    if _.includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)
       buffer = ""
       error = false
       res.on "data", (d) -> buffer += d
