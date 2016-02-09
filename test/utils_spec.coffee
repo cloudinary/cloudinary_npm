@@ -197,6 +197,7 @@ describe "utils", ->
     layers_options= [
     # [name,                    options,                                          result]
       ["string",                "text:hello",                                     "text:hello"],
+      ["string",                "folder/logo",                                    "folder:logo"],
       ["public_id",             { "public_id": "logo" },                          "logo"],
       ["public_id with folder", { "public_id": "folder/logo" },                   "folder:logo"],
       ["private",               { "public_id": "logo", "type": "private" },       "private:logo"],
