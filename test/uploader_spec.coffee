@@ -112,13 +112,13 @@ describe "uploader", ->
 
   it "should successfully call explicit api", (done) ->
     current = this
-    cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], (error, result) ->
+    cloudinary.v2.uploader.explicit "sample", type: "upload", eager: [crop: "scale", width: "2.0"], (error, result) ->
       unless error?
-        url = cloudinary.utils.url "cloudinary",
-          type: "twitter_name",
+        url = cloudinary.utils.url "sample",
+          type: "upload",
           crop: "scale",
           width: "2.0",
-          format: "png",
+          format: "jpg",
           version: result["version"]
         expect(result.eager[0].url).to.eql(url)
         done()
