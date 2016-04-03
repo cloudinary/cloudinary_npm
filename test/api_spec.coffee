@@ -142,7 +142,9 @@ describe "api", ->
         start_at = new Date()
         setTimeout ->
           cloudinary.v2.uploader.upload IMAGE_FILE, (error, response) ->
+            done(new Error error.message) if error?
             cloudinary.v2.api.resources type: "upload", start_at: start_at, direction: "asc", (error, resources_response) ->
+              done(new Error error.message) if error?
               expect(resources_response.resources).to.have.length(1)
               expect(resources_response.resources[0].public_id).to.eql(response.public_id)
               done()
