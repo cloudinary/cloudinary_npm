@@ -76,10 +76,10 @@ textStyle = (layer)->
 # @private
 process_if = (ifValue)->
   if ifValue
-    replaceRE = new RegExp("(" + Object.keys(Condition.PARAMETERS).join("|") + "|[=<>&|!]+)", "g")
+    replaceRE = new RegExp("(" + Object.keys(CONDITIONAL_PARAMETERS).join("|") + "|[=<>&|!]+)", "g")
     ifValue = ifValue.replace replaceRE, (match)->
-      Condition.OPERATORS[match] || Condition.PARAMETERS[match]
-    ifValue.replace(/[ _]+/g,'_')
+      CONDITIONAL_OPERATORS[match] || CONDITIONAL_PARAMETERS[match]
+    ifValue = ifValue.replace(/[ _]+/g,'_')
 
     ifValue = "if_" + ifValue
 

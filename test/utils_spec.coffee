@@ -444,3 +444,68 @@ describe "utils", ->
 
     cloudinary.config(orig)
 
+  describe 'Conditional Transformation', ->
+    configBck = null
+    before ->
+      configBck = cloudinary.config()
+      cloudinary.config({cloud_name: 'test123', api_key : "1234", api_secret: "b"})
+    after ->
+      cloudinary.config(configBck)
+
+    describe 'with literal condition string', ->
+      it "should include the if parameter as the first component in the transformation string", ->
+        url = utils.url("sample", { if: "w_lt_200", crop: "fill", height: 120, width: 80} )
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample")
+        url = utils.url("sample", { crop: "fill", height: 120, if: "w_lt_200", width: 80} )
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample")
+
+      it "should allow multiple conditions when chaining transformations ", ->
+        url = utils.url("sample", transformation: [{if: "w_lt_200",crop: "fill",height: 120, width: 80},
+          {if: "w_gt_400",crop: "fit",width: 150,height: 150},
+          {effect: "sepia"}])
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_w_gt_400,c_fit,h_150,w_150/e_sepia/sample")
+      describe "including spaces and operators", ->
+        it "should translate operators", ->
+          url = utils.url("sample", { if: "w < 200", crop: "fill", height: 120, width: 80} )
+          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample")
+
+    describe 'if end', ->
+      it "should include the if_end as the last parameter in its component", ->
+        url = utils.url("sample", transformation: [{if: "w_lt_200"},
+          {crop: "fill", height: 120, width: 80,effect: "sharpen"},
+          {effect: "brightness:50"},
+          {effect: "shadow",color: "red"},
+          { if: "end"}])
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200/c_fill,e_sharpen,h_120,w_80/e_brightness:50/co_red,e_shadow/if_end/sample")
+      it "should support if_else with transformation parameters", ->
+        url = utils.url("sample", transformation: [{if: "w_lt_200",crop: "fill",height: 120,width: 80},
+          {if: "else",crop: "fill",height: 90, width: 100}])
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_else,c_fill,h_90,w_100/sample")
+      it "if_else should be without any transformation parameters", ->
+        url = utils.url("sample", transformation: [
+          {if: "aspect_ratio_lt_0.7"},
+          {crop: "fill",height: 120,width: 80},
+          {if: "else"},
+          {crop: "fill",height: 90,width: 100}])
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_ar_lt_0.7/c_fill,h_120,w_80/if_else/c_fill,h_90,w_100/sample")
+
+    describe 'chaining conditions', ->
+
+
+      it "should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", ->
+
+        allOperators =
+          'if_'           +
+            'w_eq_0_and'    +
+            '_h_ne_0_or'    +
+            '_ar_lt_0_and'   +
+            '_pc_gt_0_and'   +
+            '_fc_lte_0_and'  +
+            '_w_gte_0'      +
+            ',e_grayscale'
+
+
+        expect(utils.url("sample", 
+          "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
+          "effect": "grayscale",
+        )).to.match(new RegExp(allOperators))
