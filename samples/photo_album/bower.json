@@ -17,6 +17,6 @@
     "tests"
   ],
   "dependencies": {
-    "cloudinary": "~1.0.19"
+    "cloudinary-jquery-file-upload": "^2.0.1"
   }
 }
