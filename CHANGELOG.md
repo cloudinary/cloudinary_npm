@@ -1,4 +1,30 @@
 
+1.3.1 / 2016-04-04
+==================
+
+New functionality
+-----------------
+
+  * Conditional transformations
+
+Other changes
+-------------
+
+  * Add error handling to test
+  * Fix categorization test
+  * Update sample project to use the new cloudinary_js library.
+  * Change explicit test to simple eager instead of twitter
+  * Add `*.js` and `*.map` to gitignore.
+  * Merge pull request #87 from bompus/util-speedup-2
+    * optimized speed of generate_transformation_string, removed js/map files.
+    * optimized speed of generate_transformation_string
+  * Replace `_.include` with `_.includes` - It was removed in lodash 4.0. PR #83
+  * Merge pull request #1 from cloudinary/master
+  * Merge pull request #76 from joneslee85/renaming-tests
+    * Use snakecase naming for spec files
+  * Fix dependency of sample projects on cloudinary. Fixes #80.
+  * Remove `promised-jugglingdb` - it has been deprecated. Fixes #81.
+
 1.3.0 / 2016-01-08
 ==================
 

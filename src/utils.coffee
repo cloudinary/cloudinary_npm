@@ -9,7 +9,7 @@ exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN
 
-exports.VERSION = "1.3.0"
+exports.VERSION = "1.3.1"
 exports.USER_AGENT = "CloudinaryNodeJS/#{exports.VERSION}"
 # Add platform information to the USER_AGENT header
 # This is intended for platform information and not individual applications!
