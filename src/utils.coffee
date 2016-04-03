@@ -24,6 +24,25 @@ DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {width: "auto", crop: "limit"}
 exports.DEFAULT_POSTER_OPTIONS = {format: 'jpg', resource_type: 'video'}
 exports.DEFAULT_VIDEO_SOURCE_TYPES = ['webm', 'mp4', 'ogv']
 
+CONDITIONAL_OPERATORS =
+  "=": 'eq'
+  "!=": 'ne'
+  "<": 'lt'
+  ">": 'gt'
+  "<=": 'lte'
+  ">=": 'gte'
+  "&&": 'and'
+  "||": 'or'
+
+CONDITIONAL_PARAMETERS =
+  "width": "w"
+  "height": "h"
+  "aspect_ratio": "ar"
+  "aspectRatio": "ar"
+  "page_count": "pc"
+  "pageCount": "pc"
+  "face_count": "fc"
+  "faceCount": "fc"
 
 LAYER_KEYWORD_PARAMS =
   font_weight: "normal"
@@ -49,6 +68,20 @@ textStyle = (layer)->
     keywords.unshift(font_size)
     keywords.unshift(font_family)
     _.compact(keywords).join("_")
+
+
+# Parse "if" parameter
+# Translates the condition if provided.
+# @return [string] "if_" + ifValue
+# @private
+process_if = (ifValue)->
+  if ifValue
+    replaceRE = new RegExp("(" + Object.keys(Condition.PARAMETERS).join("|") + "|[=<>&|!]+)", "g")
+    ifValue = ifValue.replace replaceRE, (match)->
+      Condition.OPERATORS[match] || Condition.PARAMETERS[match]
+    ifValue.replace(/[ _]+/g,'_')
+
+    ifValue = "if_" + ifValue
 
 # Parse layer options
 # @return [string] layer transformation string
@@ -240,6 +273,7 @@ exports.generate_transformation_string = (options) ->
 
   overlay = process_layer(utils.option_consume(options, "overlay"))
   underlay = process_layer(utils.option_consume(options, "underlay"))
+  ifValue = process_if(utils.option_consume(options, "if"))
 
   params =
     a: angle
@@ -291,14 +325,14 @@ exports.generate_transformation_string = (options) ->
   sortedParams = []
   keys = Object.keys(params)
   keys.sort()
-  keys.push 'raw_transformation'
-  params['raw_transformation'] = utils.option_consume(options, 'raw_transformation')
   keys.forEach (key) ->
     if utils.present(params[key])
       sortedParams.push key + '_' + params[key]
     return
   transformations = sortedParams.join(',')
-  
+  raw_transformation = utils.option_consume(options, 'raw_transformation')
+  transformations = _.compact([ifValue, transformations, raw_transformation]).join(",")
+
   base_transformations.push transformations
   transformations = base_transformations
   if responsive_width
