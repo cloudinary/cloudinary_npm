@@ -137,19 +137,16 @@ describe "api", ->
 
     it "should allow listing resources by start_at", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      start_at = null
       setTimeout ->
-        start_at = new Date()
-        setTimeout ->
-          cloudinary.v2.uploader.upload IMAGE_FILE, (error, response) ->
+        cloudinary.v2.uploader.upload IMAGE_FILE, (error, response) ->
+          done(new Error error.message) if error?
+          start_at = new Date(new Date( response.created_at) - 500)
+          cloudinary.v2.api.resources type: "upload", start_at: start_at, direction: "asc", (error, resources_response) ->
             done(new Error error.message) if error?
-            cloudinary.v2.api.resources type: "upload", start_at: start_at, direction: "asc", (error, resources_response) ->
-              done(new Error error.message) if error?
-              expect(resources_response.resources).to.have.length(1)
-              expect(resources_response.resources[0].public_id).to.eql(response.public_id)
-              done()
-        ,2000
-      ,2000
+            expect(resources_response.resources).to.have.length(1)
+            expect(resources_response.resources[0].public_id).to.eql(response.public_id)
+            done()
+      ,1000
 
     it "should allow get resource metadata", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
