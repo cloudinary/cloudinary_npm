@@ -408,7 +408,7 @@ exports.url = (public_id, options = {}) ->
   version ?= 1 if source_to_sign.indexOf("/") > 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)
   version = "v#{version}" if version?
 
-  transformation = transformation.replace(/([^:])\/\//, '\\1\/')
+  transformation = transformation.replace(/([^:])\/\//g, '$1/')
   if sign_url
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     shasum = crypto.createHash('sha1')
@@ -427,7 +427,7 @@ exports.video_url = (public_id, options) ->
   utils.url(public_id, options)
 
 finalize_source = (source, format, url_suffix) ->
-  source = source.replace(/([^:])\/\//, '\\1\/')
+  source = source.replace(/([^:])\/\//g, '$1/')
   if source.match(/^https?:\//i)
     source = smart_escape(source)
     source_to_sign = source
