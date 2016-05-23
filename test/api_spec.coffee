@@ -3,13 +3,47 @@ require('dotenv').load()
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
+sinon = require('sinon')
+ClientRequest = require('_http_client').ClientRequest
+http = require('http')
 _ = require("lodash")
 Q = require('q')
 fs = require('fs')
 
 helper = require("./spechelper")
+sharedExamples = helper.sharedExamples
+itBehavesLike = helper.itBehavesLike
 TEST_TAG        = helper.TEST_TAG
 IMAGE_FILE      = helper.IMAGE_FILE
+
+sharedExamples "list with cursor", (testFunc, args...)->
+  xhr = request = stub = undefined
+  before ->
+    xhr = sinon.useFakeXMLHttpRequest()
+    requests = []
+    stub = sinon.stub http, 'request', (options, cb)->
+      request = options
+      {
+        on: ()-> "on"
+        end: ()-> "end"
+        setTimeout: ()-> "timeout"
+      }
+    xhr.onCreate = (req)->
+      console.log("Request", req)
+      request =req
+
+  after ->
+    stub.restore()
+    xhr.restore()
+  specify ":max_results", ()->
+    
+    testFunc args..., max_results: 10
+    expect(request.query).to.be("max_results=10")
+  specify ":next_cursor", ()->
+    testFunc args..., next_cursor: "2134"
+    expect(request.query).to.be("next_cursor=2134")
+
+
 
 describe "api", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
@@ -243,6 +277,9 @@ describe "api", ->
         done()
 
   describe "transformations", ()->
+    itBehavesLike "list with cursor", cloudinary.v2.api.transformation, "c_scale,w_100"
+    itBehavesLike "list with cursor", cloudinary.v2.api.transformations
+
     it "should allow listing transformations", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.transformations (error, result) ->

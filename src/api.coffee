@@ -172,7 +172,7 @@ exports.transformations = (callback, options = {}) ->
 
 exports.transformation = (transformation, callback, options = {}) ->
   uri = ["transformations", transformation_string(transformation)]
-  call_api("get", uri, api.only(options, "max_results"), callback, options)
+  call_api("get", uri, api.only(options, "next_cursor", "max_results"), callback, options)
 
 exports.delete_transformation = (transformation, callback, options = {}) ->
   uri = ["transformations", transformation_string(transformation)]
