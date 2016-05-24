@@ -195,7 +195,7 @@ exports.upload_presets = (callback, options = {}) ->
 
 exports.upload_preset = (name, callback, options = {}) ->
   uri = ["upload_presets", name]
-  call_api("get", uri, api.only(options, "max_results"), callback, options)
+  call_api("get", uri, {}, callback, options)
 
 exports.delete_upload_preset = (name, callback, options = {}) ->
   uri = ["upload_presets", name]
