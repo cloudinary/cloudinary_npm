@@ -16,32 +16,47 @@ itBehavesLike = helper.itBehavesLike
 TEST_TAG        = helper.TEST_TAG
 IMAGE_FILE      = helper.IMAGE_FILE
 
-sharedExamples "list with cursor", (testFunc, args...)->
-  xhr = request = stub = undefined
+sharedExamples "a list with a cursor", (testFunc, args...)->
+  xhr = request = requestStub = requestSpy = writeSpy =undefined
   before ->
     xhr = sinon.useFakeXMLHttpRequest()
-    requests = []
-    stub = sinon.stub http, 'request', (options, cb)->
-      request = options
-      {
-        on: ()-> "on"
-        end: ()-> "end"
-        setTimeout: ()-> "timeout"
-      }
-    xhr.onCreate = (req)->
-      console.log("Request", req)
-      request =req
+    writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+    requestSpy = sinon.spy(http, 'request')
 
   after ->
-    stub.restore()
+    writeSpy.restore()
+    requestSpy.restore()
     xhr.restore()
   specify ":max_results", ()->
-    
     testFunc args..., max_results: 10
-    expect(request.query).to.be("max_results=10")
+    if writeSpy.called
+      sinon.assert.calledWith writeSpy, sinon.match(/max_results=10/)
+    else
+      sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/max_results=10/))
   specify ":next_cursor", ()->
-    testFunc args..., next_cursor: "2134"
-    expect(request.query).to.be("next_cursor=2134")
+    testFunc args..., next_cursor: 23452342
+    if writeSpy.called
+      sinon.assert.calledWith writeSpy, sinon.match(/next_cursor=23452342/)
+    else
+      sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/next_cursor=23452342/))
+
+sharedExamples "accepts next_cursor", (testFunc, args...)->
+  xhr = request = requestStub = requestSpy = writeSpy =undefined
+  before ->
+    xhr = sinon.useFakeXMLHttpRequest()
+    writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+    requestSpy = sinon.spy(http, 'request')
+
+  after ->
+    writeSpy.restore()
+    requestSpy.restore()
+    xhr.restore()
+  specify ":next_cursor", ()->
+    testFunc args..., next_cursor: 23452342
+    if writeSpy.called
+      sinon.assert.calledWith writeSpy, sinon.match(/next_cursor=23452342/)
+    else
+      sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/next_cursor=23452342/))
 
 
 
@@ -84,6 +99,7 @@ describe "api", ->
         done()
 
   describe "resources", ()->
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.resources
     it "should allow listing resource_types", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.resource_types (error, result) ->
@@ -101,19 +117,6 @@ describe "api", ->
           resource = find_by_attr(result.resources, "public_id", public_id)
           expect(resource).not.to.eql(undefined)
           expect(resource.type).to.eql("upload")
-          done()
-
-    it "should allow listing resources with cursor", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources max_results: 1, (error, result) ->
-        return done(new Error error.message) if error?
-        expect(result.resources).to.have.length 1
-        expect(result.next_cursor).not.to.eql(undefined)
-        cloudinary.v2.api.resources max_results: 1, next_cursor: result.next_cursor, (error2, result2) ->
-          return done(new Error error2.message) if error2?
-          expect(result2.resources).to.have.length 1
-          expect(result2.next_cursor).not.to.eql(undefined)
-          expect(result.resources[0].public_id).not.to.eql result2.resources[0].public_id
           done()
 
     it "should allow listing resources by type", (done) ->
@@ -137,6 +140,7 @@ describe "api", ->
         expect(public_ids).to.contain("api_test2")
         done()
 
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG
     it "should allow listing resources by tag", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.resources_by_tag TEST_TAG, context: true, tags: true, (error, result) ->
@@ -228,33 +232,38 @@ describe "api", ->
               expect(error.http_code).to.eql 404
               done()
 
-    it "should allow deleting resources by prefix", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_by_prefix", (error, r) ->
-        return done(new Error error.message) if error?
-        cloudinary.v2.api.resource "api_test_by_prefix", (error, resource) ->
-          expect(resource).not.to.eql(undefined)
-          cloudinary.v2.api.delete_resources_by_prefix "api_test_by", () ->
-            cloudinary.v2.api.resource "api_test_by_prefix", (error, result) ->
-              expect(error).to.be.an(Object)
-              expect(error.http_code).to.eql 404
-              done()
+    describe "delete_resources_by_prefix", ->
+      itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar"
+      it "should allow deleting resources by prefix", (done) ->
+        @timeout helper.TIMEOUT_MEDIUM
+        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_by_prefix", (error, r) ->
+          return done(new Error error.message) if error?
+          cloudinary.v2.api.resource "api_test_by_prefix", (error, resource) ->
+            expect(resource).not.to.eql(undefined)
+            cloudinary.v2.api.delete_resources_by_prefix "api_test_by", () ->
+              cloudinary.v2.api.resource "api_test_by_prefix", (error, result) ->
+                expect(error).to.be.an(Object)
+                expect(error.http_code).to.eql 404
+                done()
 
 
-    it "should allow deleting resources by tags", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test4", tags: ["api_test_tag_for_delete"] , (error, result) ->
-        return done(new Error error.message) if error?
-        cloudinary.v2.api.resource "api_test4", (error, resource) ->
-          expect(resource).to.be.ok()
-          cloudinary.v2.api.delete_resources_by_tag "api_test_tag_for_delete", (error, result) ->
-            return done(new Error error.message) if error?
-            cloudinary.v2.api.resource "api_test4", (error, result) ->
-              expect(error).to.be.an(Object)
-              expect(error.http_code).to.eql 404
-              done()
+    describe "delete_resources_by_tag", ->
+      itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "api_test_tag_for_delete"
+      it "should allow deleting resources by tags", (done) ->
+        @timeout helper.TIMEOUT_MEDIUM
+        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test4", tags: ["api_test_tag_for_delete"] , (error, result) ->
+          return done(new Error error.message) if error?
+          cloudinary.v2.api.resource "api_test4", (error, resource) ->
+            expect(resource).to.be.ok()
+            cloudinary.v2.api.delete_resources_by_tag "api_test_tag_for_delete", (error, result) ->
+              return done(new Error error.message) if error?
+              cloudinary.v2.api.resource "api_test4", (error, result) ->
+                expect(error).to.be.an(Object)
+                expect(error.http_code).to.eql 404
+                done()
 
   describe "tags", ()->
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.tags
     it "should allow listing tags", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.tags (error, result) ->
@@ -277,8 +286,8 @@ describe "api", ->
         done()
 
   describe "transformations", ()->
-    itBehavesLike "list with cursor", cloudinary.v2.api.transformation, "c_scale,w_100"
-    itBehavesLike "list with cursor", cloudinary.v2.api.transformations
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.transformation, "c_scale,w_100"
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.transformations
 
     it "should allow listing transformations", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -352,6 +361,7 @@ describe "api", ->
             done()
 
   describe "upload_preset", ()->
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_presets
     it "should allow creating and listing upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       create_names = ["api_test_upload_preset3", "api_test_upload_preset2", "api_test_upload_preset1"]
@@ -417,29 +427,32 @@ describe "api", ->
       expect(usage.last_update).not.to.eql null
       done()
 
-  it "should allow deleting all derived resources", (done) ->
-    @timeout helper.TIMEOUT_MEDIUM
-    cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test5", eager: {transformation: {width: 101, crop: "scale"}}, (error, upload_result) ->
-      cloudinary.v2.api.resource "api_test5", (error, resource) ->
-        return done(new Error error.message) if error?
-        expect(resource).to.be.an(Object)
-        expect(resource.derived).not.to.be.empty()
-        # Prepare to loop until no more resources to delete
-        delete_all = (next, callback)->
-          options = {keep_original: yes}
-          options.next_cursor = next if next?
-          cloudinary.v2.api.delete_all_resources options, (error, delete_result) ->
+  describe "delete_all_resources", ->
+    itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_all_resources
+    describe "keep_original: yes", ->
+      it "should allow deleting all derived resources", (done) ->
+        @timeout helper.TIMEOUT_MEDIUM
+        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test5", eager: {transformation: {width: 101, crop: "scale"}}, (error, upload_result) ->
+          cloudinary.v2.api.resource "api_test5", (error, resource) ->
             return done(new Error error.message) if error?
-            if delete_result.next_cursor?
-              delete_all(delete_result.next_cursor, callback)
-            else
-              callback()
-        # execute loop
-        delete_all undefined, ()->
-          cloudinary.v2.api.resource "api_test5", (error, new_resource) ->
-            return done(new Error error.message) if error?
-            expect(new_resource.derived).to.be.empty()
-            done()
+            expect(resource).to.be.an(Object)
+            expect(resource.derived).not.to.be.empty()
+            # Prepare to loop until no more resources to delete
+            delete_all = (next, callback)->
+              options = {keep_original: yes}
+              options.next_cursor = next if next?
+              cloudinary.v2.api.delete_all_resources options, (error, delete_result) ->
+                return done(new Error error.message) if error?
+                if delete_result.next_cursor?
+                  delete_all(delete_result.next_cursor, callback)
+                else
+                  callback()
+            # execute loop
+            delete_all undefined, ()->
+              cloudinary.v2.api.resource "api_test5", (error, new_resource) ->
+                return done(new Error error.message) if error?
+                expect(new_resource.derived).to.be.empty()
+                done()
 
   describe "update", ()->
     it "should support setting manual moderation status", (done) ->
@@ -499,6 +512,7 @@ describe "api", ->
           done()
 
   it "should support listing by moderation kind and value", (done) ->
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved"
     @timeout helper.TIMEOUT_MEDIUM
     ids = []
     api_results =[]
@@ -606,7 +620,7 @@ describe "api", ->
           done()
       else
         done()
-
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_mappings
     it 'should create mapping', (done)->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.create_upload_mapping mapping, template: "http://cloudinary.com", tags: [TEST_TAG], (error, result)->
