@@ -424,17 +424,16 @@ describe "uploader", ->
     spy = undefined
     xhr = undefined
     before ->
-      spy = sinon.spy(ClientRequest.prototype, 'write')
       xhr = sinon.useFakeXMLHttpRequest()
+      spy = sinon.spy(ClientRequest.prototype, 'write')
     after ->
       spy.restore()
       xhr.restore()
 
     describe ":invalidate", ->
-      it "should should pass the invalidate value to the server", (done)->
-        cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG],(error, result) ->
-          expect(spy.calledWith(sinon.match((arg)-> arg.toString().match(/name="invalidate"/)))).to.be.ok()
-          done()
+      it "should should pass the invalidate value to the server", ()->
+        cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG]
+        sinon.assert.calledWith(spy, sinon.match((arg)-> arg.toString().match(/name="invalidate"\s*1/)))
 
 
 
