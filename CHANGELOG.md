@@ -1,4 +1,24 @@
 
+1.4.0 / 2016-06-22
+==================
+
+New functionality
+-----------------
+
+  * New configuration parameter `:client_hints`
+  * Enhanced auto `width` values
+  * Enhanced `quality` values
+  * Add `next_cursor` to `transformation`
+
+Other changes
+-------------
+
+  * Remove redundant `max_results` from `upload_preset`
+  * Add tests for `max_results` and `next_cursor`
+  * Refactor explicit with invalidate test
+  * Fix double slash replacement
+  * Fix "should allow listing resources by start date" test
+
 1.3.1 / 2016-04-04
 ==================
 
