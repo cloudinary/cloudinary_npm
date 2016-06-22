@@ -1,3 +1,10 @@
+1.4.1 / 2016-06-22
+==================
+
+Other changes
+-------------
+
+  * Fix #105 #106 - url generation broken width numeric width parameter
 
 1.4.0 / 2016-06-22
 ==================
