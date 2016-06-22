@@ -17,8 +17,11 @@ exports.image = function (source, options) {
   if ("html_width" in options) options["width"] = cloudinary.utils.option_consume(options, "html_width");
   if ("html_height" in options) options["height"] = cloudinary.utils.option_consume(options, "html_height");
 
-  responsive = cloudinary.utils.option_consume(options, "responsive"), hidpi = cloudinary.utils.option_consume(options, "hidpi");
-  if (responsive || hidpi) {
+  client_hints = cloudinary.utils.option_consume(options, "client_hints", cloudinary.config().client_hints);
+  responsive = cloudinary.utils.option_consume(options, "responsive");
+  hidpi = cloudinary.utils.option_consume(options, "hidpi");
+
+  if ((responsive || hidpi) && !client_hints) {
     options["data-src"] = source;
     classes = [responsive ? "cld-responsive" : "cld-hidpi"];
     current_class = cloudinary.utils.option_consume(options, "class");

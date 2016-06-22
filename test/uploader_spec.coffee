@@ -194,8 +194,10 @@ describe "uploader", ->
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: ["tag1", "tag2", TEST_TAG], (error, result)->
         return done(new Error error.message) if error?
         public_id = result.public_id
-        cloudinary.v2.uploader.replace_tag "tag3Å", public_id, -> # TODO this also tests non ascii characters
+        cloudinary.v2.uploader.replace_tag "tag3Å", public_id, (error, result)-> # TODO this also tests non ascii characters
+          return done(new Error error.message) if error?
           cloudinary.v2.api.resource public_id, (error, result) ->
+            return done(new Error error.message) if error?
             expect(result.tags).to.eql(["tag3Å"])
             done()
 

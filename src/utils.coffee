@@ -231,7 +231,7 @@ exports.generate_transformation_string = (options) ->
   angle = utils.build_array(utils.option_consume(options, "angle")).join(".")
   no_html_sizes = has_layer or utils.present(angle) or crop == "fit" or crop == "limit" or responsive_width
 
-  delete options["width"] if width and (width == "auto" or no_html_sizes or parseFloat(width) < 1)
+  delete options["width"] if width and (width.startsWith("auto") or no_html_sizes or parseFloat(width) < 1)
   delete options["height"] if height and (no_html_sizes or parseFloat(height) < 1)
 
   background = utils.option_consume(options, "background")
@@ -338,7 +338,7 @@ exports.generate_transformation_string = (options) ->
   if responsive_width
     responsive_width_transformation = config().responsive_width_transformation or DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION
     transformations.push utils.generate_transformation_string(_.clone(responsive_width_transformation))
-  if width == "auto" or responsive_width
+  if width?.startsWith("auto") or responsive_width
     options.responsive = true
   if dpr == "auto"
     options.hidpi = true

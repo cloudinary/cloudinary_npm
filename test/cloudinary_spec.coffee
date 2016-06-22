@@ -114,6 +114,23 @@ describe "cloudinary", ->
     expect(options).to.eql {}
     expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/g_center,o_20,p_a,q_0.4,r_3,x_1,y_2/test"
 
+  describe ":quality", ->
+    upload_path = "http://res.cloudinary.com/test123/image/upload"
+    it "support a percent value", ->
+      expect cloudinary.utils.url( "test", { x: 1, y: 2, radius: 3, gravity:"center", quality: 80, prefix: "a" }),
+        "#{upload_path}/g_center,p_a,q_80,r_3,x_1,y_2/test"
+
+      expect cloudinary.utils.url( "test", { x: 1, y: 2, radius: 3, gravity:"center", quality: "80:444", prefix: "a" }),
+        "#{upload_path}/g_center,p_a,q_80:444,r_3,x_1,y_2/test"
+    it "should support auto value", ->
+
+      expect cloudinary.utils.url( "test", { x: 1, y: 2, radius: 3, gravity:"center", quality: "auto", prefix: "a" }),
+        "#{upload_path}/g_center,p_a,q_auto,r_3,x_1,y_2/test"
+
+      expect cloudinary.utils.url( "test", { x: 1, y: 2, radius: 3, gravity:"center", quality: "auto:good", prefix: "a" }),
+        "#{upload_path}/g_center,p_a,q_auto:good,r_3,x_1,y_2/test"
+
+
   it "should support named transformation", ->
     options = transformation: "blip"
     result = cloudinary.utils.url("test", options)
