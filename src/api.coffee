@@ -239,6 +239,24 @@ exports.create_upload_mapping = (name, callback, options = {})->
   params["folder"] = name
   call_api("post", 'upload_mappings', params, callback, options)
 
+publishResource = (byKey, value, callback, options={})->
+  params = api.only(options, "invalidate", "overwrite")
+  params[byKey] = value
+  resource_type = options.resource_type ? "image"
+  uri = ["resources", resource_type, "publish_resources"]
+  options = _.extend {resource_type: resource_type}, options
+  call_api("post", uri, params, callback, options)
+
+exports.publish_by_prefix = (prefix, callback, options={})->
+  publishResource("prefix", prefix, callback,options)
+
+exports.publish_by_tag = (tag, callback, options={})->
+  publishResource("tag", tag, callback,options)
+
+exports.publish_by_ids = (public_ids, callback, options={})->
+  publishResource("public_ids", public_ids, callback,options)
+
+
 exports.only = (hash, keys...) ->
   result = {}
   for key in keys

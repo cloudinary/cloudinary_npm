@@ -63,8 +63,15 @@ sharedExamples "accepts next_cursor", (testFunc, args...)->
 describe "api", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
 
-  after ->
-    cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+  after (done)->
+    if cloudinary.config().keep_test_products
+      done()
+    else
+      cloudinary.v2.api.delete_resources_by_tag helper.TEST_TAG, (error, result) ->
+        if error?
+          done(new Error error.message) 
+        else 
+          done()
 
   PUBLIC_ID = "api_test"
   find_by_attr = (elements, attr, value) ->
@@ -644,3 +651,51 @@ describe "api", ->
                     return done(new Error error.message) if error?
                     expect(_.find(result["mappings"], _.matchesProperty('folder', mapping))).not.to.be.ok()
                     done()
+
+  describe "publish", ->
+    suffix = ->
+      i = 0
+      loop
+        yield ++i
+      return
+
+    publishTestId = ""
+    publishTestTag = ""
+    beforeEach (done)->
+      publishTestTag = TEST_TAG + suffix()
+      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_publish", type: "authenticated", tags: [TEST_TAG, publishTestTag], (error, result)->
+        return done(new Error error.message) if error?
+        publishTestId = result.public_id
+        done()
+    afterEach (done)->
+      cloudinary.v2.uploader.destroy publishTestId, (error, result)->
+      return done(new Error error.message) if error?
+      done()
+    it "should change an authenticated resource to a public resource", (done)->
+      cloudinary.v2.api.publish_by_ids [publishTestId], (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(1)
+        expect(published[0].public_id).to.eql(publishTestId)
+        expect(published[0].url).to.match(/\/upload\//)
+        done()
+    it "should change an authenticated resource to a public resource", (done)->
+      cloudinary.v2.api.publish_by_prefix publishTestId[0..-2], (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(1)
+        expect(published[0].public_id).to.eql(publishTestId)
+        expect(published[0].url).to.match(/\/upload\//)
+        done()
+    it "should change an authenticated resource to a public resource", (done)->
+      cloudinary.v2.api.publish_by_tag publishTestTag, (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(1)
+        expect(published[0].public_id).to.eql(publishTestId)
+        expect(published[0].url).to.match(/\/upload\//)
+        done()
+
