@@ -86,7 +86,7 @@ process_if = (ifValue)->
 # Parse layer options
 # @return [string] layer transformation string
 # @private
-process_layer = (layer)->
+process_layer = (layer, escapeQuotes = true)->
   if _.isPlainObject(layer)
     public_id = layer["public_id"]
     format = layer["format"]
@@ -114,7 +114,9 @@ process_layer = (layer)->
       unless _.isEmpty(text)
         unless _.isEmpty(public_id) ^ _.isEmpty(style)
           throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay"
-        text = smart_escape(text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}"))
+        if escapeQuotes
+          text = text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}")
+        text = smart_escape(text)
 
     components.push(resource_type) if resource_type != "image"
     components.push(type) if type != "upload"
@@ -127,7 +129,7 @@ process_layer = (layer)->
 exports.build_upload_params = (options) ->
   params =
     timestamp: exports.timestamp()
-    transformation: utils.generate_transformation_string(_.clone(options))
+    transformation: utils.generate_transformation_string(_.clone(options), false)
     public_id: options.public_id
     callback: options.callback
     format: options.format
@@ -214,10 +216,10 @@ exports.build_custom_headers = (headers) ->
 exports.present = (value) ->
   not _.isUndefined(value) and ("" + value).length > 0
 
-exports.generate_transformation_string = (options) ->
+exports.generate_transformation_string = (options, escapeQuotes = true) ->
   if _.isArray(options)
     result = for base_transformation in options
-      utils.generate_transformation_string(_.clone(base_transformation))
+      utils.generate_transformation_string(_.clone(base_transformation), escapeQuotes)
     return result.join("/")
 
   responsive_width = utils.option_consume(options, "responsive_width", config().responsive_width)
@@ -243,9 +245,9 @@ exports.generate_transformation_string = (options) ->
   if base_transformations.length != 0 and _.filter(base_transformations, _.isObject).length > 0
     base_transformations = _.map(base_transformations, (base_transformation) ->
       if _.isObject(base_transformation)
-        utils.generate_transformation_string(_.clone(base_transformation))
+        utils.generate_transformation_string(_.clone(base_transformation), escapeQuotes)
       else
-        utils.generate_transformation_string(transformation: base_transformation)
+        utils.generate_transformation_string(transformation: base_transformation, escapeQuotes)
     )
   else
     named_transformation = base_transformations.join(".")
@@ -271,7 +273,7 @@ exports.generate_transformation_string = (options) ->
   if options["offset"]?
     [options["start_offset"], options["end_offset"]] = split_range(utils.option_consume(options, "offset"))
 
-  overlay = process_layer(utils.option_consume(options, "overlay"))
+  overlay = process_layer(utils.option_consume(options, "overlay"), escapeQuotes)
   underlay = process_layer(utils.option_consume(options, "underlay"))
   ifValue = process_if(utils.option_consume(options, "if"))
 

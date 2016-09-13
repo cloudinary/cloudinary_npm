@@ -385,6 +385,18 @@ describe "utils", ->
     expect(utils.build_upload_params(backup:null)['backup']).to.eql(undefined)
     expect(utils.build_upload_params({})['backup']).to.eql(undefined)
 
+  it "build_upload_params encodes commas only once" , ->
+    options = {
+        overlay: {
+          text:"Hello,World", 
+          font_family:"arial", 
+          font_size: '30'   
+        }
+    }
+    expect(utils.build_upload_params(options)['transformation']).to.eql("l_text:arial_30:Hello%2CWorld")
+    expect(Object.keys(options).length).to.eql(1)
+
+
   it "should add version if public_id contains /" , ->
     test_cloudinary_url("folder/test", {}, "http://res.cloudinary.com/#{cloud_name}/image/upload/v1/folder/test", {})
     test_cloudinary_url("folder/test", {version:123}, "http://res.cloudinary.com/#{cloud_name}/image/upload/v123/folder/test", {})
