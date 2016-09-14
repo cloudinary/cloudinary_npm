@@ -122,12 +122,15 @@ describe "utils", ->
   it "should use width and height from options only if crop is given" , ->
     test_cloudinary_url("test", {width:100, height:100, crop:'crop'}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,h_100,w_100/test", {width:100, height:100})
 
+  it "should support initial width and height" , ->
+    test_cloudinary_url("test", {width: "iw", height: "ih", crop:'crop'}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,h_ih,w_iw/test", {width: "iw", height: "ih"})
 
   it "should not pass width and height to html in case angle was used" , ->
     test_cloudinary_url("test", {width:100, height:100, crop:'scale', angle:'auto'}, "http://res.cloudinary.com/#{cloud_name}/image/upload/a_auto,c_scale,h_100,w_100/test", {})
 
   it "should use x, y, radius, prefix, gravity and quality from options" , ->
     test_cloudinary_url("test", {x:1, y:2, radius:3, gravity:'center', quality:0.4, prefix:"a"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/g_center,p_a,q_0.4,r_3,x_1,y_2/test", {})
+    test_cloudinary_url("test", {gravity:'auto', crop: "crop", width:"0.5"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,g_auto,w_0.5/test", {})
 
   it "should support named transformation" , ->
     test_cloudinary_url("test", {transformation:"blip"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/t_blip/test", {})
