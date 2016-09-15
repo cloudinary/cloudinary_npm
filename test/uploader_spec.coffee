@@ -313,7 +313,7 @@ describe "uploader", ->
 
 
   describe "upload_chunked", ()->
-    @timeout helper.TIMEOUT_LONG
+    @timeout helper.TIMEOUT_LONG * 10
     it "should specify chunk size", (done) ->
       fs.stat LARGE_RAW_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 7000000, timeout: helper.TIMEOUT_LONG, tags: TEST_TAG}, (error, result) ->

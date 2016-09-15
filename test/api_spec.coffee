@@ -15,6 +15,7 @@ sharedExamples = helper.sharedExamples
 itBehavesLike = helper.itBehavesLike
 TEST_TAG        = helper.TEST_TAG
 IMAGE_FILE      = helper.IMAGE_FILE
+IMAGE_URL       = "http://res.cloudinary.com/demo/image/upload/sample"
 
 sharedExamples "a list with a cursor", (testFunc, args...)->
   xhr = request = requestStub = requestSpy = writeSpy =undefined
@@ -659,11 +660,10 @@ describe "api", ->
                     done()
 
   describe "publish", ->
+    @timeout helper.TIMEOUT_LONG
+    i = 0
     suffix = ->
-      i = 0
-      loop
-        yield ++i
-      return
+      ++i
 
     publishTestId = ""
     publishTestTag = ""
@@ -675,10 +675,10 @@ describe "api", ->
         done()
     afterEach (done)->
       cloudinary.v2.uploader.destroy publishTestId, (error, result)->
-      return done(new Error error.message) if error?
-      done()
-    it "should change an authenticated resource to a public resource", (done)->
-      @timeout helper.TIMEOUT_MEDIUM
+        return done(new Error error.message) if error?
+        done()
+    it "by public id", (done)->
+      @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_ids [publishTestId], (error, result)->
         return done(new Error error.message) if error?
         published = result.published
@@ -687,7 +687,8 @@ describe "api", ->
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
         done()
-    it "should change an authenticated resource to a public resource", (done)->
+    it "by prefix", (done)->
+      @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_prefix publishTestId[0..-2], (error, result)->
         return done(new Error error.message) if error?
         published = result.published
@@ -696,7 +697,8 @@ describe "api", ->
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
         done()
-    it "should change an authenticated resource to a public resource", (done)->
+    it "by tag", (done)->
+      @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_tag publishTestTag, (error, result)->
         return done(new Error error.message) if error?
         published = result.published
