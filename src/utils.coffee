@@ -427,7 +427,7 @@ exports.url = (public_id, options = {}) ->
   url
 
 exports.video_url = (public_id, options) ->
-  options = _.extend({resource_type: 'video'}, options)
+  options = _.assignIn({resource_type: 'video'}, options)
   utils.url(public_id, options)
 
 finalize_source = (source, format, url_suffix) ->
@@ -447,7 +447,7 @@ finalize_source = (source, format, url_suffix) ->
   [source, source_to_sign]
 
 exports.video_thumbnail_url = (public_id, options) ->
-  options = _.extend({}, exports.DEFAULT_POSTER_OPTIONS, options)
+  options = _.assignIn({}, exports.DEFAULT_POSTER_OPTIONS, options)
   utils.url(public_id, options)
 
 finalize_resource_type = (resource_type, type, url_suffix, use_root_path, shorten) ->
@@ -475,7 +475,7 @@ finalize_resource_type = (resource_type, type, url_suffix, use_root_path, shorte
 # cdn_subdomain and secure_cdn_subdomain
 # 1) Customers in shared distribution (e.g. res.cloudinary.com)
 #   if cdn_domain is true uses res-[1-5].cloudinary.com for both http and https. Setting secure_cdn_subdomain to false disables this for https.
-# 2) Customers with private cdn 
+# 2) Customers with private cdn
 #   if cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for http
 #   if secure_cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for https (please contact support if you require this)
 # 3) Customers with cname
@@ -683,7 +683,7 @@ exports.zip_download_url = (tag, options = {}) ->
 # @option options [boolean] :async (false) If true, return immediately and perform the archive creation in the background.
 #   Relevant only for the create mode.
 # @option options [String] :notification_url Optional URL to send an HTTP post request (webhook) when the archive creation is completed.
-# @option options [String|Array<String] :target_tags Optional array. Allows assigning one or more tag to the generated archive file (for later housekeeping via the admin API).
+# @option options [String|Array<String] :target_tags Optional array. Allows _.assignIng one or more tag to the generated archive file (for later housekeeping via the admin API).
 # @option options [String] :keep_derived (false) keep the derived images used for generating the archive
 # @return [String] archive url
 ###
@@ -767,7 +767,7 @@ split_range = (range) -> # :nodoc:
     when String
       range.split ".." if offset_any_pattern_re = ~range
     when Array
-      [_.first(range), _.last(range)]
+      [_.head(range), _.last(range)]
     else
       [null, null]
 
@@ -891,4 +891,3 @@ hashToQuery = (hash)->
     else
       "#{querystring.escape(key)}=#{querystring.escape(value)}"
   ).sort().join('&')
-

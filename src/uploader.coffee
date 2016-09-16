@@ -19,7 +19,7 @@ exports.unsigned_upload_stream = (upload_preset, callback, options = {}) ->
   exports.upload_stream(callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
 
 exports.upload_stream = (callback, options = {}) ->
-  exports.upload(null, callback, _.extend({stream: true}, options))
+  exports.upload(null, callback, _.assignIn({stream: true}, options))
 
 exports.unsigned_upload = (file, upload_preset, callback, options = {}) ->
   exports.upload(file, callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
@@ -33,7 +33,7 @@ exports.upload = (file, callback, options = {}) ->
       [params, {}, file]
 
 exports.upload_large = (path, callback, options = {}) ->
-  exports.upload_chunked(path, callback, _.extend({resource_type: 'raw'}, options))
+  exports.upload_chunked(path, callback, _.assignIn({resource_type: 'raw'}, options))
 
 exports.upload_chunked = (path, callback, options) ->
   file_reader = fs.createReadStream(path)
@@ -63,10 +63,10 @@ class Chunkable extends Writable
           done()
 
 exports.upload_large_stream = (_unused_, callback, options = {}) ->
-  exports.upload_chunked_stream(callback, _.extend({resource_type: 'raw'}, options))
+  exports.upload_chunked_stream(callback, _.assignIn({resource_type: 'raw'}, options))
 
 exports.upload_chunked_stream = (callback, options = {}) ->
-  options = _.extend({}, options, stream: true)
+  options = _.assignIn({}, options, stream: true)
   options.x_unique_upload_id = utils.random_public_id()
   params = build_upload_params(options)
 
@@ -133,7 +133,7 @@ exports.text = (text, callback, options = {}) ->
 
 exports.generate_sprite = (tag, callback, options = {}) ->
   call_api "sprite", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend({}, options, fetch_format: options.format))
+    transformation = utils.generate_transformation_string(_.assignIn({}, options, fetch_format: options.format))
     return [{
       timestamp: utils.timestamp(),
       tag: tag,
@@ -144,7 +144,7 @@ exports.generate_sprite = (tag, callback, options = {}) ->
 
 exports.multi = (tag, callback, options = {}) ->
   call_api "multi", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend({}, options))
+    transformation = utils.generate_transformation_string(_.assignIn({}, options))
     return [{
       timestamp: utils.timestamp(),
       tag: tag,
@@ -156,7 +156,7 @@ exports.multi = (tag, callback, options = {}) ->
 
 exports.explode = (public_id, callback, options = {}) ->
   call_api "explode", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend({}, options))
+    transformation = utils.generate_transformation_string(_.assignIn({}, options))
     return [{
       timestamp: utils.timestamp(),
       public_id: public_id,
@@ -195,7 +195,7 @@ call_api = (action, callback, options, get_params) ->
   [params, unsigned_params, file] = get_params.call()
 
   params = utils.process_request_params(params, options)
-  params = _.extend(params, unsigned_params)
+  params = _.assignIn(params, unsigned_params)
 
   api_url = utils.api_url(action, options)
 
@@ -259,7 +259,7 @@ post = (url, post_data, boundary, file, callback, options) ->
     'User-Agent': utils.getUserAgent()
   headers['Content-Range'] = options.content_range if options.content_range?
   headers['X-Unique-Upload-Id'] = options.x_unique_upload_id if options.x_unique_upload_id?
-  post_options = _.extend post_options,
+  post_options = _.assignIn post_options,
     method: 'POST',
     headers: headers
   post_options.agent = options.agent if options.agent?
@@ -308,7 +308,7 @@ EncodeFilePart = (boundary, type, name, filename) ->
   return_part
 
 exports.direct_upload = (callback_url, options = {}) ->
-  params = build_upload_params(_.extend({callback: callback_url}, options))
+  params = build_upload_params(_.assignIn({callback: callback_url}, options))
   params = utils.process_request_params(params, options)
   api_url = utils.api_url("upload", options)
 
@@ -326,7 +326,7 @@ exports.upload_url = (options = {}) ->
 exports.image_upload_tag = (field, options = {}) ->
   html_options = options.html ? {}
 
-  tag_options = _.extend( {
+  tag_options = _.assignIn( {
     type: "file",
     name: "file",
     "data-url": exports.upload_url(options),

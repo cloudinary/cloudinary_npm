@@ -12,7 +12,7 @@
   "main": "cloudinary.js",
   "dependencies": {
     "q": "1.4.x",
-    "lodash": "3.10.x"
+    "lodash": "4.15.x"
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",
