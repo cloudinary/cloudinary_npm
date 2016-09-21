@@ -3,7 +3,7 @@
   "version": "1.2.4",
   "homepage": "https://github.com/cloudinary/cloudinary_npm",
   "authors": [
-    "Amir Tocker <amir.tocker@cloudianry.com>"
+    "Cloudinary <info@cloudianry.com>"
   ],
   "moduleType": [
     "node"
