@@ -118,7 +118,9 @@ exports.rename = (from_public_id, to_public_id, callback, options = {}) ->
       from_public_id: from_public_id,
       to_public_id: to_public_id,
       overwrite: options.overwrite,
-      invalidate: options.invalidate]
+      invalidate: options.invalidate,
+      to_type: options.to_type
+    ]
 
 TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style",
   "background", "opacity", "text_decoration"]
@@ -324,7 +326,7 @@ exports.upload_url = (options = {}) ->
 exports.image_upload_tag = (field, options = {}) ->
   html_options = options.html ? {}
 
-  tag_options = _.extend(html_options, {
+  tag_options = _.extend( {
     type: "file",
     name: "file",
     "data-url": exports.upload_url(options),
@@ -332,7 +334,7 @@ exports.image_upload_tag = (field, options = {}) ->
     "data-cloudinary-field": field,
     "data-max-chunk-size": options.chunk_size,
     "class": [html_options["class"], "cloudinary-fileupload"].join(" ")
-  })
+  }, html_options)
   return '<input ' + utils.html_attrs(tag_options) + '/>'
 
 exports.unsigned_image_upload_tag = (field, upload_preset, options = {}) ->

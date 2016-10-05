@@ -34,4 +34,7 @@ utils.v1_adapters exports, api,
   upload_mapping: 1,
   delete_upload_mapping: 1,
   update_upload_mapping: 1,
-  create_upload_mapping: 1
+  create_upload_mapping: 1,
+  publish_by_ids: 1,
+  publish_by_tag: 1,
+  publish_by_prefix: 1

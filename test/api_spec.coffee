@@ -15,6 +15,7 @@ sharedExamples = helper.sharedExamples
 itBehavesLike = helper.itBehavesLike
 TEST_TAG        = helper.TEST_TAG
 IMAGE_FILE      = helper.IMAGE_FILE
+IMAGE_URL       = "http://res.cloudinary.com/demo/image/upload/sample"
 
 sharedExamples "a list with a cursor", (testFunc, args...)->
   xhr = request = requestStub = requestSpy = writeSpy =undefined
@@ -63,10 +64,23 @@ sharedExamples "accepts next_cursor", (testFunc, args...)->
 describe "api", ->
   return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
 
-  after ->
-    cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+  after (done)->
+    if cloudinary.config().keep_test_products
+      done()
+    else
+      cloudinary.v2.api.delete_resources_by_tag helper.TEST_TAG, (error, result) ->
+        if error?
+          done(new Error error.message) 
+        else 
+          done()
 
-  PUBLIC_ID = "api_test"
+  SUFFIX = Math.floor(Math.random() * 99999)
+  PUBLIC_ID = "npm_api_test" + SUFFIX
+  PUBLIC_ID_1 = PUBLIC_ID + "_1" + SUFFIX
+  PUBLIC_ID_2 = PUBLIC_ID + "_2" + SUFFIX
+  PUBLIC_ID_3 = PUBLIC_ID + "_3" + SUFFIX
+  PUBLIC_ID_4 = PUBLIC_ID + "_4" + SUFFIX
+
   find_by_attr = (elements, attr, value) ->
     for element in elements
       return element if element[attr] == value
@@ -86,10 +100,10 @@ describe "api", ->
     @timeout 0
     @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
 
-    cloudinary.v2.api.delete_resources [PUBLIC_ID, "api_test1", "api_test2"], (error, result)->
+    cloudinary.v2.api.delete_resources [PUBLIC_ID, PUBLIC_ID_1, PUBLIC_ID_2], (error, result)->
       Q.all [
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
-        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: "api_test2", tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
+        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
         cloudinary.v2.api.delete_transformation("api_test_transformation")
         cloudinary.v2.api.delete_upload_preset("api_test_upload_preset1")
         cloudinary.v2.api.delete_upload_preset("api_test_upload_preset2")
@@ -133,11 +147,11 @@ describe "api", ->
 
     it "should allow listing resources by prefix", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources type: "upload", prefix: PUBLIC_ID, (error, result) ->
+      cloudinary.v2.api.resources type: "upload", prefix: PUBLIC_ID, max_results: 500, (error, result) ->
         return done(new Error error.message) if error?
         public_ids = (resource.public_id for resource in result.resources)
         expect(public_ids).to.contain(PUBLIC_ID)
-        expect(public_ids).to.contain("api_test2")
+        expect(public_ids).to.contain(PUBLIC_ID_2)
         done()
 
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG
@@ -146,7 +160,7 @@ describe "api", ->
       cloudinary.v2.api.resources_by_tag TEST_TAG, context: true, tags: true, (error, result) ->
         return done(new Error error.message) if error?
         expect(result.resources.map((e) -> e.public_id)).to.contain(PUBLIC_ID)
-                                                        .and.contain("api_test2")
+                                                        .and.contain(PUBLIC_ID_2)
         expect(result.resources.map((e) -> e.tags[0])).to.contain(TEST_TAG)
         expect(result.resources.map((e) -> if e.context? then e.context.custom.key else null)).to.contain("value")
         done()
@@ -154,10 +168,10 @@ describe "api", ->
 
     it "should allow listing resources by public ids", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources_by_ids [PUBLIC_ID, "api_test2"], context: true, tags: true, (error, result) ->
+      cloudinary.v2.api.resources_by_ids [PUBLIC_ID, PUBLIC_ID_2], context: true, tags: true, (error, result) ->
         return done(new Error error.message) if error?
         resource = find_by_attr(result.resources, "public_id", PUBLIC_ID)
-        expect(result.resources.map((e) -> e.public_id).sort()).to.eql([PUBLIC_ID,"api_test2"])
+        expect(result.resources.map((e) -> e.public_id).sort()).to.eql([PUBLIC_ID,PUBLIC_ID_2])
         expect(result.resources.map((e) -> e.tags[0])).to.contain(TEST_TAG)
         expect(result.resources.map((e) -> e.context.custom.key)).to.contain("value")
         done()
@@ -221,13 +235,13 @@ describe "api", ->
 
     it "should allow deleting resources", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test3", (error, r) ->
+      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: PUBLIC_ID_3, (error, r) ->
         return done(new Error error.message) if error?
-        cloudinary.v2.api.resource "api_test3", (error, resource) ->
+        cloudinary.v2.api.resource PUBLIC_ID_3, (error, resource) ->
           expect(resource).not.to.eql(undefined)
-          cloudinary.v2.api.delete_resources ["apit_test", "api_test2", "api_test3"], (error, result) ->
+          cloudinary.v2.api.delete_resources ["apit_test", PUBLIC_ID_2, PUBLIC_ID_3], (error, result) ->
             return done(new Error error.message) if error?
-            cloudinary.v2.api.resource "api_test3", (error, result) ->
+            cloudinary.v2.api.resource PUBLIC_ID_3, (error, result) ->
               expect(error).to.be.an(Object)
               expect(error.http_code).to.eql 404
               done()
@@ -251,13 +265,13 @@ describe "api", ->
       itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "api_test_tag_for_delete"
       it "should allow deleting resources by tags", (done) ->
         @timeout helper.TIMEOUT_MEDIUM
-        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test4", tags: ["api_test_tag_for_delete"] , (error, result) ->
+        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: PUBLIC_ID_4, tags: ["api_test_tag_for_delete"] , (error, result) ->
           return done(new Error error.message) if error?
-          cloudinary.v2.api.resource "api_test4", (error, resource) ->
+          cloudinary.v2.api.resource PUBLIC_ID_4, (error, resource) ->
             expect(resource).to.be.ok()
             cloudinary.v2.api.delete_resources_by_tag "api_test_tag_for_delete", (error, result) ->
               return done(new Error error.message) if error?
-              cloudinary.v2.api.resource "api_test4", (error, result) ->
+              cloudinary.v2.api.resource PUBLIC_ID_4, (error, result) ->
                 expect(error).to.be.an(Object)
                 expect(error.http_code).to.eql 404
                 done()
@@ -273,7 +287,7 @@ describe "api", ->
 
     it "should allow listing tag by prefix ", (done) =>
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags prefix: TEST_TAG.slice(0,6), (error, result) =>
+      cloudinary.v2.api.tags prefix: TEST_TAG.slice(0,13), (error, result) =>
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
@@ -644,3 +658,53 @@ describe "api", ->
                     return done(new Error error.message) if error?
                     expect(_.find(result["mappings"], _.matchesProperty('folder', mapping))).not.to.be.ok()
                     done()
+
+  describe "publish", ->
+    @timeout helper.TIMEOUT_LONG
+    i = 0
+    suffix = ->
+      ++i
+
+    publishTestId = ""
+    publishTestTag = ""
+    beforeEach (done)->
+      publishTestTag = TEST_TAG + suffix()
+      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_publish", type: "authenticated", tags: [TEST_TAG, publishTestTag], (error, result)->
+        return done(new Error error.message) if error?
+        publishTestId = result.public_id
+        done()
+    afterEach (done)->
+      cloudinary.v2.uploader.destroy publishTestId, (error, result)->
+        return done(new Error error.message) if error?
+        done()
+    it "by public id", (done)->
+      @timeout helper.TIMEOUT_LONG
+      cloudinary.v2.api.publish_by_ids [publishTestId], (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(1)
+        expect(published[0].public_id).to.eql(publishTestId)
+        expect(published[0].url).to.match(/\/upload\//)
+        done()
+    it "by prefix", (done)->
+      @timeout helper.TIMEOUT_LONG
+      cloudinary.v2.api.publish_by_prefix publishTestId[0..-2], (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(1)
+        expect(published[0].public_id).to.eql(publishTestId)
+        expect(published[0].url).to.match(/\/upload\//)
+        done()
+    it "by tag", (done)->
+      @timeout helper.TIMEOUT_LONG
+      cloudinary.v2.api.publish_by_tag publishTestTag, (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(1)
+        expect(published[0].public_id).to.eql(publishTestId)
+        expect(published[0].url).to.match(/\/upload\//)
+        done()
+

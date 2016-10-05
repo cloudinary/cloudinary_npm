@@ -1,3 +1,19 @@
+
+1.4.2 / 2016-09-14
+==================
+
+New functionality
+-----------------
+
+  * Add publish API: `publish_by_prefix`, `publish_by_public_ids`, `publish_by_tag`.
+  * Add `to_type` to `rename`.
+
+Other changes
+-------------
+
+  * Get version in `utils` from `package.json`
+  * Fix tests.
+
 1.4.1 / 2016-06-22
 ==================
 
