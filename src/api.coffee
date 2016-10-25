@@ -14,7 +14,6 @@ call_api = (method, uri, params, callback, options) ->
   api_key = options["api_key"] ? config().api_key ? throw("Must supply api_key")
   api_secret = options["api_secret"] ? config().api_secret ? throw("Must supply api_secret")
   api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/")
-
   query_params = querystring.stringify(params)
   if method == "get"
     api_url += "?" + query_params
@@ -256,6 +255,23 @@ exports.publish_by_tag = (tag, callback, options={})->
 exports.publish_by_ids = (public_ids, callback, options={})->
   publishResource("public_ids", public_ids, callback,options)
 
+exports.list_streaming_profiles = (callback, options = {})->
+  call_api("get", "streaming_profiles", {}, callback, options)
+
+exports.get_streaming_profile = (name, callback, options = {})->
+  call_api("get", "streaming_profiles/#{name}", {}, callback, options)
+
+exports.delete_streaming_profile = (name, callback, options = {})->
+  call_api("delete", "streaming_profiles/#{name}", {}, callback, options)
+
+exports.update_streaming_profile = (name, callback, options = {})->
+  params = utils.build_streaming_profiles_param(options)
+  call_api("put", "streaming_profiles/#{name}", params, callback, options)
+
+exports.create_streaming_profile = (name, callback, options = {})->
+  params = utils.build_streaming_profiles_param(options)
+  params["name"] = name
+  call_api("post", 'streaming_profiles', params, callback, options)
 
 exports.only = (hash, keys...) ->
   result = {}

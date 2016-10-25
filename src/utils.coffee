@@ -867,6 +867,20 @@ exports.generate_responsive_breakpoints_string = (breakpoints)->
         breakpoint_settings.transformation = utils.generate_transformation_string(_.clone(transformation))
   JSON.stringify(breakpoints)
 
+exports.build_streaming_profiles_param = (options={})->
+  params = utils.only(options, "display_name", "representations")
+  if _.isArray(params["representations"])
+    params["representations"] = JSON.stringify(params["representations"].map (r)->
+      {transformation: utils.generate_transformation_string(r.transformation)}
+    )
+  params
+
+exports.only = (hash, keys...) ->
+  result = {}
+  for key in keys
+    result[key] = hash[key] if hash[key]?
+  result
+
 ###*
 # @private
 ###

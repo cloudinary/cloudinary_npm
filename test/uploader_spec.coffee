@@ -18,10 +18,16 @@ EMPTY_IMAGE     = helper.EMPTY_IMAGE
 RAW_FILE        = helper.RAW_FILE
 
 describe "uploader", ->
-  return console.warn("**** Please setup environment for uploader test to run!") if !cloudinary.config().api_secret?
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
   @timeout helper.TIMEOUT_SHORT
   after ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
     cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
 
   ###*

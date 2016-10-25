@@ -20,7 +20,10 @@ cloud_name = ''
 root_path = ''
 
 describe "utils", ->
-  return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
   afterEach () ->
     cloudinary.config(_.defaults({secure:null},@orig))
