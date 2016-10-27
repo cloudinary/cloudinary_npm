@@ -1,5 +1,5 @@
 
-1.4.3 / 2016-10-27
+1.4.4 / 2016-10-27
 ==================
 
 New functionality
@@ -12,6 +12,9 @@ Other changes
 
   * Change email address in sample project's bower.json
   * Add files to `.npmignore`
+
+1.4.3 / 2016-10-27
+==================
 
 1.4.2 / 2016-09-14
 ==================
