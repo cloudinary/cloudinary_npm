@@ -1,4 +1,18 @@
 
+1.4.3 / 2016-10-27
+==================
+
+New functionality
+-----------------
+
+  * Add streaming profiles API
+
+Other changes
+-------------
+
+  * Change email address in sample project's bower.json
+  * Add files to `.npmignore`
+
 1.4.2 / 2016-09-14
 ==================
 
