@@ -828,7 +828,7 @@ exports.archive_params = (options = {})->
   tags: options.tags && exports.build_array(options.tags)
   public_ids: options.public_ids && exports.build_array(options.public_ids)
   prefixes: options.prefixes && exports.build_array(options.prefixes)
-  transformations: build_eager(options.transformations)
+  transformations: utils.build_eager(options.transformations)
 
 build_custom_headers = (headers)->
   (for a in Array(headers) when a?.join?
@@ -839,7 +839,7 @@ exports.build_explicit_api_params = (public_id, options = {})->
   opt = [
     callback: options.callback
     custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
-    eager: build_eager(options.eager)
+    eager: utils.build_eager(options.eager)
     eager_async: utils.as_safe_bool(options.eager_async)
     eager_notification_url: options.eager_notification_url
     face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
@@ -884,16 +884,6 @@ exports.only = (hash, keys...) ->
 ###*
 # @private
 ###
-build_eager = (eager)->
-  return undefined unless eager?
-  ret = (for transformation in Array(eager)
-    transformation = _.clone(transformation)
-    format = transformation.format if transformation.format?
-    delete transformation.format
-    _.compact([utils.generate_transformation_string(transformation), format]).join("/")
-  ).join("|")
-  ret
-
 
 hashToQuery = (hash)->
   _.compact(for key, value of hash
