@@ -458,6 +458,11 @@ describe "utils", ->
     cloudinary.config("responsive_width_transformation",{width: 'auto', crop: 'pad'})
     test_cloudinary_url("test", {width:100, height:100, crop:"crop", responsive_width:true}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,h_100,w_100/c_pad,w_auto/test", {responsive: true})
 
+
+  describe "streaming_profile", ->
+    it 'should support streaming_profile in options', ->
+      expect(utils.generate_transformation_string( streaming_profile: "somë-profilé")).to.eql("sp_somë-profilé")
+
   describe "zoom", ->
     it "should support a decimal value", ->
       test_cloudinary_url("test", {zoom: 1.2}, "http://res.cloudinary.com/#{cloud_name}/image/upload/z_1.2/test", {})

@@ -313,6 +313,7 @@ exports.generate_transformation_string = (options) ->
     quality: "q"
     radius: "r"
     start_offset: "so"
+    streaming_profile: "sp"
     video_codec: "vc"
     video_sampling: "vs"
     x: "x"
