@@ -1,5 +1,8 @@
 _ = require("lodash")
-https = require('https')
+if process.env.CLOUDINARY_TEST_UNSECURE == 'http'
+  https = require('http')
+else
+  https = require('https')
 utils = require("./utils")
 config = require("./config")
 querystring = require("querystring")
