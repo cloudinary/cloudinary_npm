@@ -175,18 +175,23 @@ exports.add_tag = (tag, public_ids = [], callback, options = {}) ->
 exports.remove_tag = (tag, public_ids = [], callback, options = {}) ->
   call_tags_api(tag, "remove", public_ids, callback, options)
 
+exports.remove_all_tags = (public_ids = [], callback, options = {}) ->
+  call_tags_api(null, "remove_all", public_ids, callback, options)
+
 exports.replace_tag = (tag, public_ids = [], callback, options = {}) ->
   call_tags_api(tag, "replace", public_ids, callback, options)
 
 call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
   call_api "tags", callback, options, ->
-    return [{
+    params = {
       timestamp: utils.timestamp(),
-      tag: tag,
       public_ids: utils.build_array(public_ids),
       command: command,
       type: options.type
-    }]
+    }
+    if tag?
+      params.tag = tag
+    return [params]
 
 call_api = (action, callback, options, get_params) ->
   deferred = Q.defer()

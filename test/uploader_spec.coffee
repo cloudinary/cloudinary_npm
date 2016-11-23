@@ -185,7 +185,12 @@ describe "uploader", ->
             cloudinary.v2.api.resource second_id, (error, r1) ->
               return done(new Error error.message) if error
               expect(r1.tags).to.contain("tag1")
-              done()
+              cloudinary.v2.uploader.remove_all_tags [first_id, second_id, 'noSuchId'], (err, res)->
+                expect(res["public_ids"]).to.contain(first_id)
+                expect(res["public_ids"]).to.contain(second_id)
+                expect(res["public_ids"]).to.not.contain('noSuchId')
+                cloudinary.v2.api.delete_resources [first_id, second_id], (err, res)->
+                  done()
 
     it "should keep existing tags when adding a new tag", (done)->
       upload_image (result1)->

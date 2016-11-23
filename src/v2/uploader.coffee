@@ -19,6 +19,7 @@ utils.v1_adapters exports, uploader,
   explode: 1,
   add_tag: 2,
   remove_tag: 2,
+  remove_all_tags: 1,
   replace_tag: 2,
   create_archive: 0,
   create_zip: 0
