@@ -135,24 +135,54 @@ describe "utils", ->
     test_cloudinary_url("test", {x:1, y:2, radius:3, gravity:'center', quality:0.4, prefix:"a"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/g_center,p_a,q_0.4,r_3,x_1,y_2/test", {})
     test_cloudinary_url("test", {gravity:'auto', crop: "crop", width:"0.5"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,g_auto,w_0.5/test", {})
 
-  it "should support named transformation" , ->
-    test_cloudinary_url("test", {transformation:"blip"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/t_blip/test", {})
+  describe "gravity", ->
+    it "should support auto", ->
+      test_cloudinary_url("test", {width: 100, height: 100, crop: 'crop', gravity: 'auto'},
+        "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,g_auto,h_100,w_100/test",
+        {width: 100, height: 100})
+      test_cloudinary_url("test", {width: 100, height: 100, crop: 'crop', gravity: 'auto'},
+        "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,g_auto,h_100,w_100/test",
+        {width: 100, height: 100})
 
-  it "should support array of named transformations" , ->
-    test_cloudinary_url("test", {transformation:["blip", "blop"]}, "http://res.cloudinary.com/#{cloud_name}/image/upload/t_blip.blop/test", {})
+    it "should support focal gravity", ->
+      ["adv_face", "adv_faces", "adv_eyes", "face", "faces", "body", "no_faces"].map (focal)->
+        test_cloudinary_url("test", {width:100, height:100, crop:'crop', gravity:"auto:#{focal}"},
+          "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,g_auto:#{focal},h_100,w_100/test",
+          {width: 100, height: 100})
 
-  it "should support base transformation" , ->
-    test_cloudinary_url("test", {transformation:{x:100, y:100, crop:'fill'}, crop:'crop', width:100}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_fill,x_100,y_100/c_crop,w_100/test", {width:100})
+    it "should support auto level with thumb cropping", ->
+      [0, 10, 100].map (level)->
+        test_cloudinary_url("test", {width:100, height:100, crop:'thumb', gravity:"auto:#{level}"},
+          "http://res.cloudinary.com/#{cloud_name}/image/upload/c_thumb,g_auto:#{level},h_100,w_100/test",
+        {width: 100, height: 100})
+        test_cloudinary_url("test", {width:100, height:100, crop:'thumb', gravity:"auto:adv_faces:#{level}"},
+          "http://res.cloudinary.com/#{cloud_name}/image/upload/c_thumb,g_auto:adv_faces:#{level},h_100,w_100/test",
+        {width: 100, height: 100})
 
-  it "should support array of base transformations" , ->
-    test_cloudinary_url("test", {transformation:[{x:100, y:100, width:200, crop:'fill'}, {radius:10}], crop:'crop', width:100}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_fill,w_200,x_100,y_100/r_10/c_crop,w_100/test", {width:100})
+    it "should support custom_no_override", ->
+      test_cloudinary_url("test", {width:100, height:100, crop:'crop', gravity:"auto:custom_no_override"},
+        "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,g_auto:custom_no_override,h_100,w_100/test",
+        {width: 100, height: 100})
 
-  it "should support array of transformations" , ->
-    result = utils.generate_transformation_string([{x:100, y:100, width:200, crop:'fill'}, {radius:10}])
-    expect(result).to.eql("c_fill,w_200,x_100,y_100/r_10")
+  describe "transformation", ->
+    it "should support named transformation" , ->
+      test_cloudinary_url("test", {transformation:"blip"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/t_blip/test", {})
 
-  it "should not include empty transformations" , ->
-    test_cloudinary_url("test", {transformation:[{}, {x:100, y:100, crop:'fill'}, {}]}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_fill,x_100,y_100/test", {})
+    it "should support array of named transformations" , ->
+      test_cloudinary_url("test", {transformation:["blip", "blop"]}, "http://res.cloudinary.com/#{cloud_name}/image/upload/t_blip.blop/test", {})
+
+    it "should support base transformation" , ->
+      test_cloudinary_url("test", {transformation:{x:100, y:100, crop:'fill'}, crop:'crop', width:100}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_fill,x_100,y_100/c_crop,w_100/test", {width:100})
+
+    it "should support array of base transformations" , ->
+      test_cloudinary_url("test", {transformation:[{x:100, y:100, width:200, crop:'fill'}, {radius:10}], crop:'crop', width:100}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_fill,w_200,x_100,y_100/r_10/c_crop,w_100/test", {width:100})
+
+    it "should support array of transformations" , ->
+      result = utils.generate_transformation_string([{x:100, y:100, width:200, crop:'fill'}, {radius:10}])
+      expect(result).to.eql("c_fill,w_200,x_100,y_100/r_10")
+
+    it "should not include empty transformations" , ->
+      test_cloudinary_url("test", {transformation:[{}, {x:100, y:100, crop:'fill'}, {}]}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_fill,x_100,y_100/test", {})
 
   it "should support size" , ->
     test_cloudinary_url("test", {size:"10x10", crop:'crop'}, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_crop,h_10,w_10/test", {width:"10", height:"10"})
