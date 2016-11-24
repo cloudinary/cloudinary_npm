@@ -255,11 +255,12 @@ describe "uploader", ->
   
   it "should allow sending face coordinates", (done) ->
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]]
+    out_coordinates = [[120, 30, 109, 51], [121, 31, 110, 51]] # coordinates are limited to the image dimensions
     different_coordinates = [[122, 32, 111, 152]]
     custom_coordinates = [1,2,3,4]
     cloudinary.v2.uploader.upload IMAGE_FILE, face_coordinates: coordinates, faces: yes, tags: TEST_TAG, (error, result) ->
       return done(new Error error.message) if error?
-      expect(result.faces).to.eql(coordinates)
+      expect(result.faces).to.eql(out_coordinates)
       cloudinary.v2.uploader.explicit result.public_id, face_coordinates: different_coordinates, custom_coordinates: custom_coordinates, type: "upload", (error2, result2) ->
         return done(new Error error2.message) if error2?
         cloudinary.v2.api.resource result2.public_id, faces: yes, coordinates: yes, (ierror, info) ->
