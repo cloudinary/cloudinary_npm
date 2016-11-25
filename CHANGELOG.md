@@ -1,4 +1,10 @@
 
+1.4.6 / 2016-11-25
+==================
+
+  * Merge pull request #118 from cloudinary/explicit-eager-transformations
+    * Support multiple eager transformations with explicit api
+
 1.4.5 / 2016-11-25
 ==================
 
