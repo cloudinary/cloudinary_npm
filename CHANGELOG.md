@@ -1,4 +1,21 @@
 
+1.4.5 / 2016-11-25
+==================
+
+New functionality
+-----------------
+
+  * Add `remove_all_tags` API
+  * Add `streaming_profile` transformation parameter.
+
+Other changes
+-------------
+
+  * Fix face coordinates test
+  * Sort parameters
+  * Support `http` mode for tests.
+  * Add tests for gravity modes
+
 1.4.4 / 2016-10-27
 ==================
 
