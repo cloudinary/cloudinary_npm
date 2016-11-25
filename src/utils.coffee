@@ -821,13 +821,14 @@ exports.archive_params = (options = {})->
   mode: options.mode
   notification_url: options.notification_url
   prefixes: options.prefixes && exports.build_array(options.prefixes)
+  transformations: utils.build_eager(options.transformations)
   public_ids: options.public_ids && exports.build_array(options.public_ids)
   tags: options.tags && exports.build_array(options.tags)
   target_format: options.target_format
   target_public_id: options.target_public_id
   target_tags: options.target_tags && exports.build_array(options.target_tags)
   timestamp: (options.timestamp ? exports.timestamp())
-  transformations: build_eager(options.transformations)
+  transformations: utils.build_eager(options.transformations)
   type: options.type
   use_original_filename: exports.as_safe_bool(options.use_original_filename)
 
@@ -840,7 +841,7 @@ exports.build_explicit_api_params = (public_id, options = {})->
   opt = [
     callback: options.callback
     custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
-    eager: build_eager(options.eager)
+    eager: utils.build_eager(options.eager)
     eager_async: utils.as_safe_bool(options.eager_async)
     eager_notification_url: options.eager_notification_url
     face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)

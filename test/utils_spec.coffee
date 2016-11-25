@@ -411,6 +411,24 @@ describe "utils", ->
     expect(utils.build_upload_params(options)['transformation']).to.eql("c_scale,w_100")
     expect(Object.keys(options).length).to.eql(2)
 
+  it "build_explicit_api_params should support mutiple eager transformations with a pipe" , ->
+    options = {
+      eager: [
+        {width:100, crop:"scale"},  
+        {height:100, crop:"fit"},  
+      ]
+    }
+    expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100")
+
+  it "archive_params should support mutiple eager transformations with a pipe" , ->
+    options = {
+      transformations: [
+        {width:200, crop:"scale"},  
+        {height:200, crop:"fit"},  
+      ]
+    }
+    expect(utils.archive_params(options)['transformations']).to.eql("c_scale,w_200|c_fit,h_200")
+
   it "build_upload_params canonize booleans" , ->
     options = {backup:true, use_filename:false, colors:"true", exif:"false", colors:"true", image_metadata:"false", invalidate:1, eager_async:"1"}
     params = utils.build_upload_params(options)
