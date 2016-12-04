@@ -852,6 +852,9 @@ exports.build_explicit_api_params = (public_id, options = {})->
     tags: options.tags && utils.build_array(options.tags).join(",")
     timestamp: (options.timestamp || exports.timestamp())
     type: options.type
+    phash: utils.as_safe_bool(options.phash)
+    colors: utils.as_safe_bool(options.colors)
+    image_metadata: utils.as_safe_bool(options.image_metadata)
   ]
   opt
 
