@@ -1,10 +1,10 @@
 _ = require("lodash")
-if process.env.CLOUDINARY_TEST_UNSECURE == 'http'
+config = require("./config")
+if config().upload_prefix && config().upload_prefix[0..4] == 'http:'
   https = require('http')
 else
   https = require('https')
 utils = require("./utils")
-config = require("./config")
 querystring = require("querystring")
 Q = require('q')
 
@@ -103,6 +103,14 @@ exports.resources_by_tag = (tag, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "tags", tag]
   call_api("get", uri, api.only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options)
+
+exports.resources_by_context= (key,value, callback, options = {}) ->
+  resource_type = options["resource_type"] ? "image"
+  uri = ["resources", resource_type, "context"]
+  params = api.only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations")
+  params.key = key
+  params.value = value if value?
+  call_api("get", uri,params , callback, options)
 
 exports.resources_by_moderation = (kind, status, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"

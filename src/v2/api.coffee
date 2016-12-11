@@ -7,6 +7,7 @@ utils.v1_adapters exports, api,
   resource_types: 0,
   resources: 0,
   resources_by_tag: 1,
+  resources_by_context: 2,
   resources_by_moderation: 2,
   resources_by_ids: 1
   resource: 1,
