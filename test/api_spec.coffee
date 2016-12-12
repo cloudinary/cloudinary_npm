@@ -109,7 +109,7 @@ describe "api", ->
     @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
 
     cloudinary.v2.api.delete_resources [PUBLIC_ID, PUBLIC_ID_1, PUBLIC_ID_2,PUBLIC_ID_5,PUBLIC_ID_6], (error, result)->
-      Q.all [
+      Q.allSettled [
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_5, tags: [TEST_TAG, @timestamp_tag], context: "test-key=test", eager: [width: 100, crop: "scale"])
@@ -120,7 +120,7 @@ describe "api", ->
         cloudinary.v2.api.delete_upload_preset("api_test_upload_preset3")
         cloudinary.v2.api.delete_upload_preset("api_test_upload_preset4")]
       .finally ->
-        setTimeout done,500
+        done()
 
   describe "resources", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources
@@ -148,15 +148,12 @@ describe "api", ->
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], (error, result)->
         return done(new Error error.message) if error?
         public_id = result.public_id
-
-        setTimeout ->
-          cloudinary.v2.api.resources type: "upload", (error, result) ->
-            return done(new Error error.message) if error?
-            resource = find_by_attr(result.resources, "public_id", public_id)
-            expect(resource).to.be.an(Object)
-            expect(resource.type).to.eql("upload")
-            done()
-        ,1000
+        cloudinary.v2.api.resources type: "upload", (error, result) ->
+          return done(new Error error.message) if error?
+          resource = find_by_attr(result.resources, "public_id", public_id)
+          expect(resource).to.be.an(Object)
+          expect(resource.type).to.eql("upload")
+          done()
 
     it "should allow listing resources by prefix", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -186,7 +183,7 @@ describe "api", ->
         expect(result.resources).to.have.length(2)
         done()
 
-    it "should allow listing resources by context and key", (done) ->
+    it "should allow listing resources by context key and value", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.resources_by_context "test-key","test", (error, result) ->
         return done(new Error error.message) if error?
