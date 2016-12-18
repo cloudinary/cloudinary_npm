@@ -411,7 +411,7 @@ describe "utils", ->
     expect(utils.build_upload_params(options)['transformation']).to.eql("c_scale,w_100")
     expect(Object.keys(options).length).to.eql(2)
 
-  it "build_explicit_api_params should support mutiple eager transformations with a pipe" , ->
+  it "build_explicit_api_params should support multiple eager transformations with a pipe" , ->
     options = {
       eager: [
         {width:100, crop:"scale"},  
@@ -420,7 +420,7 @@ describe "utils", ->
     }
     expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100")
 
-  it "archive_params should support mutiple eager transformations with a pipe" , ->
+  it "archive_params should support multiple eager transformations with a pipe" , ->
     options = {
       transformations: [
         {width:200, crop:"scale"},  
