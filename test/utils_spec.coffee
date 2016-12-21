@@ -420,7 +420,7 @@ describe "utils", ->
     }
     expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100")
 
-  it "build_explicit_api_params should support moderation with explicit api" , ->
+  it "build_explicit_api_params should support moderation" , ->
     expect(utils.build_explicit_api_params('some_id', {type: 'upload', moderation: 'manual'})[0]['moderation']).to.eql('manual')
 
   it "archive_params should support multiple eager transformations with a pipe" , ->
