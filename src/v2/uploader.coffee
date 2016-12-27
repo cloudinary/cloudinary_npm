@@ -20,6 +20,8 @@ utils.v1_adapters exports, uploader,
   add_tag: 2,
   remove_tag: 2,
   remove_all_tags: 1,
+  add_context: 2,
+  remove_all_context: 1,
   replace_tag: 2,
   create_archive: 0,
   create_zip: 0

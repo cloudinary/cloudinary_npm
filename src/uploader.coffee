@@ -193,6 +193,24 @@ call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
       params.tag = tag
     return [params]
 
+exports.add_context = (context, public_ids = [], callback, options = {}) ->
+  call_context_api(context, 'add', public_ids, callback, options)
+
+exports.remove_all_context = (public_ids = [], callback, options = {}) ->
+  call_context_api(null, 'remove_all', public_ids, callback, options)
+
+call_context_api = (context, command, public_ids = [], callback, options = {}) ->
+  call_api 'context', callback, options, ->
+    params = {
+      timestamp: utils.timestamp(),
+      public_ids: utils.build_array(public_ids),
+      command: command,
+      type: options.type
+    }
+    if context?
+      params.context = context
+    return [params]
+
 call_api = (action, callback, options, get_params) ->
   deferred = Q.defer()
   options ?= {}
