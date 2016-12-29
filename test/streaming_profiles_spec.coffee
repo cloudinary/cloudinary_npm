@@ -28,6 +28,14 @@ describe 'Cloudinary::Api', ->
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
     api = cloudinary.v2.api
 
+  after ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+    cloudinary.v2.api.delete_streaming_profile(test_id_1) unless cloudinary.config().keep_test_products
+    cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a') unless cloudinary.config().keep_test_products
+    cloudinary.v2.api.delete_streaming_profile(test_id_3) unless cloudinary.config().keep_test_products
+
   describe 'create_streaming_profile', ->
     it 'should create a streaming profile with representations', (done)->
       api.create_streaming_profile test_id_1, {representations:

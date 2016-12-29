@@ -419,6 +419,9 @@ describe "utils", ->
     }
     expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100")
 
+  it "build_explicit_api_params should support moderation" , ->
+    expect(utils.build_explicit_api_params('some_id', {type: 'upload', moderation: 'manual'})[0]['moderation']).to.eql('manual')
+
   it "build_explicit_api_params should support phash" , ->
     expect(utils.build_explicit_api_params('some_id', {type: 'upload', phash: true})[0]['phash']).to.eql('1')
 
