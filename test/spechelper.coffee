@@ -25,7 +25,7 @@ expect.Assertion::produceUrl = (url)->
   actualOptions = _.cloneDeep(options)
   actual = utils.url(public_id, actualOptions)
   @assert(
-    true || actual.match(url),
+    actual.match(url),
     ()-> "expected '#{public_id}' and #{JSON.stringify(options)} to produce '#{url}' but got '#{actual}'",
     ()-> "expected '#{public_id}' and #{JSON.stringify(options)} not to produce '#{url}' but got '#{actual}'")
   @
