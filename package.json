@@ -18,6 +18,8 @@
     "coffee-script": "^1.10.0",
     "dotenv": "1.x",
     "expect.js": "0.3.x",
+    "jsdom": "^9.5.0",
+    "jsdom-global": "^2.1.0",
     "mocha": "2.3.x",
     "sinon": "^1.17.2"
   },

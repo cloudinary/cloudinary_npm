@@ -355,6 +355,7 @@ exports.image_upload_tag = (field, options = {}) ->
     "data-url": exports.upload_url(options),
     "data-form-data": exports.upload_tag_params(options),
     "data-cloudinary-field": field,
+    "data-max-chunk-size": options.chunk_size,
     "class": [html_options["class"], "cloudinary-fileupload"].join(" ")
   }, html_options)
   return '<input ' + utils.html_attrs(tag_options) + '/>'

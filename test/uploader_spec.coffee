@@ -8,6 +8,7 @@ fs = require('fs')
 Q = require('q')
 _ = require("lodash")
 ClientRequest = require('_http_client').ClientRequest
+require('jsdom-global')()
 
 helper = require("./spechelper")
 TEST_TAG        = helper.TEST_TAG
@@ -486,5 +487,22 @@ describe "uploader", ->
         cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG]
         sinon.assert.calledWith(spy, sinon.match((arg)-> arg.toString().match(/name="invalidate"\s*1/)))
 
+  it "should create an image upload tag with required properties", () ->
+    @timeout helper.TIMEOUT_LONG
+    tag = cloudinary.v2.uploader.image_upload_tag "image_id", chunk_size: "1234"
+    expect(tag).to.match(/^<input/)
+
+    # Create an HTMLElement from the returned string to validate attributes
+    fakeDiv = document.createElement('div');
+    fakeDiv.innerHTML = tag;
+    input_element = fakeDiv.firstChild;
+    expect(input_element.tagName.toLowerCase()).to.be('input');
+    expect(input_element.getAttribute("data-url")).to.be.ok();
+    expect(input_element.getAttribute("data-form-data")).to.be.ok();
+    expect(input_element.getAttribute("data-cloudinary-field")).to.match(/image_id/);
+    expect(input_element.getAttribute("data-max-chunk-size")).to.match(/1234/);
+    expect(input_element.getAttribute("class")).to.match(/cloudinary-fileupload/);
+    expect(input_element.getAttribute("name")).to.be('file');
+    expect(input_element.getAttribute("type")).to.be('file');
 
 
