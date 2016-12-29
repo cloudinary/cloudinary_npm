@@ -847,6 +847,8 @@ exports.build_explicit_api_params = (public_id, options = {})->
     face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
     headers: build_custom_headers(options.headers)
     invalidate: utils.as_safe_bool(options.invalidate)
+    moderation: options.moderation
+    phash: utils.as_safe_bool(options.phash)
     public_id: public_id
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints)
     tags: options.tags && utils.build_array(options.tags).join(",")
