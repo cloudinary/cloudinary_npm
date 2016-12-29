@@ -53,8 +53,11 @@ describe 'Cloudinary::Api', ->
 
   describe 'delete_streaming_profile', ->
     it 'should delete a streaming profile', (done)->
-      api.create_streaming_profile test_id_2, {representations:
-          [{transformation: {crop: 'scale', width: '1200', height: '1200', bit_rate: '5m'}}]}, (error, result)->
+      @timeout 5000
+      api.create_streaming_profile test_id_2, {
+        representations:
+          [{transformation: {crop: 'scale', width: '1200', height: '1200', bit_rate: '5m'}}]
+      }, (error, result)->
         expect(error).to.be undefined
         expect(result).not.to.be(undefined)
         api.delete_streaming_profile test_id_2, (error, result)->

@@ -76,8 +76,8 @@ describe "api", ->
 
       cloudinary.v2.api.delete_resources_by_tag helper.TEST_TAG, (error, result) ->
         if error?
-          done(new Error error.message) 
-        else 
+          done(new Error error.message)
+        else
           done()
 
   SUFFIX = Math.floor(Math.random() * 99999)
