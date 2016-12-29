@@ -287,7 +287,6 @@ describe "utils", ->
                 .and.beServedByCloudinary(done)
     it "should correctly sign URL with transformation", (done)->
       options["transformation"] = { crop: "crop", width: 10, height: 20 } # TODO duplicate?
-      delete options.version
       expect(["#{authenticated_image['public_id']}.jpg", options])
         .to.produceUrl(new RegExp("#{authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/#{expected_transformation}v#{authenticated_image['version']}/#{authenticated_image['public_id']}.jpg"))
               .and.emptyOptions()
@@ -422,6 +421,9 @@ describe "utils", ->
 
   it "build_explicit_api_params should support moderation" , ->
     expect(utils.build_explicit_api_params('some_id', {type: 'upload', moderation: 'manual'})[0]['moderation']).to.eql('manual')
+
+  it "build_explicit_api_params should support phash" , ->
+    expect(utils.build_explicit_api_params('some_id', {type: 'upload', phash: true})[0]['phash']).to.eql('1')
 
   it "archive_params should support multiple eager transformations with a pipe" , ->
     options = {
