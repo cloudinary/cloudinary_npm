@@ -194,17 +194,24 @@ describe "api", ->
           done()
 
     it "should allow listing resources by start_at", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      setTimeout ->
-        cloudinary.v2.uploader.upload IMAGE_FILE, (error, response) ->
-          done(new Error error.message) if error?
-          start_at = new Date(new Date( response.created_at) - 500)
-          cloudinary.v2.api.resources type: "upload", start_at: start_at, direction: "asc", (error, resources_response) ->
-            done(new Error error.message) if error?
-            expect(resources_response.resources).to.have.length(1)
-            expect(resources_response.resources[0].public_id).to.eql(response.public_id)
-            done()
-      ,1000
+      xhr = sinon.useFakeXMLHttpRequest()
+      writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+      requestSpy = sinon.spy(http, 'request')
+      start_at = new Date().toString()
+      cloudinary.v2.api.resources( type: "upload", start_at: start_at, direction: "asc"
+      ).then ->
+        if writeSpy.called
+          sinon.assert.calledWith writeSpy, sinon.match(/stazdfasrt_at=10/)
+        else
+          formatted = encodeURIComponent(start_at.slice(0,start_at.search("\\("))) # cut the date string before the '('
+        done()
+      .fail (error)->
+        done(error)
+      .finally ->
+        writeSpy.restore()
+        requestSpy.restore()
+        xhr.restore()
+
 
     it "should allow get resource metadata", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
