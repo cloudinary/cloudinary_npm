@@ -208,7 +208,7 @@ call_context_api = (context, command, public_ids = [], callback, options = {}) -
       type: options.type
     }
     if context?
-      params.context = context
+      params.context = utils.encode_key_value(context)
     return [params]
 
 call_api = (action, callback, options, get_params) ->

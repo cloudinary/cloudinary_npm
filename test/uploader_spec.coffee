@@ -37,7 +37,7 @@ describe "uploader", ->
   upload_image = (callback)->
     cloudinary.v2.uploader.upload IMAGE_FILE, tags: TEST_TAG, (error, result) ->
       expect(error).to.be undefined
-      callback(result)
+      callback?(result)
 
   beforeEach ->
     cloudinary.config(true)
@@ -213,31 +213,41 @@ describe "uploader", ->
             done()
 
   describe "context", ()->
+    second_id = first_id = ''
     @timeout helper.TIMEOUT_MEDIUM
-    it "should add context to existing resources", (done) ->
-      upload_image (result1)->
+    before (done)->
+      Q.all [
+        upload_image()
+        upload_image()
+        ]
+      .spread (result1, result2)->
         first_id = result1.public_id
-        upload_image (result2)->
-          second_id = result2.public_id
-          cloudinary.v2.uploader.add_context 'alt=testAlt|custom=testCustom', [first_id, second_id], (et1, rt1) ->
-            return done(new Error et1.message) if et1?
-            cloudinary.v2.api.resource second_id, (error, r1) ->
+        second_id = result2.public_id
+        done()
+      .fail (error)->
+        done(new Error(error.message))
+    it "should add context to existing resources", (done) ->
+      cloudinary.v2.uploader.add_context 'alt=testAlt|custom=testCustom', [first_id, second_id], (et1, rt1) ->
+        return done(new Error et1.message) if et1?
+        cloudinary.v2.uploader.add_context {alt2: "testAlt2", custom2: "testCustom2"}, [first_id, second_id], (et1, rt1) ->
+          return done(new Error et1.message) if et1?
+          cloudinary.v2.api.resource second_id, (error, r1) ->
+            return done(new Error error.message) if error
+            expect(r1.context.custom.alt).to.equal('testAlt')
+            expect(r1.context.custom.alt2).to.equal('testAlt2')
+            expect(r1.context.custom.custom).to.equal('testCustom')
+            expect(r1.context.custom.custom2).to.equal('testCustom2')
+
+            cloudinary.v2.uploader.remove_all_context [first_id, second_id, 'noSuchId'], (err, res)->
               return done(new Error error.message) if error
-              expect(r1.context.custom.alt).to.equal('testAlt')
-              expect(r1.context.custom.custom).to.equal('testCustom')
+              expect(res["public_ids"]).to.contain(first_id)
+              expect(res["public_ids"]).to.contain(second_id)
+              expect(res["public_ids"]).to.not.contain('noSuchId')
 
-              cloudinary.v2.uploader.remove_all_context [first_id, second_id, 'noSuchId'], (err, res)->
-                expect(res["public_ids"]).to.contain(first_id)
-                expect(res["public_ids"]).to.contain(second_id)
-                expect(res["public_ids"]).to.not.contain('noSuchId')
-
-                cloudinary.v2.api.resource second_id, (error, r1) ->
-                  return done(new Error error.message) if error
-                  console.log(r1)
-                  expect(r1.context).to.be undefined
-
-                cloudinary.v2.api.delete_resources [first_id, second_id], (err, res)->
-                  done()
+              cloudinary.v2.api.resource second_id, (error, r1) ->
+                return done(new Error error.message) if error
+                expect(r1.context).to.be undefined
+                done()
 
   it "should support timeouts", (done) ->
     # testing a 1ms timeout, nobody is that fast.
