@@ -17,7 +17,7 @@ describe 'Cloudinary::Api', ->
   PREDEFINED_PROFILES = ["4k", "full_hd", "hd", "sd", "full_hd_wifi", "full_hd_lean", "hd_lean"]
 
 
-  prefix = helper.TEST_TAG + "_#{new Date().getMilliseconds()}"
+  prefix = helper.TEST_TAG
   test_id_1 = "#{prefix}_1"
   test_id_2 = "#{prefix}_2"
   test_id_3 = "#{prefix}_3"
