@@ -19,10 +19,16 @@ EMPTY_IMAGE     = helper.EMPTY_IMAGE
 RAW_FILE        = helper.RAW_FILE
 
 describe "uploader", ->
-  return console.warn("**** Please setup environment for uploader test to run!") if !cloudinary.config().api_secret?
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
   @timeout helper.TIMEOUT_SHORT
   after ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
     cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
 
   ###*
@@ -32,7 +38,7 @@ describe "uploader", ->
   upload_image = (callback)->
     cloudinary.v2.uploader.upload IMAGE_FILE, tags: TEST_TAG, (error, result) ->
       expect(error).to.be undefined
-      callback(result)
+      callback?(result)
 
   beforeEach ->
     cloudinary.config(true)
@@ -180,7 +186,12 @@ describe "uploader", ->
             cloudinary.v2.api.resource second_id, (error, r1) ->
               return done(new Error error.message) if error
               expect(r1.tags).to.contain("tag1")
-              done()
+              cloudinary.v2.uploader.remove_all_tags [first_id, second_id, 'noSuchId'], (err, res)->
+                expect(res["public_ids"]).to.contain(first_id)
+                expect(res["public_ids"]).to.contain(second_id)
+                expect(res["public_ids"]).to.not.contain('noSuchId')
+                cloudinary.v2.api.delete_resources [first_id, second_id], (err, res)->
+                  done()
 
     it "should keep existing tags when adding a new tag", (done)->
       upload_image (result1)->
@@ -201,6 +212,43 @@ describe "uploader", ->
             return done(new Error error.message) if error?
             expect(result.tags).to.eql(["tag3Å"])
             done()
+
+  describe "context", ()->
+    second_id = first_id = ''
+    @timeout helper.TIMEOUT_MEDIUM
+    before (done)->
+      Q.all [
+        upload_image()
+        upload_image()
+        ]
+      .spread (result1, result2)->
+        first_id = result1.public_id
+        second_id = result2.public_id
+        done()
+      .fail (error)->
+        done(new Error(error.message))
+    it "should add context to existing resources", (done) ->
+      cloudinary.v2.uploader.add_context 'alt=testAlt|custom=testCustom', [first_id, second_id], (et1, rt1) ->
+        return done(new Error et1.message) if et1?
+        cloudinary.v2.uploader.add_context {alt2: "testAlt2", custom2: "testCustom2"}, [first_id, second_id], (et1, rt1) ->
+          return done(new Error et1.message) if et1?
+          cloudinary.v2.api.resource second_id, (error, r1) ->
+            return done(new Error error.message) if error
+            expect(r1.context.custom.alt).to.equal('testAlt')
+            expect(r1.context.custom.alt2).to.equal('testAlt2')
+            expect(r1.context.custom.custom).to.equal('testCustom')
+            expect(r1.context.custom.custom2).to.equal('testCustom2')
+
+            cloudinary.v2.uploader.remove_all_context [first_id, second_id, 'noSuchId'], (err, res)->
+              return done(new Error error.message) if error
+              expect(res["public_ids"]).to.contain(first_id)
+              expect(res["public_ids"]).to.contain(second_id)
+              expect(res["public_ids"]).to.not.contain('noSuchId')
+
+              cloudinary.v2.api.resource second_id, (error, r1) ->
+                return done(new Error error.message) if error
+                expect(r1.context).to.be undefined
+                done()
 
   it "should support timeouts", (done) ->
     # testing a 1ms timeout, nobody is that fast.
@@ -245,11 +293,12 @@ describe "uploader", ->
   
   it "should allow sending face coordinates", (done) ->
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]]
+    out_coordinates = [[120, 30, 109, 51], [121, 31, 110, 51]] # coordinates are limited to the image dimensions
     different_coordinates = [[122, 32, 111, 152]]
     custom_coordinates = [1,2,3,4]
     cloudinary.v2.uploader.upload IMAGE_FILE, face_coordinates: coordinates, faces: yes, tags: TEST_TAG, (error, result) ->
       return done(new Error error.message) if error?
-      expect(result.faces).to.eql(coordinates)
+      expect(result.faces).to.eql(out_coordinates)
       cloudinary.v2.uploader.explicit result.public_id, face_coordinates: different_coordinates, custom_coordinates: custom_coordinates, type: "upload", (error2, result2) ->
         return done(new Error error2.message) if error2?
         cloudinary.v2.api.resource result2.public_id, faces: yes, coordinates: yes, (ierror, info) ->

@@ -24,8 +24,10 @@ includeContext = helper.includeContext
 ARCHIVE_TAG = "archive_test_tag_#{Math.floor(Math.random() * 10000)}"
 
 sharedExamples 'archive', ->
+
   before (done)->
     @timeout helper.TIMEOUT_LONG
+
     Q.all [
       uploader.upload(
         "http://res.cloudinary.com/demo/image/upload/sample.jpg",
@@ -45,16 +47,27 @@ sharedExamples 'archive', ->
     .finally ->
       done()
 
+  after "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+
   after ->
     cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
 
 describe "utils", ->
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+
   includeContext.call @, 'archive'
 
   describe '.generate_zip_download_url', ->
     @timeout helper.TIMEOUT_LONG
-    archive_result =
-      utils.download_zip_url
+    archive_result = undefined
+    before ->
+      archive_result = utils.download_zip_url
         target_public_id: 'gem_archive_test'
         public_ids: ["tag_sample", "tag_samplebw"]
         target_tags: ARCHIVE_TAG
@@ -80,6 +93,11 @@ describe "utils", ->
               done()
 
 describe "uploader", ->
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+
   includeContext.call @, 'archive'
   describe '.create_archive', ->
     @timeout helper.TIMEOUT_LONG

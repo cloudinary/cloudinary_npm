@@ -60,18 +60,24 @@ sharedExamples "accepts next_cursor", (testFunc, args...)->
       sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/next_cursor=23452342/))
 
 
-
 describe "api", ->
-  return console.warn("**** Please setup environment for api test to run!") if !cloudinary.config().api_secret?
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
   after (done)->
     if cloudinary.config().keep_test_products
       done()
     else
+      config = cloudinary.config()
+      if(!(config.api_key && config.api_secret))
+        expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+
       cloudinary.v2.api.delete_resources_by_tag helper.TEST_TAG, (error, result) ->
         if error?
-          done(new Error error.message) 
-        else 
+          done(new Error error.message)
+        else
           done()
 
   SUFFIX = Math.floor(Math.random() * 99999)

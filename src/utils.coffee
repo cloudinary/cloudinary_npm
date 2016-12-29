@@ -39,14 +39,14 @@ CONDITIONAL_OPERATORS =
   "||": 'or'
 
 CONDITIONAL_PARAMETERS =
-  "width": "w"
-  "height": "h"
   "aspect_ratio": "ar"
   "aspectRatio": "ar"
-  "page_count": "pc"
-  "pageCount": "pc"
   "face_count": "fc"
   "faceCount": "fc"
+  "height": "h"
+  "page_count": "pc"
+  "pageCount": "pc"
+  "width": "w"
 
 LAYER_KEYWORD_PARAMS =
   font_weight: "normal"
@@ -130,34 +130,34 @@ process_layer = (layer)->
 
 exports.build_upload_params = (options) ->
   params =
-    timestamp: exports.timestamp()
-    transformation: utils.generate_transformation_string(_.clone(options))
-    public_id: options.public_id
-    callback: options.callback
-    format: options.format
-    backup: utils.as_safe_bool(options.backup)
-    faces: utils.as_safe_bool(options.faces)
-    exif: utils.as_safe_bool(options.exif)
-    image_metadata: utils.as_safe_bool(options.image_metadata)
-    colors: utils.as_safe_bool(options.colors)
-    type: options.type
-    eager: utils.build_eager(options.eager)
-    use_filename: utils.as_safe_bool(options.use_filename)
-    unique_filename: utils.as_safe_bool(options.unique_filename)
-    discard_original_filename: utils.as_safe_bool(options.discard_original_filename)
-    notification_url: options.notification_url
-    eager_notification_url: options.eager_notification_url
-    eager_async: utils.as_safe_bool(options.eager_async)
-    invalidate: utils.as_safe_bool(options.invalidate)
-    proxy: options.proxy
-    folder: options.folder
-    overwrite: utils.as_safe_bool(options.overwrite)
     allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(",")
+    backup: utils.as_safe_bool(options.backup)
+    callback: options.callback
+    colors: utils.as_safe_bool(options.colors)
+    discard_original_filename: utils.as_safe_bool(options.discard_original_filename)
+    eager: utils.build_eager(options.eager)
+    eager_async: utils.as_safe_bool(options.eager_async)
+    eager_notification_url: options.eager_notification_url
+    exif: utils.as_safe_bool(options.exif)
+    faces: utils.as_safe_bool(options.faces)
+    folder: options.folder
+    format: options.format
+    image_metadata: utils.as_safe_bool(options.image_metadata)
+    invalidate: utils.as_safe_bool(options.invalidate)
     moderation: options.moderation
+    notification_url: options.notification_url
+    overwrite: utils.as_safe_bool(options.overwrite)
     phash: utils.as_safe_bool(options.phash)
-    upload_preset: options.upload_preset
+    proxy: options.proxy
+    public_id: options.public_id
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options["responsive_breakpoints"])
     return_delete_token: utils.as_safe_bool(options.return_delete_token)
+    timestamp: exports.timestamp()
+    transformation: utils.generate_transformation_string(_.clone(options))
+    type: options.type
+    unique_filename: utils.as_safe_bool(options.unique_filename)
+    upload_preset: options.upload_preset
+    use_filename: utils.as_safe_bool(options.use_filename)
   utils.updateable_resource_params(options, params)
 
 exports.timestamp = ->
@@ -313,6 +313,7 @@ exports.generate_transformation_string = (options) ->
     quality: "q"
     radius: "r"
     start_offset: "so"
+    streaming_profile: "sp"
     video_codec: "vc"
     video_sampling: "vs"
     x: "x"
@@ -349,18 +350,18 @@ exports.generate_transformation_string = (options) ->
   _.filter(transformations, utils.present).join "/"
 
 exports.updateable_resource_params = (options, params = {}) ->
-  params.tags = utils.build_array(options.tags).join(",") if options.tags?
+  params.auto_tagging = options.auto_tagging if options.auto_tagging?
+  params.background_removal = options.background_removal if options.background_removal?
+  params.categorization = options.categorization if options.categorization?
   params.context = utils.encode_key_value(options.context) if options.context?
-  params.face_coordinates = utils.encode_double_array(options.face_coordinates) if options.face_coordinates?
   params.custom_coordinates = utils.encode_double_array(options.custom_coordinates) if options.custom_coordinates?
+  params.detection = options.detection if options.detection?
+  params.face_coordinates = utils.encode_double_array(options.face_coordinates) if options.face_coordinates?
   params.headers = utils.build_custom_headers(options.headers) if options.headers?
   params.ocr = options.ocr if options.ocr?
   params.raw_convert = options.raw_convert if options.raw_convert?
-  params.categorization = options.categorization if options.categorization?
-  params.detection = options.detection if options.detection?
   params.similarity_search = options.similarity_search if options.similarity_search?
-  params.auto_tagging = options.auto_tagging if options.auto_tagging?
-  params.background_removal = options.background_removal if options.background_removal?
+  params.tags = utils.build_array(options.tags).join(",") if options.tags?
 
   params
 
@@ -813,22 +814,23 @@ process_video_params = (param) ->
 # @private
 ###
 exports.archive_params = (options = {})->
-  timestamp: (options.timestamp ? exports.timestamp())
-  type: options.type
-  mode: options.mode
-  target_format: options.target_format
-  target_public_id: options.target_public_id
+  async: exports.as_safe_bool(options.async)
   flatten_folders: exports.as_safe_bool(options.flatten_folders)
   flatten_transformations: exports.as_safe_bool(options.flatten_transformations)
-  use_original_filename: exports.as_safe_bool(options.use_original_filename)
-  async: exports.as_safe_bool(options.async)
-  notification_url: options.notification_url
-  target_tags: options.target_tags && exports.build_array(options.target_tags)
   keep_derived: exports.as_safe_bool(options.keep_derived)
-  tags: options.tags && exports.build_array(options.tags)
-  public_ids: options.public_ids && exports.build_array(options.public_ids)
+  mode: options.mode
+  notification_url: options.notification_url
   prefixes: options.prefixes && exports.build_array(options.prefixes)
-  transformations: build_eager(options.transformations)
+  transformations: utils.build_eager(options.transformations)
+  public_ids: options.public_ids && exports.build_array(options.public_ids)
+  tags: options.tags && exports.build_array(options.tags)
+  target_format: options.target_format
+  target_public_id: options.target_public_id
+  target_tags: options.target_tags && exports.build_array(options.target_tags)
+  timestamp: (options.timestamp ? exports.timestamp())
+  transformations: utils.build_eager(options.transformations)
+  type: options.type
+  use_original_filename: exports.as_safe_bool(options.use_original_filename)
 
 build_custom_headers = (headers)->
   (for a in Array(headers) when a?.join?
@@ -839,12 +841,14 @@ exports.build_explicit_api_params = (public_id, options = {})->
   opt = [
     callback: options.callback
     custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
-    eager: build_eager(options.eager)
+    eager: utils.build_eager(options.eager)
     eager_async: utils.as_safe_bool(options.eager_async)
     eager_notification_url: options.eager_notification_url
     face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
     headers: build_custom_headers(options.headers)
     invalidate: utils.as_safe_bool(options.invalidate)
+    moderation: options.moderation
+    phash: utils.as_safe_bool(options.phash)
     public_id: public_id
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints)
     tags: options.tags && utils.build_array(options.tags).join(",")
@@ -866,6 +870,20 @@ exports.generate_responsive_breakpoints_string = (breakpoints)->
       if transformation
         breakpoint_settings.transformation = utils.generate_transformation_string(_.clone(transformation))
   JSON.stringify(breakpoints)
+
+exports.build_streaming_profiles_param = (options={})->
+  params = utils.only(options, "display_name", "representations")
+  if _.isArray(params["representations"])
+    params["representations"] = JSON.stringify(params["representations"].map (r)->
+      {transformation: utils.generate_transformation_string(r.transformation)}
+    )
+  params
+
+exports.only = (hash, keys...) ->
+  result = {}
+  for key in keys
+    result[key] = hash[key] if hash[key]?
+  result
 
 ###*
 # @private

@@ -1,4 +1,44 @@
 
+1.4.6 / 2016-11-25
+==================
+
+  * Merge pull request #118 from cloudinary/explicit-eager-transformations
+    * Support multiple eager transformations with explicit api
+
+1.4.5 / 2016-11-25
+==================
+
+New functionality
+-----------------
+
+  * Add `remove_all_tags` API
+  * Add `streaming_profile` transformation parameter.
+
+Other changes
+-------------
+
+  * Fix face coordinates test
+  * Sort parameters
+  * Support `http` mode for tests.
+  * Add tests for gravity modes
+
+1.4.4 / 2016-10-27
+==================
+
+New functionality
+-----------------
+
+  * Add streaming profiles API
+
+Other changes
+-------------
+
+  * Change email address in sample project's bower.json
+  * Add files to `.npmignore`
+
+1.4.3 / 2016-10-27
+==================
+
 1.4.2 / 2016-09-14
 ==================
 

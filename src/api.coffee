@@ -1,5 +1,8 @@
 _ = require("lodash")
-https = require('https')
+if process.env.CLOUDINARY_TEST_UNSECURE == 'http'
+  https = require('http')
+else
+  https = require('https')
 utils = require("./utils")
 config = require("./config")
 querystring = require("querystring")
@@ -9,12 +12,11 @@ api = module.exports
 
 call_api = (method, uri, params, callback, options) ->
   deferred = Q.defer()
-  cloudinary = options["upload_prefix"] ? config().upload_prefix ? "https://api.cloudinary.com"
-  cloud_name = options["cloud_name"] ? config().cloud_name ? throw("Must supply cloud_name")
-  api_key = options["api_key"] ? config().api_key ? throw("Must supply api_key")
-  api_secret = options["api_secret"] ? config().api_secret ? throw("Must supply api_secret")
+  cloudinary = options["upload_prefix"] ? config("upload_prefix") ? "https://api.cloudinary.com"
+  cloud_name = options["cloud_name"] ? config("cloud_name") ? throw("Must supply cloud_name")
+  api_key = options["api_key"] ? config("api_key") ? throw("Must supply api_key")
+  api_secret = options["api_secret"] ? config("api_secret") ? throw("Must supply api_secret")
   api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/")
-
   query_params = querystring.stringify(params)
   if method == "get"
     api_url += "?" + query_params
@@ -223,7 +225,7 @@ exports.upload_mappings = (callback, options = {})->
   params = api.only(options, "next_cursor", "max_results")
   call_api("get", "upload_mappings", params, callback, options)
 
-exports.upload_mapping = (name = nil, callback, options = {})->
+exports.upload_mapping = (name = null, callback, options = {})->
   call_api("get", 'upload_mappings', {folder: name}, callback, options)
 
 exports.delete_upload_mapping = (name, callback, options = {})->
@@ -256,6 +258,23 @@ exports.publish_by_tag = (tag, callback, options={})->
 exports.publish_by_ids = (public_ids, callback, options={})->
   publishResource("public_ids", public_ids, callback,options)
 
+exports.list_streaming_profiles = (callback, options = {})->
+  call_api("get", "streaming_profiles", {}, callback, options)
+
+exports.get_streaming_profile = (name, callback, options = {})->
+  call_api("get", "streaming_profiles/#{name}", {}, callback, options)
+
+exports.delete_streaming_profile = (name, callback, options = {})->
+  call_api("delete", "streaming_profiles/#{name}", {}, callback, options)
+
+exports.update_streaming_profile = (name, callback, options = {})->
+  params = utils.build_streaming_profiles_param(options)
+  call_api("put", "streaming_profiles/#{name}", params, callback, options)
+
+exports.create_streaming_profile = (name, callback, options = {})->
+  params = utils.build_streaming_profiles_param(options)
+  params["name"] = name
+  call_api("post", 'streaming_profiles', params, callback, options)
 
 exports.only = (hash, keys...) ->
   result = {}
