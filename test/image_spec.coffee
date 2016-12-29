@@ -25,6 +25,9 @@ describe 'image helper', ->
   it "should support dpr auto transformation", ->
     expect(cloudinary.image("hello", format: "png", dpr: "auto")).to.eql("<img class='cld-hidpi' data-src='http://res.cloudinary.com/test/image/upload/dpr_auto/hello.png'/>")
 
+  it "should support e_art:incognito transformation", ->
+    expect(cloudinary.image("hello", format: "png", effect: "art:incognito")).to.eql("<img src='http://res.cloudinary.com/test/image/upload/e_art:incognito/hello.png' />")
+
   it "should not mutate the options argument", ->
     options =
       fetch_format: 'auto'
