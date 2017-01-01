@@ -417,7 +417,7 @@ exports.url = (public_id, options = {}) ->
   if sign_url
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     shasum = crypto.createHash('sha1')
-    shasum.update(utf8_encode(to_sign + api_secret))
+    shasum.update(utf8_encode(to_sign + api_secret), 'binary')
     signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, 8)
     signature = "s--#{signature}--"
 
@@ -597,7 +597,7 @@ exports.signed_preloaded_image = (result) ->
 exports.api_sign_request = (params_to_sign, api_secret) ->
   to_sign = _.sortBy("#{k}=#{utils.build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
   shasum = crypto.createHash('sha1')
-  shasum.update(utf8_encode(to_sign + api_secret))
+  shasum.update(utf8_encode(to_sign + api_secret), 'binary')
   shasum.digest('hex')
 
 exports.clear_blank = (hash) ->
@@ -626,7 +626,7 @@ exports.webhook_signature = (data, timestamp, options = {}) ->
   throw "Must supply timestamp"  unless timestamp
   api_secret = options.api_secret ? config().api_secret ? throw("Must supply api_secret")
   shasum = crypto.createHash('sha1')
-  shasum.update(data + timestamp + api_secret)
+  shasum.update(data + timestamp + api_secret, 'binary')
   shasum.digest('hex')
 
 exports.process_request_params = (params, options) ->
