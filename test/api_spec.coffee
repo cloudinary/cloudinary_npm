@@ -74,18 +74,29 @@ describe "api", ->
       if(!(config.api_key && config.api_secret))
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
-      cloudinary.v2.api.delete_resources_by_tag helper.TEST_TAG, (error, result) ->
+      cloudinary.v2.api.delete_resources_by_tag TEST_TAG, (error, result) ->
         if error?
           done(new Error error.message)
         else
           done()
 
   SUFFIX = Math.floor(Math.random() * 99999)
-  PUBLIC_ID = "npm_api_test" + SUFFIX
-  PUBLIC_ID_1 = PUBLIC_ID + "_1" + SUFFIX
-  PUBLIC_ID_2 = PUBLIC_ID + "_2" + SUFFIX
-  PUBLIC_ID_3 = PUBLIC_ID + "_3" + SUFFIX
-  PUBLIC_ID_4 = PUBLIC_ID + "_4" + SUFFIX
+  PUBLIC_ID_PREFIX = "npm_api_test"
+  PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX
+  PUBLIC_ID_1 = PUBLIC_ID_PREFIX + "_1_" + SUFFIX
+  PUBLIC_ID_2 = PUBLIC_ID_PREFIX + "_2_" + SUFFIX
+  PUBLIC_ID_3 = PUBLIC_ID_PREFIX + "_3_" + SUFFIX
+  PUBLIC_ID_4 = PUBLIC_ID_PREFIX + "_4_" + SUFFIX
+
+  NAMED_TRANSFORMATION = "api_test_transformation" + SUFFIX
+  API_TEST_UPLOAD_PRESET1 = "api_test_upload_preset_1_" + SUFFIX
+  API_TEST_UPLOAD_PRESET2 = "api_test_upload_preset_2_" + SUFFIX
+  API_TEST_UPLOAD_PRESET3 = "api_test_upload_preset_3_" + SUFFIX
+  API_TEST_UPLOAD_PRESET4 = "api_test_upload_preset_4_" + SUFFIX
+
+  random_width = Math.floor(Math.random() * 9999)
+  EXPLICIT_TRANSFORMATION_NAME = "c_scale,w_" + random_width
+  EXPLICIT_TRANSFORMATION = {width: random_width, crop: "scale"}
 
   find_by_attr = (elements, attr, value) ->
     for element in elements
@@ -106,17 +117,24 @@ describe "api", ->
     @timeout 0
     @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
 
-    cloudinary.v2.api.delete_resources [PUBLIC_ID, PUBLIC_ID_1, PUBLIC_ID_2], (error, result)->
-      Q.all [
-        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
-        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [width: 100, crop: "scale"])
-        cloudinary.v2.api.delete_transformation("api_test_transformation")
-        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset1")
-        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset2")
-        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset3")
-        cloudinary.v2.api.delete_upload_preset("api_test_upload_preset4")]
-      .finally ->
-        done()
+    Q.all [
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [EXPLICIT_TRANSFORMATION])
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [EXPLICIT_TRANSFORMATION])]
+    .finally ->
+      done()
+
+  after (done) ->
+    @timeout 0
+    @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
+
+    Q.all [
+      cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1)
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2)
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3)
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)]
+    .finally ->
+      done()
 
   describe "resources", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources
@@ -153,7 +171,7 @@ describe "api", ->
 
     it "should allow listing resources by prefix", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources type: "upload", prefix: PUBLIC_ID, max_results: 500, (error, result) ->
+      cloudinary.v2.api.resources type: "upload", prefix: PUBLIC_ID_PREFIX, max_results: 500, (error, result) ->
         return done(new Error error.message) if error?
         public_ids = (resource.public_id for resource in result.resources)
         expect(public_ids).to.contain(PUBLIC_ID)
@@ -215,7 +233,7 @@ describe "api", ->
 
     it "should allow get resource metadata", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], eager: [width: 100, crop: "scale"], (error, result)->
+      cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], eager: [EXPLICIT_TRANSFORMATION], (error, result)->
         done(new Error error.message) if error?
         public_id = result.public_id
         cloudinary.v2.api.resource public_id, (error, resource) ->
@@ -313,48 +331,48 @@ describe "api", ->
         done()
 
   describe "transformations", ()->
-    itBehavesLike "a list with a cursor", cloudinary.v2.api.transformation, "c_scale,w_100"
+    itBehavesLike "a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME
     itBehavesLike "a list with a cursor", cloudinary.v2.api.transformations
 
     it "should allow listing transformations", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.transformations (error, result) ->
         return done(new Error error.message) if error?
-        transformation = find_by_attr(result.transformations, "name", "c_scale,w_100")
+        transformation = find_by_attr(result.transformations, "name", EXPLICIT_TRANSFORMATION_NAME)
         expect(transformation).not.to.eql(undefined)
         expect(transformation.used).to.be.ok
         done()
 
     it "should allow getting transformation metadata", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformation "c_scale,w_100", (error, transformation) ->
+      cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
         expect(transformation).not.to.eql(undefined)
-        expect(transformation.info).to.eql([crop: "scale", width: 100])
+        expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION])
         done()
 
     it "should allow getting transformation metadata by info", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformation {crop: "scale", width: 100}, (error, transformation) ->
+      cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION, (error, transformation) ->
         expect(transformation).not.to.eql(undefined)
-        expect(transformation.info).to.eql([crop: "scale", width: 100])
+        expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION])
         done()
 
     it "should allow updating transformation allowed_for_strict", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.update_transformation "c_scale,w_100", {allowed_for_strict: true}, () ->
-        cloudinary.v2.api.transformation "c_scale,w_100", (error, transformation) ->
+      cloudinary.v2.api.update_transformation EXPLICIT_TRANSFORMATION_NAME, {allowed_for_strict: true}, () ->
+        cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
           expect(transformation).not.to.eql(undefined)
           expect(transformation.allowed_for_strict).to.be.ok
-          cloudinary.v2.api.update_transformation "c_scale,w_100", {allowed_for_strict: false}, () ->
-            cloudinary.v2.api.transformation "c_scale,w_100", (error, transformation) ->
+          cloudinary.v2.api.update_transformation EXPLICIT_TRANSFORMATION_NAME, {allowed_for_strict: false}, () ->
+            cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
               expect(transformation).not.to.eql(undefined)
               expect(transformation.allowed_for_strict).not.to.be.ok
               done()
 
     it "should allow creating named transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_transformation "api_test_transformation", {crop: "scale", width: 102}, () ->
-        cloudinary.v2.api.transformation "api_test_transformation", (error, transformation) ->
+      cloudinary.v2.api.create_transformation NAMED_TRANSFORMATION, {crop: "scale", width: 102}, () ->
+        cloudinary.v2.api.transformation NAMED_TRANSFORMATION, (error, transformation) ->
           expect(transformation).not.to.eql(undefined)
           expect(transformation.allowed_for_strict).to.be.ok
           expect(transformation.info).to.eql([crop: "scale", width: 102])
@@ -373,17 +391,17 @@ describe "api", ->
 
     it "should allow deleting named transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.delete_transformation "api_test_transformation", () ->
-        cloudinary.v2.api.transformation "api_test_transformation", (error, transformation) ->
+      cloudinary.v2.api.delete_transformation NAMED_TRANSFORMATION, () ->
+        cloudinary.v2.api.transformation NAMED_TRANSFORMATION, (error, transformation) ->
           expect(error.http_code).to.eql 404
           done()
 
     it "should allow deleting implicit transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformation "c_scale,w_100", (error, transformation) ->
+      cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
         expect(transformation).to.be.an(Object)
-        cloudinary.v2.api.delete_transformation "c_scale,w_100", () ->
-          cloudinary.v2.api.transformation "c_scale,w_100", (error, transformation) ->
+        cloudinary.v2.api.delete_transformation EXPLICIT_TRANSFORMATION_NAME, () ->
+          cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
             expect(error.http_code).to.eql 404
             done()
 
@@ -391,7 +409,7 @@ describe "api", ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_presets
     it "should allow creating and listing upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      create_names = ["api_test_upload_preset3", "api_test_upload_preset2", "api_test_upload_preset1"]
+      create_names = [API_TEST_UPLOAD_PRESET3, API_TEST_UPLOAD_PRESET2, API_TEST_UPLOAD_PRESET1]
       delete_names = []
       after_delete = ->
         delete_names.pop()
@@ -414,13 +432,13 @@ describe "api", ->
 
     it "should allow getting a single upload_preset", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_upload_preset unsigned: true, folder: "folder", transformation: {width: 100, crop: "scale"}, tags: ["a","b","c"], context: {a: "b", c: "d"}, (error, preset) ->
+      cloudinary.v2.api.create_upload_preset unsigned: true, folder: "folder", transformation: EXPLICIT_TRANSFORMATION, tags: ["a","b","c"], context: {a: "b", c: "d"}, (error, preset) ->
         name = preset.name
         cloudinary.v2.api.upload_preset name, (error, preset) ->
           expect(preset.name).to.eql(name)
           expect(preset.unsigned).to.eql(true)
           expect(preset.settings.folder).to.eql("folder")
-          expect(preset.settings.transformation).to.eql([{width: 100, crop: "scale"}])
+          expect(preset.settings.transformation).to.eql([EXPLICIT_TRANSFORMATION])
           expect(preset.settings.context).to.eql({a: "b", c: "d"})
           expect(preset.settings.tags).to.eql(["a","b","c"])
           cloudinary.v2.api.delete_upload_preset name, ->
@@ -428,10 +446,10 @@ describe "api", ->
 
     it "should allow deleting upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_upload_preset name: "api_test_upload_preset4", folder: "folder", (error, preset) ->
-        cloudinary.v2.api.upload_preset "api_test_upload_preset4", ->
-          cloudinary.v2.api.delete_upload_preset "api_test_upload_preset4", ->
-            cloudinary.v2.api.upload_preset "api_test_upload_preset4", (error, result) ->
+      cloudinary.v2.api.create_upload_preset name: API_TEST_UPLOAD_PRESET4, folder: "folder", (error, preset) ->
+        cloudinary.v2.api.upload_preset API_TEST_UPLOAD_PRESET4, ->
+          cloudinary.v2.api.delete_upload_preset API_TEST_UPLOAD_PRESET4, ->
+            cloudinary.v2.api.upload_preset API_TEST_UPLOAD_PRESET4, (error, result) ->
               expect(error.message).to.contain "Can't find"
               done()
 
@@ -687,7 +705,7 @@ describe "api", ->
         publishTestId = result.public_id
         done()
     afterEach (done)->
-      cloudinary.v2.uploader.destroy publishTestId, (error, result)->
+      cloudinary.v2.uploader.destroy publishTestId, type: "authenticated", (error, result)->
         return done(new Error error.message) if error?
         done()
     it "by public id", (done)->
