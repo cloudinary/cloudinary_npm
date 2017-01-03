@@ -698,14 +698,16 @@ describe "api", ->
 
     publishTestId = ""
     publishTestTag = ""
+    idsToDelete = []
     beforeEach (done)->
       publishTestTag = TEST_TAG + suffix()
-      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_publish", type: "authenticated", tags: [TEST_TAG, publishTestTag], (error, result)->
+      cloudinary.v2.uploader.upload IMAGE_FILE, type: "authenticated", tags: [TEST_TAG, publishTestTag], (error, result)->
         return done(new Error error.message) if error?
         publishTestId = result.public_id
+        idsToDelete.push publishTestId
         done()
-    afterEach (done)->
-      cloudinary.v2.uploader.destroy publishTestId, type: "authenticated", (error, result)->
+    after (done)->
+      cloudinary.v2.api.delete_resources  idsToDelete, type: "authenticated", (error, result)->
         return done(new Error error.message) if error?
         done()
     it "by public id", (done)->
