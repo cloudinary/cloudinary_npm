@@ -1,10 +1,13 @@
 _ = require("lodash")
-https = require('https')
+config = require("./config")
+if config().upload_prefix && config().upload_prefix[0..4] == 'http:'
+  https = require('http')
+else
+  https = require('https')
 #http = require('http')
 UploadStream = require('./upload_stream')
 utils = require("./utils")
 util = require("util")
-config = require("./config")
 fs = require('fs')
 path = require('path')
 Q = require('q')
