@@ -1,4 +1,35 @@
 
+1.5.0 / 2016-12-29
+==================
+
+New functionality
+-----------------
+
+  * `add_context` & `remove_all_context` API
+  * Add `data-max-chunk-size` to input created by `image_upload_tag`
+  * Add `moderation` and `phash` parameters to explicit API
+  
+    
+Other changes
+-------------
+
+  * Modify Travis configuration to test NodeJS v4 and v6 only.
+  * Modify `TEST_TAG`
+  * Use Sinon spy in `start_at` test
+  * Support context as hash argument in context API
+  * Delete streaming profiles after tests
+  * Fix signing URL tests, Fixes #89
+  * Add timeout to delete streaming profile test
+  * add tests for add_context & remove_all_context
+  * add add_context & remove_all_context methods
+  * fix test description
+  * add test to phash in an explicit call
+  * add test to moderation parameter in an explicit call
+  * Add test to accepts {effect: art:incognito}
+  * support phash in explicit call
+  * Fix missing moderation parameter in an explicit call
+  * Fix `nil` to `null`. Call `config()` with parameter name.
+
 1.4.6 / 2016-11-25
 ==================
 

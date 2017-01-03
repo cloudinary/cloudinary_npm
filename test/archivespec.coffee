@@ -136,6 +136,7 @@ describe "uploader", ->
     it "should include keys: #{expected_keys.join(', ')}", ->
       expect(archive_result).to.have.keys(expected_keys)
   describe '.create_zip', ->
+    @timeout helper.TIMEOUT_LONG
     spy = undefined
     before ->
       spy = sinon.spy cloudinary.uploader, "create_archive"

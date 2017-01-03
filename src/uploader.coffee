@@ -196,6 +196,24 @@ call_tags_api = (tag, command, public_ids = [], callback, options = {}) ->
       params.tag = tag
     return [params]
 
+exports.add_context = (context, public_ids = [], callback, options = {}) ->
+  call_context_api(context, 'add', public_ids, callback, options)
+
+exports.remove_all_context = (public_ids = [], callback, options = {}) ->
+  call_context_api(null, 'remove_all', public_ids, callback, options)
+
+call_context_api = (context, command, public_ids = [], callback, options = {}) ->
+  call_api 'context', callback, options, ->
+    params = {
+      timestamp: utils.timestamp(),
+      public_ids: utils.build_array(public_ids),
+      command: command,
+      type: options.type
+    }
+    if context?
+      params.context = utils.encode_key_value(context)
+    return [params]
+
 call_api = (action, callback, options, get_params) ->
   deferred = Q.defer()
   options ?= {}
@@ -340,6 +358,7 @@ exports.image_upload_tag = (field, options = {}) ->
     "data-url": exports.upload_url(options),
     "data-form-data": exports.upload_tag_params(options),
     "data-cloudinary-field": field,
+    "data-max-chunk-size": options.chunk_size,
     "class": [html_options["class"], "cloudinary-fileupload"].join(" ")
   }, html_options)
   return '<input ' + utils.html_attrs(tag_options) + '/>'

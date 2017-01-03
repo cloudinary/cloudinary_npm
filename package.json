@@ -2,7 +2,7 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
-  "version": "1.4.6",
+  "version": "1.5.0",
   "homepage": "http://cloudinary.com",
   "license": "MIT",
   "repository": {
@@ -18,6 +18,8 @@
     "coffee-script": "^1.10.0",
     "dotenv": "1.x",
     "expect.js": "0.3.x",
+    "jsdom": "^9.5.0",
+    "jsdom-global": "^2.1.0",
     "mocha": "2.3.x",
     "sinon": "^1.17.2"
   },
@@ -25,7 +27,8 @@
     "pretest": "npm run compile",
     "prepublish": "npm run compile",
     "test": "node_modules/.bin/mocha -R spec --recursive test/",
-    "compile": "node_modules/.bin/coffee --map -o lib -c src"
+    "compile": "node_modules/.bin/coffee --map -o lib -c src",
+    "watch": "node_modules/.bin/coffee --watch --map -o lib -c src"
   },
   "optionalDependencies": {},
   "engines": {

@@ -17,7 +17,7 @@ describe 'Cloudinary::Api', ->
   PREDEFINED_PROFILES = ["4k", "full_hd", "hd", "sd", "full_hd_wifi", "full_hd_lean", "hd_lean"]
 
 
-  prefix = helper.TEST_TAG + "_#{new Date().getMilliseconds()}"
+  prefix = helper.TEST_TAG
   test_id_1 = "#{prefix}_1"
   test_id_2 = "#{prefix}_2"
   test_id_3 = "#{prefix}_3"
@@ -27,6 +27,14 @@ describe 'Cloudinary::Api', ->
     if(!(config.api_key && config.api_secret))
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
     api = cloudinary.v2.api
+
+  after ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+    cloudinary.v2.api.delete_streaming_profile(test_id_1) unless cloudinary.config().keep_test_products
+    cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a') unless cloudinary.config().keep_test_products
+    cloudinary.v2.api.delete_streaming_profile(test_id_3) unless cloudinary.config().keep_test_products
 
   describe 'create_streaming_profile', ->
     it 'should create a streaming profile with representations', (done)->
@@ -53,8 +61,11 @@ describe 'Cloudinary::Api', ->
 
   describe 'delete_streaming_profile', ->
     it 'should delete a streaming profile', (done)->
-      api.create_streaming_profile test_id_2, {representations:
-          [{transformation: {crop: 'scale', width: '1200', height: '1200', bit_rate: '5m'}}]}, (error, result)->
+      @timeout 5000
+      api.create_streaming_profile test_id_2, {
+        representations:
+          [{transformation: {crop: 'scale', width: '1200', height: '1200', bit_rate: '5m'}}]
+      }, (error, result)->
         expect(error).to.be undefined
         expect(result).not.to.be(undefined)
         api.delete_streaming_profile test_id_2, (error, result)->
