@@ -8,6 +8,7 @@ fs = require('fs')
 Q = require('q')
 _ = require("lodash")
 ClientRequest = require('_http_client').ClientRequest
+require('jsdom-global')()
 
 helper = require("./spechelper")
 TEST_TAG        = helper.TEST_TAG
@@ -37,7 +38,7 @@ describe "uploader", ->
   upload_image = (callback)->
     cloudinary.v2.uploader.upload IMAGE_FILE, tags: TEST_TAG, (error, result) ->
       expect(error).to.be undefined
-      callback(result)
+      callback?(result)
 
   beforeEach ->
     cloudinary.config(true)
@@ -211,6 +212,43 @@ describe "uploader", ->
             return done(new Error error.message) if error?
             expect(result.tags).to.eql(["tag3Å"])
             done()
+
+  describe "context", ()->
+    second_id = first_id = ''
+    @timeout helper.TIMEOUT_MEDIUM
+    before (done)->
+      Q.all [
+        upload_image()
+        upload_image()
+        ]
+      .spread (result1, result2)->
+        first_id = result1.public_id
+        second_id = result2.public_id
+        done()
+      .fail (error)->
+        done(new Error(error.message))
+    it "should add context to existing resources", (done) ->
+      cloudinary.v2.uploader.add_context 'alt=testAlt|custom=testCustom', [first_id, second_id], (et1, rt1) ->
+        return done(new Error et1.message) if et1?
+        cloudinary.v2.uploader.add_context {alt2: "testAlt2", custom2: "testCustom2"}, [first_id, second_id], (et1, rt1) ->
+          return done(new Error et1.message) if et1?
+          cloudinary.v2.api.resource second_id, (error, r1) ->
+            return done(new Error error.message) if error
+            expect(r1.context.custom.alt).to.equal('testAlt')
+            expect(r1.context.custom.alt2).to.equal('testAlt2')
+            expect(r1.context.custom.custom).to.equal('testCustom')
+            expect(r1.context.custom.custom2).to.equal('testCustom2')
+
+            cloudinary.v2.uploader.remove_all_context [first_id, second_id, 'noSuchId'], (err, res)->
+              return done(new Error error.message) if error
+              expect(res["public_ids"]).to.contain(first_id)
+              expect(res["public_ids"]).to.contain(second_id)
+              expect(res["public_ids"]).to.not.contain('noSuchId')
+
+              cloudinary.v2.api.resource second_id, (error, r1) ->
+                return done(new Error error.message) if error
+                expect(r1.context).to.be undefined
+                done()
 
   it "should support timeouts", (done) ->
     # testing a 1ms timeout, nobody is that fast.
@@ -449,5 +487,22 @@ describe "uploader", ->
         cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG]
         sinon.assert.calledWith(spy, sinon.match((arg)-> arg.toString().match(/name="invalidate"\s*1/)))
 
+  it "should create an image upload tag with required properties", () ->
+    @timeout helper.TIMEOUT_LONG
+    tag = cloudinary.v2.uploader.image_upload_tag "image_id", chunk_size: "1234"
+    expect(tag).to.match(/^<input/)
+
+    # Create an HTMLElement from the returned string to validate attributes
+    fakeDiv = document.createElement('div');
+    fakeDiv.innerHTML = tag;
+    input_element = fakeDiv.firstChild;
+    expect(input_element.tagName.toLowerCase()).to.be('input');
+    expect(input_element.getAttribute("data-url")).to.be.ok();
+    expect(input_element.getAttribute("data-form-data")).to.be.ok();
+    expect(input_element.getAttribute("data-cloudinary-field")).to.match(/image_id/);
+    expect(input_element.getAttribute("data-max-chunk-size")).to.match(/1234/);
+    expect(input_element.getAttribute("class")).to.match(/cloudinary-fileupload/);
+    expect(input_element.getAttribute("name")).to.be('file');
+    expect(input_element.getAttribute("type")).to.be('file');
 
 
