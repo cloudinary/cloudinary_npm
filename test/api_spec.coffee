@@ -116,19 +116,19 @@ describe "api", ->
       callback(result)
 
   before (done) ->
-    @timeout 0
+    @timeout helper.TIMEOUT_LONG
     @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
 
     Q.allSettled [
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [EXPLICIT_TRANSFORMATION])
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [EXPLICIT_TRANSFORMATION])]
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_5, tags: [TEST_TAG, @timestamp_tag], context: "test-key=test", eager: [width: 100, crop: "scale"])
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_6, tags: [TEST_TAG, @timestamp_tag], context: "test-key=alt-test", eager: [width: 100, crop: "scale"])
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: [TEST_TAG, @timestamp_tag], context: "key=value", eager: [EXPLICIT_TRANSFORMATION])
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_5, tags: [TEST_TAG, @timestamp_tag], context: "test-key=test", eager: [EXPLICIT_TRANSFORMATION])
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_6, tags: [TEST_TAG, @timestamp_tag], context: "test-key=alt-test", eager: [EXPLICIT_TRANSFORMATION])]
     .finally ->
       done()
 
   after (done) ->
-    @timeout 0
+    @timeout helper.TIMEOUT_LONG
     @timestamp_tag = "#{TEST_TAG}_#{cloudinary.utils.timestamp()}"
 
     Q.all [
