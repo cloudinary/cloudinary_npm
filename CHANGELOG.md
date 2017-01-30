@@ -1,4 +1,25 @@
 
+1.6.0 / 2017-01-30
+==================
+
+New functionality
+-----------------
+
+  * Add Akamai token generator
+  * Add Search resource by context
+
+Other changes
+-------------
+
+  * Use http library when api protocol is set to http patch 
+  * Added timeouts to spec in order to force consistency
+  * Fix publish API test cleanup
+  * Use random suffix in api tests
+  * Use binary encoding for signature
+  * Add coffee watch
+  * Fixed async issues with before queue
+  * Add missing options to explicit api call
+
 1.5.0 / 2016-12-29
 ==================
 
