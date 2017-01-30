@@ -573,3 +573,30 @@ describe "utils", ->
           "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
           "effect": "grayscale",
         )).to.match(new RegExp(allOperators))
+
+  describe 'generateAkamaiToken', ->
+    beforeEach ->
+      cloudinary.config( akamai_key: '00112233FF99')
+    afterEach ->
+      cloudinary.config(true)
+
+    it "should generate an Akamai token with start_time and window", ->
+      token = utils.generateAkamaiToken start_time: 1111111111, acl: '/image/*', window: 300
+      expect(token).to.eql('__cld_token__=st=1111111111~exp=1111111411~acl=/image/*~hmac=0854e8b6b6a46471a80b2dc28c69bd352d977a67d031755cc6f3486c121b43af')
+    it "should generate an Akamai token with window", ->
+      first_exp = Math.round(Date.now() / 1000 )+ 300
+      # expiration is calculated automatically as now + window
+      token = utils.generateAkamaiToken acl: '*', window: 300
+      second_exp = Math.round(Date.now() / 1000 )+ 300
+      match = /exp=(\d+)/.exec(token)
+      expect(match[1]).to.be.ok()
+      expiration = parseInt(match[1])
+      expect(expiration).to.be.within(first_exp, second_exp)
+      expect(utils.generateAkamaiToken acl: '*', end_time: expiration).to.eql(token)
+
+    it "should accept a key", ->
+      expect(utils.generateAkamaiToken acl: '*', end_time: 10000000, key: '00aabbff')
+        .to.eql('__cld_token__=exp=10000000~acl=*~hmac=030eafb6b19e499659d699b3d43e7595e35e3c0060e8a71904b3b8c8759f4890')
+
+    it "should throw if no end_time or window is provided", ->
+      expect( -> utils.generateAkamaiToken( acl: '*') ).to.throwError()

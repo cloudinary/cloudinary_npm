@@ -3,7 +3,7 @@ config = require("./config")
 crypto = require('crypto')
 querystring = require('querystring')
 utils = exports
-
+exports.generateAkamaiToken = require("./generateAkamaiToken")
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
 exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
