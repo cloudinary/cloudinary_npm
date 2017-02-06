@@ -43,4 +43,7 @@ utils.v1_adapters exports, api,
   create_streaming_profile: 1,
   publish_by_ids: 1,
   publish_by_tag: 1,
-  publish_by_prefix: 1
+  publish_by_prefix: 1,
+  update_resources_access_mode_by_prefix: 2,
+  update_resources_access_mode_by_tag: 2,
+  update_resources_access_mode_by_ids: 2

@@ -758,4 +758,42 @@ describe "api", ->
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
         done()
-
+  describe "access_mode", ->
+    i = 0
+    @timeout helper.TIMEOUT_LONG
+    publicId = ""
+    access_mode_tag = ''
+    beforeEach (done)->
+      access_mode_tag = TEST_TAG + "access_mode" + i++
+      cloudinary.v2.uploader.upload IMAGE_FILE, access_mode: "authenticated", tags: [TEST_TAG, access_mode_tag], (error, result)->
+        return done(new Error error.message) if error?
+        publicId = result.public_id
+        expect(result.access_mode).to.be("authenticated")
+        done()
+    it "should update access mode by ids", (done)->
+      cloudinary.v2.api.update_resources_access_mode_by_ids "public", [publicId], (error, result)->
+        return done(new Error error.message) if error?
+        expect(result.updated).to.be.an('array')
+        expect(result.updated.length).to.be(1)
+        resource = result.updated[0]
+        expect(resource.public_id).to.be(publicId)
+        expect(resource.access_mode).to.be('public')
+        done()
+    it "should update access mode by prefix", (done)->
+      cloudinary.v2.api.update_resources_access_mode_by_prefix "public", publicId[0..-3], (error, result)->
+        return done(new Error error.message) if error?
+        expect(result.updated).to.be.an('array')
+        expect(result.updated.length).to.be(1)
+        resource = result.updated[0]
+        expect(resource.public_id).to.be(publicId)
+        expect(resource.access_mode).to.be('public')
+        done()
+    it "should update access mode by tag", (done)->
+      cloudinary.v2.api.update_resources_access_mode_by_tag "public", access_mode_tag, (error, result)->
+        return done(new Error error.message) if error?
+        expect(result.updated).to.be.an('array')
+        expect(result.updated.length).to.be(1)
+        resource = result.updated[0]
+        expect(resource.public_id).to.be(publicId)
+        expect(resource.access_mode).to.be('public')
+        done()

@@ -284,6 +284,25 @@ exports.create_streaming_profile = (name, callback, options = {})->
   params["name"] = name
   call_api("post", 'streaming_profiles', params, callback, options)
 
+update_resources_access_mode = (access_mode, by_key, value, callback, options = {})->
+  resource_type = options.resource_type ? "image"
+  type = options.type ? "upload"
+  params = { access_mode: access_mode}
+#  by_key = by_key == 'ids' ? 'ids[]' : by_key
+  params[by_key] = value
+  call_api("post", "resources/#{resource_type}/#{type}/update_access_mode", params, callback, options)
+
+exports.update_resources_access_mode_by_prefix = (access_mode, prefix, callback, options = {})->
+  update_resources_access_mode(access_mode, "prefix", prefix, callback, options)
+
+exports.update_resources_access_mode_by_tag = (access_mode, tag, callback, options = {})->
+  update_resources_access_mode(access_mode, "tag", tag, callback, options)
+
+exports.update_resources_access_mode_by_ids = (access_mode, ids, callback, options = {})->
+  update_resources_access_mode(access_mode, "public_ids[]", ids, callback, options)
+
+
+
 exports.only = (hash, keys...) ->
   result = {}
   for key in keys
