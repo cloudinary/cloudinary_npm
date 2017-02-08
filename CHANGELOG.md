@@ -1,4 +1,18 @@
 
+1.7.0 / 2017-02-08
+==================
+
+New functionality
+-----------------
+
+  * Add access mode API
+
+Other changes
+-------------
+
+  * Rework tests cleanup
+  * Use TRAVIS_JOB_ID to make test tags unique
+
 1.6.0 / 2017-01-30
 ==================
 
