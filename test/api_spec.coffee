@@ -80,7 +80,7 @@ describe "api", ->
         else
           done()
 
-  SUFFIX = Math.floor(Math.random() * 99999)
+  SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 99999)
   PUBLIC_ID_PREFIX = "npm_api_test"
   PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX
   PUBLIC_ID_1 = PUBLIC_ID_PREFIX + "_1_" + SUFFIX
@@ -250,7 +250,7 @@ describe "api", ->
 
 
     it "should allow get resource metadata", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
+      @timeout helper.TIMEOUT_LONG
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: [TEST_TAG, @timestamp_tag], eager: [EXPLICIT_TRANSFORMATION], (error, result)->
         done(new Error error.message) if error?
         public_id = result.public_id
