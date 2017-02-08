@@ -28,13 +28,19 @@ describe 'Cloudinary::Api', ->
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
     api = cloudinary.v2.api
 
-  after ->
+  after (done)->
     config = cloudinary.config(true)
-    if(!(config.api_key && config.api_secret))
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
-    cloudinary.v2.api.delete_streaming_profile(test_id_1) unless cloudinary.config().keep_test_products
-    cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a') unless cloudinary.config().keep_test_products
-    cloudinary.v2.api.delete_streaming_profile(test_id_3) unless cloudinary.config().keep_test_products
+    if cloudinary.config().keep_test_products
+      done()
+    else
+      if(!(config.api_key && config.api_secret))
+        expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
+      Q.allSettled [
+        cloudinary.v2.api.delete_streaming_profile(test_id_1)
+        cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a')
+        cloudinary.v2.api.delete_streaming_profile(test_id_3)]
+      .finally ->
+          done()
 
   describe 'create_streaming_profile', ->
     it 'should create a streaming profile with representations', (done)->
@@ -87,6 +93,7 @@ describe 'Cloudinary::Api', ->
 
   describe 'update_streaming_profile', ->
     it 'should create a streaming profile with representations', (done)->
+      @timeout helper.TIMEOUT_LONG
       api.create_streaming_profile test_id_3, {representations:
           [{transformation: {crop: 'scale', width: '1200', height: '1200', bit_rate: '5m'}}]}, (error, result)->
         expect(error).to.be undefined

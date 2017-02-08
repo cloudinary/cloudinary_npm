@@ -18,28 +18,35 @@ os = require('os')
 
 helper = require("./spechelper")
 TEST_TAG = helper.TEST_TAG
+IMAGE_URL = helper.IMAGE_URL
+
 sharedExamples = helper.sharedExamples
 includeContext = helper.includeContext
 
-ARCHIVE_TAG = "archive_test_tag_#{Math.floor(Math.random() * 10000)}"
+ARCHIVE_TAG = TEST_TAG + "_archive"
 
 sharedExamples 'archive', ->
+
+  before "Verify Configuration", ->
+    config = cloudinary.config(true)
+    if(!(config.api_key && config.api_secret))
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
   before (done)->
     @timeout helper.TIMEOUT_LONG
 
     Q.all [
       uploader.upload(
-        "http://res.cloudinary.com/demo/image/upload/sample.jpg",
+        IMAGE_URL,
         public_id: 'tag_samplebw'
-        tags: [TEST_TAG, ARCHIVE_TAG]
+        tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG])
         transformation:
           effect: "blackwhite"
       )
       uploader.upload(
-        "http://res.cloudinary.com/demo/image/upload/sample.jpg",
+        IMAGE_URL,
         public_id: 'tag_sample'
-        tags: [TEST_TAG, ARCHIVE_TAG]
+        tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG])
         transformation: {
           effect: "blackwhite"
         }
@@ -47,13 +54,8 @@ sharedExamples 'archive', ->
     .finally ->
       done()
 
-  after "Verify Configuration", ->
-    config = cloudinary.config(true)
-    if(!(config.api_key && config.api_secret))
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
-
   after ->
-    cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+    cloudinary.v2.api.delete_resources_by_tag(TEST_TAG) unless cloudinary.config().keep_test_products
 
 describe "utils", ->
   before "Verify Configuration", ->
