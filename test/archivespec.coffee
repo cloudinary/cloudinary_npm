@@ -25,6 +25,9 @@ includeContext = helper.includeContext
 
 ARCHIVE_TAG = TEST_TAG + "_archive"
 
+publicId1 = ARCHIVE_TAG + "_1"
+publicId2 = ARCHIVE_TAG + "_2"
+
 sharedExamples 'archive', ->
 
   before "Verify Configuration", ->
@@ -38,14 +41,14 @@ sharedExamples 'archive', ->
     Q.all [
       uploader.upload(
         IMAGE_URL,
-        public_id: 'tag_samplebw'
+        public_id: publicId1
         tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG])
         transformation:
           effect: "blackwhite"
       )
       uploader.upload(
         IMAGE_URL,
-        public_id: 'tag_sample'
+        public_id: publicId2
         tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG])
         transformation: {
           effect: "blackwhite"
@@ -55,7 +58,7 @@ sharedExamples 'archive', ->
       done()
 
   after ->
-    cloudinary.v2.api.delete_resources_by_tag(TEST_TAG) unless cloudinary.config().keep_test_products
+    cloudinary.v2.api.delete_resources_by_tag(ARCHIVE_TAG) unless cloudinary.config().keep_test_products
 
 describe "utils", ->
   before "Verify Configuration", ->
@@ -71,7 +74,7 @@ describe "utils", ->
     before ->
       archive_result = utils.download_zip_url
         target_public_id: 'gem_archive_test'
-        public_ids: ["tag_sample", "tag_samplebw"]
+        public_ids: [publicId2, publicId1]
         target_tags: ARCHIVE_TAG
     describe 'public_ids', ->
       it 'should generate a valid url', ->
@@ -90,8 +93,8 @@ describe "utils", ->
               list = list.toString().split('\n').slice(3, -3)
               list = (_.last(i.split(/[ ]+/)) for i in list) # keep only filenames
               expect(list.length).to.eql(2)
-              expect(list).to.contain("tag_sample.jpg")
-              expect(list).to.contain("tag_samplebw.jpg")
+              expect(list).to.contain(publicId1 + ".jpg")
+              expect(list).to.contain(publicId2 + ".jpg")
               done()
 
 describe "uploader", ->
@@ -109,7 +112,7 @@ describe "uploader", ->
       @timeout helper.TIMEOUT_LONG
       uploader.create_archive(
         target_public_id: 'gem_archive_test'
-        public_ids: ["tag_sample", "tag_samplebw"]
+        public_ids: [publicId2, publicId1]
         target_tags: [TEST_TAG, ARCHIVE_TAG]
         mode: 'create'
       ,

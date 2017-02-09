@@ -18,6 +18,25 @@ IMAGE_FILE      = helper.IMAGE_FILE
 IMAGE_URL       = helper.IMAGE_URL
 UPLOAD_TAGS     = helper.UPLOAD_TAGS
 
+SUFFIX = helper.SUFFIX
+PUBLIC_ID_PREFIX = "npm_api_test"
+PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX
+PUBLIC_ID_1 = PUBLIC_ID + "_1"
+PUBLIC_ID_2 = PUBLIC_ID + "_2"
+PUBLIC_ID_3 = PUBLIC_ID + "_3"
+PUBLIC_ID_4 = PUBLIC_ID + "_4"
+PUBLIC_ID_5 = PUBLIC_ID + "_5"
+PUBLIC_ID_6 = PUBLIC_ID + "_6"
+
+NAMED_TRANSFORMATION = "npm_api_test_transformation" + SUFFIX
+API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX
+API_TEST_UPLOAD_PRESET2 = "npm_api_test_upload_preset_2_" + SUFFIX
+API_TEST_UPLOAD_PRESET3 = "npm_api_test_upload_preset_3_" + SUFFIX
+API_TEST_UPLOAD_PRESET4 = "npm_api_test_upload_preset_4_" + SUFFIX
+
+EXPLICIT_TRANSFORMATION_NAME = "c_scale,l_text:Arial_60:#{TEST_TAG},w_100"
+EXPLICIT_TRANSFORMATION = {width: 100, crop: "scale", overlay: "text:Arial_60:#{TEST_TAG}"}
+
 sharedExamples "a list with a cursor", (testFunc, args...)->
   xhr = request = requestStub = requestSpy = writeSpy =undefined
   before ->
@@ -99,25 +118,6 @@ describe "api", ->
         .finally ->
       done()
 
-  SUFFIX = helper.SUFFIX
-  PUBLIC_ID_PREFIX = "npm_api_test"
-  PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX
-  PUBLIC_ID_1 = PUBLIC_ID_PREFIX + "_1_" + SUFFIX
-  PUBLIC_ID_2 = PUBLIC_ID_PREFIX + "_2_" + SUFFIX
-  PUBLIC_ID_3 = PUBLIC_ID_PREFIX + "_3_" + SUFFIX
-  PUBLIC_ID_4 = PUBLIC_ID_PREFIX + "_4_" + SUFFIX
-  PUBLIC_ID_5 = PUBLIC_ID_PREFIX + "_5_" + SUFFIX
-  PUBLIC_ID_6 = PUBLIC_ID_PREFIX + "_6_" + SUFFIX
-
-  NAMED_TRANSFORMATION = "api_test_transformation" + SUFFIX
-  API_TEST_UPLOAD_PRESET1 = "api_test_upload_preset_1_" + SUFFIX
-  API_TEST_UPLOAD_PRESET2 = "api_test_upload_preset_2_" + SUFFIX
-  API_TEST_UPLOAD_PRESET3 = "api_test_upload_preset_3_" + SUFFIX
-  API_TEST_UPLOAD_PRESET4 = "api_test_upload_preset_4_" + SUFFIX
-
-  EXPLICIT_TRANSFORMATION_NAME = "c_scale,l_text:Arial_60:#{TEST_TAG},w_100"
-  EXPLICIT_TRANSFORMATION = {width: 100, crop: "scale", overlay: "text:Arial_60:#{TEST_TAG}"}
-
   find_by_attr = (elements, attr, value) ->
     for element in elements
       return element if element[attr] == value
@@ -180,7 +180,7 @@ describe "api", ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG
     it "should allow listing resources by tag", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources_by_tag TEST_TAG, context: true, tags: true, (error, result) ->
+      cloudinary.v2.api.resources_by_tag TEST_TAG, context: true, tags: true, max_results: 500, (error, result) ->
         return done(new Error error.message) if error?
         expect(result.resources.map((e) -> e.public_id)).to.contain(PUBLIC_ID)
                                                         .and.contain(PUBLIC_ID_2)
@@ -332,7 +332,7 @@ describe "api", ->
 
     it "should allow listing tag by prefix ", (done) =>
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags prefix: TEST_TAG[0..-5], (error, result) =>
+      cloudinary.v2.api.tags prefix: TEST_TAG[0..-2], max_results: 500, (error, result) =>
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
@@ -605,20 +605,20 @@ describe "api", ->
         cloudinary.v2.api.update ids[0], moderation_status: "approved", after_update
         cloudinary.v2.api.update ids[1], moderation_status: "rejected", after_update
 
-    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", after_upload)
-    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", after_upload)
-    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", after_upload)
+    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
+    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
+    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
 
   # For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   # Replace `it` with  `it.skip` below if you want to disable it.
   it "should list folders in cloudinary", (done)->
     @timeout helper.TIMEOUT_LONG
     Q.all([
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/item' ),
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item' ),
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item' ),
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder1/item' ),
-      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder2/item' )
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/item', tags: UPLOAD_TAGS),
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder1/item', tags: UPLOAD_TAGS),
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder2/item', tags: UPLOAD_TAGS)
     ]).then((results)->
       Q.all([
         cloudinary.v2.api.root_folders(),
