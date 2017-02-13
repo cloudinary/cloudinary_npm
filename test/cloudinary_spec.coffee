@@ -433,4 +433,14 @@ describe "cloudinary", ->
       cloudinary.utils.userPlatform = "Spec/1.0 (Test)"
       expect(cloudinary.utils.getUserAgent()).to.match( /Spec\/1.0 \(Test\) CloudinaryNodeJS\/[\d.]+/)
 
-    
+  describe "config", ->
+    urlBackup = process.env.CLOUDINARY_URL
+    after ->
+      process.env.CLOUDINARY_URL = urlBackup
+      cloudinary.config true
+    it "should allow nested values in CLOUDINARY_URL",  ->
+      process.env.CLOUDINARY_URL = "cloudinary://key:secret@test123?foo[bar]=value"
+      cloudinary.config true
+      expect(cloudinary.config().foo?.bar).to.eql 'value'
+
+
