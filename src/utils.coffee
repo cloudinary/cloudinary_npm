@@ -2,8 +2,10 @@ _ = require("lodash")
 config = require("./config")
 crypto = require('crypto')
 querystring = require('querystring')
+url = require('url')
+
 utils = exports
-exports.generateAkamaiToken = require("./generateAkamaiToken")
+exports.generate_auth_token = require("./auth_token")
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
 exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
@@ -388,6 +390,7 @@ exports.url = (public_id, options = {}) ->
   api_secret = utils.option_consume(options, "api_secret", config().api_secret)
   url_suffix = utils.option_consume(options, "url_suffix")
   use_root_path = utils.option_consume(options, "use_root_path", config().use_root_path)
+  auth_token = utils.option_consume(options, "auth_token", config().auth_token)
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
   if preloaded
@@ -415,7 +418,7 @@ exports.url = (public_id, options = {}) ->
   version = "v#{version}" if version?
 
   transformation = transformation.replace(/([^:])\/\//g, '$1/')
-  if sign_url
+  if sign_url && !auth_token
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     shasum = crypto.createHash('sha1')
     shasum.update(utf8_encode(to_sign + api_secret), 'binary')
@@ -424,9 +427,12 @@ exports.url = (public_id, options = {}) ->
 
 
   prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
-  url = [prefix, resource_type, type, signature, transformation, version,
+  resultUrl = [prefix, resource_type, type, signature, transformation, version,
     public_id].filter((part) -> part? && part != '').join('/')
-  url
+  if sign_url && auth_token
+    token = utils.generate_auth_token exports.merge(url: url.parse(resultUrl).path, auth_token)
+    resultUrl += "?#{token}"
+  resultUrl
 
 exports.video_url = (public_id, options) ->
   options = _.extend({resource_type: 'video'}, options)
