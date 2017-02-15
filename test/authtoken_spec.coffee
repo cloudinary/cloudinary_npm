@@ -5,10 +5,12 @@ utils = cloudinary.utils
 KEY = "00112233FF99"
 ALT_KEY = "CCBB2233FF00"
 describe "authToken", ->
-  urlBackup = process.env.CLOUDINARY_URL
+  urlBackup = null
+  before ->
+    urlBackup = process.env.CLOUDINARY_URL
 
   beforeEach ->
-    process.env.CLOUDINARY_URL = "cloudinary://a:b@test123?load_strategies=false"
+    process.env.CLOUDINARY_URL = "cloudinary://a:b@test123"
     cloudinary.config true
     cloudinary.config().auth_token = {key: KEY, duration: 300, start_time: 11111111}
   after ->
@@ -27,24 +29,24 @@ describe "authToken", ->
       url = cloudinary.url "sample.jpg", sign_url: true, resource_type: "image", type: "authenticated", version: "1486020273"
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=8db0d753ee7bbb9e2eaf8698ca3797436ba4c20e31f44527e43b6a6e995cfdb3")
 
-      it "should add token for 'public' resource", ->
+    it "should add token for 'public' resource", ->
       url = cloudinary.url "sample.jpg", sign_url: true, resource_type: "image", type: "public",  version: "1486020273"
       expect(url).to.eql("http://test123-res.cloudinary.com/image/public/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=c2b77d9f81be6d89b5d0ebc67b671557e88a40bcf03dd4a6997ff4b994ceb80e")
 
-      it "should not add token if signed is false", ->
+    it "should not add token if signed is false", ->
       url = cloudinary.url "sample.jpg", type: "authenticated", version: "1486020273"
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg")
 
-      it "should not add token if authToken is globally set but null auth token is explicitly set and signed = true", ->
+    it "should not add token if authToken is globally set but null auth token is explicitly set and signed = true", ->
       url = cloudinary.url "sample.jpg", auth_token: false, sign_url: true, type: "authenticated", version: "1486020273"
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/s--v2fTPYTu--/v1486020273/sample.jpg")
 
-      it "explicit authToken should override global setting", ->
+    it "explicit authToken should override global setting", ->
       url = cloudinary.url "sample.jpg", sign_url: true, auth_token: {key: ALT_KEY, start_time: 222222222, duration: 100}, type: "authenticated", transformation: {crop: "scale", width: 300}
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/c_scale,w_300/sample.jpg?__cld_token__=st=222222222~exp=222222322~hmac=7d276841d70c4ecbd0708275cd6a82e1f08e47838fbb0bceb2538e06ddfa3029")
 
-      it "should compute expiration as start time + duration", ->
-      token = {key: KEY, start_time: 11111111, duration: 300}
+    it "should compute expiration as start time + duration", ->
+      token = {start_time: 11111111, duration: 300}
       url = cloudinary.url "sample.jpg", sign_url: true, auth_token: token, resource_type: "image", type: "authenticated", version: "1486020273"
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=8db0d753ee7bbb9e2eaf8698ca3797436ba4c20e31f44527e43b6a6e995cfdb3")
 

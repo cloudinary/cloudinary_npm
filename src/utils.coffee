@@ -396,7 +396,7 @@ exports.url = (public_id, options = {}) ->
   api_secret = utils.option_consume(options, "api_secret", config().api_secret)
   url_suffix = utils.option_consume(options, "url_suffix")
   use_root_path = utils.option_consume(options, "use_root_path", config().use_root_path)
-  auth_token = utils.option_consume(options, "auth_token", config().auth_token)
+  auth_token = if options.auth_token == false then false else exports.merge config().auth_token, utils.option_consume(options, "auth_token")
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
   if preloaded

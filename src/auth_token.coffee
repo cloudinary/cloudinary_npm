@@ -31,7 +31,7 @@ module.exports = (options)->
       start = params.start_time ? Math.round(Date.now() / 1000)
       params.expiration = start + params.duration
     else
-      throw new Error( "Must provide either end_time or window")
+      throw new Error( "Must provide either expiration or duration")
 
   tokenParts = []
   tokenParts.push("ip=#{params.ip}") if params.ip?
