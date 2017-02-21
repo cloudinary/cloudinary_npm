@@ -424,7 +424,7 @@ exports.url = (public_id, options = {}) ->
   version = "v#{version}" if version?
 
   transformation = transformation.replace(/([^:])\/\//g, '$1/')
-  if sign_url && !auth_token
+  if sign_url && _.isEmpty(auth_token)
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     shasum = crypto.createHash('sha1')
     shasum.update(utf8_encode(to_sign + api_secret), 'binary')
@@ -435,7 +435,7 @@ exports.url = (public_id, options = {}) ->
   prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
   resultUrl = [prefix, resource_type, type, signature, transformation, version,
     public_id].filter((part) -> part? && part != '').join('/')
-  if sign_url && auth_token
+  if sign_url && !_.isEmpty(auth_token)
     token = utils.generate_auth_token exports.merge(url: url.parse(resultUrl).path, auth_token)
     resultUrl += "?#{token}"
   resultUrl

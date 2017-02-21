@@ -2,7 +2,7 @@ _ = require("lodash")
 cloudinary_config = undefined
 
 isNestedKey = (key)->
-  key.match /\w+[\[\w+\]]/
+  key.match /\w+\[\w+\]/
 
 ###**
   * Assign a value to a nested object
