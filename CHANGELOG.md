@@ -1,4 +1,14 @@
 
+1.7.1 / 2017-02-23
+==================
+
+  * Refactor `generate_auth_token`
+  * Update utils documentation.
+  * Add URL authorization token. 
+  * Rename token function.
+  * Support nested keys in CLOUDINARY_URL
+  * Allow tests to run concurrently
+
 1.7.0 / 2017-02-08
 ==================
 
