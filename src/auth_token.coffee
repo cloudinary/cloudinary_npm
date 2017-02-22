@@ -6,9 +6,15 @@ crypto = require('crypto')
 config = require('./config')
 
 digest = (message, key) ->
-  crypto.createHmac("sha256", new Buffer(key, "hex"))
-    .update message
-    .digest 'hex'
+  crypto.createHmac("sha256", new Buffer(key, "hex")).update( message).digest('hex')
+
+###*
+  * Escape url using lowercase hex code
+  * @param {string} url a url string
+  * @return escaped url
+###
+escape_to_lower = (url) ->
+  encodeURIComponent(url).replace(/%../g, (match)-> match.toLowerCase())
 
 ###*
   * Generate an authorization token
@@ -23,25 +29,24 @@ digest = (message, key) ->
   * @returns {string} the authorization token
 ###
 module.exports = (options)->
-  params = Object.assign {}, config().auth_token, options
-  tokenName = params.token_name ? "__cld_token__"
+  tokenName = options.token_name ? "__cld_token__"
 
-  unless params.expiration?
-    if params.duration?
-      start = params.start_time ? Math.round(Date.now() / 1000)
-      params.expiration = start + params.duration
+  unless options.expiration?
+    if options.duration?
+      start = options.start_time ? Math.round(Date.now() / 1000)
+      options.expiration = start + options.duration
     else
       throw new Error( "Must provide either expiration or duration")
 
   tokenParts = []
-  tokenParts.push("ip=#{params.ip}") if params.ip?
-  tokenParts.push("st=#{params.start_time}") if params.start_time?
-  tokenParts.push("exp=#{params.expiration}")
-  tokenParts.push("acl=#{params.acl}") if params.acl?
+  tokenParts.push("ip=#{options.ip}") if options.ip?
+  tokenParts.push("st=#{options.start_time}") if options.start_time?
+  tokenParts.push("exp=#{options.expiration}")
+  tokenParts.push("acl=#{escape_to_lower(options.acl)}") if options.acl?
   toSign = (part for part in tokenParts)
-  if params.url
-    url = encodeURIComponent(params.url).replace(/%../g, (match)-> match.toLowerCase())
+  if options.url
+    url = escape_to_lower(options.url)
     toSign.push "url=#{url}"
-  auth = digest(toSign.join("~"), params.key)
+  auth = digest(toSign.join("~"), options.key)
   tokenParts.push("hmac=#{auth}")
   "#{tokenName}=#{tokenParts.join('~')}"

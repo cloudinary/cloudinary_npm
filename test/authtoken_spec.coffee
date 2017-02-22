@@ -19,7 +19,7 @@ describe "authToken", ->
 
   it "should generate with start and window",  ->
     token = utils.generate_auth_token start_time: 1111111111, acl: "/image/*", duration: 300
-    expect(token).to.eql '__cld_token__=st=1111111111~exp=1111111411~acl=/image/*~hmac=0854e8b6b6a46471a80b2dc28c69bd352d977a67d031755cc6f3486c121b43af'
+    expect(token).to.eql "__cld_token__=st=1111111111~exp=1111111411~acl=%2fimage%2f*~hmac=1751370bcc6cfe9e03f30dd1a9722ba0f2cdca283fa3e6df3342a00a7528cc51"
 
   describe "authenticated url", ->
     beforeEach ->
@@ -56,7 +56,7 @@ describe "authToken", ->
       tokenOptions = {key: KEY, duration: 300, acl: "/*/t_#{user}"}
       tokenOptions.start_time = 222222222 # we can't rely on the default "now" value in tests
       cookieToken = utils.generate_auth_token tokenOptions
-      expect(cookieToken).to.eql("__cld_token__=st=222222222~exp=222222522~acl=/*/t_foobar~hmac=eb5e2266c8ec9573f696025f075b92998080347e1c12ac39a26c94d7d712704a")
+      expect(cookieToken).to.eql("__cld_token__=st=222222222~exp=222222522~acl=%2f*%2ft_foobar~hmac=8e39600cc18cec339b21fe2b05fcb64b98de373355f8ce732c35710d8b10259f")
 
   it "should add token to an image tag url", ->
     tag = cloudinary.image "sample.jpg", sign_url: true, type: "authenticated", version: "1486020273"

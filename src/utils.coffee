@@ -11,7 +11,11 @@ querystring = require('querystring')
 url = require('url')
 
 utils = exports
-exports.generate_auth_token = require("./auth_token")
+generate_token = require("./auth_token")
+exports.generate_auth_token = (options)->
+  token_options = Object.assign {}, config().auth_token, options
+  generate_token token_options
+
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
 exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com"
@@ -396,7 +400,9 @@ exports.url = (public_id, options = {}) ->
   api_secret = utils.option_consume(options, "api_secret", config().api_secret)
   url_suffix = utils.option_consume(options, "url_suffix")
   use_root_path = utils.option_consume(options, "use_root_path", config().use_root_path)
-  auth_token = if options.auth_token == false then false else exports.merge config().auth_token, utils.option_consume(options, "auth_token")
+  auth_token = utils.option_consume(options, "auth_token")
+  if auth_token != false
+    auth_token = exports.merge config().auth_token, auth_token
 
   preloaded = /^(image|raw)\/([a-z0-9_]+)\/v(\d+)\/([^#]+)$/.exec(public_id)
   if preloaded
@@ -436,7 +442,8 @@ exports.url = (public_id, options = {}) ->
   resultUrl = [prefix, resource_type, type, signature, transformation, version,
     public_id].filter((part) -> part? && part != '').join('/')
   if sign_url && !_.isEmpty(auth_token)
-    token = utils.generate_auth_token exports.merge(url: url.parse(resultUrl).path, auth_token)
+    auth_token.url = url.parse(resultUrl).path
+    token = generate_token( auth_token)
     resultUrl += "?#{token}"
   resultUrl
 
