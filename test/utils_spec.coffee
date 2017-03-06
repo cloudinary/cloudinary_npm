@@ -455,7 +455,7 @@ describe "utils", ->
     test_cloudinary_url("test", {shorten:true}, "http://res.cloudinary.com/#{cloud_name}/iu/test", {})
 
   it "should escape public_ids" , ->
-    for source, target of { "a b": "a%20b", "a+b": "a%2Bb", "a%20b": "a%20b", "a-b": "a-b", "a??b": "a%3F%3Fb", "parentheses(interject)": "parentheses(interject)" }
+    for source, target of { "a b": "a%20b", "a+b": "a%2Bb", "a%20b": "a%20b", "a-b": "a-b", "a??b": "a%3F%3Fb", "parentheses(interject)": "parentheses%28interject%29" }
       expect(utils.url(source)).to.eql("http://res.cloudinary.com/#{cloud_name}/image/upload/#{target}")
   context "sign URLs", ->
     configBck = undefined
@@ -573,3 +573,34 @@ describe "utils", ->
           "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
           "effect": "grayscale",
         )).to.match(new RegExp(allOperators))
+
+  describe 'User Define Variables', ->
+    it "array should define a set of variables", ->
+      options = {
+          if: "face_count > 2",
+          variables: [ ["$z", 5], ["$foo", "$z * 2"] ],
+          crop: "scale", width: "$foo * 200"
+        }
+      t = cloudinary.utils.generate_transformation_string options
+      expect(t).to.eql("if_fc_gt_2,$z_5,$foo_$z_mul_2,c_scale,w_$foo_mul_200")
+    it "'$key' should define a variable", ->
+      options = { transformation: [
+        {$foo: 10 },
+        {if: "face_count > 2"},
+        {crop: "scale", width: "$foo * 200 / face_count"},
+        {if: "end"}
+      ] }
+      t = cloudinary.utils.generate_transformation_string options
+      expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end")
+    it "should support text values", ->
+      test_cloudinary_url("sample", {
+        effect: "$efname:100",
+        $efname: "!blur!"
+      }, "http://res.cloudinary.com/#{cloud_name}/image/upload/$efname_!blur!,e_$efname:100/sample", {})
+
+    it "should support string interpolation", ->
+      test_cloudinary_url("sample", {
+        crop: "scale",
+        overlay: {text: "$(start)Hello $(name)$(ext), $(no ) $( no)$(end)", font_family: "Arial", font_size: "18"}
+      }, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample", {})
+
