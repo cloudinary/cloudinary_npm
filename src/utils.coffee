@@ -52,7 +52,7 @@ CONDITIONAL_OPERATORS =
   "*": "mul"
   "/": "div"
   "+": "add"
-  "-": "min"
+  "-": "sub"
 
 
 PREDEFINED_VARS =
