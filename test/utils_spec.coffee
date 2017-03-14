@@ -221,7 +221,7 @@ describe "utils", ->
     test_cloudinary_url("test", {effect:"sepia"}, "http://res.cloudinary.com/#{cloud_name}/image/upload/e_sepia/test", {})
 
   it "should support effect with hash param" , ->
-    test_cloudinary_url("test", {effect:{sepia:10}}, "http://res.cloudinary.com/#{cloud_name}/image/upload/e_sepia:10/test", {})
+    test_cloudinary_url("test", {effect:{sepia: -10}}, "http://res.cloudinary.com/#{cloud_name}/image/upload/e_sepia:-10/test", {})
 
   it "should support effect with array param" , ->
     test_cloudinary_url("test", {effect:["sepia", 10]}, "http://res.cloudinary.com/#{cloud_name}/image/upload/e_sepia:10/test", {})

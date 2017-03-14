@@ -113,7 +113,7 @@ normalize_expression = (expression) ->
   return expression if !_.isString(expression) || expression.length == 0 || expression.match(/^!.+!$/)
 
   operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*"
-  pattern = "(" + operators + "|" + Object.keys(PREDEFINED_VARS).join("|") + ")"
+  pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")"
   replaceRE = new RegExp(pattern, "g")
   expression = expression.replace replaceRE, (match)->
     CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match]
