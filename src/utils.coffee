@@ -131,6 +131,9 @@ process_if = (ifValue)->
   * @private
 ###
 process_layer = (layer)->
+  if _.isString(layer)
+    layer =
+      public_id: layer
   if _.isPlainObject(layer)
     public_id = layer["public_id"]
     format = layer["format"]
