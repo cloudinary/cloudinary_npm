@@ -8,6 +8,7 @@ api = cloudinary.v2.api
 uploader = cloudinary.v2.uploader
 zlib = require('zlib')
 sinon = require("sinon")
+ClientRequest = require('_http_client').ClientRequest
 
 exec = require('child_process').exec
 execSync = require('child_process').execSync
@@ -27,6 +28,7 @@ ARCHIVE_TAG = TEST_TAG + "_archive"
 
 publicId1 = ARCHIVE_TAG + "_1"
 publicId2 = ARCHIVE_TAG + "_2"
+publicIdRaw = ARCHIVE_TAG + "_3"
 
 sharedExamples 'archive', ->
 
@@ -35,7 +37,7 @@ sharedExamples 'archive', ->
     if(!(config.api_key && config.api_secret))
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
-  before (done)->
+  before ->
     @timeout helper.TIMEOUT_LONG
 
     Q.all [
@@ -53,10 +55,13 @@ sharedExamples 'archive', ->
         transformation: {
           effect: "blackwhite"
         }
+      )
+      uploader.upload(
+        IMAGE_URL,
+        public_id: publicIdRaw
+        resource_type: "raw"
+        tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG])
       )]
-    .finally ->
-      done()
-
   after ->
     cloudinary.v2.api.delete_resources_by_tag(ARCHIVE_TAG) unless cloudinary.config().keep_test_products
 
@@ -108,18 +113,18 @@ describe "uploader", ->
     @timeout helper.TIMEOUT_LONG
     archive_result = undefined
 
-    before (done)->
+    before ->
       @timeout helper.TIMEOUT_LONG
       uploader.create_archive(
         target_public_id: 'gem_archive_test'
         public_ids: [publicId2, publicId1]
         target_tags: [TEST_TAG, ARCHIVE_TAG]
         mode: 'create'
+        skip_transformation_name: true
       ,
         (error, result)->
-          return done(new Error error.message) if error?
+          new Error error.message if error?
           archive_result = result
-          done()
       )
     it 'should return a Hash', ->
       expect(archive_result).to.be.an(Object)
@@ -142,11 +147,18 @@ describe "uploader", ->
       expect(archive_result).to.have.keys(expected_keys)
   describe '.create_zip', ->
     @timeout helper.TIMEOUT_LONG
-    spy = undefined
+    spy1 = undefined
+    spy2 = undefined
+    xhr = undefined
     before ->
-      spy = sinon.spy cloudinary.uploader, "create_archive"
+      spy1 = sinon.spy cloudinary.uploader, "create_archive"
+      spy2 = sinon.spy ClientRequest.prototype, 'write'
+      xhr = sinon.useFakeXMLHttpRequest()
     after ->
-      spy.reset()
-    it 'should call create_archive with "zip" format', ->
-      uploader.create_zip({tags: TEST_TAG})
-      expect(spy.calledWith(null, {tags: TEST_TAG}, "zip")).to.be.ok()
+      spy1.restore()
+      spy2.restore()
+      xhr.restore()
+    it 'should call create_archive with "zip" format and ignore missing resources', ->
+      uploader.create_zip({tags: TEST_TAG, public_ids: [publicIdRaw, "non-existing-resource"], resource_type: "raw", allow_missing: true})
+      expect(spy1.calledWith(null, {tags: TEST_TAG, public_ids: [publicIdRaw, "non-existing-resource"], resource_type: "raw", allow_missing: true}, "zip")).to.be.ok()
+      sinon.assert.calledWith(spy2, sinon.match((arg)-> arg.toString().match(/name="allow_missing"\s*1/)))

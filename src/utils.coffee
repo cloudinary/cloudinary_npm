@@ -886,6 +886,7 @@ process_video_params = (param) ->
 # @private
 ###
 exports.archive_params = (options = {})->
+  allow_missing: exports.as_safe_bool(options.allow_missing)
   async: exports.as_safe_bool(options.async)
   flatten_folders: exports.as_safe_bool(options.flatten_folders)
   flatten_transformations: exports.as_safe_bool(options.flatten_transformations)
@@ -893,8 +894,9 @@ exports.archive_params = (options = {})->
   mode: options.mode
   notification_url: options.notification_url
   prefixes: options.prefixes && exports.build_array(options.prefixes)
-  transformations: utils.build_eager(options.transformations)
   public_ids: options.public_ids && exports.build_array(options.public_ids)
+  skip_transformation_name: exports.as_safe_bool(options.skip_transformation_name)
+  transformations: utils.build_eager(options.transformations)
   tags: options.tags && exports.build_array(options.tags)
   target_format: options.target_format
   target_public_id: options.target_public_id
