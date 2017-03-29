@@ -161,14 +161,15 @@ process_layer = (layer)->
         re = /\$\([a-zA-Z]\w*\)/g
         start = 0
 #        textSource = text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}")
-        textSource = smart_escape(text, /[,/]/g)
+        textSource = smart_escape(decodeURIComponent(text), /[,/]/g)
         text = ""
         while res = re.exec(textSource)
           text += smart_escape(textSource.slice(start, res.index))
           text += res[0]
           start = res.index + res[0].length
-        text += smart_escape(textSource.slice(start))
-
+        text += encodeURIComponent(textSource.slice(start))
+        # console.log("NADAV = #{text}")
+    # console.log("NADAV = #{text}")
     components.push(resource_type) if resource_type != "image"
     components.push(type) if type != "upload"
     components.push(style)
@@ -505,7 +506,7 @@ finalize_source = (source, format, url_suffix) ->
     source = smart_escape(source)
     source_to_sign = source
   else
-    source = smart_escape(decodeURIComponent(source))
+    source = encodeURIComponent(decodeURIComponent(source)).replace(/%3A/g, ":").replace(/%2F/g, "/")
     source_to_sign = source
     if !!url_suffix
       throw new Error('url_suffix should not include . or /') if url_suffix.match(/[\.\/]/)

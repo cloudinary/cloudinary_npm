@@ -233,7 +233,9 @@ describe "utils", ->
     layers_options= [
     # [name,                    options,                                          result]
       ["string",                "text:hello",                                     "text:hello"],
+      ["string",                { "font_family": "arial", "font_size": 30, "text": "abc,αβγ/אבג"},                                     "text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92"],
       ["public_id",             { "public_id": "logo" },                          "logo"],
+      ["public_id",             { "public_id": "abcαβγאבג.jpg" },                 "abcαβγאבג.jpg"],
       ["public_id with folder", { "public_id": "folder/logo" },                   "folder:logo"],
       ["private",               { "public_id": "logo", "type": "private" },       "private:logo"],
       ["format",                { "public_id": "logo", "format": "png" },         "logo.png"],
@@ -455,7 +457,7 @@ describe "utils", ->
     test_cloudinary_url("test", {shorten:true}, "http://res.cloudinary.com/#{cloud_name}/iu/test", {})
 
   it "should escape public_ids" , ->
-    for source, target of { "a b": "a%20b", "a+b": "a%2Bb", "a%20b": "a%20b", "a-b": "a-b", "a??b": "a%3F%3Fb", "parentheses(interject)": "parentheses%28interject%29" }
+    for source, target of { "a b": "a%20b", "a+b": "a%2Bb", "a%20b": "a%20b", "a-b": "a-b", "a??b": "a%3F%3Fb", "parentheses(interject)": "parentheses(interject)", "abcαβγאבג": "abc%CE%B1%CE%B2%CE%B3%D7%90%D7%91%D7%92" }
       expect(utils.url(source)).to.eql("http://res.cloudinary.com/#{cloud_name}/image/upload/#{target}")
   context "sign URLs", ->
     configBck = undefined
