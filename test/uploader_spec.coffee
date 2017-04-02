@@ -251,6 +251,15 @@ describe "uploader", ->
                 expect(r1.context).to.be undefined
                 done()
 
+    it "should upload with context containing reserved characters", (done)->
+      context = {key1: 'value1', key2: 'valu\e2', key3: 'val=u|e3', key4: 'val\=ue'}
+      cloudinary.v2.uploader.upload IMAGE_FILE, context: context, (error, result) ->
+        cloudinary.v2.api.resource result.public_id, context: true, (error, result) ->
+          expect(result.context.custom).to.eql(context)
+          done()
+        true
+      true
+
   it "should support timeouts", (done) ->
     # testing a 1ms timeout, nobody is that fast.
     cloudinary.v2.uploader.upload "http://cloudinary.com/images/old_logo.png", timeout: 1, tags: UPLOAD_TAGS, (error, result) ->
