@@ -429,6 +429,7 @@ exports.updateable_resource_params = (options, params = {}) ->
   params.detection = options.detection if options.detection?
   params.face_coordinates = utils.encode_double_array(options.face_coordinates) if options.face_coordinates?
   params.headers = utils.build_custom_headers(options.headers) if options.headers?
+  params.notification_url = options.notification_url if options.notification_url?
   params.ocr = options.ocr if options.ocr?
   params.raw_convert = options.raw_convert if options.raw_convert?
   params.similarity_search = options.similarity_search if options.similarity_search?

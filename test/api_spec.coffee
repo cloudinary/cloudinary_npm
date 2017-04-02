@@ -514,6 +514,20 @@ describe "api", ->
                 done()
 
   describe "update", ()->
+    describe "notification url", ()->
+      xhr = request = requestStub = requestSpy = writeSpy =undefined
+      before ->
+        xhr = sinon.useFakeXMLHttpRequest()
+        writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+      after ->
+        writeSpy.restore()
+        xhr.restore()
+      it "should support changing moderation status with notification-url", ()->
+        cloudinary.v2.api.update "sample", moderation_status: "approved", notification_url: "http://example.com"
+        if writeSpy.called
+          sinon.assert.calledWith writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/)
+          sinon.assert.calledWith writeSpy, sinon.match(/moderation_status=approved/)
+
     it "should support setting manual moderation status", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->
