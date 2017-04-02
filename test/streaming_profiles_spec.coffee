@@ -40,7 +40,8 @@ describe 'Cloudinary::Api', ->
         cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a')
         cloudinary.v2.api.delete_streaming_profile(test_id_3)]
       .finally ->
-          done()
+        done()
+      true
 
   describe 'create_streaming_profile', ->
     it 'should create a streaming profile with representations', (done)->
@@ -49,12 +50,14 @@ describe 'Cloudinary::Api', ->
         expect(error).to.be undefined
         expect(result).not.to.be(undefined)
         done()
+      true
     it 'should create a streaming profile with an array of transformation', (done)->
       api.create_streaming_profile test_id_1 + 'a', {representations:
           [{transformation: [{crop: 'scale', width: '1200', height: '1200', bit_rate: '5m'}]}]}, (error, result)->
         expect(error).to.be undefined
         expect(result).not.to.be(undefined)
         done()
+      true
 
   describe 'list_streaming_profile', ->
     it 'should list streaming profile', (done)->
@@ -64,6 +67,7 @@ describe 'Cloudinary::Api', ->
         for profile in PREDEFINED_PROFILES
           expect(result['data'].some((p)-> p.name == profile)).to.be.ok()
         done()
+      true
 
   describe 'delete_streaming_profile', ->
     it 'should delete a streaming profile', (done)->
@@ -81,6 +85,9 @@ describe 'Cloudinary::Api', ->
           api.list_streaming_profiles (error, result)->
             expect(result['data'].map((p) -> p['name'])).not.to.contain(test_id_2)
             done()
+          true
+        true
+      true
 
   describe 'get_streaming_profile', ->
     it 'should get a specific streaming profile', (done)->
@@ -90,6 +97,7 @@ describe 'Cloudinary::Api', ->
         expect(_.keys(result['data'])).to.contain('display_name')
         expect(_.keys(result['data'])).to.contain('representations')
         done()
+      true
 
   describe 'update_streaming_profile', ->
     it 'should create a streaming profile with representations', (done)->
@@ -109,3 +117,6 @@ describe 'Cloudinary::Api', ->
             # Notice transformation is always returned as an array; numeric values represented as numbers, not strings
             expect(result['representations'][0]).to.eql({transformation: [crop: 'scale', width: 1000, height: 1000, bit_rate: '4m']})
             done()
+          true
+        true
+      true

@@ -98,7 +98,7 @@ describe "api", ->
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_6, tags: UPLOAD_TAGS, context: "#{contextKey}=alt-test", eager: [EXPLICIT_TRANSFORMATION])]
     .finally ->
       done()
-
+    true
   after (done)->
     @timeout helper.TIMEOUT_LONG
     if cloudinary.config().keep_test_products
@@ -116,7 +116,8 @@ describe "api", ->
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)]
         .finally ->
-      done()
+          done()
+        true
 
   find_by_attr = (elements, attr, value) ->
     for element in elements
@@ -132,6 +133,7 @@ describe "api", ->
       expect(error).to.be undefined
       expect(result).to.be.an(Object)
       callback(result)
+    true
 
   contextKey = "test-key#{helper.SUFFIX}"
 
@@ -143,6 +145,7 @@ describe "api", ->
         return done(new Error error.message) if error?
         expect(result.resource_types).to.contain("image")
         done()
+      true
 
     it "should allow listing resources", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -155,6 +158,8 @@ describe "api", ->
           expect(resource).not.to.eql(undefined)
           expect(resource.type).to.eql("upload")
           done()
+        true
+      true
 
     it "should allow listing resources by type", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -167,6 +172,8 @@ describe "api", ->
           expect(resource).to.be.an(Object)
           expect(resource.type).to.eql("upload")
           done()
+        true
+      true
 
     it "should allow listing resources by prefix", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -176,6 +183,7 @@ describe "api", ->
         expect(public_ids).to.contain(PUBLIC_ID)
         expect(public_ids).to.contain(PUBLIC_ID_2)
         done()
+      true
 
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG
     it "should allow listing resources by tag", (done) ->
@@ -187,6 +195,7 @@ describe "api", ->
         expect(getAllTags(result)).to.contain(TEST_TAG)
         expect(result.resources.map((e) -> if e.context? then e.context.custom.key else null)).to.contain("value")
         done()
+      true
 
 
     it "should allow listing resources by context only", (done) ->
@@ -195,6 +204,7 @@ describe "api", ->
         return done(new Error error.message) if error?
         expect(result.resources).to.have.length(2)
         done()
+      true
 
     it "should allow listing resources by context key and value", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -202,6 +212,7 @@ describe "api", ->
         return done(new Error error.message) if error?
         expect(result.resources).to.have.length(1)
         done()
+      true
 
     it "should allow listing resources by public ids", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -212,9 +223,10 @@ describe "api", ->
         expect(getAllTags(result)).to.contain(TEST_TAG)
         expect(result.resources.map((e) -> e.context.custom.key)).to.contain("value")
         done()
+      true
 
     it "should allow listing resources specifying direction", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
+      @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.resources_by_tag TEST_TAG, type: "upload", max_results: 500, direction: "asc", (error, result) =>
         return done(new Error error.message) if error?
         asc = (resource.public_id for resource in result.resources)
@@ -223,6 +235,8 @@ describe "api", ->
           desc = (resource.public_id for resource in result.resources)
           expect(asc.reverse()).to.eql(desc)
           done()
+        true
+      true
 
     it "should allow listing resources by start_at", (done) ->
       xhr = sinon.useFakeXMLHttpRequest()
@@ -242,6 +256,7 @@ describe "api", ->
         writeSpy.restore()
         requestSpy.restore()
         xhr.restore()
+      true
 
 
     it "should allow get resource metadata", (done) ->
@@ -256,6 +271,8 @@ describe "api", ->
           expect(resource.bytes).to.eql(3381)
           expect(resource.derived).to.have.length(1)
           done()
+        true
+      true
 
   describe "delete", ()->
     it "should allow deleting derived resource", (done) ->
@@ -276,6 +293,10 @@ describe "api", ->
               expect(resource).not.to.eql(undefined)
               expect(resource.derived).to.have.length(0)
               done()
+            true
+          true
+        true
+      true
 
     it "should allow deleting resources", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -289,6 +310,10 @@ describe "api", ->
               expect(error).to.be.an(Object)
               expect(error.http_code).to.eql 404
               done()
+            true
+          true
+        true
+      true
 
     describe "delete_resources_by_prefix", ->
       itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar"
@@ -303,6 +328,10 @@ describe "api", ->
                 expect(error).to.be.an(Object)
                 expect(error.http_code).to.eql 404
                 done()
+              true
+            true
+          true
+        true
 
 
     describe "delete_resources_by_tag", ->
@@ -320,6 +349,10 @@ describe "api", ->
                 expect(error).to.be.an(Object)
                 expect(error.http_code).to.eql 404
                 done()
+              true
+            true
+          true
+        true
 
   describe "tags", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.tags
@@ -329,6 +362,7 @@ describe "api", ->
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
+      true
 
     it "should allow listing tag by prefix ", (done) =>
       @timeout helper.TIMEOUT_MEDIUM
@@ -336,6 +370,7 @@ describe "api", ->
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
+      true
 
     it "should allow listing tag by prefix if not found", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -343,6 +378,7 @@ describe "api", ->
         return done(new Error error.message) if error?
         expect(result.tags).to.be.empty()
         done()
+      true
 
   describe "transformations", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME
@@ -356,6 +392,7 @@ describe "api", ->
         expect(transformation).not.to.eql(undefined)
         expect(transformation.used).to.be.ok
         done()
+      true
 
     it "should allow getting transformation metadata", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -363,6 +400,7 @@ describe "api", ->
         expect(transformation).not.to.eql(undefined)
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION])
         done()
+      true
 
     it "should allow getting transformation metadata by info", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -370,6 +408,7 @@ describe "api", ->
         expect(transformation).not.to.eql(undefined)
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION])
         done()
+      true
 
     it "should allow updating transformation allowed_for_strict", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -382,6 +421,10 @@ describe "api", ->
               expect(transformation).not.to.eql(undefined)
               expect(transformation.allowed_for_strict).not.to.be.ok
               done()
+            true
+          true
+        true
+      true
 
     it "should allow creating named transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -392,6 +435,8 @@ describe "api", ->
           expect(transformation.info).to.eql([crop: "scale", width: 102])
           expect(transformation.used).not.to.be.ok
           done()
+        true
+      true
 
     it "should allow unsafe update of named transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -402,6 +447,9 @@ describe "api", ->
             expect(transformation.info).to.eql([crop: "scale", width: 103])
             expect(transformation.used).not.to.be.ok
             done()
+          true
+        true
+      true
 
     it "should allow deleting named transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -409,6 +457,8 @@ describe "api", ->
         cloudinary.v2.api.transformation NAMED_TRANSFORMATION, (error, transformation) ->
           expect(error.http_code).to.eql 404
           done()
+        true
+      true
 
     it "should allow deleting implicit transformation", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -418,6 +468,9 @@ describe "api", ->
           cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
             expect(error.http_code).to.eql 404
             done()
+          true
+        true
+      true
 
   describe "upload_preset", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_presets
@@ -428,21 +481,26 @@ describe "api", ->
       after_delete = ->
         delete_names.pop()
         done() if delete_names.length == 0
-
+        true
       validate_presets = ->
         cloudinary.v2.api.upload_presets (error, response) ->
           expect(response.presets.slice(0,3).map((p) -> p.name)).to.eql(delete_names)
-          delete_names.forEach((name) -> cloudinary.v2.api.delete_upload_preset name, after_delete)
+          delete_names.forEach (name) ->
+            cloudinary.v2.api.delete_upload_preset name, after_delete
+            true
+        true
 
       after_create = ->
         if create_names.length > 0
           name = create_names.pop()
           delete_names.unshift(name)
           cloudinary.v2.api.create_upload_preset name: name , folder: "folder", after_create
+          true
         else
           validate_presets()
 
       after_create()
+      true
 
     it "should allow getting a single upload_preset", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -457,6 +515,9 @@ describe "api", ->
           expect(preset.settings.tags).to.eql(["a","b","c"])
           cloudinary.v2.api.delete_upload_preset name, ->
             done()
+          true
+        true
+      true
 
     it "should allow deleting upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -466,6 +527,10 @@ describe "api", ->
             cloudinary.v2.api.upload_preset API_TEST_UPLOAD_PRESET4, (error, result) ->
               expect(error.message).to.contain "Can't find"
               done()
+            true
+          true
+        true
+      true
 
     it "should allow updating upload_presets", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -479,12 +544,18 @@ describe "api", ->
               expect(preset.settings).to.eql(folder: "folder", colors: true, disallow_public_id: true)
               cloudinary.v2.api.delete_upload_preset name, ->
                 done()
+              true
+            true
+          true
+        true
+      true
 
   it "should support the usage API call", (done) ->
     @timeout helper.TIMEOUT_MEDIUM
     cloudinary.v2.api.usage (error, usage) ->
       expect(usage.last_update).not.to.eql null
       done()
+    true
 
   describe "delete_all_resources", ->
     itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_all_resources
@@ -512,14 +583,19 @@ describe "api", ->
                 return done(new Error error.message) if error?
                 expect(new_resource.derived).to.be.empty()
                 done()
+              true
+          true
+        true
 
   describe "update", ()->
     it "should support setting manual moderation status", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
+      @timeout helper.TIMEOUT_LONG
       cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->
         cloudinary.v2.api.update upload_result.public_id, moderation_status: "approved", (error, api_result) ->
           expect(api_result.moderation[0].status).to.eql("approved")
           done()
+        true
+      true
 
     it "should support requesting ocr info", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -527,6 +603,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, ocr: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Illegal value"
           done()
+        true
 
     it "should support requesting raw conversion", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -534,6 +611,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, raw_convert: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Illegal value"
           done()
+        true
 
     it "should support requesting categorization", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -541,6 +619,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, categorization: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Illegal value"
           done()
+        true
 
     it "should support requesting detection", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -548,6 +627,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, detection: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Illegal value"
           done()
+        true
 
     it "should support requesting background_removal", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -555,6 +635,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, background_removal: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Illegal value"
           done()
+        true
 
     it "should support requesting similarity_search", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -562,6 +643,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, similarity_search: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Illegal value"
           done()
+        true
 
     it "should support requesting auto_tagging", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -569,6 +651,7 @@ describe "api", ->
         cloudinary.v2.api.update upload_result.public_id, auto_tagging: "illegal", (error, api_result) ->
           expect(error.message).to.contain "Must use"
           done()
+        true
 
   it "should support listing by moderation kind and value", (done) ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved"
@@ -608,6 +691,7 @@ describe "api", ->
     cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
     cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
     cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
+    true
 
   # For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   # Replace `it` with  `it.skip` below if you want to disable it.
@@ -640,6 +724,7 @@ describe "api", ->
       expect(err.error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
       done()
     )
+    true
 
   describe '.restore', ->
     @timeout helper.TIMEOUT_MEDIUM
@@ -658,6 +743,10 @@ describe "api", ->
               expect(resource["bytes"]).to.eql(0)
               expect(resource["placeholder"]).to.eql(true)
               done()
+            true
+          true
+        true
+      true
 
     it 'should restore a deleted resource', (done)->
       cloudinary.v2.api.restore "api_test_restore", (error, response)->
@@ -668,6 +757,8 @@ describe "api", ->
           expect(resource).not.to.be(null)
           expect(resource["bytes"]).to.eql(3381)
           done()
+        true
+      true
 
 
   describe 'mapping', ->
@@ -677,6 +768,7 @@ describe "api", ->
       if(deleteMapping)
         cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
           done()
+        true
       else
         done()
     itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_mappings
@@ -703,6 +795,13 @@ describe "api", ->
                     return done(new Error error.message) if error?
                     expect(_.find(result["mappings"], _.matchesProperty('folder', mapping))).not.to.be.ok()
                     done()
+                  true
+                true
+              true
+            true
+          true
+        true
+      true
 
   describe "publish", ->
     @timeout helper.TIMEOUT_LONG
@@ -718,11 +817,13 @@ describe "api", ->
         publishTestId = result.public_id
         idsToDelete.push publishTestId
         done()
+      true
     after (done)->
       # cleanup any resource that were not published
       cloudinary.v2.api.delete_resources  idsToDelete, type: "authenticated", (error, result)->
         return done(new Error error.message) if error?
         done()
+      true
     it "by public id", (done)->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_ids [publishTestId], (error, result)->
@@ -733,6 +834,7 @@ describe "api", ->
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
         done()
+      true
     it "by prefix", (done)->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_prefix publishTestId[0..-2], (error, result)->
@@ -743,6 +845,7 @@ describe "api", ->
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
         done()
+      true
     it "by tag", (done)->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_tag publishTestTag, (error, result)->
@@ -753,6 +856,7 @@ describe "api", ->
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
         done()
+      true
   describe "access_mode", ->
     i = 0
     @timeout helper.TIMEOUT_LONG
@@ -765,6 +869,7 @@ describe "api", ->
         publicId = result.public_id
         expect(result.access_mode).to.be("authenticated")
         done()
+      true
     it "should update access mode by ids", (done)->
       cloudinary.v2.api.update_resources_access_mode_by_ids "public", [publicId], (error, result)->
         return done(new Error error.message) if error?
@@ -774,6 +879,7 @@ describe "api", ->
         expect(resource.public_id).to.be(publicId)
         expect(resource.access_mode).to.be('public')
         done()
+      true
     it "should update access mode by prefix", (done)->
       cloudinary.v2.api.update_resources_access_mode_by_prefix "public", publicId[0..-3], (error, result)->
         return done(new Error error.message) if error?
@@ -783,6 +889,7 @@ describe "api", ->
         expect(resource.public_id).to.be(publicId)
         expect(resource.access_mode).to.be('public')
         done()
+      true
     it "should update access mode by tag", (done)->
       cloudinary.v2.api.update_resources_access_mode_by_tag "public", access_mode_tag, (error, result)->
         return done(new Error error.message) if error?
@@ -792,3 +899,4 @@ describe "api", ->
         expect(resource.public_id).to.be(publicId)
         expect(resource.access_mode).to.be('public')
         done()
+      true
