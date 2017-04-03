@@ -775,7 +775,8 @@ describe "api", ->
           published = result.published
           expect(published).not.to.be(null)
           expect(published.length).to.be(0)
-        done()
+          done()
+        true
   describe "access_mode", ->
     i = 0
     @timeout helper.TIMEOUT_LONG
