@@ -272,6 +272,8 @@ describe "utils", ->
           authenticated_image = result
           authenticated_path =  "#{root_path}/image/authenticated"
           done()
+      true
+    true
 
     beforeEach ->
       options =  _.merge({ version: authenticated_image['version'], sign_url: true, type: "authenticated" }, specific_options)
