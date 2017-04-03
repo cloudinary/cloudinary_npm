@@ -250,6 +250,15 @@ exports.encode_key_value = (arg) ->
   else
     arg
 
+exports.encode_context = (arg) ->
+  if _.isObject(arg)
+    pairs = for k, v of arg
+      v = v.replace /([=|])/g, (match)-> "\\#{match}"
+      "#{k}=#{v}"
+    pairs.join("|")
+  else
+    arg
+
 exports.build_eager = (transformations) ->
   (for transformation in utils.build_array(transformations)
     transformation = _.clone(transformation)
@@ -416,7 +425,7 @@ exports.updateable_resource_params = (options, params = {}) ->
   params.auto_tagging = options.auto_tagging if options.auto_tagging?
   params.background_removal = options.background_removal if options.background_removal?
   params.categorization = options.categorization if options.categorization?
-  params.context = utils.encode_key_value(options.context) if options.context?
+  params.context = utils.encode_context(options.context) if options.context?
   params.custom_coordinates = utils.encode_double_array(options.custom_coordinates) if options.custom_coordinates?
   params.detection = options.detection if options.detection?
   params.face_coordinates = utils.encode_double_array(options.face_coordinates) if options.face_coordinates?

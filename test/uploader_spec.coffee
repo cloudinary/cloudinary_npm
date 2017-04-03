@@ -25,12 +25,13 @@ describe "uploader", ->
     if(!(config.api_key && config.api_secret))
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
-  @timeout helper.TIMEOUT_SHORT
+  @timeout helper.TIMEOUT_LONG
   after ->
     config = cloudinary.config(true)
     if(!(config.api_key && config.api_secret))
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
     cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+
 
   ###*
   # Upload an image to be tested on.
@@ -45,12 +46,14 @@ describe "uploader", ->
     cloudinary.config(true)
 
   it "should successfully upload file", (done) ->
+    @timeout helper.TIMEOUT_LONG
     upload_image (result) ->
       expect(result.width).to.eql(241)
       expect(result.height).to.eql(51)
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
       done()
+    true
 
   it "should successfully upload url", (done) ->
     cloudinary.v2.uploader.upload "http://cloudinary.com/images/old_logo.png", tags: UPLOAD_TAGS, (error, result) ->
@@ -60,6 +63,7 @@ describe "uploader", ->
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
       done()
+    true
 
   describe "rename", ()->
     @timeout helper.TIMEOUT_LONG
@@ -71,6 +75,9 @@ describe "uploader", ->
           cloudinary.v2.api.resource public_id+"2", (e2, r2) ->
             expect(e2).to.be undefined
             done()
+          true
+        true
+      true
 
     it "should not rename to an existing public_id", (done)->
       upload_image (result)->
@@ -80,6 +87,9 @@ describe "uploader", ->
           cloudinary.v2.uploader.rename first_id, second_id, (e3, r3) ->
             expect(e3).not.to.be undefined
             done()
+          true
+        true
+      true
 
     it "should allow to rename to an existing ID, if overwrite is true", (done)->
       upload_image (result)->
@@ -91,6 +101,10 @@ describe "uploader", ->
             cloudinary.v2.api.resource second_id, (error, result) ->
               expect(result.format).to.eql "png"
               done()
+            true
+          true
+        true
+      true
 
     context ":invalidate", ->
       spy = undefined
@@ -105,6 +119,7 @@ describe "uploader", ->
         cloudinary.v2.uploader.rename "first_id", "second_id", invalidate: true, (error, result) ->
           expect(spy.calledWith(sinon.match((arg)-> arg.toString().match(/name="invalidate"/)))).to.be.ok()
           done()
+        true
 
   describe "destroy", ()->
     @timeout helper.TIMEOUT_MEDIUM
@@ -117,6 +132,9 @@ describe "uploader", ->
           cloudinary.v2.api.resource public_id, (error, result)->
             expect(error).to.be.ok()
             done()
+          true
+        true
+      true
 
   it "should successfully call explicit api", (done) ->
     current = this
@@ -138,23 +156,27 @@ describe "uploader", ->
           done()
         else
           done(new Error error.message)
+    true
 
   it "should support eager in upload", (done) ->
     @timeout helper.TIMEOUT_SHORT
     cloudinary.v2.uploader.upload IMAGE_FILE, eager: [crop: "scale", width: "2.0"], tags: UPLOAD_TAGS, (error, result) ->
       return done(new Error error.message) if error?
       done()
+    true
 
   describe "custom headers", ()->
     it "should support custom headers in object format e.g. {Link: \"1\"}", (done) ->
       cloudinary.v2.uploader.upload IMAGE_FILE, headers: {Link: "1"}, tags: UPLOAD_TAGS, (error, result) ->
         return done(new Error error.message) if error?
         done()
+      true
 
     it "should support custom headers as array of strings e.g. [\"Link: 1\"]", (done) ->
       cloudinary.v2.uploader.upload IMAGE_FILE, headers: ["Link: 1"], tags: UPLOAD_TAGS, (error, result) ->
         return done(new Error error.message) if error?
         done()
+      true
 
   it "should successfully generate text image", (done) ->
     cloudinary.v2.uploader.text "hello world", tags: UPLOAD_TAGS, (error, result) ->
@@ -162,6 +184,7 @@ describe "uploader", ->
       expect(result.width).to.within(50,70)
       expect(result.height).to.within(5,15)
       done()
+    true
 
   it "should successfully upload stream", (done) ->
     stream = cloudinary.v2.uploader.upload_stream tags: UPLOAD_TAGS, (error, result) ->
@@ -171,6 +194,7 @@ describe "uploader", ->
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
       done()
+    true
     file_reader = fs.createReadStream(IMAGE_FILE, {encoding: 'binary'})
     file_reader.on 'data', (chunk)-> stream.write(chunk,'binary')
     file_reader.on 'end', -> stream.end()
@@ -193,6 +217,12 @@ describe "uploader", ->
                 expect(res["public_ids"]).to.not.contain('noSuchId')
                 cloudinary.v2.api.delete_resources [first_id, second_id], (err, res)->
                   done()
+                true
+              true
+            true
+          true
+        true
+      true
 
     it "should keep existing tags when adding a new tag", (done)->
       upload_image (result1)->
@@ -202,6 +232,10 @@ describe "uploader", ->
             cloudinary.v2.api.resource public_id, (e1, r1) ->
               expect(r1.tags).to.contain("tag1").and.contain( "tag2")
               done()
+            true
+          true
+        true
+      true
 
     it "should replace existing tag", (done)->
       cloudinary.v2.uploader.upload IMAGE_FILE, tags: ["tag1", "tag2", TEST_TAG], (error, result)->
@@ -213,6 +247,9 @@ describe "uploader", ->
             return done(new Error error.message) if error?
             expect(result.tags).to.eql(["tag3Å"])
             done()
+          true
+        true
+      true
 
   describe "context", ()->
     second_id = first_id = ''
@@ -228,6 +265,7 @@ describe "uploader", ->
         done()
       .fail (error)->
         done(new Error(error.message))
+      true
     it "should add context to existing resources", (done) ->
       cloudinary.v2.uploader.add_context 'alt=testAlt|custom=testCustom', [first_id, second_id], (et1, rt1) ->
         return done(new Error et1.message) if et1?
@@ -250,6 +288,20 @@ describe "uploader", ->
                 return done(new Error error.message) if error
                 expect(r1.context).to.be undefined
                 done()
+              true
+            true
+          true
+        true
+      true
+
+    it "should upload with context containing reserved characters", (done)->
+      context = {key1: 'value1', key2: 'valu\e2', key3: 'val=u|e3', key4: 'val\=ue'}
+      cloudinary.v2.uploader.upload IMAGE_FILE, context: context, (error, result) ->
+        cloudinary.v2.api.resource result.public_id, context: true, (error, result) ->
+          expect(result.context.custom).to.eql(context)
+          done()
+        true
+      true
 
   it "should support timeouts", (done) ->
     # testing a 1ms timeout, nobody is that fast.
@@ -257,6 +309,7 @@ describe "uploader", ->
       expect(error.http_code).to.eql(499)
       expect(error.message).to.eql("Request Timeout")
       done()
+    true
 
     
   it "should upload a file and base public id on the filename if use_filename is set to true", (done) ->
@@ -265,6 +318,7 @@ describe "uploader", ->
       return done(new Error error.message) if error?
       expect(result.public_id).to.match /logo_[a-zA-Z0-9]{6}/
       done()
+    true
 
 
   it "should upload a file and set the filename as the public_id if use_filename is set to true and unique_filename is set to false", (done) ->
@@ -272,6 +326,7 @@ describe "uploader", ->
       return done(new Error error.message) if error?
       expect(result.public_id).to.eql "logo"
       done()
+    true
 
   describe "allowed_formats", ->
     it "should allow whitelisted formats", (done) ->
@@ -279,20 +334,24 @@ describe "uploader", ->
         return done(new Error error.message) if error?
         expect(result.format).to.eql("png")
         done()
+      true
 
     it "should prevent non whitelisted formats from being uploaded", (done) ->
       cloudinary.v2.uploader.upload IMAGE_FILE, allowed_formats: ["jpg"], tags: UPLOAD_TAGS, (error, result) ->
         expect(error.http_code).to.eql(400)
         done()
+      true
 
     it "should allow non whitelisted formats if type is specified and convert to that type", (done) ->
       cloudinary.v2.uploader.upload IMAGE_FILE, allowed_formats: ["jpg"], format: "jpg", tags: UPLOAD_TAGS, (error, result) ->
         return done(new Error error.message) if error?
         expect(result.format).to.eql("jpg")
         done()
+      true
 
   
   it "should allow sending face coordinates", (done) ->
+    @timeout helper.TIMEOUT_LONG
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]]
     out_coordinates = [[120, 30, 109, 51], [121, 31, 110, 51]] # coordinates are limited to the image dimensions
     different_coordinates = [[122, 32, 111, 152]]
@@ -307,6 +366,9 @@ describe "uploader", ->
           expect(info.faces).to.eql(different_coordinates)
           expect(info.coordinates).to.eql(faces: different_coordinates, custom: [custom_coordinates])
           done()
+        true
+      true
+    true
   
   it "should allow sending context", (done) ->
     @timeout helper.TIMEOUT_LONG
@@ -318,6 +380,8 @@ describe "uploader", ->
         expect(info.context.custom.caption).to.eql("some caption")
         expect(info.context.custom.alt).to.eql("alternative")
         done()
+      true
+    true
 
 
        
@@ -326,6 +390,7 @@ describe "uploader", ->
       expect(result.moderation[0].status).to.eql("pending")
       expect(result.moderation[0].kind).to.eql("manual")
       done()
+    true
 
     
   it "should support requesting raw conversion", (done) ->
@@ -333,6 +398,7 @@ describe "uploader", ->
       expect(error?).to.be true
       expect(error.message).to.contain "is not a valid"
       done()
+    true
 
     
   it "should support requesting categorization", (done) ->
@@ -340,6 +406,7 @@ describe "uploader", ->
       expect(error?).to.be true
       expect(error.message).to.contain "is invalid"
       done()
+    true
 
     
   it "should support requesting detection", (done) ->
@@ -347,6 +414,7 @@ describe "uploader", ->
       expect(error).not.to.be undefined
       expect(error.message).to.contain "is not a valid"
       done()
+    true
 
       
   it "should support requesting background_removal", (done) ->
@@ -354,6 +422,7 @@ describe "uploader", ->
       expect(error?).to.be true
       expect(error.message).to.contain "is invalid"
       done()
+    true
 
       
   it "should support requesting auto_tagging", (done) ->
@@ -361,6 +430,7 @@ describe "uploader", ->
       expect(error?).to.be true
       expect(error.message).to.contain "Must use"
       done()
+    true
 
 
   describe "upload_chunked", ()->
@@ -372,12 +442,14 @@ describe "uploader", ->
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("4c13724e950abcb13ec480e10f8541f5")
           done()
+        true
 
     it "should return error if value is less than 5MB", (done)->
       fs.stat LARGE_RAW_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 40000, tags: UPLOAD_TAGS}, (error, result) ->
           expect(error.message).to.eql("All parts except last must be larger than 5mb")
           done()
+        true
 
     it "should support uploading a small raw file", (done) ->
       fs.stat RAW_FILE, (err, stat) ->
@@ -386,6 +458,7 @@ describe "uploader", ->
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("ffc265d8d1296247972b4d478048e448")
           done()
+        true
 
     it "should support uploading a small image file", (done) ->
       fs.stat IMAGE_FILE, (err, stat) ->
@@ -394,6 +467,7 @@ describe "uploader", ->
           expect(result.bytes).to.eql(stat.size)
           expect(result.etag).to.eql("7dc60722d4653261648038b579fdb89e")
           done()
+        true
 
     it "should support uploading large video files", (done) ->
       @timeout helper.TIMEOUT_LONG * 10
@@ -405,6 +479,8 @@ describe "uploader", ->
           expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571")
           cloudinary.v2.uploader.destroy result.public_id, ()->
             done()
+          true
+        true
 
   it "should support unsigned uploading using presets", (done) ->
     @timeout helper.TIMEOUT_LONG
@@ -414,6 +490,9 @@ describe "uploader", ->
         cloudinary.v2.api.delete_upload_preset preset.name, ->
           expect(result.public_id).to.match /^upload_folder\/[a-z0-9]+$/
           done()
+        true
+      true
+    true
 
   it "should reject promise if error code is returned from the server", (done) ->
     cloudinary.v2.uploader.upload(EMPTY_IMAGE, tags: UPLOAD_TAGS)
@@ -423,6 +502,7 @@ describe "uploader", ->
       expect(error.message).to.contain "empty"
     .finally ->
       done()
+    true
 
   it "should successfully upload with pipes", (done) ->
     @timeout helper.TIMEOUT_LONG
@@ -433,6 +513,7 @@ describe "uploader", ->
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
       done()
+    true
     file_reader = fs.createReadStream(IMAGE_FILE)
     file_reader.pipe(upload)
 
@@ -443,6 +524,7 @@ describe "uploader", ->
         expect(error).to.be.ok()
         expect(error.message).to.match(/socket hang up|ECONNRESET/)
         done()
+      true
 
       file_reader = fs.createReadStream(IMAGE_FILE)
       file_reader.pipe(upload)
@@ -453,6 +535,7 @@ describe "uploader", ->
         done()
       ).to.throwError()
       done()
+      true
 
   it "should successfully override https agent", (done) ->
     upload = cloudinary.v2.uploader.upload_stream agent:new https.Agent, tags: UPLOAD_TAGS, (error, result) ->
@@ -462,6 +545,7 @@ describe "uploader", ->
       expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
       expect(result.signature).to.eql(expected_signature)
       done()
+    true
     file_reader = fs.createReadStream(IMAGE_FILE)
     file_reader.pipe(upload)
 
@@ -472,6 +556,7 @@ describe "uploader", ->
           return done(new Error error.message) if error?
           expect(result).to.have.key('responsive_breakpoints')
           done()
+        true
 
   describe "explicit", ->
     spy = undefined
