@@ -739,7 +739,7 @@ describe "api", ->
         done()
     it "by public id", (done)->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.publish_by_ids [publishTestId], (error, result)->
+      cloudinary.v2.api.publish_by_ids [publishTestId], type: "authenticated", (error, result)->
         return done(new Error error.message) if error?
         published = result.published
         expect(published).not.to.be(null)
@@ -766,6 +766,15 @@ describe "api", ->
         expect(published.length).to.be(1)
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
+        done()
+    context "error", ->
+      it "shoule return empty due to wrong type given", (done)->
+        @timeout helper.TIMEOUT_LONG
+        cloudinary.v2.api.publish_by_ids [publishTestId], type: "private", (error, result)->
+          return done(new Error error.message) if error?
+          published = result.published
+          expect(published).not.to.be(null)
+          expect(published.length).to.be(0)
         done()
   describe "access_mode", ->
     i = 0
