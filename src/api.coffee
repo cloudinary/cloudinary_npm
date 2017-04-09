@@ -250,7 +250,7 @@ exports.create_upload_mapping = (name, callback, options = {})->
   call_api("post", 'upload_mappings', params, callback, options)
 
 publishResource = (byKey, value, callback, options={})->
-  params = api.only(options, "invalidate", "overwrite")
+  params = api.only(options, "type", "invalidate", "overwrite")
   params[byKey] = value
   resource_type = options.resource_type ? "image"
   uri = ["resources", resource_type, "publish_resources"]

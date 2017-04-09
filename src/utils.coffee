@@ -351,6 +351,7 @@ exports.generate_transformation_string = (options) ->
     e: normalize_expression(effect)
     fl: flags
     h: normalize_expression(height)
+    ki: normalize_expression(utils.option_consume(options, "keyframe_interval"))
     l: overlay
     o: normalize_expression(utils.option_consume(options, "opacity"))
     q: normalize_expression(utils.option_consume(options, "quality"))

@@ -33,9 +33,10 @@ describe "video tag helper", ->
       html_width  : "200",
       video_codec : {codec: "h264"},
       audio_codec : "acc",
-      start_offset: 3
+      start_offset: 3,
+      keyframe_interval: "2.0"
     }
-    expected_url = VIDEO_UPLOAD_PATH + "ac_acc,so_3,vc_h264/movie"
+    expected_url = VIDEO_UPLOAD_PATH + "ac_acc,ki_2.0,so_3,vc_h264/movie"
     expect(cloudinary.video("movie", options)).to.eql(
       "<video height='100' poster='#{expected_url}.jpg' src='#{expected_url}.mp4' width='200'></video>")
 
@@ -51,7 +52,7 @@ describe "video tag helper", ->
     delete options['html_width']
     options['width'] = 250
     options['crop'] = 'scale'
-    expected_url = VIDEO_UPLOAD_PATH + "ac_acc,c_scale,so_3,vc_h264,w_250/movie"
+    expected_url = VIDEO_UPLOAD_PATH + "ac_acc,c_scale,ki_2.0,so_3,vc_h264,w_250/movie"
     expect(cloudinary.video("movie", options)).to.eql(
       "<video poster='#{expected_url}.jpg' width='250'>" +
       "<source src='#{expected_url}.webm' type='video/webm'>" +
@@ -59,7 +60,7 @@ describe "video tag helper", ->
       "<source src='#{expected_url}.ogv' type='video/ogg'>" +
       "</video>")
 
-    expected_url = VIDEO_UPLOAD_PATH + "ac_acc,c_fit,so_3,vc_h264,w_250/movie"
+    expected_url = VIDEO_UPLOAD_PATH + "ac_acc,c_fit,ki_2.0,so_3,vc_h264,w_250/movie"
     options['crop'] = 'fit'
     expect(cloudinary.video("movie", options)).to.eql(
       "<video poster='#{expected_url}.jpg'>" +

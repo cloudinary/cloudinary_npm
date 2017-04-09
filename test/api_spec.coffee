@@ -838,9 +838,9 @@ describe "api", ->
         return done(new Error error.message) if error?
         done()
       true
-    it "by public id", (done)->
+    it "should publish by public id", (done)->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.publish_by_ids [publishTestId], (error, result)->
+      cloudinary.v2.api.publish_by_ids [publishTestId], type: "authenticated", (error, result)->
         return done(new Error error.message) if error?
         published = result.published
         expect(published).not.to.be(null)
@@ -849,7 +849,7 @@ describe "api", ->
         expect(published[0].url).to.match(/\/upload\//)
         done()
       true
-    it "by prefix", (done)->
+    it "should publish by prefix", (done)->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_prefix publishTestId[0..-2], (error, result)->
         return done(new Error error.message) if error?
@@ -860,7 +860,7 @@ describe "api", ->
         expect(published[0].url).to.match(/\/upload\//)
         done()
       true
-    it "by tag", (done)->
+    it "should publish by tag", (done)->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.api.publish_by_tag publishTestTag, (error, result)->
         return done(new Error error.message) if error?
@@ -871,6 +871,16 @@ describe "api", ->
         expect(published[0].url).to.match(/\/upload\//)
         done()
       true
+    it "should return empty when explicit given type doesn't match resource", (done)->
+      @timeout helper.TIMEOUT_LONG
+      cloudinary.v2.api.publish_by_ids [publishTestId], type: "private", (error, result)->
+        return done(new Error error.message) if error?
+        published = result.published
+        expect(published).not.to.be(null)
+        expect(published.length).to.be(0)
+        done()
+      true
+
   describe "access_mode", ->
     i = 0
     @timeout helper.TIMEOUT_LONG
