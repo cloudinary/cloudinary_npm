@@ -1,4 +1,25 @@
 
+1.9.0 / 2017-04-30
+==================
+
+New functionality
+-----------------
+
+  * Add Search API
+  * Add support for `type` parameter in publish-resources api
+  * Add support for `keyframe-interval` (ki) video manipulation parameter
+  * Added parameters `allow_missing` and `skip_transformation_name` to generate-archive api
+  * Add support for `notification-url` parameter to update API
+  * Support = and | characters within context values using escaping + test (#143)
+
+Other changes
+-------------
+
+  * Test/upgrade mocha (#142)
+  * fix bad escaping of special characters in certain scenarios + tests (#140) Fixes #138
+  * Don't normalize negative numbers.
+  * Fix typo: rename `min` to `sub`
+
 1.8.0 / 2017-03-09
 ==================
 
