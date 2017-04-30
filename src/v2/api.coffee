@@ -46,4 +46,5 @@ utils.v1_adapters exports, api,
   publish_by_prefix: 1,
   update_resources_access_mode_by_prefix: 2,
   update_resources_access_mode_by_tag: 2,
-  update_resources_access_mode_by_ids: 2
+  update_resources_access_mode_by_ids: 2,
+  search: 1

@@ -115,9 +115,9 @@ describe "api", ->
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)]
-        .finally ->
+      .finally ->
           done()
-        true
+      true
 
   find_by_attr = (elements, attr, value) ->
     for element in elements

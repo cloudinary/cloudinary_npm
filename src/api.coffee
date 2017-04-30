@@ -17,7 +17,12 @@ call_api = (method, uri, params, callback, options) ->
   api_key = options["api_key"] ? config("api_key") ? throw("Must supply api_key")
   api_secret = options["api_secret"] ? config("api_secret") ? throw("Must supply api_secret")
   api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/")
-  query_params = querystring.stringify(params)
+  content_type ='application/x-www-form-urlencoded'
+  if options['content_type']=='json'
+    query_params = JSON.stringify(params)
+    content_type='application/json'
+  else
+    query_params = querystring.stringify(params)
   if method == "get"
     api_url += "?" + query_params
 
@@ -25,12 +30,11 @@ call_api = (method, uri, params, callback, options) ->
   request_options = _.extend request_options,
     method: method.toUpperCase()
     headers:
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': content_type
       'User-Agent': utils.getUserAgent()
     auth: "#{api_key}:#{api_secret}"
   request_options.agent = options.agent if options.agent?
   request_options.headers['Content-Length'] = Buffer.byteLength(query_params) unless method == "get"
-
   handle_response = (res) ->
     if _.includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)
       buffer = ""
@@ -291,6 +295,10 @@ update_resources_access_mode = (access_mode, by_key, value, callback, options = 
 #  by_key = by_key == 'ids' ? 'ids[]' : by_key
   params[by_key] = value
   call_api("post", "resources/#{resource_type}/#{type}/update_access_mode", params, callback, options)
+
+exports.search = (params, callback, options= {})->
+  options['content_type']='json'
+  call_api("post", "resources/search", params, callback, options)
 
 exports.update_resources_access_mode_by_prefix = (access_mode, prefix, callback, options = {})->
   update_resources_access_mode(access_mode, "prefix", prefix, callback, options)
