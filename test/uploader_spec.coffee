@@ -543,11 +543,16 @@ describe "uploader", ->
     file_reader.pipe(upload)
 
   context ":responsive_breakpoints", ->
-    context ":create_derived", ->
+    context ":create_derived with different transformation settings", ->
       it 'should return a responsive_breakpoints in the response', (done)->
-        cloudinary.v2.uploader.upload IMAGE_FILE, responsive_breakpoints: {create_derived: false }, tags: UPLOAD_TAGS, (error, result)->
+        cloudinary.v2.uploader.upload IMAGE_FILE, responsive_breakpoints: [{transformation:{effect: "sepia"}, format:"jpg", bytes_step:20000, create_derived: true, min_width: 200, max_width: 1000, max_images: 20}, {format:"gif", create_derived:true, bytes_step:20000, min_width: 200, max_width: 1000, max_images: 20}], tags: UPLOAD_TAGS, (error, result)->
           return done(new Error error.message) if error?
           expect(result).to.have.key('responsive_breakpoints')
+          expect(result.responsive_breakpoints).to.have.length(2)
+          expect(result.responsive_breakpoints[0]).to.have.key("transformation")
+          expect(result.responsive_breakpoints[0].transformation).to.eql("e_sepia/jpg")
+          expect(result.responsive_breakpoints[1]).to.have.key("transformation")
+          expect(result.responsive_breakpoints[1].transformation).to.eql("gif")
           done()
         true
 

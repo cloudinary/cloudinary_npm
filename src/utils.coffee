@@ -962,8 +962,11 @@ exports.generate_responsive_breakpoints_string = (breakpoints)->
     if breakpoint_settings?
       transformation = breakpoint_settings.transformation
       delete breakpoint_settings.transformation
+      format = breakpoint_settings.format
+      delete breakpoint_settings.format
       if transformation
-        breakpoint_settings.transformation = utils.generate_transformation_string(_.clone(transformation))
+        transformation = utils.generate_transformation_string(_.clone(transformation))
+      breakpoint_settings.transformation = _.compact([transformation, format]).join("/")
   JSON.stringify(breakpoints)
 
 exports.build_streaming_profiles_param = (options={})->
