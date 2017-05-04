@@ -81,11 +81,13 @@ describe "utils", ->
         target_public_id: 'gem_archive_test'
         public_ids: [publicId2, publicId1]
         target_tags: ARCHIVE_TAG
+        expires_at: Date.now() / 1000 + 60 # expiration after 60 seconds
     describe 'public_ids', ->
       it 'should generate a valid url', ->
         expect(archive_result).not.to.be.empty()
       it 'should include two files', (done)->
         filename = "#{os.tmpdir()}/deleteme-#{Math.floor(Math.random() * 100000)}.zip"
+        expect(archive_result).to.contain("expires_at")
         https.get archive_result, (res)->
           file = fs.createWriteStream(filename)
           if(res.statusCode == 200)
