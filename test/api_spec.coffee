@@ -35,7 +35,9 @@ API_TEST_UPLOAD_PRESET3 = "npm_api_test_upload_preset_3_" + SUFFIX
 API_TEST_UPLOAD_PRESET4 = "npm_api_test_upload_preset_4_" + SUFFIX
 
 EXPLICIT_TRANSFORMATION_NAME = "c_scale,l_text:Arial_60:#{TEST_TAG},w_100"
+EXPLICIT_TRANSFORMATION_NAME2 = "c_scale,l_text:Arial_60:#{TEST_TAG},w_200"
 EXPLICIT_TRANSFORMATION = {width: 100, crop: "scale", overlay: "text:Arial_60:#{TEST_TAG}"}
+EXPLICIT_TRANSFORMATION2 = {width: 200, crop: "scale", overlay: "text:Arial_60:#{TEST_TAG}"}
 
 sharedExamples "a list with a cursor", (testFunc, args...)->
   xhr = request = requestStub = requestSpy = writeSpy =undefined
@@ -389,9 +391,14 @@ describe "api", ->
       cloudinary.v2.api.transformations (error, result) ->
         return done(new Error error.message) if error?
         transformation = find_by_attr(result.transformations, "name", EXPLICIT_TRANSFORMATION_NAME)
+        expect(result.next_cursor).not.to.be.empty()
         expect(transformation).not.to.eql(undefined)
         expect(transformation.used).to.be.ok
-        done()
+        previous_cursor = result.next_cursor
+        cloudinary.v2.api.transformations next_cursor: result.next_cursor, (error, result) ->
+          expect(result).not.to.be.empty()
+          expect(result.next_cursor).not.to.eql(previous_cursor)
+          done()
       true
 
     it "should allow getting transformation metadata", (done) ->
