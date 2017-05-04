@@ -906,6 +906,7 @@ process_video_params = (param) ->
 exports.archive_params = (options = {})->
   allow_missing: exports.as_safe_bool(options.allow_missing)
   async: exports.as_safe_bool(options.async)
+  expires_at: options.expires_at
   flatten_folders: exports.as_safe_bool(options.flatten_folders)
   flatten_transformations: exports.as_safe_bool(options.flatten_transformations)
   keep_derived: exports.as_safe_bool(options.keep_derived)
