@@ -393,6 +393,10 @@ describe "uploader", ->
       done()
     true
 
+  it "should support requesting ocr anlysis", ->
+    cloudinary.v2.uploader.upload IMAGE_FILE, ocr: "adv_ocr", tags: UPLOAD_TAGS, (error, result) ->
+      expect(result.info.ocr).to.have.key("adv_ocr")
+
     
   it "should support requesting raw conversion", (done) ->
     cloudinary.v2.uploader.upload RAW_FILE, raw_convert: "illegal", resource_type: "raw", tags: UPLOAD_TAGS,  (error, result) ->
