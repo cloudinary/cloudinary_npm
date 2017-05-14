@@ -541,6 +541,13 @@ describe "utils", ->
           url = utils.url("sample", { if: "w < 200", crop: "fill", height: 120, width: 80} )
           expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample")
 
+    describe 'with tags', =>
+      it "should allow multiple tags condition", ->
+        url = utils.url("sample", { transformation: [{ if: "!tag1:tag2:tag3!_in_tags", crop: "fill", height: 120, width: 80 },
+                                           { if: "else", crop: "fit", width: 150, height: 150 },
+                                           { effect: "sepia" }]})
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_!tag1:tag2:tag3!_in_tags,c_fill,h_120,w_80/if_else,c_fit,h_150,w_150/e_sepia/sample")
+
     describe 'if end', ->
       it "should include the if_end as the last parameter in its component", ->
         url = utils.url("sample", transformation: [{if: "w_lt_200"},
