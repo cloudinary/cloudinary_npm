@@ -209,6 +209,7 @@ exports.build_upload_params = (options) ->
     unique_filename: utils.as_safe_bool(options.unique_filename)
     upload_preset: options.upload_preset
     use_filename: utils.as_safe_bool(options.use_filename)
+    analyze: JSON.stringify(options.analyze)
   utils.updateable_resource_params(options, params)
 
 exports.timestamp = ->
