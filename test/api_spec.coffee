@@ -300,6 +300,24 @@ describe "api", ->
         true
       true
 
+    it "should allow deleting derived resources by transformations", (done) ->
+      @timeout helper.TIMEOUT_LONG
+      Q.all([
+        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_1, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION]),
+        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION2]),
+        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_3, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2])
+      ]).then((results)->
+        cloudinary.v2.api.delete_derived_by_transformation [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2], (error, result)->
+          cloudinary.v2.api.resource PUBLIC_ID_1, (error, result) ->
+            expect(result.derived.length).to.eql(0)
+          cloudinary.v2.api.resource PUBLIC_ID_2, (error, result) ->
+            expect(_.find(result.derived, (d) -> d.transformation is EXPLICIT_TRANSFORMATION_NAME2)).to.not.be.empty()
+          cloudinary.v2.api.resource PUBLIC_ID_3, (error, result) ->
+            expect(result.derived.length).to.eql(0)
+            done()
+      )
+      true
+  
     it "should allow deleting resources", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.uploader.upload IMAGE_FILE, public_id: PUBLIC_ID_3, tags: UPLOAD_TAGS, (error, r) ->
