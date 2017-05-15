@@ -176,6 +176,15 @@ exports.delete_derived_resources = (derived_resource_ids, callback, options = {}
   uri = ["derived_resources"]
   call_api("delete", uri, {"derived_resource_ids[]": derived_resource_ids}, callback, options)
 
+exports.delete_derived_by_transformation = (public_ids, transformations, callback, options={}) ->
+  resource_type = options["resource_type"] || "image"
+  type          = options["type"] || "upload"
+  uri           = "resources/#{resource_type}/#{type}"
+  params = _.extend({"public_ids[]": public_ids}, api.only(options, "invalidate"))
+  params["keep_original"] = true
+  params["transformations"] = utils.build_eager(transformations)
+  call_api("delete", uri, params, callback, options)
+
 exports.tags = (callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["tags", resource_type]
