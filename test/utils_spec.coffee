@@ -84,7 +84,7 @@ describe "utils", ->
     expect(()-> utils.url("test", {url_suffix:"hello"})).to.be.throwError(/URL Suffix only supported in private CDN/)
 
   it "should disallow url_suffix in non upload types" , ->
-    expect(()-> utils.url("test", {url_suffix:"hello", private_cdn:true, type:'facebook'})).to.be.throwError(/URL Suffix only supported for image\/upload and raw\/upload/)
+    expect(()-> utils.url("test", {url_suffix:"hello", private_cdn:true, type:'facebook'})).to.be.throwError(/URL Suffix only supported for image\/upload, image\/private, image\/authenticated, video\/upload and raw\/upload/)
 
   it "should disallow url_suffix with / or ." , ->
     expect(()-> utils.url("test", {url_suffix:"hello/world", private_cdn:true})).to.be.throwError(/url_suffix should not include . or \//)
@@ -110,6 +110,12 @@ describe "utils", ->
 
   it "should support url_suffix for raw uploads" , ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, resource_type:'raw'}, "http://#{cloud_name}-res.cloudinary.com/files/test/hello", {})
+
+  it "should support url_suffix for raw uploads" , ->
+    test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, resource_type:'video'}, "http://#{cloud_name}-res.cloudinary.com/videos/test/hello", {})
+
+  it "should support url_suffix for raw uploads" , ->
+    test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, type:'authenticated'}, "http://#{cloud_name}-res.cloudinary.com/authenticated_images/test/hello", {})
 
   it "should support use_root_path in shared distribution" , ->
     test_cloudinary_url("test", {use_root_path:true, private_cdn:false}, "http://res.cloudinary.com/#{cloud_name}/test", {})
