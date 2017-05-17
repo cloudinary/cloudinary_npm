@@ -478,6 +478,14 @@ describe "uploader", ->
             done()
           true
         true
+        
+    it "should support uploading based on a url", (done) ->
+      @timeout helper.TIMEOUT_MEDIUM
+      cloudinary.v2.uploader.upload_large "http://cloudinary.com/images/old_logo.png", {tags: UPLOAD_TAGS}, (error, result) ->
+        return done(new Error error.message) if error?
+        expect(result.etag).to.eql("7dc60722d4653261648038b579fdb89e")
+        done()
+      true
 
   it "should support unsigned uploading using presets", (done) ->
     @timeout helper.TIMEOUT_LONG
