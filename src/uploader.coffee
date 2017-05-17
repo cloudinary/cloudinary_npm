@@ -36,7 +36,10 @@ exports.upload = (file, callback, options = {}) ->
       [params, {}, file]
 
 exports.upload_large = (path, callback, options = {}) ->
-  exports.upload_chunked(path, callback, _.extend({resource_type: 'raw'}, options))
+  if path? && path.match(/^https?:/)
+    exports.upload(path, callback, options)
+  else
+    exports.upload_chunked(path, callback, _.extend({resource_type: 'raw'}, options))
 
 exports.upload_chunked = (path, callback, options) ->
   file_reader = fs.createReadStream(path)
