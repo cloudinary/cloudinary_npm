@@ -9,21 +9,32 @@
     "type": "git",
     "url": "https://github.com/cloudinary/cloudinary_npm.git"
   },
-  "main": "cloudinary.js",
+  "main": "./dist/cloudinary.js",
   "dependencies": {
     "q": "1.4.x",
     "lodash": "3.10.x"
   },
   "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "coffee-loader": "^0.7.3",
     "coffee-script": "^1.10.0",
     "dotenv": "1.x",
     "expect.js": "0.3.x",
     "jsdom": "^9.5.0",
     "jsdom-global": "^2.1.0",
+    "json-loader": "^0.5.7",
     "mocha": "2.3.x",
-    "sinon": "^1.17.2"
+    "progress-bar-webpack-plugin": "^1.10.0",
+    "sinon": "^1.17.2",
+    "webpack": "^3.5.3",
+    "webpack-notifier": "^1.5.0"
   },
   "scripts": {
+    "clean": "rimraf ./dist/*",
+    "build:prod": "node_modules/.bin/webpack --env=prod",
+    "build:watch": "node_modules/.bin/webpack --env=prod -w",
+    "prod": "npm run clean & npm run build:prod",
     "pretest": "npm run compile",
     "prepublish": "npm run compile",
     "test": "node_modules/.bin/mocha -R spec --recursive test/",

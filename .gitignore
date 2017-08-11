@@ -1,9 +1,32 @@
+# Dependency directories
 node_modules/
-bower_components/
+jspm_packages/
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# IDEA dependency directory
 .idea
 .DS_Store
+
+# dotenv environment variables file
 .env
+
+# Optional npm cache directory
+.npm
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Others dependency directory
 bin
 lib/*spec.*
-*.js
 *.map
+
+# vscode
+/.history
+/vscode
