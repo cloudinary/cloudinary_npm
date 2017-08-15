@@ -711,18 +711,20 @@ describe "api", ->
   # Replace `it` with  `it.skip` below if you want to disable it.
   it "should list folders in cloudinary", (done)->
     @timeout helper.TIMEOUT_LONG
-    Q.all([
+    return Q.all([
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder1/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder2/item', tags: UPLOAD_TAGS)
     ]).then((results)->
-      Q.all([
+      console.log('>>>', results.map((r) -> r.public_id))
+      return Q.all([
         cloudinary.v2.api.root_folders(),
         cloudinary.v2.api.sub_folders('test_folder1')
       ])
     ).then((results)->
+      console.log('>>>', results.map((r) -> r.public_id))
       root= results[0]
       root_folders = (folder.name for folder in root.folders)
       sub_1 = results[1]
@@ -730,10 +732,11 @@ describe "api", ->
       expect(root_folders).to.contain('test_folder2')
       expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1')
       expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2')
-      cloudinary.v2.api.sub_folders('test_folder_not_exists')
+      return cloudinary.v2.api.sub_folders('test_folder_not_exists')
     ).then((result)->
       console.log('error test_folder_not_exists should not pass to "then" handler but "catch"')
       expect(true).to.eql(false)
+      done()
     ).catch((err)->
       expect(err.error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
       done()

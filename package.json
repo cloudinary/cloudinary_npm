@@ -27,6 +27,7 @@
     "pretest": "npm run compile",
     "prepublish": "npm run compile",
     "test": "node_modules/.bin/mocha -R spec --recursive test/",
+    "test:watch": "node_modules/.bin/mocha -R spec --watch test/",
     "compile": "node_modules/.bin/coffee --map -o lib -c src",
     "watch": "node_modules/.bin/coffee --watch --map -o lib -c src"
   },
