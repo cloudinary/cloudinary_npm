@@ -7,3 +7,5 @@ bin
 lib/*spec.*
 *.js
 *.map
+*.sublime-workspace
+*.sublime-project
