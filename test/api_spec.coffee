@@ -358,7 +358,7 @@ describe "api", ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.tags
     it "should allow listing tags", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags max_results: 50, (error, result) ->
+      cloudinary.v2.api.tags max_results: 50, prefix: TEST_TAG[0..-2],  (error, result) ->
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
@@ -711,7 +711,7 @@ describe "api", ->
   # Replace `it` with  `it.skip` below if you want to disable it.
   it "should list folders in cloudinary", (done)->
     @timeout helper.TIMEOUT_LONG
-    Q.all([
+    return Q.all([
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
@@ -732,8 +732,8 @@ describe "api", ->
       expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2')
       cloudinary.v2.api.sub_folders('test_folder_not_exists')
     ).then((result)->
-      console.log('error test_folder_not_exists should not pass to "then" handler but "catch"')
       expect(true).to.eql(false)
+      done()
     ).catch((err)->
       expect(err.error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
       done()
