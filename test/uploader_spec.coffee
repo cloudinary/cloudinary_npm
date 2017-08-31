@@ -1,4 +1,7 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
+
 https = require('https')
 http = require('http')
 expect = require("expect.js")
@@ -42,8 +45,26 @@ describe "uploader", ->
       expect(error).to.be undefined
       callback?(result)
 
+  upload_image_quality_override = (callback)->
+    options = {
+      quality_override: true
+    }
+    cloudinary.v2.uploader.upload IMAGE_FILE, options, (error, result) ->
+      expect(error).to.be undefined
+      callback?(result)
+
   beforeEach ->
     cloudinary.config(true)
+
+  it "should successfully upload with 'quality_override' file", (done) ->
+    @timeout helper.TIMEOUT_LONG
+    upload_image_quality_override (result) ->
+      expect(result.width).to.eql(241)
+      expect(result.height).to.eql(51)
+      expected_signature = cloudinary.utils.api_sign_request({public_id: result.public_id, version: result.version}, cloudinary.config().api_secret)
+      expect(result.signature).to.eql(expected_signature)
+      done()
+    true
 
   it "should successfully upload file", (done) ->
     @timeout helper.TIMEOUT_LONG

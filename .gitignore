@@ -2,6 +2,7 @@ node_modules/
 bower_components/
 .idea
 .DS_Store
+.vscode
 .env
 bin
 lib/*spec.*
