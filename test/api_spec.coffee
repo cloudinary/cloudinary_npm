@@ -617,6 +617,20 @@ describe "api", ->
         true
       true
 
+    it "should successfully call update api with 'quality_override'", (done) ->
+      @timeout helper.TIMEOUT_LONG
+      options = {
+        quality_override: 'auto:best',
+        moderation_status: "approved"
+      }
+      upload_image (upload_result) ->
+        cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->
+          cloudinary.v2.api.update upload_result.public_id, options, (error, api_result) ->
+            expect(api_result.moderation[0].status).to.eql("approved")
+            done()
+          true
+        true
+
     it "should support requesting ocr info", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       upload_image (upload_result)->
