@@ -1,5 +1,6 @@
-var dotenv = require('dotenv');
-dotenv.load();
+try{
+  require('dotenv').config()
+}catch(e){}
 
 var fs = require('fs');
 var cloudinary = require('cloudinary').v2;
