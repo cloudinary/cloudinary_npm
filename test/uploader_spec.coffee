@@ -1,4 +1,7 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
+
 https = require('https')
 http = require('http')
 expect = require("expect.js")
@@ -42,8 +45,26 @@ describe "uploader", ->
       expect(error).to.be undefined
       callback?(result)
 
+  upload_image_async = (callback)->
+    options = {
+      tags: UPLOAD_TAGS,
+      async: true
+    }
+    cloudinary.v2.uploader.upload IMAGE_FILE, options, (error, result) ->
+      expect(error).to.be undefined
+      callback?(result)
+
   beforeEach ->
     cloudinary.config(true)
+
+  it "should successfully upload 'async' file", (done) ->
+    @timeout helper.TIMEOUT_LONG 
+    upload_image_async (result, result2) ->
+      expect(result.type).to.eql('upload')
+      expect(result.status).to.eql('pending')
+      expect(result.resource_type).to.eql('image')
+      done()
+    true
 
   it "should successfully upload file", (done) ->
     @timeout helper.TIMEOUT_LONG

@@ -1,4 +1,7 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
+
 http = require('http')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
