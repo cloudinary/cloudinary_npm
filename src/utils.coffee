@@ -180,6 +180,7 @@ process_layer = (layer)->
 
 exports.build_upload_params = (options) ->
   params =
+    async: utils.as_safe_bool(options.async)
     access_mode: options.access_mode
     allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(",")
     backup: utils.as_safe_bool(options.backup)

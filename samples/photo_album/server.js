@@ -1,6 +1,7 @@
 // Load environment variables
-var dotenv = require('dotenv');
-dotenv.load();
+try{
+  require('dotenv').config()
+}catch(){}
 var cloudinary = require('cloudinary').v2;
 if (typeof(process.env.CLOUDINARY_URL)=='undefined'){
   console.warn('!! cloudinary config is undefined !!');
