@@ -201,6 +201,7 @@ exports.build_upload_params = (options) ->
     phash: utils.as_safe_bool(options.phash)
     proxy: options.proxy
     public_id: options.public_id
+    quality_override: utils.as_safe_bool(options.quality_override)
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options["responsive_breakpoints"])
     return_delete_token: utils.as_safe_bool(options.return_delete_token)
     timestamp: exports.timestamp()
