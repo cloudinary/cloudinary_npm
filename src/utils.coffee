@@ -136,7 +136,7 @@ process_layer = (layer)->
     format = layer["format"]
     resource_type = layer["resource_type"]
     type = layer["type"]
-    text = layer["text"] || ''
+    text = layer["text"]
     fetch = layer["fetch"]
     components = []
 
@@ -180,6 +180,7 @@ process_layer = (layer)->
         start = 0
         # textSource = text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}")
         textSource = smart_escape(decodeURIComponent(text), /[,/]/g)
+        text = ""
         while res = re.exec(textSource)
           text += smart_escape(textSource.slice(start, res.index))
           text += res[0]

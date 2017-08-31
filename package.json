@@ -29,6 +29,7 @@
     "test": "node_modules/.bin/mocha -R spec --recursive test/",
     "compile": "node_modules/.bin/coffee --map -o lib -c src",
     "compile:test": "node_modules/.bin/coffee --map -o bin -c test",
+    "test:watch": "node_modules/.bin/coffee --watch --map -o bin -c test",
     "watch": "node_modules/.bin/coffee --watch --map -o lib -c src"
   },
   "optionalDependencies": {},
