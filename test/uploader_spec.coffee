@@ -1,4 +1,7 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
+
 https = require('https')
 http = require('http')
 expect = require("expect.js")
@@ -138,7 +141,12 @@ describe "uploader", ->
 
   it "should successfully call explicit api", (done) ->
     current = this
-    cloudinary.v2.uploader.explicit "sample", type: "upload", eager: [crop: "scale", width: "2.0"], (error, result) ->
+    options = {
+      quality_override: 'auto:best',
+      type: "upload",
+      eager: [crop: "scale", width: "2.0"]
+    }
+    cloudinary.v2.uploader.explicit "sample", options, (error, result) ->
       unless error?
         url = cloudinary.utils.url "sample",
           type: "upload",

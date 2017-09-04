@@ -180,6 +180,7 @@ process_layer = (layer)->
 
 exports.build_upload_params = (options) ->
   params =
+    quality_override: utils.as_safe_bool(options.quality_override)
     access_mode: options.access_mode
     allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(",")
     backup: utils.as_safe_bool(options.backup)
