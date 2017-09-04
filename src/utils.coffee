@@ -134,33 +134,51 @@ process_layer = (layer)->
   if _.isPlainObject(layer)
     public_id = layer["public_id"]
     format = layer["format"]
-    resource_type = layer["resource_type"] || "image"
-    type = layer["type"] || "upload"
+    resource_type = layer["resource_type"]
+    type = layer["type"]
     text = layer["text"]
-    style = null
+    fetch = layer["fetch"]
     components = []
 
-    unless _.isEmpty(public_id)
-      public_id = public_id.replace(new RegExp("/", 'g'), ":")
-      public_id = "#{public_id}.#{format}" if format?
-
-    if _.isEmpty(text) && resource_type != "text"
-      if _.isEmpty(public_id)
-        throw "Must supply public_id for resource_type layer_parameter"
-      if resource_type == "subtitles"
-        style = textStyle(layer)
-
-    else
+    if !_.isEmpty(text) && _.isEmpty(resource_type)
       resource_type = "text"
-      type = null
-      # // type is ignored for text layers
+
+    if fetch && _.isEmpty(public_id)
+      resource_type = "fetch"
+
+    if !_.isEmpty(public_id) && !_.isEmpty(format)
+      public_id = public_id + "." + format
+      
+
+    if _.isEmpty(public_id) && resource_type != 'text' && resource_type != 'fetch'
+      throw 'Must supply public_id for for non-text' + layer_parameter
+
+    if !_.isEmpty(resource_type) && resource_type != 'image'
+      components.push(resource_type)
+    
+    if !_.isEmpty(type) && type != "upload"
+      components.push(type)
+
+    if resource_type == "text" || resource_type == "subtitles"
+      if _.isEmpty(public_id) && _.isEmpty(text)
+        throw "Must supply public_id for resource_type layer_parameter"
+
       style = textStyle(layer)
-      unless _.isEmpty(text)
+
+      if !_.isEmpty(style)
+        components.push(style)
+
+      if !_.isEmpty(public_id )
+        public_id = public_id.replace(new RegExp("/", 'g'), ":")
+        components.push(public_id)
+
+      if !_.isEmpty(text)
         unless _.isEmpty(public_id) ^ _.isEmpty(style)
-          throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay"
+          throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay";
+        
         re = /\$\([a-zA-Z]\w*\)/g
         start = 0
-#        textSource = text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}")
+        # textSource = text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}")
         textSource = smart_escape(decodeURIComponent(text), /[,/]/g)
         text = ""
         while res = re.exec(textSource)
@@ -168,13 +186,14 @@ process_layer = (layer)->
           text += res[0]
           start = res.index + res[0].length
         text += encodeURIComponent(textSource.slice(start))
-        # console.log("NADAV = #{text}")
-    # console.log("NADAV = #{text}")
-    components.push(resource_type) if resource_type != "image"
-    components.push(type) if type != "upload"
-    components.push(style)
-    components.push(public_id)
-    components.push(text)
+        components.push(text);
+    else if resource_type == "fetch"
+      b64 = new Buffer(fetch).toString('base64').replace(/=/, '')
+      components.push(b64);
+    else
+      public_id = public_id.replace(new RegExp("/", 'g'), ":")
+      components.push(public_id);
+
     layer = _.compact(components).join(":")
   layer
 
@@ -489,7 +508,7 @@ exports.url = (public_id, options = {}) ->
   version ?= 1 if source_to_sign.indexOf("/") > 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)
   version = "v#{version}" if version?
 
-  transformation = transformation.replace(/([^:])\/\//g, '$1/')
+  transformation = transformation.replace(/([^:])\/\//g, '$1')
   if sign_url && _.isEmpty(auth_token)
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     shasum = crypto.createHash('sha1')
@@ -512,7 +531,7 @@ exports.video_url = (public_id, options) ->
   utils.url(public_id, options)
 
 finalize_source = (source, format, url_suffix) ->
-  source = source.replace(/([^:])\/\//g, '$1/')
+  source = source.replace(/([^:])\/\//g, '$1')
   if source.match(/^https?:\//i)
     source = smart_escape(source)
     source_to_sign = source

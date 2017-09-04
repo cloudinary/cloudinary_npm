@@ -1,4 +1,6 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
 http = require('http')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
@@ -232,10 +234,11 @@ describe "utils", ->
     letter = 'l'
     layers_options= [
     # [name,                    options,                                          result]
-      ["string",                "text:hello",                                     "text:hello"],
+      ["fetch image",           { "fetch": "http://cloudinary.com/images/old_logo.png"}, "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc"],
       ["string",                { "font_family": "arial", "font_size": 30, "text": "abc,αβγ/אבג"},                                     "text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92"],
+      ["string",                "text:hello",                                      "text:hello"],
       ["public_id",             { "public_id": "logo" },                          "logo"],
-      ["public_id",             { "public_id": "abcαβγאבג.jpg" },                 "abcαβγאבג.jpg"],
+      ["public_id with name url", { "public_id": "abcαβγאבג.jpg" },                 "abcαβγאבג.jpg"],
       ["public_id with folder", { "public_id": "folder/logo" },                   "folder:logo"],
       ["private",               { "public_id": "logo", "type": "private" },       "private:logo"],
       ["format",                { "public_id": "logo", "format": "png" },         "logo.png"],

@@ -1,4 +1,6 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
 
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
@@ -358,7 +360,7 @@ describe "api", ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.tags
     it "should allow listing tags", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags max_results: 50, (error, result) ->
+      cloudinary.v2.api.tags max_results: 50, prefix: TEST_TAG[0..-2],  (error, result) ->
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
@@ -484,7 +486,11 @@ describe "api", ->
         true
       validate_presets = ->
         cloudinary.v2.api.upload_presets (error, response) ->
-          expect(response.presets.slice(0,3).map((p) -> p.name)).to.eql(delete_names)
+          count = delete_names.length
+          for preset in response.presets
+            if _.includes(delete_names, preset.name) && count > 0
+              count = count - 1;
+          expect(count).to.eql(0)
           delete_names.forEach (name) ->
             cloudinary.v2.api.delete_upload_preset name, after_delete
             true

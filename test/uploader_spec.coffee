@@ -1,4 +1,6 @@
-require('dotenv').load()
+try
+  require('dotenv').config()
+catch e
 https = require('https')
 http = require('http')
 expect = require("expect.js")

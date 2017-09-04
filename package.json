@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",
-    "dotenv": "1.x",
+    "dotenv": "^4.0.0",
     "expect.js": "0.3.x",
     "jsdom": "^9.5.0",
     "jsdom-global": "^2.1.0",
@@ -28,6 +28,8 @@
     "prepublish": "npm run compile",
     "test": "node_modules/.bin/mocha -R spec --recursive test/",
     "compile": "node_modules/.bin/coffee --map -o lib -c src",
+    "compile:test": "node_modules/.bin/coffee --map -o bin -c test",
+    "test:watch": "node_modules/.bin/coffee --watch --map -o bin -c test",
     "watch": "node_modules/.bin/coffee --watch --map -o lib -c src"
   },
   "optionalDependencies": {},
