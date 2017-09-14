@@ -1,4 +1,4 @@
-require('dotenv').load()
+require('dotenv').load(silent: true)
 
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
