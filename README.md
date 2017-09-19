@@ -12,7 +12,7 @@ Cloudinary provides URL and HTTP based APIs that can be easily integrated with a
 For Node.js, Cloudinary provides an extension for simplifying the integration even further.
 
 ## Getting started guide
-![](http://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png)  **Take a look at our [Getting started guide for Node.js](http://cloudinary.com/documentation/node_integration#getting_started_guide)**.
+![](https://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png)  **Take a look at our [Getting started guide for Node.js](https://cloudinary.com/documentation/node_integration#node_js_getting_started_guide)**.
 
 
 ## Setup ######################################################################
@@ -51,7 +51,7 @@ Generating a 120x90 thumbnail based on automatic face detection of the Facebook 
 
 ![Facebook 90x120](https://res.cloudinary.com/demo/image/facebook/c_thumb,g_face,h_90,w_120/billclinton.jpg "Facebook 90x200")
 
-For more details, see our documentation for embedding [Facebook](http://cloudinary.com/documentation/facebook_profile_pictures) and [Twitter](http://cloudinary.com/documentation/twitter_profile_pictures) profile pictures.
+For more details, see our documentation for embedding [Facebook](https://cloudinary.com/documentation/facebook_profile_pictures) and [Twitter](https://cloudinary.com/documentation/twitter_profile_pictures) profile pictures.
 
 
 ## Usage
@@ -59,7 +59,7 @@ For more details, see our documentation for embedding [Facebook](http://cloudina
 ### Configuration
 
 Each request for building a URL of a remote cloud resource must have the `cloud_name` parameter set.
-Each request to our secure APIs (e.g., image uploads, eager sprite generation) must have the `api_key` and `api_secret` parameters set. See [API, URLs and access identifiers](http://cloudinary.com/documentation/api_and_access_identifiers) for more details.
+Each request to our secure APIs (e.g., image uploads, eager sprite generation) must have the `api_key` and `api_secret` parameters set. See [API, URLs and access identifiers](https://cloudinary.com/documentation/solution_overview#account_and_api_setup) for more details.
 
 Setting the `cloud_name`, `api_key` and `api_secret` parameters can be done either directly in each call to a Cloudinary method, by calling the cloudinary.config(), or by using the CLOUDINARY_URL environment variable.
 
@@ -97,7 +97,7 @@ Same goes for Twitter:
 
     cloudinary.url("billclinton.jpg", {type: "twitter_name"})
 
-![](http://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](http://cloudinary.com/documentation/node_image_manipulation) for more information about displaying and transforming images in Node.js**.
+![](https://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](https://cloudinary.com/documentation/node_image_manipulation) for more information about displaying and transforming images in Node.js**.
 
 ### Upload
 
@@ -135,7 +135,7 @@ You can also specify your own public ID:
 
     http://res.cloudinary.com/demo/image/upload/sample_remote.jpg
 
-![](http://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](http://cloudinary.com/documentation/node_image_upload) for plenty more options of uploading to the cloud from your Node.js code or directly from the browser**.
+![](https://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](https://cloudinary.com/documentation/node_image_upload) for plenty more options of uploading to the cloud from your Node.js code or directly from the browser**.
 
 ### cloudinary.upload_stream
 
@@ -175,13 +175,14 @@ Please consult with the [README file](https://github.com/cloudinary/cloudinary_n
 
 Additional resources are available at:
 
-* [Website](http://cloudinary.com)
-* [Documentation](http://cloudinary.com/documentation)
-* [Knowledge Base](http://support.cloudinary.com/forums)
-* [Documentation for Node.js integration](http://cloudinary.com/documentation/node_integration)
-* [Node.js image upload documentation](http://cloudinary.com/documentation/node_image_upload)
-* [Node.js image manipulation documentation](http://cloudinary.com/documentation/node_image_manipulation)
-* [Image transformations documentation](http://cloudinary.com/documentation/image_transformations)
+* [Website](https://cloudinary.com)
+* [Interactive demo](https://demo.cloudinary.com/default)
+* [Documentation](https://cloudinary.com/documentation)
+* [Knowledge Base](https://support.cloudinary.com/hc/en-us)
+* [Documentation for Node.js integration](https://cloudinary.com/documentation/node_integration)
+* [Node.js image upload documentation](https://cloudinary.com/documentation/node_image_upload)
+* [Node.js image manipulation documentation](https://cloudinary.com/documentation/node_image_manipulation)
+* [Image transformations documentation](https://cloudinary.com/documentation/image_transformations)
 
 ## Run test
 
@@ -193,9 +194,9 @@ npm run test
 
 You can [open an issue through GitHub](https://github.com/cloudinary/cloudinary_npm/issues).
 
-Contact us [http://cloudinary.com/contact](http://cloudinary.com/contact)
+Contact us [https://cloudinary.com/contact](https://cloudinary.com/contact)
 
-Stay tuned for updates, tips and tutorials: [Blog](http://cloudinary.com/blog), [Twitter](https://twitter.com/cloudinary), [Facebook](http://www.facebook.com/Cloudinary).
+Stay tuned for updates, tips and tutorials: [Blog](https://cloudinary.com/blog), [Twitter](https://twitter.com/cloudinary), [Facebook](https://www.facebook.com/Cloudinary).
 
 ## License #######################################################################
 
