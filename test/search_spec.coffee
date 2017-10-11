@@ -1,3 +1,4 @@
+require('dotenv').load(silent: true)
 expect = require('expect.js')
 cloudinary = require('../cloudinary')
 helper = require("./spechelper")
@@ -19,7 +20,7 @@ describe "search_api", ->
 
     it 'should always return same object in fluent interface',->
       instance = cloudinary.v2.search.instance()
-      for method in ['expression','sort_by','max_results','next_cursor','aggregate','with_field'] 
+      for method in ['expression','sort_by','max_results','next_cursor','aggregate','with_field']
         same_instance = instance[method]('emptyarg')
         expect(instance).to.eql(same_instance)
 
@@ -115,7 +116,7 @@ describe "search_api", ->
         expect(results['resources'].length).to.eql( 3 )
         for res in results['resources']
           expect(Object.keys(res['context'])).to.eql ['stage']
-      
+    
 
     it 'should include context, tags and image_metadata',->
       cloudinary.v2.search.expression("tags:#{SEARCH_TAG}").with_field('context').with_field('tags').with_field('image_metadata').execute (err,results)->
@@ -124,6 +125,3 @@ describe "search_api", ->
           expect(Object.keys(res['context'])).to.eql ['stage']
           expect(res.image_metadata).to.exist
           expect(res['tags'].length).to.eql ( 4 )
-      
-
-
