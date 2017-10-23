@@ -493,9 +493,12 @@ exports.url = (public_id, options = {}) ->
   if sign_url && _.isEmpty(auth_token)
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     i = 0;
-    while (to_sign != decodeURIComponent(to_sign) && i<10)
-      to_sign = decodeURIComponent(to_sign)
-      i++
+    try
+      while (to_sign != decodeURIComponent(to_sign) && i<10)
+        to_sign = decodeURIComponent(to_sign)
+        i++
+    catch
+      
     shasum = crypto.createHash('sha1')
     shasum.update(utf8_encode(to_sign + api_secret), 'binary')
     signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, 8)
