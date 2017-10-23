@@ -105,8 +105,8 @@ describe "utils", ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, format:"jpg", angle:0, sign_url:true}, "http://#{cloud_name}-res.cloudinary.com/images/#{expected_signature}/a_0/test/hello.jpg", {})
 
   it "should sign the decoded form of a url" , ->
-    expected_signature = utils.url("a (b)", format:"jpg", sign_url:true).match(/s--[0-9A-Za-z_-]{8}--/).toString()
-    test_cloudinary_url("a (b)", {format:"jpg", sign_url:true}, "http://res.cloudinary.com/#{cloud_name}/image/upload/#{expected_signature}/a%20(b).jpg", {})
+    expected_signature = utils.url("%25a%20(b)", format:"jpg", sign_url:true).match(/s--[0-9A-Za-z_-]{8}--/).toString()
+    test_cloudinary_url("%25a%20(b)", {format:"jpg", sign_url:true}, "http://res.cloudinary.com/#{cloud_name}/image/upload/#{expected_signature}/%25a%20(b).jpg", {})
 
   it "should support url_suffix for raw uploads" , ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, resource_type:'raw'}, "http://#{cloud_name}-res.cloudinary.com/files/test/hello", {})
