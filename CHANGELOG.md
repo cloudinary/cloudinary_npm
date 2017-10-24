@@ -1,4 +1,14 @@
 
+1.9.1 / 2017-10-24
+==================
+
+  * Decode string to sign before creating the signature (#167)
+  * Update Readme to point to HTTPS URLs of cloudinary.com
+  * Update lib files
+  * Ignore error when `.env` file is missing.
+  * Remove CoffeeScript header
+  * Add `lib\v2\search.js` to git.
+
 1.9.0 / 2017-04-30
 ==================
 
