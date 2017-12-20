@@ -276,7 +276,7 @@ call_api = (action, callback, options, get_params) ->
 post = (url, post_data, boundary, file, callback, options) ->
   finish_buffer = new Buffer("--" + boundary + "--", 'ascii')
   if file? || options.stream
-    filename = if options.stream then "file" else path.basename(file)
+    filename = if options.stream then options.filename || "file" else path.basename(file)
     file_header = new Buffer(EncodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary')
 
   post_options = require('url').parse(url)
