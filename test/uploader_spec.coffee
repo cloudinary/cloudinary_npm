@@ -425,14 +425,6 @@ describe "uploader", ->
     true
 
       
-  it "should support requesting auto_tagging", (done) ->
-    cloudinary.v2.uploader.upload IMAGE_FILE, auto_tagging: 0.5, tags: UPLOAD_TAGS, (error, result) ->
-      expect(error?).to.be true
-      expect(error.message).to.contain "Must use"
-      done()
-    true
-
-
   describe "upload_chunked", ()->
     @timeout helper.TIMEOUT_LONG * 10
     it "should specify chunk size", (done) ->

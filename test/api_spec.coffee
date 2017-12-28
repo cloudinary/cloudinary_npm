@@ -659,14 +659,6 @@ describe "api", ->
           done()
         true
 
-    it "should support requesting auto_tagging", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, auto_tagging: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Must use"
-          done()
-        true
-
   it "should support listing by moderation kind and value", (done) ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved"
     @timeout helper.TIMEOUT_MEDIUM
