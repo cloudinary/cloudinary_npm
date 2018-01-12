@@ -146,6 +146,7 @@ describe "uploader", ->
           width: "2.0",
           format: "jpg",
           version: result["version"]
+
         expect(result.eager[0].url).to.eql(url)
         done()
       else
@@ -427,8 +428,12 @@ describe "uploader", ->
       
   it "should support requesting auto_tagging", (done) ->
     cloudinary.v2.uploader.upload IMAGE_FILE, auto_tagging: 0.5, tags: UPLOAD_TAGS, (error, result) ->
-      expect(error?).to.be true
-      expect(error.message).to.contain "Must use"
+      if error # auto_tagging available
+        expect(error?).to.be true
+        error && expect(error.message).to.contain "Must use"
+      else
+        expect(result.public_id?).to.be true
+
       done()
     true
 
@@ -447,7 +452,7 @@ describe "uploader", ->
     it "should return error if value is less than 5MB", (done)->
       fs.stat LARGE_RAW_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 40000, tags: UPLOAD_TAGS}, (error, result) ->
-          expect(error.message).to.eql("All parts except last must be larger than 5mb")
+          expect(error.message).to.eql("All parts except EOF-chunk must be larger than 5mb")
           done()
         true
 

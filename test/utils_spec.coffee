@@ -352,9 +352,9 @@ describe "utils", ->
         [name, options, result] = layer
 
         it "should support #{name}", (done)->
-          opt = {}
+          opt = {version: 1}
           opt['overlay'] = options
-          expect(["sample", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/l_#{result}/sample")
+          expect(["sample", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/l_#{result}/v1/sample")
             .and.emptyOptions()
               .and.beServedByCloudinary(done)
         unless _.isString(options)

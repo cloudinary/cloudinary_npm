@@ -662,8 +662,12 @@ describe "api", ->
     it "should support requesting auto_tagging", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
       upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, auto_tagging: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Must use"
+        cloudinary.v2.api.update upload_result.public_id, auto_tagging: -999, (error, api_result) ->
+          if error
+            expect(error?).to.be true
+            error && expect(error.message).to.contain "Must use"
+          else
+            expect(api_result.public_id?).to.be true
           done()
         true
 
