@@ -87,6 +87,7 @@ describe "search_api", ->
         expect(results['resources'].length).to.eql(3)
 
     it "should return resource #{PUBLIC_ID_1}",->
+      @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.search.expression("public_id:#{PUBLIC_ID_1}").execute (err,results)->
         expect(results['resources'].length).to.eql(1)
 
@@ -112,6 +113,7 @@ describe "search_api", ->
 
 
     it 'should include context',->
+      @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.search.expression("tags:#{SEARCH_TAG}").with_field('context').execute (err,results)->
         expect(results['resources'].length).to.eql( 3 )
         for res in results['resources']
