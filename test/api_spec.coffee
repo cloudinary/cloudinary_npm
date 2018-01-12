@@ -315,6 +315,39 @@ describe "api", ->
         true
       true
 
+    it "should allow deleting resources with transformations", (done) ->
+      @timeout helper.TIMEOUT_MEDIUM
+      transformations = [crop: "scale", width: "2.0"]
+      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: PUBLIC_ID_3, tags: UPLOAD_TAGS, eager: transformations, (error, res) ->
+        return done(new Error error.message) if error?
+        cloudinary.v2.api.resource PUBLIC_ID_3, (error, resGet) ->
+          expect(resGet).not.to.eql(undefined)
+          expect(resGet.url).to.eql(res.url)
+          expect(resGet.derived).not.to.eql(undefined)
+          expect(resGet.derived[0]).not.to.eql(undefined)
+          expect(resGet.derived[0].transformation).to.eql "c_scale,w_2.0"
+
+          # delete derived resource
+          cloudinary.v2.api.delete_resources [PUBLIC_ID_3], transformations: transformations, (error, res) ->
+            return done(new Error error.message) if error?
+            cloudinary.v2.api.resource PUBLIC_ID_3, (error, res) ->
+              return done(new Error error.message) if error?
+              # delete main resource
+              cloudinary.v2.api.delete_resources [PUBLIC_ID_3], (error, res) ->
+                return done(new Error error.message) if error?
+                cloudinary.v2.api.resource PUBLIC_ID_3, (error, res) ->
+                  expect(error).to.be.an(Object)
+                  expect(error.http_code).to.eql 404
+                  done()
+                true
+              true
+
+                  
+            true
+          true
+        true
+      true
+
     describe "delete_resources_by_prefix", ->
       itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar"
       it "should allow deleting resources by prefix", (done) ->
