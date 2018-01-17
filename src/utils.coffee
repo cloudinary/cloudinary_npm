@@ -937,6 +937,7 @@ exports.build_explicit_api_params = (public_id, options = {})->
     eager_async: utils.as_safe_bool(options.eager_async)
     eager_notification_url: options.eager_notification_url
     face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
+    faces: utils.as_safe_bool(options.faces)
     headers: build_custom_headers(options.headers)
     image_metadata: utils.as_safe_bool(options.image_metadata)
     invalidate: utils.as_safe_bool(options.invalidate)

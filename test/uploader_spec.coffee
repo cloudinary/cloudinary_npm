@@ -359,8 +359,9 @@ describe "uploader", ->
     cloudinary.v2.uploader.upload IMAGE_FILE, face_coordinates: coordinates, faces: yes, tags: UPLOAD_TAGS, (error, result) ->
       return done(new Error error.message) if error?
       expect(result.faces).to.eql(out_coordinates)
-      cloudinary.v2.uploader.explicit result.public_id, face_coordinates: different_coordinates, custom_coordinates: custom_coordinates, type: "upload", (error2, result2) ->
+      cloudinary.v2.uploader.explicit result.public_id, faces: true, face_coordinates: different_coordinates, custom_coordinates: custom_coordinates, type: "upload", (error2, result2) ->
         return done(new Error error2.message) if error2?
+        expect(result2.faces).not.to.be undefined
         cloudinary.v2.api.resource result2.public_id, faces: yes, coordinates: yes, (ierror, info) ->
           return done(new Error ierror.message) if ierror?
           expect(info.faces).to.eql(different_coordinates)
