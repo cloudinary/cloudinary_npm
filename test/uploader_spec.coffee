@@ -439,7 +439,7 @@ describe "uploader", ->
     it "should return error if value is less than 5MB", (done)->
       fs.stat LARGE_RAW_FILE, (err, stat) ->
         cloudinary.v2.uploader.upload_large LARGE_RAW_FILE, {chunk_size: 40000, tags: UPLOAD_TAGS}, (error, result) ->
-          expect(error.message).to.eql("All parts except last must be larger than 5mb")
+          expect(error.message).to.eql("All parts except EOF-chunk must be larger than 5mb")
           done()
         true
 

@@ -358,7 +358,7 @@ describe "api", ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.tags
     it "should allow listing tags", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags max_results: 50, (error, result) ->
+      cloudinary.v2.api.tags max_results: 500, (error, result) ->
         return done(new Error error.message) if error?
         expect(result.tags).to.contain(TEST_TAG)
         done()
