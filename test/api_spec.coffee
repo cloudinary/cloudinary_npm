@@ -561,7 +561,7 @@ describe "api", ->
     itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_all_resources
     describe "keep_original: yes", ->
       it "should allow deleting all derived resources", (done) ->
-        @timeout helper.TIMEOUT_MEDIUM
+        @timeout helper.TIMEOUT_LONG
         cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test5", eager: {transformation: {width: 101, crop: "scale"}}, tags: UPLOAD_TAGS, (error, upload_result) ->
           cloudinary.v2.api.resource "api_test5", (error, resource) ->
             return done(new Error error.message) if error?

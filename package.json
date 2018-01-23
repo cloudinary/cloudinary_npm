@@ -11,17 +11,17 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
-    "q": "1.4.x",
-    "lodash": "3.10.x"
+    "q": "^1.5.1",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",
-    "dotenv": "1.x",
+    "dotenv": "4.x",
     "expect.js": "0.3.x",
-    "jsdom": "^9.5.0",
-    "jsdom-global": "^2.1.0",
-    "mocha": "2.3.x",
-    "sinon": "^1.17.2"
+    "jsdom": "^9.12.0",
+    "jsdom-global": "2.1.1",
+    "mocha": "^5.0.0",
+    "sinon": "^4.2.1"
   },
   "scripts": {
     "pretest": "npm run compile",
