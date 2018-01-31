@@ -111,10 +111,10 @@ describe "utils", ->
   it "should support url_suffix for raw uploads" , ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, resource_type:'raw'}, "http://#{cloud_name}-res.cloudinary.com/files/test/hello", {})
 
-  it "should support url_suffix for raw uploads" , ->
+  it "should support url_suffix for video uploads" , ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, resource_type:'video'}, "http://#{cloud_name}-res.cloudinary.com/videos/test/hello", {})
 
-  it "should support url_suffix for raw uploads" , ->
+  it "should support url_suffix for authenticated uploads" , ->
     test_cloudinary_url("test", {url_suffix:"hello", private_cdn:true, type:'authenticated'}, "http://#{cloud_name}-res.cloudinary.com/authenticated_images/test/hello", {})
 
   it "should support use_root_path in shared distribution" , ->
