@@ -80,9 +80,10 @@ describe "utils", ->
   it "should use format from options" , ->
     test_cloudinary_url("test", {format:'jpg'}, "http://res.cloudinary.com/#{cloud_name}/image/upload/test.jpg", {})
 
-  it "should disallow url_suffix in shared distribution" , ->
-    expect(()-> utils.url("test", {url_suffix:"hello"})).to.be.throwError(/URL Suffix only supported in private CDN/)
-
+  it "should support url_suffix in shared distribution", ->
+    test_cloudinary_url("test", {url_suffix:"hello"}, "http://res.cloudinary.com/#{cloud_name}/images/test/hello", {})
+    test_cloudinary_url("test", {url_suffix:"hello", angle: 0}, "http://res.cloudinary.com/#{cloud_name}/images/a_0/test/hello", {})
+    
   it "should disallow url_suffix in non upload types" , ->
     expect(()-> utils.url("test", {url_suffix:"hello", private_cdn:true, type:'facebook'})).to.be.throwError(/URL Suffix only supported for image\/upload, image\/private, image\/authenticated, video\/upload and raw\/upload/)
 

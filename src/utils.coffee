@@ -471,10 +471,6 @@ exports.url = (public_id, options = {}) ->
     version = preloaded[3]
     public_id = preloaded[4]
 
-  if url_suffix and not private_cdn
-    throw 'URL Suffix only supported in private CDN'
-
-
   original_source = public_id
   return original_source unless public_id?
   public_id = public_id.toString()
