@@ -1,4 +1,32 @@
 
+1.10.0 / 2018-02-13
+===================
+
+New functionality
+-----------------
+
+  * Support url suffix for shared CDN
+  * Add Node 8 to Travis CI tests and remove secure variables
+  * Fix breakpoints format parameter
+  * Extend support of url_suffix for different resource types
+  * Add support for URLs in upload_large
+  * Add support for transformations parameter in delete_resources api
+  * Add support for delete_derived_by_transformation
+  * Add format parameter support to responsive-breakpoints encoder
+  * Add expires_at parameter to archive_params
+  * Add `faces` parameter to the `explicit` API
+
+Other changes
+-------------
+
+  * Fix typos
+  * Test transformations api with next_cursor
+  * add test cases of ocr for upload and url generation
+  * add test case of conditional tags
+  * Update dependencies
+  * Fix tests
+  * Remove tests for `auto_tagging`
+
 1.9.1 / 2017-10-24
 ==================
 
