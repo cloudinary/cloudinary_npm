@@ -236,7 +236,7 @@ call_api = (action, callback, options, get_params) ->
 # Already reported
     else if res.error
       error = true
-      deferred.reject(res)
+      deferred.reject(res.error)
       callback?(res)
     else if _.includes([200, 400, 401, 404, 420, 500], res.statusCode)
       buffer = ""
