@@ -1027,7 +1027,6 @@ build_eager = (eager)->
   ).join("|")
   ret
 
-
 hashToQuery = (hash)->
   compact(for key, value of hash
     if isArray(value)
@@ -1039,3 +1038,17 @@ hashToQuery = (hash)->
       "#{querystring.escape(key)}=#{querystring.escape(value)}"
   ).sort().join('&')
 
+###*
+# Returns a JSON array as String.
+# Yields the array before it is converted to JSON format
+# @api private
+# @param [Hash|String|Array<Hash>] data
+# @return [String|nil] a JSON array string or `nil` if data is `nil`
+###
+jsonArrayParam = (data, callback)->
+  return unless data
+
+  data = JSON.parse(data) if isString(data)
+  data = [data] unless isArray(data)
+  data = callback(data) if isFunction(callback)
+  JSON.stringify(data)
