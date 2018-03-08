@@ -3,10 +3,14 @@ require('dotenv').load(silent: true)
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
+{
+  find,
+  keys,
+  matchesProperty
+} = utils
 sinon = require('sinon')
 ClientRequest = require('_http_client').ClientRequest
 http = require('http')
-_ = require("lodash")
 Q = require('q')
 fs = require('fs')
 
@@ -311,7 +315,7 @@ describe "api", ->
           cloudinary.v2.api.resource PUBLIC_ID_1, (error, result) ->
             expect(result.derived.length).to.eql(0)
           cloudinary.v2.api.resource PUBLIC_ID_2, (error, result) ->
-            expect(_.find(result.derived, (d) -> d.transformation is EXPLICIT_TRANSFORMATION_NAME2)).to.not.be.empty()
+            expect(find(result.derived, (d) -> d.transformation is EXPLICIT_TRANSFORMATION_NAME2)).to.not.be.empty()
           cloudinary.v2.api.resource PUBLIC_ID_3, (error, result) ->
             expect(result.derived.length).to.eql(0)
             done()
@@ -693,7 +697,7 @@ describe "api", ->
     after_listing = (list) ->
       (error, list_result) ->
         lists[list] = list_result.resources.map((r) -> r.public_id)
-        if _.keys(lists).length == 3
+        if keys(lists).length == 3
           expect(lists.approved).to.contain(ids[0])
           expect(lists.approved).not.to.contain(ids[1])
           expect(lists.approved).not.to.contain(ids[2])
@@ -818,13 +822,13 @@ describe "api", ->
               expect(result["template"]).to.eql("http://res.cloudinary.com")
               cloudinary.v2.api.upload_mappings (error, result)->
                 return done(new Error error.message) if error?
-                expect(_.find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com"})).to.be.ok()
+                expect(find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com"})).to.be.ok()
                 cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
                   return done(new Error error.message) if error?
                   deleteMapping = false
                   cloudinary.v2.api.upload_mappings (error, result)->
                     return done(new Error error.message) if error?
-                    expect(_.find(result["mappings"], _.matchesProperty('folder', mapping))).not.to.be.ok()
+                    expect(find(result["mappings"], matchesProperty('folder', mapping))).not.to.be.ok()
                     done()
                   true
                 true

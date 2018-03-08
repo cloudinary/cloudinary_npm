@@ -1,4 +1,3 @@
-_ = require("lodash")
 config = require("./config")
 if config().upload_prefix && config().upload_prefix[0..4] == 'http:'
   https = require('http')
@@ -7,7 +6,12 @@ else
 #http = require('http')
 UploadStream = require('./upload_stream')
 utils = require("./utils")
-util = require("util")
+{
+  extend
+  includes, 
+  isArray, 
+  isObject, 
+} = utils
 fs = require('fs')
 path = require('path')
 Q = require('q')
@@ -22,7 +26,7 @@ exports.unsigned_upload_stream = (upload_preset, callback, options = {}) ->
   exports.upload_stream(callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
 
 exports.upload_stream = (callback, options = {}) ->
-  exports.upload(null, callback, _.extend({stream: true}, options))
+  exports.upload(null, callback, extend({stream: true}, options))
 
 exports.unsigned_upload = (file, upload_preset, callback, options = {}) ->
   exports.upload(file, callback, utils.merge(options, unsigned: true, upload_preset: upload_preset))
@@ -39,7 +43,7 @@ exports.upload_large = (path, callback, options = {}) ->
   if path? && path.match(/^https?:/)
     exports.upload(path, callback, options)
   else
-    exports.upload_chunked(path, callback, _.extend({resource_type: 'raw'}, options))
+    exports.upload_chunked(path, callback, extend({resource_type: 'raw'}, options))
 
 exports.upload_chunked = (path, callback, options) ->
   file_reader = fs.createReadStream(path)
@@ -69,10 +73,10 @@ class Chunkable extends Writable
           done()
 
 exports.upload_large_stream = (_unused_, callback, options = {}) ->
-  exports.upload_chunked_stream(callback, _.extend({resource_type: 'raw'}, options))
+  exports.upload_chunked_stream(callback, extend({resource_type: 'raw'}, options))
 
 exports.upload_chunked_stream = (callback, options = {}) ->
-  options = _.extend({}, options, stream: true)
+  options = extend({}, options, stream: true)
   options.x_unique_upload_id = utils.random_public_id()
   params = build_upload_params(options)
 
@@ -83,7 +87,7 @@ exports.upload_chunked_stream = (callback, options = {}) ->
   chunker.on 'ready', (buffer, is_last, done) ->
     chunk_start = sent
     sent += buffer.length
-    options.content_range = util.format("bytes %d-%d/%d", chunk_start, sent - 1, if is_last then sent else -1)
+    options.content_range = "bytes #{chunk_start}-#{sent - 1}/#{if is_last then sent else -1}"
     finished_part = (result) ->
       if result.error? || is_last
         callback?(result)
@@ -139,7 +143,7 @@ exports.text = (text, callback, options = {}) ->
 
 exports.generate_sprite = (tag, callback, options = {}) ->
   call_api "sprite", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend({}, options, fetch_format: options.format))
+    transformation = utils.generate_transformation_string(extend({}, options, fetch_format: options.format))
     return [{
       timestamp: utils.timestamp(),
       tag: tag,
@@ -150,7 +154,7 @@ exports.generate_sprite = (tag, callback, options = {}) ->
 
 exports.multi = (tag, callback, options = {}) ->
   call_api "multi", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend({}, options))
+    transformation = utils.generate_transformation_string(extend({}, options))
     return [{
       timestamp: utils.timestamp(),
       tag: tag,
@@ -162,7 +166,7 @@ exports.multi = (tag, callback, options = {}) ->
 
 exports.explode = (public_id, callback, options = {}) ->
   call_api "explode", callback, options, ->
-    transformation = utils.generate_transformation_string(_.extend({}, options))
+    transformation = utils.generate_transformation_string(extend({}, options))
     return [{
       timestamp: utils.timestamp(),
       public_id: public_id,
@@ -224,7 +228,7 @@ call_api = (action, callback, options, get_params) ->
   [params, unsigned_params, file] = get_params.call()
 
   params = utils.process_request_params(params, options)
-  params = _.extend(params, unsigned_params)
+  params = extend(params, unsigned_params)
 
   api_url = utils.api_url(action, options)
 
@@ -238,7 +242,7 @@ call_api = (action, callback, options, get_params) ->
       error = true
       deferred.reject(res)
       callback?(res)
-    else if _.includes([200, 400, 401, 404, 420, 500], res.statusCode)
+    else if includes([200, 400, 401, 404, 420, 500], res.statusCode)
       buffer = ""
       res.on "data", (d) -> buffer += d
       res.on "end", ->
@@ -264,14 +268,14 @@ call_api = (action, callback, options, get_params) ->
       callback?(error_obj)
   post_data = []
   for key, value of params
-    if _.isArray(value)
+    if isArray(value)
       for v in value
         post_data.push new Buffer(EncodeFieldPart(boundary, key + "[]", v), 'utf8')
     else if utils.present(value)
       post_data.push new Buffer(EncodeFieldPart(boundary, key, value), 'utf8')
 
   result = post api_url, post_data, boundary, file, handle_response, options
-  if _.isObject(result)
+  if isObject(result)
     return result
   else
     return deferred.promise
@@ -288,7 +292,7 @@ post = (url, post_data, boundary, file, callback, options) ->
     'User-Agent': utils.getUserAgent()
   headers['Content-Range'] = options.content_range if options.content_range?
   headers['X-Unique-Upload-Id'] = options.x_unique_upload_id if options.x_unique_upload_id?
-  post_options = _.extend post_options,
+  post_options = extend post_options,
     method: 'POST',
     headers: headers
   post_options.agent = options.agent if options.agent?
@@ -337,7 +341,7 @@ EncodeFilePart = (boundary, type, name, filename) ->
   return_part
 
 exports.direct_upload = (callback_url, options = {}) ->
-  params = build_upload_params(_.extend({callback: callback_url}, options))
+  params = build_upload_params(extend({callback: callback_url}, options))
   params = utils.process_request_params(params, options)
   api_url = utils.api_url("upload", options)
 
@@ -355,7 +359,7 @@ exports.upload_url = (options = {}) ->
 exports.image_upload_tag = (field, options = {}) ->
   html_options = options.html ? {}
 
-  tag_options = _.extend( {
+  tag_options = extend( {
     type: "file",
     name: "file",
     "data-url": exports.upload_url(options),

@@ -1,4 +1,8 @@
-_ = require("lodash")
+extend = require("lodash/extend")
+isObject = require("lodash/isObject")
+isString = require("lodash/isString")
+isUndefined = require("lodash/isUndefined")
+
 cloudinary_config = undefined
 
 isNestedKey = (key)->
@@ -44,10 +48,10 @@ module.exports = (new_config, new_value) ->
             cloudinary_config[k] = v
     else
       cloudinary_config = {}
-  if not _.isUndefined(new_value)
+  if not isUndefined(new_value)
     cloudinary_config[new_config] = new_value
-  else if _.isString(new_config)
+  else if isString(new_config)
     return cloudinary_config[new_config]
-  else if _.isObject(new_config)
-    _.extend(cloudinary_config, new_config)
+  else if isObject(new_config)
+    extend(cloudinary_config, new_config)
   cloudinary_config

@@ -3,8 +3,14 @@ http = require('http')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
+{
+  clone, 
+  defaults, 
+  isString, 
+  merge, 
+  only
+} = utils
 api = require("../lib/api")
-_ = require("lodash")
 Q = require('q')
 fs = require('fs')
 os = require('os')
@@ -26,12 +32,12 @@ describe "utils", ->
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
   afterEach () ->
-    cloudinary.config(_.defaults({secure:null},@orig))
+    cloudinary.config(defaults({secure:null},@orig))
 
   beforeEach () ->
 #    @cfg= cloudinary.config( {cloud_name:"test123", secure_distribution : null, private_cdn : false, secure : false, cname : null ,cdn_subdomain : false, api_key : "1234", api_secret: "b" })
     @cfg= cloudinary.config( {secure_distribution : null, private_cdn : false, secure : false, cname : null ,cdn_subdomain : false})
-    @orig = _.clone(@cfg)
+    @orig = clone(@cfg)
     cloud_name = cloudinary.config( "cloud_name")
     root_path = "http://res.cloudinary.com/#{cloud_name}"
 
@@ -287,7 +293,7 @@ describe "utils", ->
     true
 
     beforeEach ->
-      options =  _.merge({ version: authenticated_image['version'], sign_url: true, type: "authenticated" }, specific_options)
+      options =  merge({ version: authenticated_image['version'], sign_url: true, type: "authenticated" }, specific_options)
 
     it "should correctly sign URL with version", (done)->
       expect(["#{authenticated_image['public_id']}.jpg", options])
@@ -364,7 +370,7 @@ describe "utils", ->
           expect(["sample", opt]).to.produceUrl("http://res.cloudinary.com/#{cloud_name}/image/upload/l_#{result}/sample")
             .and.emptyOptions()
               .and.beServedByCloudinary(done)
-        unless _.isString(options)
+        unless isString(options)
           op        = {}
           op['overlay'] = options
           itBehavesLike "a signed url", op, "l_#{result}"
@@ -453,7 +459,7 @@ describe "utils", ->
     options = {backup:true, use_filename:false, colors:"true", exif:"false", colors:"true", image_metadata:"false", invalidate:1, eager_async:"1"}
     params = utils.build_upload_params(options)
 
-    expected = api.only(params, Object.keys(options)...)
+    expected = only(params, Object.keys(options)...)
     actual = { backup:1, use_filename:0, colors:1, exif:0, colors:1, image_metadata:0, invalidate:1, eager_async:1}
     expect( expected ).to.eql( actual )
     expect(utils.build_upload_params(backup:null)['backup']).to.eql(undefined)

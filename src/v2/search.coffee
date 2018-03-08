@@ -1,5 +1,8 @@
 api = require('./api')
-_ = require('lodash')
+{
+  isEmpty
+  isNumber
+} = require('../utils')
 
 class Search
   constructor: ()->
@@ -54,7 +57,7 @@ class Search
 
   to_query: ()->
     for k,v of @query_hash
-      delete @query_hash[k] if !_.isNumber(v) && _.isEmpty(v)
+      delete @query_hash[k] if !isNumber(v) && isEmpty(v)
     @query_hash
 
   execute: (options, callback)->

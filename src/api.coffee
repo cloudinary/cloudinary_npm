@@ -1,10 +1,15 @@
-_ = require("lodash")
 config = require("./config")
 if config().upload_prefix && config().upload_prefix[0..4] == 'http:'
   https = require('http')
 else
   https = require('https')
 utils = require("./utils")
+{
+  extend, 
+  includes, 
+  isString, 
+  only
+} = utils
 querystring = require("querystring")
 Q = require('q')
 
@@ -27,7 +32,7 @@ call_api = (method, uri, params, callback, options) ->
     api_url += "?" + query_params
 
   request_options = require('url').parse(api_url)
-  request_options = _.extend request_options,
+  request_options = extend request_options,
     method: method.toUpperCase()
     headers:
       'Content-Type': content_type
@@ -36,7 +41,7 @@ call_api = (method, uri, params, callback, options) ->
   request_options.agent = options.agent if options.agent?
   request_options.headers['Content-Length'] = Buffer.byteLength(query_params) unless method == "get"
   handle_response = (res) ->
-    if _.includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)
+    if includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)
       buffer = ""
       error = false
       res.on "data", (d) -> buffer += d
@@ -81,13 +86,13 @@ call_api = (method, uri, params, callback, options) ->
   return deferred.promise
 
 transformation_string = (transformation) ->
-  if _.isString(transformation)
+  if isString(transformation)
     transformation
   else
-    utils.generate_transformation_string(_.extend({}, transformation))
+    utils.generate_transformation_string(extend({}, transformation))
 
 delete_resources_params = (options, params = {}) ->
-  _.extend(params, api.only(options, "keep_original", "invalidate", "next_cursor", "transformations"))
+  extend(params, only(options, "keep_original", "invalidate", "next_cursor", "transformations"))
 
 exports.ping = (callback, options = {}) ->
   call_api("get", ["ping"], {}, callback, options)
@@ -104,17 +109,17 @@ exports.resources = (callback, options = {}) ->
   uri = ["resources", resource_type]
   uri.push type if type?
   options.start_at = options.start_at.toUTCString() if options.start_at? && Object.prototype.toString.call(options.start_at) == '[object Date]'
-  call_api("get", uri, api.only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options)
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options)
 
 exports.resources_by_tag = (tag, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "tags", tag]
-  call_api("get", uri, api.only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options)
+  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options)
 
 exports.resources_by_context= (key,value, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "context"]
-  params = api.only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations")
+  params = only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations")
   params.key = key
   params.value = value if value?
   call_api("get", uri,params , callback, options)
@@ -122,13 +127,13 @@ exports.resources_by_context= (key,value, callback, options = {}) ->
 exports.resources_by_moderation = (kind, status, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["resources", resource_type, "moderations", kind, status]
-  call_api("get", uri, api.only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options)
+  call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options)
 
 exports.resources_by_ids = (public_ids, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type]
-  params = api.only(options, "tags", "context", "moderations")
+  params = only(options, "tags", "context", "moderations")
   params["public_ids[]"] = public_ids
   call_api("get", uri, params, callback, options)
 
@@ -136,7 +141,7 @@ exports.resource = (public_id, callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   type = options["type"] ? "upload"
   uri = ["resources", resource_type, type, public_id]
-  call_api("get", uri, api.only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options)
+  call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options)
 
 exports.restore = (public_ids, callback, options = {})->
   resource_type = options["resource_type"] ? "image"
@@ -183,7 +188,7 @@ exports.delete_derived_by_transformation = (public_ids, transformations, callbac
   resource_type = options["resource_type"] || "image"
   type          = options["type"] || "upload"
   uri           = "resources/#{resource_type}/#{type}"
-  params = _.extend({"public_ids[]": public_ids}, api.only(options, "invalidate"))
+  params = extend({"public_ids[]": public_ids}, only(options, "invalidate"))
   params["keep_original"] = true
   params["transformations"] = utils.build_eager(transformations)
   call_api("delete", uri, params, callback, options)
@@ -191,14 +196,14 @@ exports.delete_derived_by_transformation = (public_ids, transformations, callbac
 exports.tags = (callback, options = {}) ->
   resource_type = options["resource_type"] ? "image"
   uri = ["tags", resource_type]
-  call_api("get", uri, api.only(options, "next_cursor", "max_results", "prefix"), callback, options)
+  call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options)
 
 exports.transformations = (callback, options = {}) ->
-  call_api("get", ["transformations"], api.only(options, "next_cursor", "max_results"), callback, options)
+  call_api("get", ["transformations"], only(options, "next_cursor", "max_results"), callback, options)
 
 exports.transformation = (transformation, callback, options = {}) ->
   uri = ["transformations", transformation_string(transformation)]
-  call_api("get", uri, api.only(options, "next_cursor", "max_results"), callback, options)
+  call_api("get", uri, only(options, "next_cursor", "max_results"), callback, options)
 
 exports.delete_transformation = (transformation, callback, options = {}) ->
   uri = ["transformations", transformation_string(transformation)]
@@ -207,7 +212,7 @@ exports.delete_transformation = (transformation, callback, options = {}) ->
 # updates - currently only supported update is the "allowed_for_strict" boolean flag
 exports.update_transformation = (transformation, updates, callback, options = {}) ->
   uri = ["transformations", transformation_string(transformation)]
-  params = api.only(updates, "allowed_for_strict")
+  params = only(updates, "allowed_for_strict")
   params.unsafe_update = transformation_string(updates.unsafe_update) if updates.unsafe_update?
   call_api("put", uri, params, callback, options)
 
@@ -217,7 +222,7 @@ exports.create_transformation = (name, definition, callback, options = {}) ->
 
 
 exports.upload_presets = (callback, options = {}) ->
-  call_api("get", ["upload_presets"], api.only(options, "next_cursor", "max_results"), callback, options)
+  call_api("get", ["upload_presets"], only(options, "next_cursor", "max_results"), callback, options)
 
 exports.upload_preset = (name, callback, options = {}) ->
   uri = ["upload_presets", name]
@@ -229,12 +234,12 @@ exports.delete_upload_preset = (name, callback, options = {}) ->
 
 exports.update_upload_preset = (name, callback, options = {}) ->
   uri = ["upload_presets", name]
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), api.only(options, "unsigned", "disallow_public_id"))
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id"))
   call_api("put", uri, params, callback, options)
 
 exports.create_upload_preset = (callback, options = {}) ->
   uri = ["upload_presets"]
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), api.only(options, "name", "unsigned", "disallow_public_id"))
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id"))
   call_api("post", uri, params, callback, options)
 
 exports.root_folders = (callback, options = {}) ->
@@ -246,7 +251,7 @@ exports.sub_folders = (path, callback, options = {}) ->
   call_api("get", uri, {}, callback, options)
 
 exports.upload_mappings = (callback, options = {})->
-  params = api.only(options, "next_cursor", "max_results")
+  params = only(options, "next_cursor", "max_results")
   call_api("get", "upload_mappings", params, callback, options)
 
 exports.upload_mapping = (name = null, callback, options = {})->
@@ -256,21 +261,21 @@ exports.delete_upload_mapping = (name, callback, options = {})->
   call_api("delete", 'upload_mappings', {folder: name}, callback, options)
 
 exports.update_upload_mapping = (name, callback, options = {})->
-  params = api.only(options, "template")
+  params = only(options, "template")
   params["folder"] = name
   call_api("put", 'upload_mappings', params, callback, options)
 
 exports.create_upload_mapping = (name, callback, options = {})->
-  params = api.only(options, "template")
+  params = only(options, "template")
   params["folder"] = name
   call_api("post", 'upload_mappings', params, callback, options)
 
 publishResource = (byKey, value, callback, options={})->
-  params = api.only(options, "type", "invalidate", "overwrite")
+  params = only(options, "type", "invalidate", "overwrite")
   params[byKey] = value
   resource_type = options.resource_type ? "image"
   uri = ["resources", resource_type, "publish_resources"]
-  options = _.extend {resource_type: resource_type}, options
+  options = extend {resource_type: resource_type}, options
   call_api("post", uri, params, callback, options)
 
 exports.publish_by_prefix = (prefix, callback, options={})->
@@ -320,11 +325,3 @@ exports.update_resources_access_mode_by_tag = (access_mode, tag, callback, optio
 
 exports.update_resources_access_mode_by_ids = (access_mode, ids, callback, options = {})->
   update_resources_access_mode(access_mode, "public_ids[]", ids, callback, options)
-
-
-
-exports.only = (hash, keys...) ->
-  result = {}
-  for key in keys
-    result[key] = hash[key] if hash[key]?
-  result

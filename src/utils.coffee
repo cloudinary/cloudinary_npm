@@ -4,7 +4,26 @@
   * @borrows module:auth_token as generate_auth_token
 ###
 
-_ = require("lodash")
+clone = require('lodash/clone');
+compact = require('lodash/compact');
+extend = require('lodash/extend');
+filter = require('lodash/filter');
+first = require('lodash/first');
+identity = require('lodash/identity');
+isArray = require('lodash/isArray');
+isEmpty = require('lodash/isEmpty');
+isFunction = require('lodash/isFunction');
+isObject = require('lodash/isObject');
+isPlainObject = require('lodash/isPlainObject');
+isString = require('lodash/isString');
+isUndefined = require('lodash/isUndefined');
+last = require('lodash/last');
+map = require('lodash/map');
+merge = require('lodash/merge');
+merge = require('lodash/merge');
+sortBy = require('lodash/sortBy');
+take = require('lodash/take');
+
 config = require("./config")
 crypto = require('crypto')
 querystring = require('querystring')
@@ -31,7 +50,7 @@ exports.USER_AGENT = "CloudinaryNodeJS/#{exports.VERSION}"
 # This is intended for platform information and not individual applications!
 exports.userPlatform = ""
 exports.getUserAgent = ()->
-  if _.isEmpty(utils.userPlatform)
+  if isEmpty(utils.userPlatform)
     "#{utils.USER_AGENT}"
   else
     "#{utils.userPlatform} #{utils.USER_AGENT}"
@@ -96,12 +115,12 @@ textStyle = (layer)->
   keywords.push("letter_spacing_#{letter_spacing}") if letter_spacing
   line_spacing = layer["line_spacing"]
   keywords.push("line_spacing_#{line_spacing}") if line_spacing
-  if font_size || font_family || !_.isEmpty(keywords)
+  if font_size || font_family || !isEmpty(keywords)
     raise(CloudinaryException, "Must supply font_family for text in overlay/underlay") unless font_family
     raise(CloudinaryException, "Must supply font_size for text in overlay/underlay") unless font_size
     keywords.unshift(font_size)
     keywords.unshift(font_family)
-    _.compact(keywords).join("_")
+    compact(keywords).join("_")
 
 ###*
   * Parse "if" parameter
@@ -110,7 +129,7 @@ textStyle = (layer)->
   * @private
 ###
 normalize_expression = (expression) ->
-  return expression if !_.isString(expression) || expression.length == 0 || expression.match(/^!.+!$/)
+  return expression if !isString(expression) || expression.length == 0 || expression.match(/^!.+!$/)
 
   operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*"
   pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")"
@@ -131,7 +150,7 @@ process_if = (ifValue)->
   * @private
 ###
 process_layer = (layer)->
-  if _.isPlainObject(layer)
+  if isPlainObject(layer)
     public_id = layer["public_id"]
     format = layer["format"]
     resource_type = layer["resource_type"] || "image"
@@ -140,12 +159,12 @@ process_layer = (layer)->
     style = null
     components = []
 
-    unless _.isEmpty(public_id)
+    unless isEmpty(public_id)
       public_id = public_id.replace(new RegExp("/", 'g'), ":")
       public_id = "#{public_id}.#{format}" if format?
 
-    if _.isEmpty(text) && resource_type != "text"
-      if _.isEmpty(public_id)
+    if isEmpty(text) && resource_type != "text"
+      if isEmpty(public_id)
         throw "Must supply public_id for resource_type layer_parameter"
       if resource_type == "subtitles"
         style = textStyle(layer)
@@ -155,8 +174,8 @@ process_layer = (layer)->
       type = null
       # // type is ignored for text layers
       style = textStyle(layer)
-      unless _.isEmpty(text)
-        unless _.isEmpty(public_id) ^ _.isEmpty(style)
+      unless isEmpty(text)
+        unless isEmpty(public_id) ^ isEmpty(style)
           throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay"
         re = /\$\([a-zA-Z]\w*\)/g
         start = 0
@@ -175,7 +194,7 @@ process_layer = (layer)->
     components.push(style)
     components.push(public_id)
     components.push(text)
-    layer = _.compact(components).join(":")
+    layer = compact(components).join(":")
   layer
 
 exports.build_upload_params = (options) ->
@@ -204,7 +223,7 @@ exports.build_upload_params = (options) ->
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options["responsive_breakpoints"])
     return_delete_token: utils.as_safe_bool(options.return_delete_token)
     timestamp: exports.timestamp()
-    transformation: utils.generate_transformation_string(_.clone(options))
+    transformation: utils.generate_transformation_string(clone(options))
     type: options.type
     unique_filename: utils.as_safe_bool(options.unique_filename)
     upload_preset: options.upload_preset
@@ -230,20 +249,20 @@ exports.option_consume = (options, option_name, default_value) ->
 exports.build_array = (arg) ->
   if !arg?
     []
-  else if _.isArray(arg)
+  else if isArray(arg)
     arg
   else
     [arg]
 
 exports.encode_double_array = (array) ->
   array = utils.build_array(array)
-  if array.length > 0 and _.isArray(array[0])
+  if array.length > 0 and isArray(array[0])
     array.map((e) -> utils.build_array(e).join(",")).join("|")
   else
     array.join(",")
 
 exports.encode_key_value = (arg) ->
-  if _.isObject(arg)
+  if isObject(arg)
     pairs = for k, v of arg
       "#{k}=#{v}"
     pairs.join("|")
@@ -251,7 +270,7 @@ exports.encode_key_value = (arg) ->
     arg
 
 exports.encode_context = (arg) ->
-  if _.isObject(arg)
+  if isObject(arg)
     pairs = for k, v of arg
       v = v.replace /([=|])/g, (match)-> "\\#{match}"
       "#{k}=#{v}"
@@ -261,28 +280,28 @@ exports.encode_context = (arg) ->
 
 exports.build_eager = (transformations) ->
   (for transformation in utils.build_array(transformations)
-    transformation = _.clone(transformation)
-    _.filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
+    transformation = clone(transformation)
+    filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
   ).join("|")
 
 exports.build_custom_headers = (headers) ->
   switch
     when !headers?
       undefined
-    when _.isArray headers
+    when isArray headers
       headers.join "\n"
-    when _.isObject headers
+    when isObject headers
       [k + ": " + v for k, v of headers].join "\n"
     else
       headers
 
 exports.present = (value) ->
-  not _.isUndefined(value) and ("" + value).length > 0
+  not isUndefined(value) and ("" + value).length > 0
 
 exports.generate_transformation_string = (options) ->
-  if _.isArray(options)
+  if isArray(options)
     result = for base_transformation in options
-      utils.generate_transformation_string(_.clone(base_transformation))
+      utils.generate_transformation_string(clone(base_transformation))
     return result.join("/")
 
   responsive_width = utils.option_consume(options, "responsive_width", config().responsive_width)
@@ -305,10 +324,10 @@ exports.generate_transformation_string = (options) ->
   color = color and color.replace(/^#/, "rgb:")
   base_transformations = utils.build_array(utils.option_consume(options, "transformation", []))
   named_transformation = []
-  if base_transformations.length != 0 and _.filter(base_transformations, _.isObject).length > 0
-    base_transformations = _.map(base_transformations, (base_transformation) ->
-      if _.isObject(base_transformation)
-        utils.generate_transformation_string(_.clone(base_transformation))
+  if base_transformations.length != 0 and filter(base_transformations, isObject).length > 0
+    base_transformations = map(base_transformations, (base_transformation) ->
+      if isObject(base_transformation)
+        utils.generate_transformation_string(clone(base_transformation))
       else
         utils.generate_transformation_string(transformation: base_transformation)
     )
@@ -318,13 +337,13 @@ exports.generate_transformation_string = (options) ->
 
   effect = utils.option_consume(options, "effect")
 
-  if _.isArray(effect)
+  if isArray(effect)
     effect = effect.join(":")
-  else if _.isObject(effect)
+  else if isObject(effect)
     effect = "#{key}:#{value}" for key,value of effect
 
   border = utils.option_consume(options, "border")
-  if _.isObject(border)
+  if isObject(border)
     border = "#{border.width ? 2}px_solid_#{(border.color ? "black").replace(/^#/, 'rgb:')}"
   else if /^\d+$/.exec(border) #fallback to html border attributes
     options.border = border
@@ -396,7 +415,7 @@ exports.generate_transformation_string = (options) ->
     var_params.push "#{key}_#{normalize_expression(value)}"
 
   var_params = var_params.sort()
-  unless _.isEmpty(variables)
+  unless isEmpty(variables)
     for [name, value] in variables
       var_params.push "#{name}_#{normalize_expression(value)}"
   variables = var_params.filter((x)->x).join(',')
@@ -409,17 +428,17 @@ exports.generate_transformation_string = (options) ->
     return
   transformations = sortedParams.join(',')
   raw_transformation = utils.option_consume(options, 'raw_transformation')
-  transformations = _.compact([ifValue, variables, transformations, raw_transformation]).join(",")
+  transformations = compact([ifValue, variables, transformations, raw_transformation]).join(",")
   base_transformations.push transformations
   transformations = base_transformations
   if responsive_width
     responsive_width_transformation = config().responsive_width_transformation or DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION
-    transformations.push utils.generate_transformation_string(_.clone(responsive_width_transformation))
+    transformations.push utils.generate_transformation_string(clone(responsive_width_transformation))
   if width?.toString().indexOf("auto") == 0 or responsive_width
     options.responsive = true
   if dpr == "auto"
     options.hidpi = true
-  _.filter(transformations, utils.present).join "/"
+  filter(transformations, utils.present).join "/"
 
 exports.updateable_resource_params = (options, params = {}) ->
   params.auto_tagging = options.auto_tagging if options.auto_tagging?
@@ -486,7 +505,7 @@ exports.url = (public_id, options = {}) ->
   version = "v#{version}" if version?
 
   transformation = transformation.replace(/([^:])\/\//g, '$1/')
-  if sign_url && _.isEmpty(auth_token)
+  if sign_url && isEmpty(auth_token)
     to_sign = [transformation, source_to_sign].filter((part) -> part? && part != '').join('/')
     i = 0;
     try
@@ -504,14 +523,14 @@ exports.url = (public_id, options = {}) ->
   prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution)
   resultUrl = [prefix, resource_type, type, signature, transformation, version,
     public_id].filter((part) -> part? && part != '').join('/')
-  if sign_url && !_.isEmpty(auth_token)
+  if sign_url && !isEmpty(auth_token)
     auth_token.url = url.parse(resultUrl).path
     token = generate_token( auth_token)
     resultUrl += "?#{token}"
   resultUrl
 
 exports.video_url = (public_id, options) ->
-  options = _.extend({resource_type: 'video'}, options)
+  options = extend({resource_type: 'video'}, options)
   utils.url(public_id, options)
 
 finalize_source = (source, format, url_suffix) ->
@@ -531,7 +550,7 @@ finalize_source = (source, format, url_suffix) ->
   [source, source_to_sign]
 
 exports.video_thumbnail_url = (public_id, options) ->
-  options = _.extend({}, exports.DEFAULT_POSTER_OPTIONS, options)
+  options = extend({}, exports.DEFAULT_POSTER_OPTIONS, options)
   utils.url(public_id, options)
 
 finalize_resource_type = (resource_type, type, url_suffix, use_root_path, shorten) ->
@@ -686,11 +705,11 @@ exports.random_public_id = ->
   crypto.randomBytes(12).toString('base64').replace(/[^a-z0-9]/g, "")
 
 exports.signed_preloaded_image = (result) ->
-  "#{result.resource_type}/upload/v#{result.version}/#{_.filter([result.public_id,
+  "#{result.resource_type}/upload/v#{result.version}/#{filter([result.public_id,
     result.format], utils.present).join(".")}##{result.signature}"
 
 exports.api_sign_request = (params_to_sign, api_secret) ->
-  to_sign = _.sortBy("#{k}=#{utils.build_array(v).join(",")}" for k, v of params_to_sign when v?, _.identity).join("&")
+  to_sign = sortBy("#{k}=#{utils.build_array(v).join(",")}" for k, v of params_to_sign when v?, identity).join("&")
   shasum = crypto.createHash('sha1')
   shasum.update(utf8_encode(to_sign + api_secret), 'binary')
   shasum.digest('hex')
@@ -784,7 +803,7 @@ exports.zip_download_url = (tag, options = {}) ->
 # @return [String] archive url
 ###
 exports.download_archive_url = (options = {})->
-  cloudinary_params = exports.sign_request(exports.archive_params(_.merge(options, mode: "download")), options)
+  cloudinary_params = exports.sign_request(exports.archive_params(merge(options, mode: "download")), options)
   exports.api_url("generate_archive", options) + "?" + hashToQuery(cloudinary_params)
 
 ###*
@@ -792,7 +811,7 @@ exports.download_archive_url = (options = {})->
 # @see download_archive_url
 ###
 exports.download_zip_url = (options = {})->
-  exports.download_archive_url(_.merge(options, target_format: "zip"))
+  exports.download_archive_url(merge(options, target_format: "zip"))
 
 join_pair = (key, value) ->
   if !value
@@ -803,7 +822,7 @@ join_pair = (key, value) ->
     return key + "='" + value + "'";
 
 exports.html_attrs = (attrs) ->
-  pairs = _.filter(_.map(attrs, (value, key) -> return join_pair(key, value)))
+  pairs = filter(map(attrs, (value, key) -> return join_pair(key, value)))
   pairs.sort()
   return pairs.join(" ")
 
@@ -829,10 +848,10 @@ v1_result_adapter = (callback) ->
 
 v1_adapter = (name, num_pass_args, v1) ->
   return (args...) ->
-    pass_args = _.take(args, num_pass_args)
+    pass_args = take(args, num_pass_args)
     options = args[num_pass_args]
     callback = args[num_pass_args + 1]
-    if !callback? && _.isFunction(options)
+    if !callback? && isFunction(options)
       callback = options
       options = {}
     callback = v1_result_adapter(callback)
@@ -863,7 +882,7 @@ split_range = (range) -> # :nodoc:
     when String
       range.split ".." if offset_any_pattern_re = ~range
     when Array
-      [_.first(range), _.last(range)]
+      [first(range), last(range)]
     else
       [null, null]
 
@@ -959,20 +978,20 @@ exports.build_explicit_api_params = (public_id, options = {})->
 
 exports.generate_responsive_breakpoints_string = (breakpoints)->
   return unless breakpoints?
-  breakpoints = _.clone(breakpoints)
-  unless _.isArray(breakpoints)
+  breakpoints = clone(breakpoints)
+  unless isArray(breakpoints)
     breakpoints = [breakpoints]
 
   for breakpoint_settings in breakpoints
     if breakpoint_settings?
       if breakpoint_settings.transformation
-        breakpoint_settings.transformation = utils.generate_transformation_string(_.clone(breakpoint_settings.transformation))
+        breakpoint_settings.transformation = utils.generate_transformation_string(clone(breakpoint_settings.transformation))
 
   JSON.stringify(breakpoints)
 
 exports.build_streaming_profiles_param = (options={})->
   params = utils.only(options, "display_name", "representations")
-  if _.isArray(params["representations"])
+  if isArray(params["representations"])
     params["representations"] = JSON.stringify(params["representations"].map (r)->
       {transformation: utils.generate_transformation_string(r.transformation)}
     )
@@ -990,17 +1009,17 @@ exports.only = (hash, keys...) ->
 build_eager = (eager)->
   return undefined unless eager?
   ret = (for transformation in Array(eager)
-    transformation = _.clone(transformation)
+    transformation = clone(transformation)
     format = transformation.format if transformation.format?
     delete transformation.format
-    _.compact([utils.generate_transformation_string(transformation), format]).join("/")
+    compact([utils.generate_transformation_string(transformation), format]).join("/")
   ).join("|")
   ret
 
 
 hashToQuery = (hash)->
-  _.compact(for key, value of hash
-    if _.isArray(value)
+  compact(for key, value of hash
+    if isArray(value)
       (for v in value
         key = "#{key}[]" unless key.match(/\w+\[\]/)
         "#{querystring.escape("#{key}")}=#{querystring.escape(v)}"

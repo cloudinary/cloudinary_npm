@@ -1,6 +1,11 @@
 expect = require('expect.js')
-_ = require("lodash")
 utils = require("../lib/utils")
+{
+  cloneDeep 
+  isEmpty 
+  isFunction 
+  last
+} = utils
 http = require('http')
 
 exports.TIMEOUT_SHORT   = 5000

@@ -6,7 +6,7 @@ sinon = require('sinon')
 cloudinary = require("../cloudinary")
 fs = require('fs')
 Q = require('q')
-_ = require("lodash")
+{at} = cloudinary.utils
 ClientRequest = require('_http_client').ClientRequest
 require('jsdom-global')()
 
@@ -577,10 +577,10 @@ describe "uploader", ->
           return done(new Error error.message) if error?
           expect(result).to.have.key('responsive_breakpoints')
           expect(result.responsive_breakpoints).to.have.length(2)
-          expect(_.at(result, "responsive_breakpoints[0].transformation")[0]).to.eql("e_sepia")
-          expect(_.at(result, "responsive_breakpoints[0].breakpoints[0].url")[0]).to.match(/\.jpg$/)
-          expect(_.at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10")
-          expect(_.at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/)
+          expect(at(result, "responsive_breakpoints[0].transformation")[0]).to.eql("e_sepia")
+          expect(at(result, "responsive_breakpoints[0].breakpoints[0].url")[0]).to.match(/\.jpg$/)
+          expect(at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10")
+          expect(at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/)
           done()
         true
 

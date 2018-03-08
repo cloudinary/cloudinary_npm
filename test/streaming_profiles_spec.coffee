@@ -6,7 +6,7 @@ utils = require("../lib/utils")
 sinon = require('sinon')
 ClientRequest = require('_http_client').ClientRequest
 http = require('http')
-_ = require("lodash")
+{keys} = utils
 Q = require('q')
 fs = require('fs')
 
@@ -93,9 +93,9 @@ describe 'Cloudinary::Api', ->
     it 'should get a specific streaming profile', (done)->
       api.get_streaming_profile PREDEFINED_PROFILES[1], (error, result)->
         expect(error).to.be undefined
-        expect(_.keys(result['data'])).to.contain('name')
-        expect(_.keys(result['data'])).to.contain('display_name')
-        expect(_.keys(result['data'])).to.contain('representations')
+        expect(keys(result['data'])).to.contain('name')
+        expect(keys(result['data'])).to.contain('display_name')
+        expect(keys(result['data'])).to.contain('representations')
         done()
       true
 

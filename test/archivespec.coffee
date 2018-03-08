@@ -4,6 +4,7 @@ https = require('https')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = cloudinary.v2.utils
+last = utils.last
 api = cloudinary.v2.api
 uploader = cloudinary.v2.uploader
 zlib = require('zlib')
@@ -12,7 +13,6 @@ ClientRequest = require('_http_client').ClientRequest
 
 exec = require('child_process').exec
 execSync = require('child_process').execSync
-_ = require("lodash")
 Q = require('q')
 fs = require('fs')
 os = require('os')
@@ -98,7 +98,7 @@ describe "utils", ->
             file.on 'close', ->
               list = execSync("unzip -l #{filename}")
               list = list.toString().split('\n').slice(3, -3)
-              list = (_.last(i.split(/[ ]+/)) for i in list) # keep only filenames
+              list = (last(i.split(/[ ]+/)) for i in list) # keep only filenames
               expect(list.length).to.eql(2)
               expect(list).to.contain(publicId1 + ".jpg")
               expect(list).to.contain(publicId2 + ".jpg")
