@@ -452,6 +452,7 @@ exports.generate_transformation_string = (options) ->
   filter(transformations, utils.present).join "/"
 
 exports.updateable_resource_params = (options, params = {}) ->
+  params.access_control = jsonArrayParam(options.access_control) if options.access_control?
   params.auto_tagging = options.auto_tagging if options.auto_tagging?
   params.background_removal = options.background_removal if options.background_removal?
   params.categorization = options.categorization if options.categorization?
@@ -1045,7 +1046,7 @@ hashToQuery = (hash)->
 # @param [Hash|String|Array<Hash>] data
 # @return [String|nil] a JSON array string or `nil` if data is `nil`
 ###
-jsonArrayParam = (data, callback)->
+exports.jsonArrayParam = jsonArrayParam = (data, callback)->
   return unless data
 
   data = JSON.parse(data) if isString(data)

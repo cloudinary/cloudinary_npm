@@ -38,8 +38,9 @@ describe "uploader", ->
   # Upload an image to be tested on.
   # @callback the callback receives the public_id of the uploaded image
   ###
-  upload_image = (callback)->
-    cloudinary.v2.uploader.upload IMAGE_FILE, tags: UPLOAD_TAGS, (error, result) ->
+  upload_image = (options, callback)->
+    [options, callback] = if isFunction(options) then [{tags: UPLOAD_TAGS}, options] else [options, callback] 
+    cloudinary.v2.uploader.upload IMAGE_FILE, options, (error, result) ->
       expect(error).to.be undefined
       callback?(result)
 
@@ -617,5 +618,43 @@ describe "uploader", ->
     expect(input_element.getAttribute("class")).to.match(/cloudinary-fileupload/);
     expect(input_element.getAttribute("name")).to.be('file');
     expect(input_element.getAttribute("type")).to.be('file');
+
+  describe "access_control", ()->
+    writeSpy = undefined
+    requestSpy = undefined
+    options = undefined
+
+    beforeEach ->
+      writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+      requestSpy = sinon.spy(http, 'request')
+      options = {
+        public_id: helper.TEST_TAG,
+        tags: [helper.UPLOAD_TAGS..., 'access_control_test']
+      }
+
+    afterEach ->
+      requestSpy.restore()
+      writeSpy.restore()
+
+    acl = {
+      access_type: 'anonymous',
+      start: new Date(Date.UTC(2019,1,22, 16, 20, 57)),
+      end: '2019-03-22 00:00 +0200'
+    }
+    acl_string =
+      '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}'
+
+    it "should allow the user to define ACL in the upload parameters", ()->
+      options.access_control = [acl]
+      upload_image(options).then (resource)=>
+        sinon.assert.calledWith(writeSpy, sinon.match(
+          helper.uploadParamMatcher('access_control', helper.escapeRegexp("[#{acl_string}]"))
+        ))
+        expect(resource).to.have.key('access_control')
+        response_acl = resource["access_control"]
+        expect(response_acl.length).to.be(1)
+        expect(response_acl[0]["access_type"]).to.be("anonymous")
+        expect(Date.parse(response_acl[0]["start"])).to.be(Date.parse(acl.start))
+        expect(Date.parse(response_acl[0]["end"])).to.be(Date.parse(acl.end))
 
 

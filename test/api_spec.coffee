@@ -15,8 +15,9 @@ ClientRequest = require('_http_client').ClientRequest
 http = require('http')
 Q = require('q')
 fs = require('fs')
-
 helper = require("./spechelper")
+mockTest = helper.mockTest
+
 sharedExamples = helper.sharedExamples
 itBehavesLike = helper.itBehavesLike
 TEST_TAG        = helper.TEST_TAG
@@ -56,6 +57,7 @@ sharedExamples "a list with a cursor", (testFunc, args...)->
     writeSpy.restore()
     requestSpy.restore()
     xhr.restore()
+
   specify ":max_results", ()->
     testFunc args..., max_results: 10
     if writeSpy.called
@@ -689,6 +691,28 @@ describe "api", ->
           expect(error.message).to.contain "Illegal value"
           done()
         true
+
+    describe "access_control", ()->
+      acl = {
+        access_type: 'anonymous',
+        start: new Date(Date.UTC(2019,1,22, 16, 20, 57)),
+        end: '2019-03-22 00:00 +0200'
+      }
+      acl_string =
+        '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}'
+      options = {
+        public_id: helper.TEST_TAG,
+        tags: [helper.UPLOAD_TAGS..., 'access_control_test']
+      }
+
+      it "should allow the user to define ACL in the update parameters2", ()->
+        helper.mockPromise((xhr, writeSpy, requestSpy)->
+          options.access_control = [acl]
+          cloudinary.v2.api.update("id", options)
+          sinon.assert.calledWith(writeSpy, sinon.match((arg)->
+            helper.apiParamMatcher('access_control', "[#{acl_string}]")(arg)
+          ))
+        )
 
   it "should support listing by moderation kind and value", (done) ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved"
