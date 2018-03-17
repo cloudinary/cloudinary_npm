@@ -2,11 +2,10 @@ require('dotenv').load(silent: true)
 
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
-utils = require("../lib/utils")
 sinon = require('sinon')
 ClientRequest = require('_http_client').ClientRequest
 http = require('http')
-{keys} = utils
+keys = require('lodash/keys')
 Q = require('q')
 fs = require('fs')
 

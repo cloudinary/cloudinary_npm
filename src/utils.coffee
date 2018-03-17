@@ -4,32 +4,43 @@
   * @borrows module:auth_token as generate_auth_token
 ###
 
-clone = require('lodash/clone');
-compact = require('lodash/compact');
-extend = require('lodash/extend');
-filter = require('lodash/filter');
-first = require('lodash/first');
-identity = require('lodash/identity');
-isArray = require('lodash/isArray');
-isEmpty = require('lodash/isEmpty');
-isFunction = require('lodash/isFunction');
-isObject = require('lodash/isObject');
-isPlainObject = require('lodash/isPlainObject');
-isString = require('lodash/isString');
-isUndefined = require('lodash/isUndefined');
-last = require('lodash/last');
-map = require('lodash/map');
-merge = require('lodash/merge');
-merge = require('lodash/merge');
-sortBy = require('lodash/sortBy');
-take = require('lodash/take');
+utils = exports
 
 config = require("./config")
 crypto = require('crypto')
 querystring = require('querystring')
 url = require('url')
 
-utils = exports
+# Functions used internally
+
+compact = require('lodash/compact');
+defaults = require('lodash/defaults');
+find = require('lodash/find');
+first = require('lodash/first');
+identity = require('lodash/identity');
+isFunction = require('lodash/isFunction');
+isPlainObject = require('lodash/isPlainObject');
+last = require('lodash/last');
+map = require('lodash/map');
+sortBy = require('lodash/sortBy');
+take = require('lodash/take');
+
+# Exposed functions
+
+utils.at = at = require('lodash/at');
+utils.clone = clone = require('lodash/clone');
+utils.extend = extend = require('lodash/extend');
+utils.filter = filter = require('lodash/filter');
+utils.includes = includes = require('lodash/includes');
+utils.isArray = isArray = require('lodash/isArray');
+utils.isEmpty = isEmpty = require('lodash/isEmpty');
+utils.isNumber = isNumber = require('lodash/isNumber');
+utils.isObject = isObject = require('lodash/isObject');
+utils.isString = isString = require('lodash/isString');
+utils.isUndefined = isUndefined = require('lodash/isUndefined');
+utils.keys = keys = require('lodash/keys');
+utils.merge = merge = require('lodash/merge');
+
 generate_token = require("./auth_token")
 exports.generate_auth_token = (options)->
   token_options = Object.assign {}, config().auth_token, options

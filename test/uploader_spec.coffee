@@ -6,7 +6,8 @@ sinon = require('sinon')
 cloudinary = require("../cloudinary")
 fs = require('fs')
 Q = require('q')
-{at} = cloudinary.utils
+isFunction = require('lodash/isFunction')
+at = require('lodash/at')
 ClientRequest = require('_http_client').ClientRequest
 require('jsdom-global')()
 

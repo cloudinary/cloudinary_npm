@@ -5,11 +5,11 @@ cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
 {
   clone, 
-  defaults, 
   isString, 
   merge, 
   only
 } = utils
+defaults = require('lodash/defaults')
 api = require("../lib/api")
 Q = require('q')
 fs = require('fs')

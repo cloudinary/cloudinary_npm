@@ -4,10 +4,12 @@ expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
 {
-  find,
-  keys,
-  matchesProperty
+  matchesProperty,
+  merge
 } = utils
+matchesProperty = require('lodash/matchesProperty')
+find = require('lodash/find')
+keys = require('lodash/keys')
 sinon = require('sinon')
 ClientRequest = require('_http_client').ClientRequest
 http = require('http')
@@ -566,7 +568,7 @@ describe "api", ->
       cloudinary.v2.api.create_upload_preset folder: "folder", (error, preset) ->
         name = preset.name
         cloudinary.v2.api.upload_preset name, (error, preset) ->
-          cloudinary.v2.api.update_upload_preset name, utils.merge(preset.settings, {colors: true, unsigned: true, disallow_public_id: true}), (error, preset) ->
+          cloudinary.v2.api.update_upload_preset name, merge(preset.settings, {colors: true, unsigned: true, disallow_public_id: true}), (error, preset) ->
             cloudinary.v2.api.upload_preset name, (error, preset) ->
               expect(preset.name).to.eql(name)
               expect(preset.unsigned).to.eql(true)
