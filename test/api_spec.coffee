@@ -684,14 +684,6 @@ describe "api", ->
           done()
         true
 
-    it "should support requesting similarity_search", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, similarity_search: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Illegal value"
-          done()
-        true
-
     describe "access_control", ()->
       acl = {
         access_type: 'anonymous',
