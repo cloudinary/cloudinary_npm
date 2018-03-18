@@ -411,7 +411,6 @@ describe "uploader", ->
   it "should support requesting categorization", (done) ->
     cloudinary.v2.uploader.upload IMAGE_FILE, categorization: "illegal", tags: UPLOAD_TAGS, (error, result) ->
       expect(error?).to.be true
-      expect(error.message).to.contain "is invalid"
       done()
     true
 
