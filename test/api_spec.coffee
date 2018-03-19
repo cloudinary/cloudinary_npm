@@ -639,6 +639,7 @@ describe "api", ->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->
         cloudinary.v2.api.update upload_result.public_id, moderation_status: "approved", (error, api_result) ->
+          return done(new Error error.message) if error?
           expect(api_result.moderation[0].status).to.eql("approved")
           done()
         true
@@ -706,45 +707,27 @@ describe "api", ->
           ))
         )
 
-  it "should support listing by moderation kind and value", (done) ->
+  it "should support listing by moderation kind and value", () ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved"
-    @timeout helper.TIMEOUT_MEDIUM
-    ids = []
-    api_results =[]
-    lists = {}
-    after_listing = (list) ->
-      (error, list_result) ->
-        lists[list] = list_result.resources.map((r) -> r.public_id)
-        if keys(lists).length == 3
-          expect(lists.approved).to.contain(ids[0])
-          expect(lists.approved).not.to.contain(ids[1])
-          expect(lists.approved).not.to.contain(ids[2])
-          expect(lists.rejected).to.contain(ids[1])
-          expect(lists.rejected).not.to.contain(ids[0])
-          expect(lists.rejected).not.to.contain(ids[2])
-          expect(lists.pending).to.contain(ids[2])
-          expect(lists.pending).not.to.contain(ids[0])
-          expect(lists.pending).not.to.contain(ids[1])
-          done()
-
-    after_update = (error, api_result) ->
-      api_results.push(api_result)
-      if api_results.length == 2
-        cloudinary.v2.api.resources_by_moderation("manual", "approved", max_results: 1000, moderations: true, after_listing("approved"))
-        cloudinary.v2.api.resources_by_moderation("manual", "rejected", max_results: 1000, moderations: true, after_listing("rejected"))
-        cloudinary.v2.api.resources_by_moderation("manual", "pending", max_results: 1000, moderations: true, after_listing("pending"))
-
-    after_upload = (error, upload_result) ->
-      return done(new Error error.message) if error?
-      ids.push(upload_result.public_id)
-      if ids.length == 3
-        cloudinary.v2.api.update ids[0], moderation_status: "approved", after_update
-        cloudinary.v2.api.update ids[1], moderation_status: "rejected", after_update
-
-    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
-    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
-    cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual", tags: UPLOAD_TAGS, after_upload)
-    true
+    
+    
+    helper.mockPromise (xhr, write, request)->
+      [
+        "approved"
+        "pending"
+        "rejected"
+      ].forEach (stat)->
+        status= stat
+        status2 = status
+        request.resetHistory()
+        
+        cloudinary.v2.api.resources_by_moderation("manual", status2, moderations: true)
+        sinon.assert.calledWith request, sinon.match( (arg)->
+          new RegExp("/resources/image/moderations/manual/#{status2}$").test(arg?.pathname)
+        , "/resources/image/moderations/manual/#{status}")
+        sinon.assert.calledWith request, sinon.match( (arg)->
+          /^moderations=true$/.test(arg?.query) 
+        , "moderations=true")
 
   # For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   # Replace `it` with  `it.skip` below if you want to disable it.
