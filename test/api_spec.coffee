@@ -593,32 +593,30 @@ describe "api", ->
   describe "delete_all_resources", ->
     itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_all_resources
     describe "keep_original: yes", ->
-      it "should allow deleting all derived resources", (done) ->
-        @timeout helper.TIMEOUT_LONG
-        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test5", eager: {transformation: {width: 101, crop: "scale"}}, tags: UPLOAD_TAGS, (error, upload_result) ->
-          cloudinary.v2.api.resource "api_test5", (error, resource) ->
-            return done(new Error error.message) if error?
-            expect(resource).to.be.an(Object)
-            expect(resource.derived).not.to.be.empty()
-            # Prepare to loop until no more resources to delete
-            delete_all = (next, callback)->
-              options = {keep_original: yes}
-              options.next_cursor = next if next?
-              cloudinary.v2.api.delete_all_resources options, (error, delete_result) ->
-                return done(new Error error.message) if error?
-                if delete_result.next_cursor?
-                  delete_all(delete_result.next_cursor, callback)
-                else
-                  callback()
-            # execute loop
-            delete_all undefined, ()->
-              cloudinary.v2.api.resource "api_test5", (error, new_resource) ->
-                return done(new Error error.message) if error?
-                expect(new_resource.derived).to.be.empty()
-                done()
-              true
-          true
-        true
+      it "should allow deleting all derived resources", () ->
+        helper.mockPromise (xhr, write, request)->
+          options = {keep_original: yes}
+          cloudinary.v2.api.delete_all_resources options
+          sinon.assert.calledWith(request, sinon.match((arg)->
+            new RegExp("/resources/image/upload$").test(arg.pathname)
+          ,
+            "/resources/image/upload"
+          ))
+          sinon.assert.calledWith(request, sinon.match((arg)->
+            "DELETE" == arg.method
+          ,
+            "DELETE"
+          ))
+          sinon.assert.calledWith(write, sinon.match(
+            helper.apiParamMatcher('keep_original', 'true')
+          ,
+            "keep_original=true"
+          ))
+          sinon.assert.calledWith(write, sinon.match(
+            helper.apiParamMatcher('all', 'true')
+          ,
+            "all=true"
+          ))
 
   describe "update", ()->
     describe "notification url", ()->
