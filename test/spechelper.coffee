@@ -7,7 +7,14 @@ utils = require("../lib/utils")
 } = utils
 isFunction = require('lodash/isFunction')
 cloneDeep = require('lodash/cloneDeep')
+config = require("../lib/config")
 http = require('http')
+https = require('https')
+if config().upload_prefix && config().upload_prefix[0..4] == 'http:'
+  api_http = http
+else
+  api_http = https
+
 querystring = require('querystring')
 sinon = require('sinon')
 ClientRequest = require('_http_client').ClientRequest
@@ -59,7 +66,11 @@ expect.Assertion::beServedByCloudinary = (done)->
   [public_id, options] = @obj
   actualOptions = cloneDeep(options)
   actual = utils.url(public_id, actualOptions)
-  http.get actual, (res)=>
+  if(actual.startsWith("https"))
+    callHttp = https
+  else
+    callHttp = http
+  callHttp.get actual, (res)=>
     @assert res.statusCode == 200,
       ()-> "Expected to get #{actual} but server responded with \"#{res.statusCode}: #{res.headers['x-cld-error']}\"",
       ()-> "Expeted not to get #{actual}."
@@ -129,22 +140,34 @@ exports.escapeRegexp = (s)->
 ###*
   @function mockTest
   @nodoc
-  provides a wrapper for mocked tests
-  @return {object} the mocked objects
+  Provides a wrapper for mocked tests. Must be called in a `describe` context.
+  @example
+  <pre>
+  const mockTest = require('./spechelper').mockTest
+  describe("some topic", function() {
+    mocked = mockTest()
+    it("should do something" function() {
+      options.access_control = [acl];
+      cloudinary.v2.api.update("id", options);
+      sinon.assert.calledWith(mocked.writeSpy, sinon.match(function(arg) {
+        return helper.apiParamMatcher('access_control', "[" + acl_string + "]")(arg);
+    })
+  );
+  </pre>
+  @return {object} the mocked objects: `xhr`, `write`, `request`
 ###
 exports.mockTest = ()->
-  mock = {}
+  mocked = {}
   before ()->
-    mock.xhr = sinon.useFakeXMLHttpRequest()
-    mock.writeSpy = sinon.spy(ClientRequest.prototype, 'write')
-    mock.requestSpy = sinon.spy(http, 'request')
+    mocked.xhr = sinon.useFakeXMLHttpRequest()
+    mocked.write = sinon.spy(ClientRequest.prototype, 'write')
+    mocked.request = sinon.spy(api_http, 'request')
   
   after ()->
-    mock.requestSpy.restore()
-    mock.writeSpy.restore()
-    mock.xhr.restore()
-
-  mock
+    mocked.request.restore()
+    mocked.write.restore()
+    mocked.xhr.restore()
+  mocked
   
 ###*
   @callback mockBlock
@@ -157,8 +180,10 @@ exports.mockTest = ()->
 
 ###*
   @function mockPromise
-  Wraps the test to be mocked using a promise
-  @param {mockBlock} the test function
+  Wraps the test to be mocked using a promise.
+  Can be called inside `it` functions
+  @param {mockBlock} the test function, accepting (xhr, write, request)
+  @return {Promise}
 ###
 exports.mockPromise = (mockBlock)->
   xhr = undefined
@@ -167,7 +192,7 @@ exports.mockPromise = (mockBlock)->
   Q.Promise((resolve, reject, notify)->
     xhr = sinon.useFakeXMLHttpRequest()
     writeSpy = sinon.spy(ClientRequest.prototype, 'write')
-    requestSpy = sinon.spy(http, 'request')
+    requestSpy = sinon.spy(api_http, 'request')
     mock = {xhr, writeSpy, requestSpy }
     result = mockBlock(xhr, writeSpy, requestSpy)
     if isFunction(result?.then)
@@ -178,4 +203,4 @@ exports.mockPromise = (mockBlock)->
     requestSpy.restore()
     writeSpy.restore()
     xhr.restore()
-  )
+  ).done()
