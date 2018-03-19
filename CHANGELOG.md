@@ -1,4 +1,25 @@
 
+1.11.0 / 2018-03-19
+===================
+
+New functionality
+-----------------
+
+  * Add `access_control` parameter to `upload` and `update`
+ 
+Other changes
+-------------
+
+  * Mock `delete_all_resources` test
+  * Add `compileTests` script to `package.json`
+  * Add http/https handling to spec helper
+  * Mock moderation tests
+  * Fix `categorization` test
+  * Remove `similiarity_search` test
+  * Add test helper functions
+  * Add utility functions to `utils`
+  * Replace lodash's `_` with explicitly requiring methods
+
 1.10.0 / 2018-02-13
 ===================
 

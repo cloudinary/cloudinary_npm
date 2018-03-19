@@ -2,7 +2,7 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "homepage": "http://cloudinary.com",
   "license": "MIT",
   "repository": {
@@ -15,7 +15,7 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "coffee-script": "^1.10.0",
+    "coffee-script": "^1.11.0",
     "dotenv": "4.x",
     "expect.js": "0.3.x",
     "jsdom": "^9.12.0",
