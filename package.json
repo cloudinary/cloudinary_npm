@@ -28,6 +28,7 @@
     "prepublish": "npm run compile",
     "test": "node_modules/.bin/mocha -R spec --recursive test/",
     "compile": "node_modules/.bin/coffee --no-header --map -o lib -c src",
+    "compileTests": "node_modules/.bin/coffee --no-header --map -o test_lib -c test",
     "watch": "node_modules/.bin/coffee --watch --map -o lib -c src"
   },
   "optionalDependencies": {},
