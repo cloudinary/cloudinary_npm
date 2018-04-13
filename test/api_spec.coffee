@@ -633,6 +633,18 @@ describe "api", ->
           sinon.assert.calledWith writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/)
           sinon.assert.calledWith writeSpy, sinon.match(/moderation_status=approved/)
 
+    describe "quality override", ()->
+      mocked = helper.mockTest()
+      qualityValues = ["auto:advanced", "auto:best", "80:420", "none"]
+
+      for quality in qualityValues
+        do (quality) ->
+          it "should support '#{quality}' in update", ()->
+            cloudinary.v2.api.update "sample", "quality_override": quality
+            sinon.assert.calledWith mocked.write, sinon.match(
+              helper.apiParamMatcher("quality_override", quality)
+            )
+
     it "should support setting manual moderation status", (done) ->
       @timeout helper.TIMEOUT_LONG
       cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->

@@ -466,6 +466,7 @@ exports.updateable_resource_params = (options, params = {}) ->
   params.raw_convert = options.raw_convert if options.raw_convert?
   params.similarity_search = options.similarity_search if options.similarity_search?
   params.tags = utils.build_array(options.tags).join(",") if options.tags?
+  params.quality_override = options.quality_override if options.quality_override?
 
   params
 
@@ -985,6 +986,7 @@ exports.build_explicit_api_params = (public_id, options = {})->
     tags: options.tags && utils.build_array(options.tags).join(",")
     timestamp: (options.timestamp || exports.timestamp())
     type: options.type
+    quality_override: options.quality_override
   ]
   opt
 

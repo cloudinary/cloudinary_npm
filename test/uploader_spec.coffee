@@ -600,6 +600,19 @@ describe "uploader", ->
         cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG]
         sinon.assert.calledWith(spy, sinon.match((arg)-> arg.toString().match(/name="invalidate"\s*1/)))
 
+  describe ":quality_override", ->
+    mocked = helper.mockTest()
+    qualityValues = ["auto:advanced", "auto:best", "80:420", "none"]
+    for quality in qualityValues
+      do (quality) ->
+        it "should pass '#{quality}'", ()->
+          cloudinary.v2.uploader.upload IMAGE_FILE, "quality_override": quality
+          sinon.assert.calledWithMatch mocked.write, helper.uploadParamMatcher("quality_override", quality)
+
+    it "should be supported by explicit api", ()->
+      cloudinary.v2.uploader.explicit "cloudinary", "quality_override": "auto:best"
+      sinon.assert.calledWithMatch mocked.write, helper.uploadParamMatcher("quality_override", "auto:best")
+
   it "should create an image upload tag with required properties", () ->
     @timeout helper.TIMEOUT_LONG
     tag = cloudinary.v2.uploader.image_upload_tag "image_id", chunk_size: "1234"
