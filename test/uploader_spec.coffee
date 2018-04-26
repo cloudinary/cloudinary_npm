@@ -403,7 +403,7 @@ describe "uploader", ->
   it "should support requesting raw conversion", (done) ->
     cloudinary.v2.uploader.upload RAW_FILE, raw_convert: "illegal", resource_type: "raw", tags: UPLOAD_TAGS,  (error, result) ->
       expect(error?).to.be true
-      expect(error.message).to.contain "is not a valid"
+      expect(error.message).to.contain "Raw convert is invalid"
       done()
     true
 
