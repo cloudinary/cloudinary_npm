@@ -212,6 +212,7 @@ exports.build_upload_params = (options) ->
   params =
     access_mode: options.access_mode
     allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(",")
+    async: utils.as_safe_bool(options.async)
     backup: utils.as_safe_bool(options.backup)
     callback: options.callback
     colors: utils.as_safe_bool(options.colors)
