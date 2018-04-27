@@ -291,8 +291,11 @@ exports.encode_context = (arg) ->
 
 exports.build_eager = (transformations) ->
   (for transformation in utils.build_array(transformations)
-    transformation = clone(transformation)
-    filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
+    if isString(transformation)
+      transformation
+    else
+      transformation = clone(transformation)
+      filter([utils.generate_transformation_string(transformation), transformation.format], utils.present).join("/")
   ).join("|")
 
 exports.build_custom_headers = (headers) ->

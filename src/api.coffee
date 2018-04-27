@@ -93,6 +93,8 @@ transformation_string = (transformation) ->
 
 delete_resources_params = (options, params = {}) ->
   extend(params, only(options, "keep_original", "invalidate", "next_cursor", "transformations"))
+  params["transformations"] = utils.build_eager(params["transformations"]) if params["transformations"]?
+  params
 
 exports.ping = (callback, options = {}) ->
   call_api("get", ["ping"], {}, callback, options)

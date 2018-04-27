@@ -343,6 +343,36 @@ describe "api", ->
         true
       true
 
+    describe "deleting resources by transformations", ->
+      mocked = mockTest()
+      it "should be supported by delete_resources", ->
+        transformations = "c_crop,w_100"
+        cloudinary.v2.api.delete_resources "api_test", transformations: transformations
+        sinon.assert.calledWith mocked.write, sinon.match(
+          helper.apiParamMatcher('transformations', transformations)
+        )
+
+      it "should be supported by delete_resources_by_prefix", ->
+        transformations = "c_crop,w_100"
+        cloudinary.v2.api.delete_resources_by_prefix "api_test_by", transformations: transformations
+        sinon.assert.calledWith mocked.write, sinon.match(
+          helper.apiParamMatcher('transformations', transformations)
+        )
+
+      it "should be supported by delete_resources_by_tag", ->
+        transformations = "c_crop,w_100"
+        cloudinary.v2.api.delete_resources_by_tag "api_test_tag", transformations: transformations
+        sinon.assert.calledWith mocked.write, sinon.match(
+          helper.apiParamMatcher('transformations', transformations)
+        )
+
+      it "should be supported by delete_all_resources", ->
+        transformations = ["c_crop,w_100", {crop: "scale", width: 107}]
+        cloudinary.v2.api.delete_all_resources transformations: transformations
+        sinon.assert.calledWith mocked.write, sinon.match(
+          helper.apiParamMatcher('transformations', "c_crop,w_100|c_scale,w_107")
+        )
+
     describe "delete_resources_by_prefix", ->
       itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar"
       it "should allow deleting resources by prefix", (done) ->
