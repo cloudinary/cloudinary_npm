@@ -969,6 +969,7 @@ exports.build_explicit_api_params = (public_id, options = {})->
   opt = [
     callback: options.callback
     colors: utils.as_safe_bool(options.colors)
+    context: options.context && utils.encode_context(options.context)
     custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
     eager: utils.build_eager(options.eager)
     eager_async: utils.as_safe_bool(options.eager_async)
