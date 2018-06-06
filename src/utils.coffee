@@ -186,14 +186,13 @@ process_layer = (layer)->
       else
         resource_type = "text"
         type = null
-        # // type is ignored for text layers
+        # type is ignored for text layers
         style = textStyle(layer)
         unless isEmpty(text)
           unless isEmpty(public_id) ^ isEmpty(style)
             throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay"
           re = /\$\([a-zA-Z]\w*\)/g
           start = 0
-  #        textSource = text.replace(new RegExp("[,/]", 'g'), (c)-> "%#{c.charCodeAt(0).toString(16).toUpperCase()}")
           textSource = smart_escape(decodeURIComponent(text), /[,/]/g)
           text = ""
           while res = re.exec(textSource)
@@ -201,8 +200,6 @@ process_layer = (layer)->
             text += res[0]
             start = res.index + res[0].length
           text += encodeURIComponent(textSource.slice(start))
-          # console.log("NADAV = #{text}")
-      # console.log("NADAV = #{text}")
       components.push(resource_type) if resource_type != "image"
       components.push(type) if type != "upload"
       components.push(style)
@@ -217,31 +214,21 @@ process_layer = (layer)->
 
 ###*
 * Returns the Base64-decoded version of url.<br>
-* This method delegates to `btoa` if present. Otherwise it tries `Buffer`.
-* @function Util.base64EncodeURL
-* @param {string} url - the url to encode. the value is URIdecoded and then re-encoded before converting to base64 representation
+* @function utils.base64EncodeURL
+* @param {string} url - the url to encode. the value is decoded and then re-encoded before converting to base64 representation
 * @return {string} the base64 representation of the URL
 ###
-base64EncodeURL = (input)->
+base64EncodeURL = (url)->
   try
-    input = decodeURI(input)
+    url = decodeURI(url)
   catch ignore
 
-  input = encodeURI(input)
-  base64Encode(input)
+  url = encodeURI(url)
+  base64Encode(url)
 
-base64Encode =
-  if typeof btoa != 'undefined' && isFunction(btoa)
-# Browser
-    btoa
-  else if typeof Buffer != 'undefined' && isFunction(Buffer)
-# Node.js
-    (input)->
-      input = new Buffer.from(String(input), 'binary') unless input instanceof Buffer
-      input.toString('base64')
-  else
-    (input)->
-      throw new Error("No base64 encoding function found")
+base64Encode = (input)->
+  input = new Buffer.from(String(input), 'binary') unless input instanceof Buffer
+  input.toString('base64')
 
 exports.build_upload_params = (options) ->
   params =
