@@ -403,7 +403,7 @@ describe "uploader", ->
   it "should support requesting raw conversion", (done) ->
     cloudinary.v2.uploader.upload RAW_FILE, raw_convert: "illegal", resource_type: "raw", tags: UPLOAD_TAGS,  (error, result) ->
       expect(error?).to.be true
-      expect(error.message).to.contain "is not a valid"
+      expect(error.message).to.contain "Raw convert is invalid"
       done()
     true
 
@@ -604,7 +604,12 @@ describe "uploader", ->
     describe ":invalidate", ->
       it "should should pass the invalidate value to the server", ()->
         cloudinary.v2.uploader.explicit "cloudinary", type: "twitter_name", eager: [crop: "scale", width: "2.0"], invalidate: true, tags: [TEST_TAG]
-        sinon.assert.calledWith(spy, sinon.match((arg)-> arg.toString().match(/name="invalidate"\s*1/)))
+        sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('invalidate', 1)))
+    it "should support raw_convert", ->
+      cloudinary.v2.uploader.explicit "cloudinary", raw_convert: "google_speech", tags: [TEST_TAG]
+      sinon.assert.calledWith(spy, sinon.match(
+        helper.uploadParamMatcher('raw_convert', 'google_speech')
+      ))
 
   it "should create an image upload tag with required properties", () ->
     @timeout helper.TIMEOUT_LONG

@@ -967,27 +967,7 @@ build_custom_headers = (headers)->
   ).join("\n")
 
 exports.build_explicit_api_params = (public_id, options = {})->
-  opt = [
-    callback: options.callback
-    colors: utils.as_safe_bool(options.colors)
-    custom_coordinates: options.custom_coordinates && utils.encode_double_array(options.custom_coordinates)
-    eager: utils.build_eager(options.eager)
-    eager_async: utils.as_safe_bool(options.eager_async)
-    eager_notification_url: options.eager_notification_url
-    face_coordinates: options.face_coordinates && utils.encode_double_array(options.face_coordinates)
-    faces: utils.as_safe_bool(options.faces)
-    headers: build_custom_headers(options.headers)
-    image_metadata: utils.as_safe_bool(options.image_metadata)
-    invalidate: utils.as_safe_bool(options.invalidate)
-    moderation: options.moderation
-    phash: utils.as_safe_bool(options.phash)
-    public_id: public_id
-    responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints)
-    tags: options.tags && utils.build_array(options.tags).join(",")
-    timestamp: (options.timestamp || exports.timestamp())
-    type: options.type
-  ]
-  opt
+  [exports.build_upload_params(extend({}, {public_id}, options))]
 
 exports.generate_responsive_breakpoints_string = (breakpoints)->
   return unless breakpoints?
