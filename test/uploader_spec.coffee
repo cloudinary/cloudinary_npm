@@ -585,6 +585,12 @@ describe "uploader", ->
           done()
         true
 
+  describe "async upload", ->
+    mocked = helper.mockTest()
+    it "should pass `async` value to the server", ->
+      cloudinary.v2.uploader.upload IMAGE_FILE, {async: true, transformation: {effect: "sepia"}}
+      sinon.assert.calledWith mocked.write, sinon.match(helper.uploadParamMatcher("async", 1))
+
   describe "explicit", ->
     spy = undefined
     xhr = undefined
