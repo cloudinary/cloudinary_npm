@@ -143,10 +143,14 @@ normalize_expression = (expression) ->
   return expression if !isString(expression) || expression.length == 0 || expression.match(/^!.+!$/)
 
   operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*"
-  pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")"
+  variable_pattern = "\\$\\w*"
+  pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + "|" + variable_pattern + ")"
   replaceRE = new RegExp(pattern, "g")
   expression = expression.replace replaceRE, (match)->
-    CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match]
+    if match.startsWith "$"
+      match
+    else 
+      CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match]
   expression.replace(/[ _]+/g, '_')
 
 process_if = (ifValue)->
