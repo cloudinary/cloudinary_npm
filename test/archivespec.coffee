@@ -96,7 +96,7 @@ describe "utils", ->
             done(new Error "#{res.statusCode}: #{res.headers['x-cld-error']}")
           res.on 'end', ->
             file.on 'close', ->
-              list = execSync("unzip -l #{filename}")
+              list = execSync("unzip -l -qq #{filename}")
               list = list.toString().split('\n').slice(3, -3)
               list = (last(i.split(/[ ]+/)) for i in list) # keep only filenames
               expect(list.length).to.eql(2)
@@ -149,18 +149,11 @@ describe "uploader", ->
       expect(archive_result).to.have.keys(expected_keys)
   describe '.create_zip', ->
     @timeout helper.TIMEOUT_LONG
-    spy1 = undefined
-    spy2 = undefined
-    xhr = undefined
-    before ->
-      spy1 = sinon.spy cloudinary.uploader, "create_archive"
-      spy2 = sinon.spy ClientRequest.prototype, 'write'
-      xhr = sinon.useFakeXMLHttpRequest()
-    after ->
-      spy1.restore()
-      spy2.restore()
-      xhr.restore()
+    mocked = helper.mockTest()
     it 'should call create_archive with "zip" format and ignore missing resources', ->
       uploader.create_zip({tags: TEST_TAG, public_ids: [publicIdRaw, "non-existing-resource"], resource_type: "raw", allow_missing: true})
-      expect(spy1.calledWith(null, {tags: TEST_TAG, public_ids: [publicIdRaw, "non-existing-resource"], resource_type: "raw", allow_missing: true}, "zip")).to.be.ok()
-      sinon.assert.calledWith(spy2, sinon.match((arg)-> arg.toString().match(/name="allow_missing"\s*1/)))
+      sinon.assert.calledWith mocked.write, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG))
+      sinon.assert.calledWith mocked.write, sinon.match(helper.uploadParamMatcher("public_ids[]", publicIdRaw))
+      sinon.assert.calledWith mocked.write, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource"))
+      sinon.assert.calledWith mocked.write, sinon.match(helper.uploadParamMatcher("allow_missing", 1))
+      sinon.assert.calledWith mocked.write, sinon.match(helper.uploadParamMatcher("target_format", "zip"))

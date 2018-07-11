@@ -562,7 +562,7 @@ describe "uploader", ->
       options.access_control = [acl]
       uploadImage(options).then (resource)=>
         sinon.assert.calledWith(writeSpy, sinon.match(
-          helper.uploadParamMatcher('access_control', helper.escapeRegexp("[#{acl_string}]"))
+          helper.uploadParamMatcher('access_control', "[#{acl_string}]")
         ))
         expect(resource).to.have.key('access_control')
         response_acl = resource["access_control"]

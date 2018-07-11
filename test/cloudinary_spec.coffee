@@ -285,7 +285,7 @@ describe "cloudinary", ->
       expect(result).to.eql "http://res.cloudinary.com/test123/image/upload/h_100,#{layers[layer]}_text:hello,w_100/test"
 
   it "should correctly sign api requests", ->
-    expect(cloudinary.utils.api_sign_request({hello: null, goodbye: 12, world: "problem"}, "1234")).to.eql "f05cfe85cee78e7e997b3c7da47ba212dcbf1ea5"
+    expect(cloudinary.utils.api_sign_request({hello: null, goodbye: 12, world: "problem", undef: undefined }, "1234")).to.eql "f05cfe85cee78e7e997b3c7da47ba212dcbf1ea5"
 
   it "should correctly build signed preloaded image", ->
     expect(cloudinary.utils.signed_preloaded_image(

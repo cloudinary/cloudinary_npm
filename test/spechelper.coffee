@@ -113,10 +113,9 @@ exports.includeContext = (name, args...)->
 ###
 exports.uploadParamMatcher = (name, value)->
   (arg)->
-    EncodeFieldPart = (name, value) ->
     return_part = 'Content-Disposition: form-data; name="' + name+ '"\r\n\r\n'
-    return_part += value
-    new RegExp(return_part).test(arg)
+    return_part += String(value)
+    arg.indexOf(return_part) + 1
 
 ###*
   Create a matcher method for api parameters
