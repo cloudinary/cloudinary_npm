@@ -67,7 +67,7 @@ exports.upload = function upload(file, callback) {
 
   return call_api("upload", callback, options, function () {
     var params = build_upload_params(options);
-    if (file != null && file.match(/^ftp:|^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)) {
+    if (file != null && file.match(/^ftp:|^https?:|^gs:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)) {
       return [params, { file: file }];
     } else {
       return [params, {}, file];
