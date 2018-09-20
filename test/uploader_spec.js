@@ -77,6 +77,35 @@ describe("uploader", function() {
       expect(result.signature).to.eql(expected_signature);
     });
   });
+  describe("remote urls ", function() {
+    var writeSpy;
+    writeSpy = void 0;
+    beforeEach(function() {
+      return writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+    });
+    afterEach(function() {
+      return writeSpy.restore();
+    });
+    it("should send s3:// URLs to server", function() {
+      cloudinary.v2.uploader.upload("s3://test/1.jpg", {
+        tags: UPLOAD_TAGS
+      });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('file', "s3://test/1.jpg")));
+    });
+    it("should send gs:// URLs to server", function() {
+      cloudinary.v2.uploader.upload("gs://test/1.jpg", {
+        tags: UPLOAD_TAGS
+      });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('file', "gs://test/1.jpg")));
+    });
+    it("should send ftp:// URLs to server", function() {
+      cloudinary.v2.uploader.upload("ftp://example.com/1.jpg", {
+        tags: UPLOAD_TAGS
+      });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('file', "ftp://example.com/1.jpg")));
+    });
+  });
+
   describe("rename", function() {
     this.timeout(helper.TIMEOUT_LONG);
     it("should successfully rename a file", function() {
