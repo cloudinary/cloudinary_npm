@@ -13,8 +13,8 @@ The basic sample uploads local and remote image to Cloudinary and generates URLs
 ## Photo Album sample
 
 Simple application for uploading images and displaying them in a list.  
-This sample uses [jugglingdb orm](https://github.com/1602/jugglingdb)
-see [schema.js](config/schema.js) for adapter configuration.
+This sample uses [jugglingdb orm](https://github.com/1602/jugglingdb). 
+See [schema.js](photo_album/config/schema.js) for adapter configuration.
 
 ### Setting up
 1. Before running the sample, copy the Environment variable configuration parameters from Cloudinary's [Management Console](https://cloudinary.com/console) of your account into `.env` file of the project or export it (i.e. export CLOUDINARY_URL=xxx).
@@ -28,4 +28,4 @@ see [schema.js](config/schema.js) for adapter configuration.
 
 * [Node integration documentation](http://cloudinary.com/documentation/node_integration)
 * [Image transformations documentation](http://cloudinary.com/documentation/node_image_manipulation)
-* [Node Image Upload] (http://cloudinary.com/documentation/node_image_upload)
+* [Node Image Upload](http://cloudinary.com/documentation/node_image_upload)
