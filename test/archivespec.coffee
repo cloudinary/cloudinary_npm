@@ -96,8 +96,8 @@ describe "utils", ->
             done(new Error "#{res.statusCode}: #{res.headers['x-cld-error']}")
           res.on 'end', ->
             file.on 'close', ->
-              list = execSync("unzip -l #{filename}")
-              list = list.toString().split('\n').slice(3, -3)
+              list = execSync("unzip -ql #{filename}")
+              list = list.toString().split('\n').slice(2, -3)
               list = (last(i.split(/[ ]+/)) for i in list) # keep only filenames
               expect(list.length).to.eql(2)
               expect(list).to.contain(publicId1 + ".jpg")
