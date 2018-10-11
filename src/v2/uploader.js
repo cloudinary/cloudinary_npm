@@ -1,7 +1,10 @@
-uploader = require('../uploader')
-utils = require('../utils')
+var uploader, utils;
 
-utils.v1_adapters exports, uploader, 
+uploader = require('../uploader');
+
+utils = require('../utils');
+
+utils.v1_adapters(exports, uploader, {
   unsigned_upload_stream: 1,
   upload_stream: 0,
   unsigned_upload: 2,
@@ -25,9 +28,14 @@ utils.v1_adapters exports, uploader,
   replace_tag: 2,
   create_archive: 0,
   create_zip: 0
+});
 
-exports.direct_upload = uploader.direct_upload
-exports.upload_tag_params = uploader.upload_tag_params
-exports.upload_url = uploader.upload_url
-exports.image_upload_tag = uploader.image_upload_tag
-exports.unsigned_image_upload_tag = uploader.unsigned_image_upload_tag
+exports.direct_upload = uploader.direct_upload;
+
+exports.upload_tag_params = uploader.upload_tag_params;
+
+exports.upload_url = uploader.upload_url;
+
+exports.image_upload_tag = uploader.image_upload_tag;
+
+exports.unsigned_image_upload_tag = uploader.unsigned_image_upload_tag;

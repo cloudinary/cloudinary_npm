@@ -501,5 +501,3 @@ exports.update_resources_access_mode_by_tag = function(access_mode, tag, callbac
 exports.update_resources_access_mode_by_ids = function(access_mode, ids, callback, options = {}) {
   return update_resources_access_mode(access_mode, "public_ids[]", ids, callback, options);
 };
-
-//# sourceMappingURL=api.js.map

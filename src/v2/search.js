@@ -97,5 +97,3 @@ Search = class Search {
 };
 
 module.exports = Search;
-
-//# sourceMappingURL=search.js.map

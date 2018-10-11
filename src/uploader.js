@@ -572,5 +572,3 @@ exports.unsigned_image_upload_tag = function(field, upload_preset, options = {})
     upload_preset: upload_preset
   }));
 };
-
-//# sourceMappingURL=uploader.js.map

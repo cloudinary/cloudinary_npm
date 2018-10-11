@@ -4,6 +4,5 @@ bower_components/
 .DS_Store
 .env
 bin
-lib/*spec.*
-*.js
 *.map
+!lib

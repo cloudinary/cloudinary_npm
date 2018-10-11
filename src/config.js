@@ -79,5 +79,3 @@ module.exports = function(new_config, new_value) {
   }
   return cloudinary_config;
 };
-
-//# sourceMappingURL=config.js.map

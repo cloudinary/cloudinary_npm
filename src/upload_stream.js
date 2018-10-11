@@ -25,5 +25,3 @@ UploadStream.prototype._flush = function(next) {
 };
 
 module.exports = UploadStream;
-
-//# sourceMappingURL=upload_stream.js.map

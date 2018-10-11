@@ -68,5 +68,3 @@ PreloadedFile = class PreloadedFile {
 };
 
 module.exports = PreloadedFile;
-
-//# sourceMappingURL=preloaded_file.js.map

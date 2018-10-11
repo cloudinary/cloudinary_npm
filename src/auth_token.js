@@ -74,5 +74,3 @@ module.exports = function(options) {
   tokenParts.push(`hmac=${auth}`);
   return `${tokenName}=${tokenParts.join('~')}`;
 };
-
-//# sourceMappingURL=auth_token.js.map
