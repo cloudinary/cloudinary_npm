@@ -15,6 +15,9 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
     "coffee-script": "^1.12.7",
     "dotenv": "4.x",
     "expect.js": "0.3.x",
@@ -24,6 +27,8 @@
     "sinon": "^4.2.1"
   },
   "scripts": {
+    "compile": "node_modules/.bin/babel src --out-dir lib --delete-dir-on-start",
+    "pretest": "npm run compile",
     "test": "node_modules/.bin/mocha -R spec --recursive test/"
   },
   "optionalDependencies": {},
