@@ -1,4 +1,5 @@
 expect = require('expect.js')
+cloudinary = require("../cloudinary")
 utils = require("../lib/utils")
 {
   isEmpty 
@@ -204,3 +205,10 @@ exports.mockPromise = (mockBlock)->
     writeSpy.restore()
     xhr.restore()
   ).done()
+
+###*
+  Upload an image to be tested on.
+  @callback the callback receives the public_id of the uploaded image
+###
+exports.uploadImage = (options)->
+  cloudinary.v2.uploader.upload(exports.IMAGE_FILE, options)

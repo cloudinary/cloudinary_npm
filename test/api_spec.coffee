@@ -24,6 +24,7 @@ TEST_TAG        = helper.TEST_TAG
 IMAGE_FILE      = helper.IMAGE_FILE
 IMAGE_URL       = helper.IMAGE_URL
 UPLOAD_TAGS     = helper.UPLOAD_TAGS
+uploadImage    = helper.uploadImage
 
 SUFFIX = helper.SUFFIX
 PUBLIC_ID_PREFIX = "npm_api_test"
@@ -92,13 +93,14 @@ sharedExamples "accepts next_cursor", (testFunc, args...)->
 
 getAllTags = (arr) ->
   arr.resources.map((e) -> e.tags).reduce(((a, b) -> a.concat(b)), [])
+
 describe "api", ->
   before "Verify Configuration", ->
     config = cloudinary.config(true)
     if(!(config.api_key && config.api_secret))
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
-  before (done) ->
+  before ()->
     @timeout helper.TIMEOUT_LONG
 
     Q.allSettled [
@@ -107,148 +109,116 @@ describe "api", ->
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_5, tags: UPLOAD_TAGS, context: "#{contextKey}=test", eager: [EXPLICIT_TRANSFORMATION])
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_6, tags: UPLOAD_TAGS, context: "#{contextKey}=alt-test", eager: [EXPLICIT_TRANSFORMATION])]
     .finally ->
-      done()
-    true
-  after (done)->
+
+  after ()->
     @timeout helper.TIMEOUT_LONG
     if cloudinary.config().keep_test_products
-      done()
+      Promise.resolve()
     else
       config = cloudinary.config()
       if(!(config.api_key && config.api_secret))
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
 
       Q.allSettled [
-        cloudinary.v2.api.delete_resources_by_tag TEST_TAG
+        cloudinary.v2.api.delete_resources_by_tag(TEST_TAG)
         cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)]
       .finally ->
-          done()
-      true
 
   find_by_attr = (elements, attr, value) ->
     for element in elements
       return element if element[attr] == value
     undefined
 
-  ###*
-  # Upload an image to be tested on.
-  # @callback the callback recieves the public_id of the uploaded image
-  ###
-  upload_image = (callback)->
-    cloudinary.v2.uploader.upload IMAGE_FILE, (error, result) ->
-      expect(error).to.be undefined
-      expect(result).to.be.an(Object)
-      callback(result)
-    true
-
   contextKey = "test-key#{helper.SUFFIX}"
 
   describe "resources", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources
-    it "should allow listing resource_types", (done) ->
+    it "should allow listing resource_types", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resource_types (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.resource_types()
+      .then (result)->
         expect(result.resource_types).to.contain("image")
-        done()
-      true
 
-    it "should allow listing resources", (done) ->
+    it "should allow listing resources", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, tags: UPLOAD_TAGS, (error, result)->
-        done(new Error error.message) if error?
+      publicId = ''
+      cloudinary.v2.uploader.upload(IMAGE_FILE, tags: UPLOAD_TAGS)
+      .then (result)->
+        publicId = result.public_id
+        cloudinary.v2.api.resources()
+      .then (result)->
+        resource = find_by_attr(result.resources, "public_id", publicId)
+        expect(resource).not.to.eql(undefined)
+        expect(resource.type).to.eql("upload")
+
+    it "should allow listing resources by type", ()->
+      @timeout helper.TIMEOUT_MEDIUM
+      cloudinary.v2.uploader.upload(IMAGE_FILE, tags: UPLOAD_TAGS)
+      .then (result)->
         public_id = result.public_id
-        cloudinary.v2.api.resources (error, result) ->
-          return done(new Error error.message) if error?
-          resource = find_by_attr(result.resources, "public_id", public_id)
-          expect(resource).not.to.eql(undefined)
-          expect(resource.type).to.eql("upload")
-          done()
-        true
-      true
+        cloudinary.v2.api.resources(type: "upload")
+        .then (result)-> [public_id, result]
+      .then ([public_id, result])->
+        resource = find_by_attr(result.resources, "public_id", public_id)
+        expect(resource).to.be.an(Object)
+        expect(resource.type).to.eql("upload")
 
-    it "should allow listing resources by type", (done) ->
+    it "should allow listing resources by prefix", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, tags: UPLOAD_TAGS, (error, result)->
-        return done(new Error error.message) if error?
-        public_id = result.public_id
-        cloudinary.v2.api.resources type: "upload", (error, result) ->
-          return done(new Error error.message) if error?
-          resource = find_by_attr(result.resources, "public_id", public_id)
-          expect(resource).to.be.an(Object)
-          expect(resource.type).to.eql("upload")
-          done()
-        true
-      true
-
-    it "should allow listing resources by prefix", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources type: "upload", prefix: PUBLIC_ID_PREFIX, max_results: 500, (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.resources(type: "upload", prefix: PUBLIC_ID_PREFIX, max_results: 500)
+      .then (result) ->
         public_ids = (resource.public_id for resource in result.resources)
         expect(public_ids).to.contain(PUBLIC_ID)
         expect(public_ids).to.contain(PUBLIC_ID_2)
-        done()
-      true
 
     itBehavesLike "a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG
-    it "should allow listing resources by tag", (done) ->
+    it "should allow listing resources by tag", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources_by_tag TEST_TAG, context: true, tags: true, max_results: 500, (error, result) ->
-        return done(new Error error.message) if error?
-        expect(result.resources.map((e) -> e.public_id)).to.contain(PUBLIC_ID)
+      cloudinary.v2.api.resources_by_tag(TEST_TAG, context: true, tags: true, max_results: 500)
+      .then (result)->
+        expect(result.resources.map((e)-> e.public_id)).to.contain(PUBLIC_ID)
                                                         .and.contain(PUBLIC_ID_2)
         expect(getAllTags(result)).to.contain(TEST_TAG)
-        expect(result.resources.map((e) -> if e.context? then e.context.custom.key else null)).to.contain("value")
-        done()
-      true
+        expect(result.resources.map((e)-> if e.context? then e.context.custom.key else null)).to.contain("value")
 
 
-    it "should allow listing resources by context only", (done) ->
+    it "should allow listing resources by context only", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources_by_context contextKey,null, (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.resources_by_context( contextKey,null)
+      .then (result) ->
         expect(result.resources).to.have.length(2)
-        done()
-      true
 
-    it "should allow listing resources by context key and value", (done) ->
+    it "should allow listing resources by context key and value", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources_by_context contextKey,"test", (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.resources_by_context(contextKey,"test")
+      .then (result)->
         expect(result.resources).to.have.length(1)
-        done()
-      true
 
-    it "should allow listing resources by public ids", (done) ->
+    it "should allow listing resources by public ids", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.resources_by_ids [PUBLIC_ID, PUBLIC_ID_2], context: true, tags: true, (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.resources_by_ids([PUBLIC_ID, PUBLIC_ID_2], context: true, tags: true)
+      .then (result)->
         resource = find_by_attr(result.resources, "public_id", PUBLIC_ID)
         expect(result.resources.map((e) -> e.public_id).sort()).to.eql([PUBLIC_ID,PUBLIC_ID_2])
         expect(getAllTags(result)).to.contain(TEST_TAG)
         expect(result.resources.map((e) -> e.context.custom.key)).to.contain("value")
-        done()
-      true
 
-    it "should allow listing resources specifying direction", (done) ->
+    it "should allow listing resources specifying direction", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.resources_by_tag TEST_TAG, type: "upload", max_results: 500, direction: "asc", (error, result) =>
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.resources_by_tag(TEST_TAG, type: "upload", max_results: 500, direction: "asc")
+      .then (result)=>
         asc = (resource.public_id for resource in result.resources)
-        cloudinary.v2.api.resources_by_tag TEST_TAG, type: "upload", max_results: 500, direction: "desc", (error, result) ->
-          return done(new Error error.message) if error?
-          desc = (resource.public_id for resource in result.resources)
-          expect(asc.reverse()).to.eql(desc)
-          done()
-        true
-      true
+        cloudinary.v2.api.resources_by_tag(TEST_TAG, type: "upload", max_results: 500, direction: "desc")
+        .then (result)-> [asc, result]
+      .then ([asc, result])->
+        desc = (resource.public_id for resource in result.resources)
+        expect(asc.reverse()).to.eql(desc)
 
-    it "should allow listing resources by start_at", (done) ->
+    it "should allow listing resources by start_at", () ->
       xhr = sinon.useFakeXMLHttpRequest()
       writeSpy = sinon.spy(ClientRequest.prototype, 'write')
       requestSpy = sinon.spy(http, 'request')
@@ -259,336 +229,297 @@ describe "api", ->
           sinon.assert.calledWith writeSpy, sinon.match(/stazdfasrt_at=10/)
         else
           formatted = encodeURIComponent(start_at.slice(0,start_at.search("\\("))) # cut the date string before the '('
-        done()
-      .fail (error)->
-        done(error)
       .finally ->
         writeSpy.restore()
         requestSpy.restore()
         xhr.restore()
-      true
 
 
-    it "should allow get resource metadata", (done) ->
+    it "should allow get resource metadata", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.uploader.upload IMAGE_FILE, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION], (error, result)->
-        done(new Error error.message) if error?
-        public_id = result.public_id
-        cloudinary.v2.api.resource public_id, (error, resource) ->
-          done(new Error error.message) if error?
-          expect(resource).not.to.eql(undefined)
-          expect(resource.public_id).to.eql(public_id)
-          expect(resource.bytes).to.eql(3381)
-          expect(resource.derived).to.have.length(1)
-          done()
-        true
-      true
+      cloudinary.v2.uploader.upload(IMAGE_FILE, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION])
+      .then (result)->
+        cloudinary.v2.api.resource(result.public_id)
+        .then (resource)-> [result.public_id, resource]
+      .then ([public_id, resource])->
+        expect(resource).not.to.eql(undefined)
+        expect(resource.public_id).to.eql(public_id)
+        expect(resource.bytes).to.eql(3381)
+        expect(resource.derived).to.have.length(1)
 
   describe "delete", ()->
-    it "should allow deleting derived resource", (done) ->
+    it "should allow deleting derived resource", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, tags: UPLOAD_TAGS, eager: [width: 101, crop: "scale"], (error, r) ->
-        return done(new Error error.message) if error?
-        public_id = r.public_id
-        cloudinary.v2.api.resource public_id, (error, resource) ->
-          return done(new Error error.message) if error?
-          expect(resource).not.to.eql(undefined)
-          expect(resource.bytes).to.eql(3381)
-          expect(resource.derived).to.have.length(1)
-          derived_resource_id = resource.derived[0].id
-          cloudinary.v2.api.delete_derived_resources derived_resource_id, (error, r) ->
-            return done(new Error error.message) if error?
-            cloudinary.v2.api.resource public_id, (error, resource) ->
-              return done(new Error error.message) if error?
-              expect(resource).not.to.eql(undefined)
-              expect(resource.derived).to.have.length(0)
-              done()
-            true
-          true
-        true
-      true
+      cloudinary.v2.uploader.upload(IMAGE_FILE, tags: UPLOAD_TAGS, eager: [width: 101, crop: "scale"])
+      .then (r)->
+        cloudinary.v2.api.resource(r.public_id)
+        .then (resource)-> [r.public_id, resource]
+      .then ([public_id, resource])->
+        expect(resource).not.to.eql(undefined)
+        expect(resource.bytes).to.eql(3381)
+        expect(resource.derived).to.have.length(1)
+        derived_resource_id = resource.derived[0].id
+        cloudinary.v2.api.delete_derived_resources(derived_resource_id)
+        .then ()-> public_id
+      .then (public_id)->
+        cloudinary.v2.api.resource(public_id)
+      .then (resource)->
+        expect(resource).not.to.eql(undefined)
+        expect(resource.derived).to.have.length(0)
 
-    it "should allow deleting derived resources by transformations", (done) ->
+    it "should allow deleting derived resources by transformations", ()->
       @timeout helper.TIMEOUT_LONG
       Q.all([
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_1, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION]),
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_2, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION2]),
         cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_3, tags: UPLOAD_TAGS, eager: [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2])
-      ]).then((results)->
-        cloudinary.v2.api.delete_derived_by_transformation [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2], (error, result)->
-          cloudinary.v2.api.resource PUBLIC_ID_1, (error, result) ->
-            expect(result.derived.length).to.eql(0)
-          cloudinary.v2.api.resource PUBLIC_ID_2, (error, result) ->
-            expect(find(result.derived, (d) -> d.transformation is EXPLICIT_TRANSFORMATION_NAME2)).to.not.be.empty()
-          cloudinary.v2.api.resource PUBLIC_ID_3, (error, result) ->
-            expect(result.derived.length).to.eql(0)
-            done()
-      )
-      true
-  
-    it "should allow deleting resources", (done) ->
+      ]).then (results)->
+        cloudinary.v2.api.delete_derived_by_transformation([PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2])
+      .then (result)->
+        cloudinary.v2.api.resource(PUBLIC_ID_1)
+      .then (result)->
+        expect(result.derived.length).to.eql(0)
+        cloudinary.v2.api.resource(PUBLIC_ID_2)
+      .then (result)->
+        expect(find(result.derived, (d) -> d.transformation is EXPLICIT_TRANSFORMATION_NAME2)).to.not.be.empty()
+        cloudinary.v2.api.resource(PUBLIC_ID_3)
+      .then (result)->
+        expect(result.derived.length).to.eql(0)
+
+    it "should allow deleting resources", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: PUBLIC_ID_3, tags: UPLOAD_TAGS, (error, r) ->
-        return done(new Error error.message) if error?
-        cloudinary.v2.api.resource PUBLIC_ID_3, (error, resource) ->
-          expect(resource).not.to.eql(undefined)
-          cloudinary.v2.api.delete_resources ["apit_test", PUBLIC_ID_2, PUBLIC_ID_3], (error, result) ->
-            return done(new Error error.message) if error?
-            cloudinary.v2.api.resource PUBLIC_ID_3, (error, result) ->
-              expect(error).to.be.an(Object)
-              expect(error.http_code).to.eql 404
-              done()
-            true
-          true
-        true
-      true
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_3, tags: UPLOAD_TAGS)
+      .then (r)->
+        cloudinary.v2.api.resource(PUBLIC_ID_3)
+      .then (resource)->
+        expect(resource).not.to.eql(undefined)
+        cloudinary.v2.api.delete_resources(["apit_test", PUBLIC_ID_2, PUBLIC_ID_3])
+      .then (result)->
+        cloudinary.v2.api.resource(PUBLIC_ID_3)
+      .then ()-> expect().fail()
+      .catch ({error})->
+        expect(error).to.be.an(Object)
+        expect(error.http_code).to.eql 404
 
     describe "delete_resources_by_prefix", ->
       itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar"
-      it "should allow deleting resources by prefix", (done) ->
+      it "should allow deleting resources by prefix", () ->
         @timeout helper.TIMEOUT_MEDIUM
-        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_by_prefix", tags: UPLOAD_TAGS, (error, r) ->
-          return done(new Error error.message) if error?
-          cloudinary.v2.api.resource "api_test_by_prefix", (error, resource) ->
-            expect(resource).not.to.eql(undefined)
-            cloudinary.v2.api.delete_resources_by_prefix "api_test_by", () ->
-              cloudinary.v2.api.resource "api_test_by_prefix", (error, result) ->
-                expect(error).to.be.an(Object)
-                expect(error.http_code).to.eql 404
-                done()
-              true
-            true
-          true
-        true
+        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: "api_test_by_prefix", tags: UPLOAD_TAGS)
+        .then (r)->
+          cloudinary.v2.api.resource("api_test_by_prefix")
+        .then (resource)->
+          expect(resource).not.to.eql(undefined)
+          cloudinary.v2.api.delete_resources_by_prefix("api_test_by")
+        .then () ->
+          cloudinary.v2.api.resource("api_test_by_prefix")
+        .then ()-> expect().fail()
+        .catch ({error})->
+          expect(error).to.be.an(Object)
+          expect(error.http_code).to.eql 404
 
 
     describe "delete_resources_by_tag", ->
       deleteTestTag = TEST_TAG + "_delete"
       itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag
-      it "should allow deleting resources by tags", (done) ->
+      it "should allow deleting resources by tags", () ->
         @timeout helper.TIMEOUT_MEDIUM
-        cloudinary.v2.uploader.upload IMAGE_FILE, public_id: PUBLIC_ID_4, tags: UPLOAD_TAGS.concat([deleteTestTag]) , (error, result) ->
-          return done(new Error error.message) if error?
-          cloudinary.v2.api.resource PUBLIC_ID_4, (error, resource) ->
-            expect(resource).to.be.ok()
-            cloudinary.v2.api.delete_resources_by_tag deleteTestTag, (error, result) ->
-              return done(new Error error.message) if error?
-              cloudinary.v2.api.resource PUBLIC_ID_4, (error, result) ->
-                expect(error).to.be.an(Object)
-                expect(error.http_code).to.eql 404
-                done()
-              true
-            true
-          true
-        true
+        cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: PUBLIC_ID_4, tags: UPLOAD_TAGS.concat([deleteTestTag]) )
+        .then (result)->
+          cloudinary.v2.api.resource(PUBLIC_ID_4)
+        .then (resource)->
+          expect(resource).to.be.ok()
+          cloudinary.v2.api.delete_resources_by_tag(deleteTestTag)
+        .then (result)->
+          cloudinary.v2.api.resource(PUBLIC_ID_4)
+        .then ()-> expect().fail()
+        .catch ({error})->
+          expect(error).to.be.an(Object)
+          expect(error.http_code).to.eql 404
 
   describe "tags", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.tags
-    it "should allow listing tags", (done) ->
+    it "should allow listing tags", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags max_results: 500, (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.tags(max_results: 500)
+      .then (result)->
         expect(result.tags).to.contain(TEST_TAG)
-        done()
-      true
 
-    it "should allow listing tag by prefix ", (done) =>
+    it "should allow listing tag by prefix ", () =>
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags prefix: TEST_TAG[0..-2], max_results: 500, (error, result) =>
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.tags(prefix: TEST_TAG[0..-2], max_results: 500)
+      .then (result)=>
         expect(result.tags).to.contain(TEST_TAG)
-        done()
-      true
 
-    it "should allow listing tag by prefix if not found", (done) ->
+    it "should allow listing tag by prefix if not found", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.tags prefix: "api_test_no_such_tag", (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.tags(prefix: "api_test_no_such_tag")
+      .then (result)->
         expect(result.tags).to.be.empty()
-        done()
-      true
 
   describe "transformations", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME
     itBehavesLike "a list with a cursor", cloudinary.v2.api.transformations
 
-    it "should allow listing transformations", (done) ->
+    it "should allow listing transformations", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformations (error, result) ->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.transformations()
+      .then (result)->
         transformation = find_by_attr(result.transformations, "name", EXPLICIT_TRANSFORMATION_NAME)
         expect(result.next_cursor).not.to.be.empty()
         expect(transformation).not.to.eql(undefined)
-        expect(transformation.used).to.be.ok
+        expect(transformation.used).to.be.ok()
         previous_cursor = result.next_cursor
-        cloudinary.v2.api.transformations next_cursor: result.next_cursor, (error, result) ->
-          expect(result).not.to.be.empty()
-          expect(result.next_cursor).not.to.eql(previous_cursor)
-          done()
-      true
+        cloudinary.v2.api.transformations(next_cursor: result.next_cursor)
+        .then (result)-> [previous_cursor, result]
+      .then ([previous_cursor, result])->
+        expect(result).not.to.be.empty()
+        expect(result.next_cursor).not.to.eql(previous_cursor)
 
-    it "should allow getting transformation metadata", (done) ->
+    it "should allow getting transformation metadata", () ->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
+      cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      .then (transformation)->
         expect(transformation).not.to.eql(undefined)
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION])
-        done()
-      true
 
-    it "should allow getting transformation metadata by info", (done) ->
+    it "should allow getting transformation metadata by info", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION, (error, transformation) ->
+      cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION)
+      .then (transformation)->
         expect(transformation).not.to.eql(undefined)
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION])
-        done()
-      true
 
-    it "should allow updating transformation allowed_for_strict", (done) ->
+    it "should allow updating transformation allowed_for_strict", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.update_transformation EXPLICIT_TRANSFORMATION_NAME, {allowed_for_strict: true}, () ->
-        cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
-          expect(transformation).not.to.eql(undefined)
-          expect(transformation.allowed_for_strict).to.be.ok
-          cloudinary.v2.api.update_transformation EXPLICIT_TRANSFORMATION_NAME, {allowed_for_strict: false}, () ->
-            cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
-              expect(transformation).not.to.eql(undefined)
-              expect(transformation.allowed_for_strict).not.to.be.ok
-              done()
-            true
-          true
-        true
-      true
+      cloudinary.v2.api.update_transformation(EXPLICIT_TRANSFORMATION_NAME, {allowed_for_strict: true})
+      .then ()->
+        cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      .then (transformation)->
+        expect(transformation).not.to.eql(undefined)
+        expect(transformation.allowed_for_strict).to.be.ok()
+        cloudinary.v2.api.update_transformation(EXPLICIT_TRANSFORMATION_NAME, {allowed_for_strict: false})
+      .then ()->
+        cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      .then (transformation)->
+        expect(transformation).not.to.eql(undefined)
+        expect(transformation.allowed_for_strict).not.to.be.ok()
 
-    it "should allow creating named transformation", (done) ->
+    it "should allow creating named transformation", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_transformation NAMED_TRANSFORMATION, {crop: "scale", width: 102}, () ->
-        cloudinary.v2.api.transformation NAMED_TRANSFORMATION, (error, transformation) ->
-          expect(transformation).not.to.eql(undefined)
-          expect(transformation.allowed_for_strict).to.be.ok
-          expect(transformation.info).to.eql([crop: "scale", width: 102])
-          expect(transformation.used).not.to.be.ok
-          done()
-        true
-      true
+      cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION, {crop: "scale", width: 102})
+      .then () ->
+        cloudinary.v2.api.transformation(NAMED_TRANSFORMATION)
+      .then (transformation)->
+        expect(transformation).not.to.eql(undefined)
+        expect(transformation.allowed_for_strict).to.be.ok()
+        expect(transformation.info).to.eql([crop: "scale", width: 102])
+        expect(transformation.used).not.to.be.ok()
 
-    it "should allow unsafe update of named transformation", (done) ->
+    it "should allow unsafe update of named transformation", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_transformation "api_test_transformation3", {crop: "scale", width: 102}, () ->
-        cloudinary.v2.api.update_transformation "api_test_transformation3", {unsafe_update: {crop: "scale", width: 103}}, () ->
-          cloudinary.v2.api.transformation "api_test_transformation3", (error, transformation) ->
-            expect(transformation).not.to.eql(undefined)
-            expect(transformation.info).to.eql([crop: "scale", width: 103])
-            expect(transformation.used).not.to.be.ok
-            done()
-          true
-        true
-      true
+      transformationName = "api_test_transformation3" + SUFFIX
+      cloudinary.v2.api.create_transformation(transformationName, {crop: "scale", width: 102})
+      .then (result) ->
+        cloudinary.v2.api.update_transformation(transformationName, {unsafe_update: {crop: "scale", width: 103}})
+      .then (result) ->
+        cloudinary.v2.api.transformation(transformationName)
+      .then (transformation)->
+        expect(transformation).not.to.eql(undefined)
+        expect(transformation.info).to.eql([crop: "scale", width: 103])
+        expect(transformation.used).not.to.be.ok()
 
-    it "should allow deleting named transformation", (done) ->
+    it "should allow deleting named transformation", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.delete_transformation NAMED_TRANSFORMATION, () ->
-        cloudinary.v2.api.transformation NAMED_TRANSFORMATION, (error, transformation) ->
-          expect(error.http_code).to.eql 404
-          done()
-        true
-      true
+      cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)
+      .then () ->
+        cloudinary.v2.api.transformation(NAMED_TRANSFORMATION)
+      .then ()->
+        expect().fail()
+      .catch ({error})->
+        expect(error.http_code).to.eql 404
 
-    it "should allow deleting implicit transformation", (done) ->
+    it "should allow deleting implicit transformation", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
+      cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      .then (transformation)->
         expect(transformation).to.be.an(Object)
-        cloudinary.v2.api.delete_transformation EXPLICIT_TRANSFORMATION_NAME, () ->
-          cloudinary.v2.api.transformation EXPLICIT_TRANSFORMATION_NAME, (error, transformation) ->
-            expect(error.http_code).to.eql 404
-            done()
-          true
-        true
-      true
+        cloudinary.v2.api.delete_transformation(EXPLICIT_TRANSFORMATION_NAME)
+      .then () ->
+        cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      .then (transformation)->
+        expect().fail()
+      .catch ({error})->
+        expect(error.http_code).to.eql 404
 
   describe "upload_preset", ()->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_presets
-    it "should allow creating and listing upload_presets", (done) ->
+    it "should allow creating and listing upload_presets", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      create_names = [API_TEST_UPLOAD_PRESET3, API_TEST_UPLOAD_PRESET2, API_TEST_UPLOAD_PRESET1]
-      delete_names = []
-      after_delete = ->
-        delete_names.pop()
-        done() if delete_names.length == 0
-        true
-      validate_presets = ->
-        cloudinary.v2.api.upload_presets (error, response) ->
-          expect(response.presets.slice(0,3).map((p) -> p.name)).to.eql(delete_names)
-          delete_names.forEach (name) ->
-            cloudinary.v2.api.delete_upload_preset name, after_delete
-            true
-        true
+      presetNames = [API_TEST_UPLOAD_PRESET3, API_TEST_UPLOAD_PRESET2, API_TEST_UPLOAD_PRESET1]
+      Promise.all presetNames.map (name)->
+        cloudinary.v2.api.create_upload_preset(name: name , folder: "folder")
+      .then ()->
+        cloudinary.v2.api.upload_presets()
+      .then ({presets})->
+        presetList = presets.map (p)-> p.name
+        presetNames
+          .forEach (p) -> expect(presetList).to.contain(p)
+      .then ()->
+        Promise.all presetNames.map (name)->
+          cloudinary.v2.api.delete_upload_preset(name)
 
-      after_create = ->
-        if create_names.length > 0
-          name = create_names.pop()
-          delete_names.unshift(name)
-          cloudinary.v2.api.create_upload_preset name: name , folder: "folder", after_create
-          true
-        else
-          validate_presets()
-
-      after_create()
-      true
-
-    it "should allow getting a single upload_preset", (done) ->
+    it "should allow getting a single upload_preset", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_upload_preset unsigned: true, folder: "folder", transformation: EXPLICIT_TRANSFORMATION, tags: ["a","b","c"], context: {a: "b", c: "d"}, (error, preset) ->
+      cloudinary.v2.api.create_upload_preset(unsigned: true, folder: "folder", transformation: EXPLICIT_TRANSFORMATION, tags: ["a","b","c"], context: {a: "b", c: "d"})
+      .then (newPreset)->
+        cloudinary.v2.api.upload_preset(newPreset.name)
+        .then (preset)-> [newPreset.name, preset]
+      .then ([name, preset])->
+        expect(preset.name).to.eql(name)
+        expect(preset.unsigned).to.eql(true)
+        expect(preset.settings.folder).to.eql("folder")
+        expect(preset.settings.transformation).to.eql([EXPLICIT_TRANSFORMATION])
+        expect(preset.settings.context).to.eql({a: "b", c: "d"})
+        expect(preset.settings.tags).to.eql(["a","b","c"])
+        cloudinary.v2.api.delete_upload_preset(name)
+
+    it "should allow deleting upload_presets", ()->
+      @timeout helper.TIMEOUT_MEDIUM
+      cloudinary.v2.api.create_upload_preset(name: API_TEST_UPLOAD_PRESET4, folder: "folder")
+      .then ()->
+        cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4)
+      .then ()->
+        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)
+      .then ()->
+        cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4)
+      .then ()->
+        expect().fail()
+      .catch ({error})->
+        expect(error.message).to.contain "Can't find"
+
+    it "should allow updating upload_presets", ()->
+      @timeout helper.TIMEOUT_MEDIUM
+      name = ''
+      cloudinary.v2.api.create_upload_preset(folder: "folder")
+      .then (preset)->
         name = preset.name
-        cloudinary.v2.api.upload_preset name, (error, preset) ->
-          expect(preset.name).to.eql(name)
-          expect(preset.unsigned).to.eql(true)
-          expect(preset.settings.folder).to.eql("folder")
-          expect(preset.settings.transformation).to.eql([EXPLICIT_TRANSFORMATION])
-          expect(preset.settings.context).to.eql({a: "b", c: "d"})
-          expect(preset.settings.tags).to.eql(["a","b","c"])
-          cloudinary.v2.api.delete_upload_preset name, ->
-            done()
-          true
-        true
-      true
+        cloudinary.v2.api.upload_preset(name)
+      .then (preset)->
+        cloudinary.v2.api.update_upload_preset(name, merge(preset.settings, {colors: true, unsigned: true, disallow_public_id: true}))
+      .then ()->
+        cloudinary.v2.api.upload_preset(name)
+      .then (preset)->
+        expect(preset.name).to.eql(name)
+        expect(preset.unsigned).to.eql(true)
+        expect(preset.settings).to.eql(folder: "folder", colors: true, disallow_public_id: true)
+        cloudinary.v2.api.delete_upload_preset(name)
 
-    it "should allow deleting upload_presets", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_upload_preset name: API_TEST_UPLOAD_PRESET4, folder: "folder", (error, preset) ->
-        cloudinary.v2.api.upload_preset API_TEST_UPLOAD_PRESET4, ->
-          cloudinary.v2.api.delete_upload_preset API_TEST_UPLOAD_PRESET4, ->
-            cloudinary.v2.api.upload_preset API_TEST_UPLOAD_PRESET4, (error, result) ->
-              expect(error.message).to.contain "Can't find"
-              done()
-            true
-          true
-        true
-      true
-
-    it "should allow updating upload_presets", (done) ->
-      @timeout helper.TIMEOUT_MEDIUM
-      cloudinary.v2.api.create_upload_preset folder: "folder", (error, preset) ->
-        name = preset.name
-        cloudinary.v2.api.upload_preset name, (error, preset) ->
-          cloudinary.v2.api.update_upload_preset name, merge(preset.settings, {colors: true, unsigned: true, disallow_public_id: true}), (error, preset) ->
-            cloudinary.v2.api.upload_preset name, (error, preset) ->
-              expect(preset.name).to.eql(name)
-              expect(preset.unsigned).to.eql(true)
-              expect(preset.settings).to.eql(folder: "folder", colors: true, disallow_public_id: true)
-              cloudinary.v2.api.delete_upload_preset name, ->
-                done()
-              true
-            true
-          true
-        true
-      true
-
-  it "should support the usage API call", (done) ->
+  it "should support the usage API call", ()->
     @timeout helper.TIMEOUT_MEDIUM
-    cloudinary.v2.api.usage (error, usage) ->
+    cloudinary.v2.api.usage()
+    .then (usage)->
       expect(usage.last_update).not.to.eql null
-      done()
-    true
 
   describe "delete_all_resources", ->
     itBehavesLike "accepts next_cursor", cloudinary.v2.api.delete_all_resources
@@ -596,7 +527,7 @@ describe "api", ->
       it "should allow deleting all derived resources", () ->
         helper.mockPromise (xhr, write, request)->
           options = {keep_original: yes}
-          cloudinary.v2.api.delete_all_resources options
+          cloudinary.v2.api.delete_all_resources(options)
           sinon.assert.calledWith(request, sinon.match((arg)->
             new RegExp("/resources/image/upload$").test(arg.pathname)
           ,
@@ -633,55 +564,58 @@ describe "api", ->
           sinon.assert.calledWith writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/)
           sinon.assert.calledWith writeSpy, sinon.match(/moderation_status=approved/)
 
-    it "should support setting manual moderation status", (done) ->
+    it "should support setting manual moderation status", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.uploader.upload IMAGE_FILE, moderation: "manual", (error, upload_result) ->
-        cloudinary.v2.api.update upload_result.public_id, moderation_status: "approved", (error, api_result) ->
-          return done(new Error error.message) if error?
-          expect(api_result.moderation[0].status).to.eql("approved")
-          done()
-        true
-      true
+      cloudinary.v2.uploader.upload(IMAGE_FILE, moderation: "manual")
+      .then (upload_result)->
+        cloudinary.v2.api.update(upload_result.public_id, moderation_status: "approved")
+      .then (api_result)->
+        expect(api_result.moderation[0].status).to.eql("approved")
 
-    it "should support requesting ocr info", (done) ->
+    it "should support requesting ocr info", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, ocr: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Illegal value"
-          done()
-        true
+      uploadImage()
+      .then (upload_result)->
+        cloudinary.v2.api.update(upload_result.public_id, ocr: "illegal")
+      .then ()-> expect().fail()
+      .catch ({error})->
+        expect(error.message).to.contain "Illegal value"
 
-    it "should support requesting raw conversion", (done) ->
+    it "should support requesting raw conversion", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, raw_convert: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Illegal value"
-          done()
-        true
+      uploadImage()
+      .then (upload_result)->
+        cloudinary.v2.api.update(upload_result.public_id, raw_convert: "illegal")
+      .then ()-> expect().fail()
+      .catch ({error})->
+        expect(error.message).to.contain "Illegal value"
 
-    it "should support requesting categorization", (done) ->
+    it "should support requesting categorization", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, categorization: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Illegal value"
-          done()
-        true
+      uploadImage()
+      .then (upload_result)->
+        cloudinary.v2.api.update(upload_result.public_id, categorization: "illegal")
+      .then ()-> expect().fail()
+      .catch ({error})->
+        expect(error.message).to.contain "Illegal value"
 
-    it "should support requesting detection", (done) ->
+    it "should support requesting detection", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, detection: "illegal", (error, api_result) ->
-          expect(error.message).to.contain "Illegal value"
-          done()
-        true
+      uploadImage()
+      .then (upload_result)->
+        cloudinary.v2.api.update(upload_result.public_id, detection: "illegal")
+      .then ()-> expect().fail()
+      .catch ({error})->
+        expect(error.message).to.contain "Illegal value"
 
-    it "should support requesting background_removal", (done) ->
+    it "should support requesting background_removal", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      upload_image (upload_result)->
-        cloudinary.v2.api.update upload_result.public_id, background_removal: "illegal", (error, api_result) ->
+      uploadImage()
+      .then (upload_result)->
+        cloudinary.v2.api.update(upload_result.public_id, background_removal: "illegal")
+      .then ()-> expect().fail()
+      .catch ({error})->
           expect(error.message).to.contain "Illegal value"
-          done()
-        true
 
     describe "access_control", ()->
       acl = {
@@ -729,7 +663,7 @@ describe "api", ->
 
   # For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   # Replace `it` with  `it.skip` below if you want to disable it.
-  it "should list folders in cloudinary", (done)->
+  it "should list folders in cloudinary", ()->
     @timeout helper.TIMEOUT_LONG
     Q.all([
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/item', tags: UPLOAD_TAGS),
@@ -737,12 +671,12 @@ describe "api", ->
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder2/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder1/item', tags: UPLOAD_TAGS),
       cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: 'test_folder1/test_subfolder2/item', tags: UPLOAD_TAGS)
-    ]).then((results)->
+    ]).then (results)->
       Q.all([
         cloudinary.v2.api.root_folders(),
         cloudinary.v2.api.sub_folders('test_folder1')
       ])
-    ).then((results)->
+    .then (results)->
       root= results[0]
       root_folders = (folder.name for folder in root.folders)
       sub_1 = results[1]
@@ -751,91 +685,71 @@ describe "api", ->
       expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1')
       expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2')
       cloudinary.v2.api.sub_folders('test_folder_not_exists')
-    ).then((result)->
+    .then (result)->
       console.log('error test_folder_not_exists should not pass to "then" handler but "catch"')
-      expect(true).to.eql(false)
-    ).catch((err)->
-      expect(err.error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
-      done()
-    )
-    true
+      expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"')
+    .catch ({error})->
+      expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists')
+
 
   describe '.restore', ->
     @timeout helper.TIMEOUT_MEDIUM
-    before (done)->
-      cloudinary.v2.uploader.upload IMAGE_FILE, public_id: "api_test_restore", backup: true, tags: UPLOAD_TAGS, (error, result)->
-        return done(new Error error.message) if error?
-        cloudinary.v2.api.resource "api_test_restore", (error, resource)->
-          return done(new Error error.message) if error?
-          expect(resource).not.to.be(null)
-          expect(resource["bytes"]).to.eql(3381)
-          cloudinary.v2.api.delete_resources "api_test_restore", (error, resource)->
-            return done(new Error error.message) if error?
-            cloudinary.v2.api.resource "api_test_restore", (error, resource)->
-              return done(new Error error.message) if error?
-              expect(resource).not.to.be(null)
-              expect(resource["bytes"]).to.eql(0)
-              expect(resource["placeholder"]).to.eql(true)
-              done()
-            true
-          true
-        true
-      true
+    before ()->
+      cloudinary.v2.uploader.upload(IMAGE_FILE, public_id: "api_test_restore", backup: true, tags: UPLOAD_TAGS)
+      .then (result)-> cloudinary.v2.api.resource("api_test_restore")
+      .then (resource)->
+        expect(resource).not.to.be(null)
+        expect(resource["bytes"]).to.eql(3381)
+        cloudinary.v2.api.delete_resources("api_test_restore")
+      .then (resource)-> cloudinary.v2.api.resource("api_test_restore")
+      .then (resource)->
+        expect(resource).not.to.be(null)
+        expect(resource["bytes"]).to.eql(0)
+        expect(resource["placeholder"]).to.eql(true)
 
-    it 'should restore a deleted resource', (done)->
-      cloudinary.v2.api.restore "api_test_restore", (error, response)->
+    it 'should restore a deleted resource', ()->
+      cloudinary.v2.api.restore("api_test_restore")
+      .then (response)->
         info = response["api_test_restore"]
         expect(info).not.to.be(null)
         expect(info["bytes"]).to.eql(3381)
-        cloudinary.v2.api.resource "api_test_restore", (error, resource)->
-          expect(resource).not.to.be(null)
-          expect(resource["bytes"]).to.eql(3381)
-          done()
-        true
-      true
+        cloudinary.v2.api.resource("api_test_restore")
+      .then (resource)->
+        expect(resource).not.to.be(null)
+        expect(resource["bytes"]).to.eql(3381)
 
 
   describe 'mapping', ->
     mapping = "api_test_upload_mapping#{Math.floor(Math.random() * 100000)}"
     deleteMapping = false
-    after (done)->
+    after ()->
       if(deleteMapping)
-        cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
-          done()
-        true
+        cloudinary.v2.api.delete_upload_mapping(mapping)
       else
-        done()
+        Promise.resolve()
+
     itBehavesLike "a list with a cursor", cloudinary.v2.api.upload_mappings
-    it 'should create mapping', (done)->
+    it 'should create mapping', ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.create_upload_mapping mapping, template: "http://cloudinary.com", tags: UPLOAD_TAGS, (error, result)->
-        return done(new Error error.message) if error?
-        deleteMapping = true
-        cloudinary.v2.api.upload_mapping mapping, (error, result)->
-          return done(new Error error.message) if error?
-          expect(result['template']).to.eql("http://cloudinary.com")
-          cloudinary.v2.api.update_upload_mapping mapping, template: "http://res.cloudinary.com", (error, result)->
-            return done(new Error error.message) if error?
-            cloudinary.v2.api.upload_mapping mapping, (error, result)->
-              return done(new Error error.message) if error?
-              expect(result["template"]).to.eql("http://res.cloudinary.com")
-              cloudinary.v2.api.upload_mappings (error, result)->
-                return done(new Error error.message) if error?
-                expect(find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com"})).to.be.ok()
-                cloudinary.v2.api.delete_upload_mapping mapping, (error, result)->
-                  return done(new Error error.message) if error?
-                  deleteMapping = false
-                  cloudinary.v2.api.upload_mappings (error, result)->
-                    return done(new Error error.message) if error?
-                    expect(find(result["mappings"], matchesProperty('folder', mapping))).not.to.be.ok()
-                    done()
-                  true
-                true
-              true
-            true
-          true
-        true
-      true
+      cloudinary.v2.api.create_upload_mapping(mapping, template: "http://cloudinary.com", tags: UPLOAD_TAGS)
+      .then (result)->
+        deleteMapping = cloudinary.v2.api.upload_mapping(mapping)
+      .then (result)->
+        expect(result['template']).to.eql("http://cloudinary.com")
+        cloudinary.v2.api.update_upload_mapping(mapping, template: "http://res.cloudinary.com")
+      .then (result)->
+        cloudinary.v2.api.upload_mapping(mapping)
+      .then (result)->
+        expect(result["template"]).to.eql("http://res.cloudinary.com")
+        cloudinary.v2.api.upload_mappings()
+      .then (result)->
+        expect(find(result["mappings"], {folder: mapping, template: "http://res.cloudinary.com"})).to.be.ok()
+        cloudinary.v2.api.delete_upload_mapping(mapping)
+      .then (result)->
+        deleteMapping = false
+        cloudinary.v2.api.upload_mappings()
+      .then (result)->
+        expect(find(result["mappings"], matchesProperty('folder', mapping))).not.to.be.ok()
 
   describe "publish", ->
     @timeout helper.TIMEOUT_LONG
@@ -844,103 +758,82 @@ describe "api", ->
     publishTestId = ""
     publishTestTag = ""
     idsToDelete = []
-    beforeEach (done)->
+    beforeEach ()->
       publishTestTag = TEST_TAG + i++
-      cloudinary.v2.uploader.upload IMAGE_FILE, type: "authenticated", tags: UPLOAD_TAGS.concat([publishTestTag]), (error, result)->
-        return done(new Error error.message) if error?
+      cloudinary.v2.uploader.upload(IMAGE_FILE, type: "authenticated", tags: UPLOAD_TAGS.concat([publishTestTag]))
+      .then (result)->
         publishTestId = result.public_id
-        idsToDelete.push publishTestId
-        done()
-      true
-    after (done)->
+        idsToDelete.push(publishTestId)
+    after ()->
       # cleanup any resource that were not published
-      cloudinary.v2.api.delete_resources  idsToDelete, type: "authenticated", (error, result)->
-        return done(new Error error.message) if error?
-        done()
-      true
-    it "should publish by public id", (done)->
+      cloudinary.v2.api.delete_resources(idsToDelete, type: "authenticated")
+    it "should publish by public id", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.publish_by_ids [publishTestId], type: "authenticated", (error, result)->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.publish_by_ids([publishTestId], type: "authenticated")
+      .then (result)->
         published = result.published
         expect(published).not.to.be(null)
         expect(published.length).to.be(1)
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
-        done()
-      true
-    it "should publish by prefix", (done)->
+    it "should publish by prefix", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.publish_by_prefix publishTestId[0..-2], (error, result)->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.publish_by_prefix(publishTestId[0..-2])
+      .then (result)->
         published = result.published
         expect(published).not.to.be(null)
         expect(published.length).to.be(1)
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
-        done()
-      true
-    it "should publish by tag", (done)->
+    it "should publish by tag", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.publish_by_tag publishTestTag, (error, result)->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.publish_by_tag(publishTestTag)
+      .then (result)->
         published = result.published
         expect(published).not.to.be(null)
         expect(published.length).to.be(1)
         expect(published[0].public_id).to.eql(publishTestId)
         expect(published[0].url).to.match(/\/upload\//)
-        done()
-      true
-    it "should return empty when explicit given type doesn't match resource", (done)->
+    it "should return empty when explicit given type doesn't match resource", ()->
       @timeout helper.TIMEOUT_LONG
-      cloudinary.v2.api.publish_by_ids [publishTestId], type: "private", (error, result)->
-        return done(new Error error.message) if error?
+      cloudinary.v2.api.publish_by_ids([publishTestId], type: "private")
+      .then (result)->
         published = result.published
         expect(published).not.to.be(null)
         expect(published.length).to.be(0)
-        done()
-      true
 
   describe "access_mode", ->
     i = 0
     @timeout helper.TIMEOUT_LONG
     publicId = ""
     access_mode_tag = ''
-    beforeEach (done)->
+    beforeEach ()->
       access_mode_tag = TEST_TAG + "access_mode" + i++
-      cloudinary.v2.uploader.upload IMAGE_FILE, access_mode: "authenticated", tags: UPLOAD_TAGS.concat([access_mode_tag]), (error, result)->
-        return done(new Error error.message) if error?
+      cloudinary.v2.uploader.upload(IMAGE_FILE, access_mode: "authenticated", tags: UPLOAD_TAGS.concat([access_mode_tag]))
+      .then (result)->
         publicId = result.public_id
         expect(result.access_mode).to.be("authenticated")
-        done()
-      true
-    it "should update access mode by ids", (done)->
-      cloudinary.v2.api.update_resources_access_mode_by_ids "public", [publicId], (error, result)->
-        return done(new Error error.message) if error?
+    it "should update access mode by ids", ()->
+      cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId])
+      .then (result)->
         expect(result.updated).to.be.an('array')
         expect(result.updated.length).to.be(1)
         resource = result.updated[0]
         expect(resource.public_id).to.be(publicId)
         expect(resource.access_mode).to.be('public')
-        done()
-      true
-    it "should update access mode by prefix", (done)->
-      cloudinary.v2.api.update_resources_access_mode_by_prefix "public", publicId[0..-3], (error, result)->
-        return done(new Error error.message) if error?
+    it "should update access mode by prefix", ()->
+      cloudinary.v2.api.update_resources_access_mode_by_prefix("public", publicId[0..-3])
+      .then (result)->
         expect(result.updated).to.be.an('array')
         expect(result.updated.length).to.be(1)
         resource = result.updated[0]
         expect(resource.public_id).to.be(publicId)
         expect(resource.access_mode).to.be('public')
-        done()
-      true
-    it "should update access mode by tag", (done)->
-      cloudinary.v2.api.update_resources_access_mode_by_tag "public", access_mode_tag, (error, result)->
-        return done(new Error error.message) if error?
+    it "should update access mode by tag", ()->
+      cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag)
+      .then (result)->
         expect(result.updated).to.be.an('array')
         expect(result.updated.length).to.be(1)
         resource = result.updated[0]
         expect(resource.public_id).to.be(publicId)
         expect(resource.access_mode).to.be('public')
-        done()
-      true
