@@ -1,10 +1,7 @@
-var uploader, utils;
+const uploader = require('../uploader');
+const v1_adapters = require('../utils').v1_adapters;
 
-uploader = require('../uploader');
-
-utils = require('../utils');
-
-utils.v1_adapters(exports, uploader, {
+v1_adapters(exports, uploader, {
   unsigned_upload_stream: 1,
   upload_stream: 0,
   unsigned_upload: 2,
@@ -31,11 +28,7 @@ utils.v1_adapters(exports, uploader, {
 });
 
 exports.direct_upload = uploader.direct_upload;
-
 exports.upload_tag_params = uploader.upload_tag_params;
-
 exports.upload_url = uploader.upload_url;
-
 exports.image_upload_tag = uploader.image_upload_tag;
-
 exports.unsigned_image_upload_tag = uploader.unsigned_image_upload_tag;

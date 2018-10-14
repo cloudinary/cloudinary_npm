@@ -1,87 +1,61 @@
-var Q, api, call_api, config, delete_resources_params, extend, https, includes, isString, only, publishResource, querystring, transformation_string, update_resources_access_mode, utils;
 
-config = require("./config");
+const config = require("./config");
 
-if (config().upload_prefix && config().upload_prefix.slice(0, 5) === 'http:') {
-  https = require('http');
-} else {
-  https = require('https');
-}
+const https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
+const utils = require("./utils");
 
-utils = require("./utils");
+const {extend, includes, isString, only} = utils;
 
-({extend, includes, isString, only} = utils);
+const querystring = require("querystring");
 
-querystring = require("querystring");
+const Q = require('q');
 
-Q = require('q');
+const api = module.exports;
 
-api = module.exports;
+function call_api(method, uri, params, callback, options) {
+  let  handle_response, query_params;
+  const deferred = Q.defer();
+  const cloudinary = options["upload_prefix"] || config("upload_prefix") || "https://api.cloudinary.com";
+  const cloud_name = options["cloud_name"] || config("cloud_name") || throw "Must supply cloud_name";
+  const api_key = options["api_key"] || config("api_key") || throw "Must supply api_key";
+  const api_secret = options["api_secret"] || config("api_secret") || throw "Must supply api_secret";
 
-call_api = function(method, uri, params, callback, options) {
-  var api_key, api_secret, api_url, cloud_name, cloudinary, content_type, deferred, handle_response, query_params, ref, ref1, ref2, ref3, ref4, ref5, request, request_options;
-  deferred = Q.defer();
-  cloudinary = (ref = (ref1 = options["upload_prefix"]) != null ? ref1 : config("upload_prefix")) != null ? ref : "https://api.cloudinary.com";
-  cloud_name = (function() {
-    var ref3;
-    if ((ref2 = (ref3 = options["cloud_name"]) != null ? ref3 : config("cloud_name")) != null) {
-      return ref2;
-    } else {
-      throw "Must supply cloud_name";
-    }
-  })();
-  api_key = (function() {
-    var ref4;
-    if ((ref3 = (ref4 = options["api_key"]) != null ? ref4 : config("api_key")) != null) {
-      return ref3;
-    } else {
-      throw "Must supply api_key";
-    }
-  })();
-  api_secret = (function() {
-    var ref5;
-    if ((ref4 = (ref5 = options["api_secret"]) != null ? ref5 : config("api_secret")) != null) {
-      return ref4;
-    } else {
-      throw "Must supply api_secret";
-    }
-  })();
-  api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
-  content_type = 'application/x-www-form-urlencoded';
+  method = method.toUpperCase();
+  let api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
+  let content_type = 'application/x-www-form-urlencoded';
   if (options['content_type'] === 'json') {
     query_params = JSON.stringify(params);
     content_type = 'application/json';
   } else {
     query_params = querystring.stringify(params);
   }
-  if (method === "get") {
+  if (method === "GET") {
     api_url += "?" + query_params;
   }
-  request_options = require('url').parse(api_url);
+  let request_options = require('url').parse(api_url);
   request_options = extend(request_options, {
-    method: method.toUpperCase(),
+    method: method,
     headers: {
       'Content-Type': content_type,
       'User-Agent': utils.getUserAgent()
     },
-    auth: `${api_key}:${api_secret}`
+    auth: api_key + ":" + api_secret
   });
   if (options.agent != null) {
     request_options.agent = options.agent;
   }
-  if (method !== "get") {
+  if (method !== "GET") {
     request_options.headers['Content-Length'] = Buffer.byteLength(query_params);
   }
-  handle_response = function(res) {
-    var buffer, err_obj, error;
+  handle_response = function (res) {
     if (includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)) {
-      buffer = "";
-      error = false;
-      res.on("data", function(d) {
+      let buffer = "";
+      let error = false;
+      res.on("data", function (d) {
         return buffer += d;
       });
-      res.on("end", function() {
-        var e, result;
+      res.on("end", function () {
+        let e, result;
         if (error) {
           return;
         }
@@ -91,7 +65,7 @@ call_api = function(method, uri, params, callback, options) {
           e = error1;
           result = {
             error: {
-              message: `Server return invalid JSON response. Status Code ${res.statusCode}`
+              message: "Server return invalid JSON response. Status Code " + res.statusCode
             }
           };
         }
@@ -109,10 +83,9 @@ call_api = function(method, uri, params, callback, options) {
         }
         return typeof callback === "function" ? callback(result) : void 0;
       });
-      return res.on("error", function(e) {
-        var err_obj;
+      return res.on("error", function (e) {
         error = true;
-        err_obj = {
+        let err_obj = {
           error: {
             message: e,
             http_code: res.statusCode
@@ -122,9 +95,9 @@ call_api = function(method, uri, params, callback, options) {
         return typeof callback === "function" ? callback(err_obj) : void 0;
       });
     } else {
-      err_obj = {
+      let err_obj = {
         error: {
-          message: `Server returned unexpected status code - ${res.statusCode}`,
+          message: "Server returned unexpected status code - " + res.statusCode,
           http_code: res.statusCode
         }
       };
@@ -132,46 +105,46 @@ call_api = function(method, uri, params, callback, options) {
       return typeof callback === "function" ? callback(err_obj) : void 0;
     }
   };
-  request = https.request(request_options, handle_response);
-  request.on("error", function(e) {
+  const request = https.request(request_options, handle_response);
+  request.on("error", function (e) {
     return typeof callback === "function" ? callback({
       error: e
     }) : void 0;
   });
-  request.setTimeout((ref5 = options["timeout"]) != null ? ref5 : 60000);
-  if (method !== "get") {
+  request.setTimeout(options["timeout"] != null ? options["timeout"] : 60000);
+  if (method !== "GET") {
     request.write(query_params);
   }
   request.end();
   return deferred.promise;
-};
+}
 
-transformation_string = function(transformation) {
+function transformationString(transformation) {
   if (isString(transformation)) {
     return transformation;
   } else {
     return utils.generate_transformation_string(extend({}, transformation));
   }
-};
+}
 
-delete_resources_params = function(options, params = {}) {
+function deleteResourcesParams(options, params={}) {
   return extend(params, only(options, "keep_original", "invalidate", "next_cursor", "transformations"));
-};
+}
 
-exports.ping = function(callback, options = {}) {
+exports.ping = function ping(callback, options={}) {
   return call_api("get", ["ping"], {}, callback, options);
 };
 
-exports.usage = function(callback, options = {}) {
+exports.usage = function usage(callback, options={}) {
   return call_api("get", ["usage"], {}, callback, options);
 };
 
-exports.resource_types = function(callback, options = {}) {
+exports.resource_types = function resource_types(callback, options={}) {
   return call_api("get", ["resources"], {}, callback, options);
 };
 
-exports.resources = function(callback, options = {}) {
-  var ref, resource_type, type, uri;
+exports.resources = function resources(callback, options={}) {
+  let ref, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = options["type"];
   uri = ["resources", resource_type];
@@ -184,15 +157,15 @@ exports.resources = function(callback, options = {}) {
   return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options);
 };
 
-exports.resources_by_tag = function(tag, callback, options = {}) {
-  var ref, resource_type, uri;
+exports.resources_by_tag = function resources_by_tag(tag, callback, options={}) {
+  let ref, resource_type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
 
-exports.resources_by_context = function(key, value, callback, options = {}) {
-  var params, ref, resource_type, uri;
+exports.resources_by_context = function resources_by_context(key, value, callback, options={}) {
+  let params, ref, resource_type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   uri = ["resources", resource_type, "context"];
   params = only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
@@ -203,15 +176,15 @@ exports.resources_by_context = function(key, value, callback, options = {}) {
   return call_api("get", uri, params, callback, options);
 };
 
-exports.resources_by_moderation = function(kind, status, callback, options = {}) {
-  var ref, resource_type, uri;
+exports.resources_by_moderation = function resources_by_moderation(kind, status, callback, options={}) {
+  let ref, resource_type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   uri = ["resources", resource_type, "moderations", kind, status];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
 
-exports.resources_by_ids = function(public_ids, callback, options = {}) {
-  var params, ref, ref1, resource_type, type, uri;
+exports.resources_by_ids = function resources_by_ids(public_ids, callback, options={}) {
+  let params, ref, ref1, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
@@ -220,16 +193,16 @@ exports.resources_by_ids = function(public_ids, callback, options = {}) {
   return call_api("get", uri, params, callback, options);
 };
 
-exports.resource = function(public_id, callback, options = {}) {
-  var ref, ref1, resource_type, type, uri;
+exports.resource = function resource(public_id, callback, options={}) {
+  let ref, ref1, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, public_id];
   return call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
 };
 
-exports.restore = function(public_ids, callback, options = {}) {
-  var ref, ref1, resource_type, type, uri;
+exports.restore = function restore(public_ids, callback, options={}) {
+  let ref, ref1, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, "restore"];
@@ -238,8 +211,8 @@ exports.restore = function(public_ids, callback, options = {}) {
   }, callback, options);
 };
 
-exports.update = function(public_id, callback, options = {}) {
-  var params, ref, ref1, resource_type, type, uri;
+exports.update = function update(public_id, callback, options={}) {
+  let params, ref, ref1, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, public_id];
@@ -250,56 +223,57 @@ exports.update = function(public_id, callback, options = {}) {
   return call_api("post", uri, params, callback, options);
 };
 
-exports.delete_resources = function(public_ids, callback, options = {}) {
-  var ref, ref1, resource_type, type, uri;
+exports.delete_resources = function delete_resources(public_ids, callback, options={}) {
+  let ref, ref1, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
-  return call_api("delete", uri, delete_resources_params(options, {
+  return call_api("delete", uri, deleteResourcesParams(options, {
     "public_ids[]": public_ids
   }), callback, options);
 };
 
-exports.delete_resources_by_prefix = function(prefix, callback, options = {}) {
-  var ref, ref1, resource_type, type, uri;
+exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix, callback, options={}) {
+  let ref, ref1, resource_type, type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
-  return call_api("delete", uri, delete_resources_params(options, {
+  return call_api("delete", uri, deleteResourcesParams(options, {
     prefix: prefix
   }), callback, options);
 };
 
-exports.delete_resources_by_tag = function(tag, callback, options = {}) {
-  var ref, resource_type, uri;
+exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback, options={}) {
+  let ref, resource_type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   uri = ["resources", resource_type, "tags", tag];
-  return call_api("delete", uri, delete_resources_params(options), callback, options);
+  return call_api("delete", uri, deleteResourcesParams(options), callback, options);
 };
 
-exports.delete_all_resources = function(callback, options = {}) {
-  var ref, ref1, resource_type, type, uri;
+exports.delete_all_resources = function delete_all_resources(callback, options={}) {
+  let ref, ref1, resource_type, type, uri;
+
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
-  return call_api("delete", uri, delete_resources_params(options, {
+  return call_api("delete", uri, deleteResourcesParams(options, {
     all: true
   }), callback, options);
 };
 
-exports.delete_derived_resources = function(derived_resource_ids, callback, options = {}) {
-  var uri;
+exports.delete_derived_resources = function delete_derived_resources(derived_resource_ids, callback, options={}) {
+  let uri;
   uri = ["derived_resources"];
   return call_api("delete", uri, {
     "derived_resource_ids[]": derived_resource_ids
   }, callback, options);
 };
 
-exports.delete_derived_by_transformation = function(public_ids, transformations, callback, options = {}) {
-  var params, resource_type, type, uri;
+exports.delete_derived_by_transformation = function delete_derived_by_transformation(public_ids, transformations, callback, options={}) {
+  let params, resource_type, type, uri;
   resource_type = options["resource_type"] || "image";
   type = options["type"] || "upload";
-  uri = `resources/${resource_type}/${type}`;
+  uri = "resources/" + resource_type + "/" + type;
   params = extend({
     "public_ids[]": public_ids
   }, only(options, "invalidate"));
@@ -308,124 +282,126 @@ exports.delete_derived_by_transformation = function(public_ids, transformations,
   return call_api("delete", uri, params, callback, options);
 };
 
-exports.tags = function(callback, options = {}) {
-  var ref, resource_type, uri;
+exports.tags = function tags(callback, options={}) {
+  let ref, resource_type, uri;
   resource_type = (ref = options["resource_type"]) != null ? ref : "image";
   uri = ["tags", resource_type];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options);
 };
 
-exports.transformations = function(callback, options = {}) {
+exports.transformations = function transformations(callback, options={}) {
   return call_api("get", ["transformations"], only(options, "next_cursor", "max_results"), callback, options);
 };
 
-exports.transformation = function(transformation, callback, options = {}) {
-  var uri;
-  uri = ["transformations", transformation_string(transformation)];
+exports.transformation = function transformation(transformation, callback, options={}) {
+  let uri;
+  uri = ["transformations", transformationString(transformation)];
   return call_api("get", uri, only(options, "next_cursor", "max_results"), callback, options);
 };
 
-exports.delete_transformation = function(transformation, callback, options = {}) {
-  var uri;
-  uri = ["transformations", transformation_string(transformation)];
+exports.delete_transformation = function delete_transformation(transformation, callback, options={}) {
+  let uri;
+  uri = ["transformations", transformationString(transformation)];
   return call_api("delete", uri, {}, callback, options);
 };
 
-// updates - currently only supported update is the "allowed_for_strict" boolean flag
-exports.update_transformation = function(transformation, updates, callback, options = {}) {
-  var params, uri;
-  uri = ["transformations", transformation_string(transformation)];
+exports.update_transformation = function update_transformation(transformation, updates, callback, options={}) {
+  let params, uri;
+  uri = ["transformations", transformationString(transformation)];
   params = only(updates, "allowed_for_strict");
   if (updates.unsafe_update != null) {
-    params.unsafe_update = transformation_string(updates.unsafe_update);
+    params.unsafe_update = transformationString(updates.unsafe_update);
   }
   return call_api("put", uri, params, callback, options);
 };
 
-exports.create_transformation = function(name, definition, callback, options = {}) {
-  var uri;
+exports.create_transformation = function create_transformation(name, definition, callback, options={}) {
+  let uri;
   uri = ["transformations", name];
   return call_api("post", uri, {
-    transformation: transformation_string(definition)
+    transformation: transformationString(definition)
   }, callback, options);
 };
 
-exports.upload_presets = function(callback, options = {}) {
+exports.upload_presets = function upload_presets(callback, options={}) {
   return call_api("get", ["upload_presets"], only(options, "next_cursor", "max_results"), callback, options);
 };
 
-exports.upload_preset = function(name, callback, options = {}) {
-  var uri;
+exports.upload_preset = function upload_preset(name, callback, options={}) {
+  let uri;
   uri = ["upload_presets", name];
   return call_api("get", uri, {}, callback, options);
 };
 
-exports.delete_upload_preset = function(name, callback, options = {}) {
-  var uri;
+exports.delete_upload_preset = function delete_upload_preset(name, callback, options={}) {
+  let uri;
   uri = ["upload_presets", name];
   return call_api("delete", uri, {}, callback, options);
 };
 
-exports.update_upload_preset = function(name, callback, options = {}) {
-  var params, uri;
+exports.update_upload_preset = function update_upload_preset(name, callback, options={}) {
+  let params, uri;
   uri = ["upload_presets", name];
   params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id"));
   return call_api("put", uri, params, callback, options);
 };
 
-exports.create_upload_preset = function(callback, options = {}) {
-  var params, uri;
+exports.create_upload_preset = function create_upload_preset(callback, options={}) {
+  let params, uri;
   uri = ["upload_presets"];
   params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id"));
   return call_api("post", uri, params, callback, options);
 };
 
-exports.root_folders = function(callback, options = {}) {
-  var uri;
+exports.root_folders = function root_folders(callback, options={}) {
+  let uri;
   uri = ["folders"];
   return call_api("get", uri, {}, callback, options);
 };
 
-exports.sub_folders = function(path, callback, options = {}) {
-  var uri;
+exports.sub_folders = function sub_folders(path, callback, options={}) {
+  let uri;
   uri = ["folders", path];
   return call_api("get", uri, {}, callback, options);
 };
 
-exports.upload_mappings = function(callback, options = {}) {
-  var params;
+exports.upload_mappings = function upload_mappings(callback, options={}) {
+  let params;
   params = only(options, "next_cursor", "max_results");
   return call_api("get", "upload_mappings", params, callback, options);
 };
 
-exports.upload_mapping = function(name = null, callback, options = {}) {
+exports.upload_mapping = function upload_mapping(name, callback, options={}) {
+  if (name == null) {
+    name = null;
+  }
   return call_api("get", 'upload_mappings', {
     folder: name
   }, callback, options);
 };
 
-exports.delete_upload_mapping = function(name, callback, options = {}) {
+exports.delete_upload_mapping = function delete_upload_mapping(name, callback, options={}) {
   return call_api("delete", 'upload_mappings', {
     folder: name
   }, callback, options);
 };
 
-exports.update_upload_mapping = function(name, callback, options = {}) {
-  var params;
+exports.update_upload_mapping = function update_upload_mapping(name, callback, options={}) {
+  let params;
   params = only(options, "template");
   params["folder"] = name;
   return call_api("put", 'upload_mappings', params, callback, options);
 };
 
-exports.create_upload_mapping = function(name, callback, options = {}) {
-  var params;
+exports.create_upload_mapping = function create_upload_mapping(name, callback, options={}) {
+  let params;
   params = only(options, "template");
   params["folder"] = name;
   return call_api("post", 'upload_mappings', params, callback, options);
 };
 
-publishResource = function(byKey, value, callback, options = {}) {
-  var params, ref, resource_type, uri;
+function publishResource(byKey, value, callback, options={}) {
+  let params, ref, resource_type, uri;
   params = only(options, "type", "invalidate", "overwrite");
   params[byKey] = value;
   resource_type = (ref = options.resource_type) != null ? ref : "image";
@@ -434,70 +410,69 @@ publishResource = function(byKey, value, callback, options = {}) {
     resource_type: resource_type
   }, options);
   return call_api("post", uri, params, callback, options);
-};
+}
 
-exports.publish_by_prefix = function(prefix, callback, options = {}) {
+exports.publish_by_prefix = function publish_by_prefix(prefix, callback, options={}) {
   return publishResource("prefix", prefix, callback, options);
 };
 
-exports.publish_by_tag = function(tag, callback, options = {}) {
+exports.publish_by_tag = function publish_by_tag(tag, callback, options={}) {
   return publishResource("tag", tag, callback, options);
 };
 
-exports.publish_by_ids = function(public_ids, callback, options = {}) {
+exports.publish_by_ids = function publish_by_ids(public_ids, callback, options={}) {
   return publishResource("public_ids", public_ids, callback, options);
 };
 
-exports.list_streaming_profiles = function(callback, options = {}) {
+exports.list_streaming_profiles = function list_streaming_profiles(callback, options={}) {
   return call_api("get", "streaming_profiles", {}, callback, options);
 };
 
-exports.get_streaming_profile = function(name, callback, options = {}) {
-  return call_api("get", `streaming_profiles/${name}`, {}, callback, options);
+exports.get_streaming_profile = function get_streaming_profile(name, callback, options={}) {
+  return call_api("get", "streaming_profiles/" + name, {}, callback, options);
 };
 
-exports.delete_streaming_profile = function(name, callback, options = {}) {
-  return call_api("delete", `streaming_profiles/${name}`, {}, callback, options);
+exports.delete_streaming_profile = function delete_streaming_profile(name, callback, options={}) {
+  return call_api("delete", "streaming_profiles/" + name, {}, callback, options);
 };
 
-exports.update_streaming_profile = function(name, callback, options = {}) {
-  var params;
+exports.update_streaming_profile = function update_streaming_profile(name, callback, options={}) {
+  let params;
   params = utils.build_streaming_profiles_param(options);
-  return call_api("put", `streaming_profiles/${name}`, params, callback, options);
+  return call_api("put", "streaming_profiles/" + name, params, callback, options);
 };
 
-exports.create_streaming_profile = function(name, callback, options = {}) {
-  var params;
+exports.create_streaming_profile = function create_streaming_profile(name, callback, options={}) {
+  let params;
   params = utils.build_streaming_profiles_param(options);
   params["name"] = name;
   return call_api("post", 'streaming_profiles', params, callback, options);
 };
 
-update_resources_access_mode = function(access_mode, by_key, value, callback, options = {}) {
-  var params, ref, ref1, resource_type, type;
+function updateResourcesAccessMode(access_mode, by_key, value, callback, options={}) {
+  let params, ref, ref1, resource_type, type;
   resource_type = (ref = options.resource_type) != null ? ref : "image";
   type = (ref1 = options.type) != null ? ref1 : "upload";
   params = {
     access_mode: access_mode
   };
-  //  by_key = by_key == 'ids' ? 'ids[]' : by_key
   params[by_key] = value;
-  return call_api("post", `resources/${resource_type}/${type}/update_access_mode`, params, callback, options);
-};
+  return call_api("post", "resources/" + resource_type + "/" + type + "/update_access_mode", params, callback, options);
+}
 
-exports.search = function(params, callback, options = {}) {
+exports.search = function search(params, callback, options={}) {
   options['content_type'] = 'json';
   return call_api("post", "resources/search", params, callback, options);
 };
 
-exports.update_resources_access_mode_by_prefix = function(access_mode, prefix, callback, options = {}) {
-  return update_resources_access_mode(access_mode, "prefix", prefix, callback, options);
+exports.update_resources_access_mode_by_prefix = function update_resources_access_mode_by_prefix(access_mode, prefix, callback, options={}) {
+  return updateResourcesAccessMode(access_mode, "prefix", prefix, callback, options);
 };
 
-exports.update_resources_access_mode_by_tag = function(access_mode, tag, callback, options = {}) {
-  return update_resources_access_mode(access_mode, "tag", tag, callback, options);
+exports.update_resources_access_mode_by_tag = function update_resources_access_mode_by_tag(access_mode, tag, callback, options={}) {
+  return updateResourcesAccessMode(access_mode, "tag", tag, callback, options);
 };
 
-exports.update_resources_access_mode_by_ids = function(access_mode, ids, callback, options = {}) {
+exports.update_resources_access_mode_by_ids = function update_resources_access_mode_by_ids(access_mode, ids, callback, options={}) {
   return update_resources_access_mode(access_mode, "public_ids[]", ids, callback, options);
 };

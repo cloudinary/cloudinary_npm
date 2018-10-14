@@ -1,10 +1,7 @@
-var Search, api, isEmpty, isNumber;
+const api = require('./api');
+const {isEmpty, isNumber} = require('../utils');
 
-api = require('./api');
-
-({isEmpty, isNumber} = require('../utils'));
-
-Search = class Search {
+const Search = class Search {
   constructor() {
     this.query_hash = {
       sort_by: [],
@@ -75,10 +72,8 @@ Search = class Search {
   }
 
   to_query() {
-    var k, ref, v;
-    ref = this.query_hash;
-    for (k in ref) {
-      v = ref[k];
+    for (let k in this.query_hash) {
+      let v = this.query_hash[k];
       if (!isNumber(v) && isEmpty(v)) {
         delete this.query_hash[k];
       }

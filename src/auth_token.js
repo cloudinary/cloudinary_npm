@@ -1,52 +1,56 @@
 /**
-  * Authorization Token
-  * @module auth_token
+ * Authorization Token
+ * @module auth_token
  */
-  /**
-  * Escape url using lowercase hex code
-  * @param {string} url a url string
-  * @return escaped url
-   */
-var config, crypto, digest, escape_to_lower;
 
-crypto = require('crypto');
+const crypto = require('crypto');
+const config = require('./config');
 
-config = require('./config');
-
-digest = function(message, key) {
+function digest(message, key) {
   return crypto.createHmac("sha256", new Buffer(key, "hex")).update(message).digest('hex');
-};
+}
 
-escape_to_lower = function(url) {
+/**
+ * Escape url using lowercase hex code
+ * @param {string} url a url string
+ * @return {string} escaped url
+ */
+function escapeToLower(url) {
   return encodeURIComponent(url).replace(/%../g, function(match) {
     return match.toLowerCase();
   });
-};
+}
 
 /**
-* Generate an authorization token
-* @param {Object} options
-* @param {string} options.key - the secret key required to sign the token
-* @param {string} [options.ip] - the IP address of the client
-* @param {number} [options.start_time=now] - the start time of the token in seconds from epoch
-* @param {string} [options.expiration] - the expiration time of the token in seconds from epoch
-* @param {string} [options.duration] - the duration of the token (from start_time)
-* @param {string} [options.acl] - the ACL for the token
-* @param {string} [options.url] - the URL to authentication in case of a URL token
-* @returns {string} the authorization token
+ * Auth token options
+ * @typedef {object} authTokenOptions
+ * @property {string} [token_name="__cld_token__"] The name of the token.
+ * @property {string} key The secret key required to sign the token.
+ * @property {string} ip The IP address of the client.
+ * @property {number} start_time=now The start time of the token in seconds from epoch.
+ * @property {string} expiration The expiration time of the token in seconds from epoch.
+ * @property {string} duration The duration of the token (from start_time).
+ * @property {string} acl The ACL for the token.
+ * @property {string} url The URL to authentication in case of a URL token.
+ *
+ */
+
+/**
+ * Generate an authorization token
+ * @param {authTokenOptions} options
+ * @returns {string} the authorization token
  */
 module.exports = function(options) {
-  var auth, part, ref, ref1, start, toSign, tokenName, tokenParts, url;
-  tokenName = (ref = options.token_name) != null ? ref : "__cld_token__";
+  const tokenName = options.token_name ? options.token_name : "__cld_token__";
   if (options.expiration == null) {
     if (options.duration != null) {
-      start = (ref1 = options.start_time) != null ? ref1 : Math.round(Date.now() / 1000);
+      let start = options.start_time != null ? options.start_time : Math.round(Date.now() / 1000);
       options.expiration = start + options.duration;
     } else {
       throw new Error("Must provide either expiration or duration");
     }
   }
-  tokenParts = [];
+  let tokenParts = [];
   if (options.ip != null) {
     tokenParts.push(`ip=${options.ip}`);
   }
@@ -55,22 +59,14 @@ module.exports = function(options) {
   }
   tokenParts.push(`exp=${options.expiration}`);
   if (options.acl != null) {
-    tokenParts.push(`acl=${escape_to_lower(options.acl)}`);
+    tokenParts.push(`acl=${escapeToLower(options.acl)}`);
   }
-  toSign = (function() {
-    var i, len, results;
-    results = [];
-    for (i = 0, len = tokenParts.length; i < len; i++) {
-      part = tokenParts[i];
-      results.push(part);
-    }
-    return results;
-  })();
+  let toSign = [...tokenParts];
   if (options.url) {
-    url = escape_to_lower(options.url);
+    let url = escapeToLower(options.url);
     toSign.push(`url=${url}`);
   }
-  auth = digest(toSign.join("~"), options.key);
+  let auth = digest(toSign.join("~"), options.key);
   tokenParts.push(`hmac=${auth}`);
   return `${tokenName}=${tokenParts.join('~')}`;
 };

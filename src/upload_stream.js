@@ -1,27 +1,23 @@
-var UploadStream, stream, util;
 
-stream = require("stream");
+const Transform = require("stream").Transform;
 
-util = require("util");
+class UploadStream extends Transform {
+  constructor(options) {
+    super();
+    this.boundary = options.boundary;
+  }
 
-UploadStream = function(options) {
-  this.boundary = options.boundary;
-  stream.Transform.call(this, options);
-};
+  _transform(data, encoding, next) {
+    let buffer = ((Buffer.isBuffer(data)) ? data : new Buffer(data, encoding));
+    this.push(buffer);
+    next();
+  }
 
-util.inherits(UploadStream, stream.Transform);
-
-UploadStream.prototype._transform = function(data, encoding, next) {
-  var buffer;
-  buffer = ((Buffer.isBuffer(data)) ? data : new Buffer(data, encoding));
-  this.push(buffer);
-  next();
-};
-
-UploadStream.prototype._flush = function(next) {
-  this.push(new Buffer("\r\n", 'ascii'));
-  this.push(new Buffer("--" + this.boundary + "--", 'ascii'));
-  return next();
-};
+  _flush(next) {
+    this.push(new Buffer("\r\n", 'ascii'));
+    this.push(new Buffer("--" + this.boundary + "--", 'ascii'));
+    return next();
+  }
+}
 
 module.exports = UploadStream;

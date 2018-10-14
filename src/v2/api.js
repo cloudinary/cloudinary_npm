@@ -1,10 +1,7 @@
-var api, utils;
+const api = require('../api');
+const v1_adapters = require('../utils').v1_adapters;
 
-api = require('../api');
-
-utils = require('../utils');
-
-utils.v1_adapters(exports, api, {
+v1_adapters(exports, api, {
   ping: 0,
   usage: 0,
   resource_types: 0,
