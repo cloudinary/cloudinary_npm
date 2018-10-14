@@ -1,10 +1,11 @@
 
 const config = require("./config");
+const ensureOption = require('./utils/ensureOption').defaults(config());
 
 const https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
 const utils = require("./utils");
 
-const {extend, includes, isString, only} = utils;
+const {extend, includes, isString, only, ensurePresenceOf} = utils;
 
 const querystring = require("querystring");
 
@@ -14,11 +15,12 @@ const api = module.exports;
 
 function call_api(method, uri, params, callback, options) {
   let  handle_response, query_params;
+  ensurePresenceOf({method, uri});
   const deferred = Q.defer();
-  const cloudinary = options["upload_prefix"] || config("upload_prefix") || "https://api.cloudinary.com";
-  const cloud_name = options["cloud_name"] || config("cloud_name") || throw "Must supply cloud_name";
-  const api_key = options["api_key"] || config("api_key") || throw "Must supply api_key";
-  const api_secret = options["api_secret"] || config("api_secret") || throw "Must supply api_secret";
+  const cloudinary = ensureOption(options, "upload_prefix", "https://api.cloudinary.com");
+  const cloud_name = ensureOption(options, "cloud_name");
+  const api_key =    ensureOption(options, "api_key");
+  const api_secret = ensureOption(options, "api_secret");
 
   method = method.toUpperCase();
   let api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
@@ -111,7 +113,7 @@ function call_api(method, uri, params, callback, options) {
       error: e
     }) : void 0;
   });
-  request.setTimeout(options["timeout"] != null ? options["timeout"] : 60000);
+  request.setTimeout( ensureOption(options, "timeout", 60000));
   if (method !== "GET") {
     request.write(query_params);
   }
@@ -474,5 +476,5 @@ exports.update_resources_access_mode_by_tag = function update_resources_access_m
 };
 
 exports.update_resources_access_mode_by_ids = function update_resources_access_mode_by_ids(access_mode, ids, callback, options={}) {
-  return update_resources_access_mode(access_mode, "public_ids[]", ids, callback, options);
+  return updateResourcesAccessMode(access_mode, "public_ids[]", ids, callback, options);
 };
