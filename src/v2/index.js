@@ -1,6 +1,6 @@
 var clone, v1, v2;
 
-v1 = require('../../cloudinary.js');
+v1 = require('../cloudinary.js');
 
 clone = require('lodash/clone');
 
