@@ -19,9 +19,7 @@ function isNestedKey(key) {
 }
 
 function putNestedValue(params, key, value) {
-  let chain = key.split(/[\[\]]+/).filter((i) => {
-    return i.length;
-  });
+  let chain = key.split(/[\[\]]+/).filter((i) => i.length);
   let outer = params;
   let lastKey = chain.pop();
   for (let j = 0; j < chain.length; j++) {
@@ -35,31 +33,35 @@ function putNestedValue(params, key, value) {
   }
   return outer[lastKey] = value;
 }
+
 module.exports = function(new_config, new_value) {
   if ((cloudinary_config == null) || new_config === true) {
+    if (cloudinary_config == null){
+      cloudinary_config = {};
+    } else {
+      Object.keys(cloudinary_config).forEach(key=> delete cloudinary_config[key]);
+    }
+
+
     let cloudinary_url = process.env.CLOUDINARY_URL;
     if (cloudinary_url != null) {
 
       let uri = url.parse(cloudinary_url, true);
-      cloudinary_config = {
+      let parsedConfig = {
         cloud_name: uri.host,
         api_key: uri.auth && uri.auth.split(":")[0],
         api_secret: uri.auth && uri.auth.split(":")[1],
         private_cdn: uri.pathname != null,
         secure_distribution: uri.pathname && uri.pathname.substring(1)
       };
-      if (uri.query != null) {
-        for (let k in uri.query) {
-          let v = uri.query[k];
-          if (isNestedKey(k)) {
-            putNestedValue(cloudinary_config, k, v);
-          } else {
-            cloudinary_config[k] = v;
-          }
+      Object.entries(parsedConfig).forEach(([key, value])=> {
+        if(value !== undefined) {
+          cloudinary_config[key] = value;
         }
+      });
+      if (uri.query != null) {
+        Object.entries(uri.query).forEach( ([key, value])=> putNestedValue(cloudinary_config, key, value));
       }
-    } else {
-      cloudinary_config = {};
     }
   }
   if (!isUndefined(new_value)) {
