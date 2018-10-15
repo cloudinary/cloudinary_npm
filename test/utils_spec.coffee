@@ -20,6 +20,8 @@ TEST_TAG        = helper.TEST_TAG
 sharedExamples = helper.sharedExamples
 itBehavesLike = helper.itBehavesLike
 test_cloudinary_url = helper.test_cloudinary_url
+generateBreakpoints = require('../lib/utils/generateBreakpoints')
+{srcsetUrl, generateSrcsetAttribute} = require('../lib/utils/srcsetUtils')
 
 # Defined globals
 cloud_name = ''
@@ -635,3 +637,20 @@ describe "utils", ->
         overlay: {text: "$(start)Hello $(name)$(ext), $(no ) $( no)$(end)", font_family: "Arial", font_size: "18"}
       }, "http://res.cloudinary.com/#{cloud_name}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample", {})
 
+  describe 'generateBreakpoints', ->
+    it 'should accept breakpoints', ->
+     expect(generateBreakpoints({breakpoints: [1,2,3]})).to.eql([1,2,3])
+    it 'should accept min_width, max_width', ->
+     expect(generateBreakpoints({min_width: 100, max_width: 600, max_images: 7})).to.eql([ 100, 184, 268, 352, 436, 520, 600 ])
+  describe 'srcsetUrl', ->
+    it 'should generate url', ->
+      url = srcsetUrl('sample.jpg', 101, {width: 200, crop: 'scale'})
+      expect(url).to.eql("http://res.cloudinary.com/#{cloud_name}/image/upload/c_scale,w_200/c_scale,w_101/sample.jpg")
+    it "should generate url without a transformation", ->
+      url = srcsetUrl('sample.jpg', 101, {})
+      expect(url).to.eql("http://res.cloudinary.com/#{cloud_name}/image/upload/c_scale,w_101/sample.jpg")
+
+  describe 'generateSrcsetAttribute', ->
+    it "should generate a url for each breakpoint", ->
+      srcset = generateSrcsetAttribute('sample', [1,2,3])
+      expect(srcset.split(', ').length).to.eql(3)
