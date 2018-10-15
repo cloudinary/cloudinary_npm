@@ -13,6 +13,7 @@ const defaultsDeep = require('lodash/defaultsDeep');
 const UploadStream = require('./upload_stream');
 const utils = require("./utils");
 const {extend, includes, isArray, isObject, build_upload_params} = utils;
+const Cache = require('./cache');
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback, options = {}) {
   return exports.upload_stream(callback, utils.merge(options, {
@@ -310,6 +311,27 @@ function call_context_api(context, command, public_ids = [], callback, options =
   });
 }
 
+/**
+ * Cache (part of) the upload results.
+ * @param result
+ * @param {object} options
+ * @param {string} options.type
+ * @param {string} options.resource_type
+ */
+function cacheResults(result, {type, resource_type}) {
+  if (result.responsive_breakpoints) {
+    result.responsive_breakpoints.forEach(
+      ({transformation,
+         url,
+         breakpoints}) => Cache.set(
+        result.public_id,
+        {type, resource_type, raw_transformation: transformation, format: path.extname(breakpoints[0].url).slice(1)},
+        breakpoints.map(i => i.width)
+      ));
+  }
+}
+
+
 function parseResult(buffer, res) {
   let result='';
   try {
@@ -361,6 +383,7 @@ function call_api(action, callback, options, get_params) {
           result["error"]["http_code"] = res.statusCode;
           deferred.reject(result.error);
         } else {
+          cacheResults(result, options);
           deferred.resolve(result);
         }
         return callback(result);

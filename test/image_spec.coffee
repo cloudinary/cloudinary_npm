@@ -1,18 +1,26 @@
 expect = require('expect.js')
 cloudinary = require('../cloudinary')
+utils = cloudinary.utils
 helper = require("./spechelper")
 sharedContext = helper.sharedContext
 sharedExamples = helper.sharedExamples
 includeContext = helper.includeContext
-utils = cloudinary.utils
 extend = require('lodash/extend')
-
+BREAKPOINTS = [5,3,7,5]
 UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload"
+Cache = cloudinary.Cache
 
 srcRegExp = (name, path)->
   RegExp("#{name}=[\"']#{UPLOAD_PATH}/#{path}[\"']".replace("/", "\/"))
 
 describe 'image helper', ->
+  commonTrans =
+    effect: 'sepia',
+    cloud_name: 'test123',
+    client_hints: false
+  commonTransformationStr = 'e_sepia'
+  customAttributes = custom_attr1: 'custom_value1', custom_attr2: 'custom_value2'
+
   beforeEach ->
     cloudinary.config(true) # Reset
     cloudinary.config(cloud_name: "test123", api_secret: "1234")
@@ -42,6 +50,23 @@ describe 'image helper', ->
     cloudinary.image('hello', options)
     expect(options.fetch_format).to.eql('auto')
     expect(options.flags).to.eql('progressive')
+
+  it "Should consume custom attributes from 'attributes' key", ->
+    tag = cloudinary.image('sample.jpg', utils.extend({attributes: customAttributes}, commonTrans))
+    Object.entries(customAttributes).forEach ([key, value])->
+      expect(tag).to.contain("#{key}='#{value}'")
+
+  it "Should consume custom attributes as is from options", ->
+    options = utils.extend({}, commonTrans, customAttributes)
+    tag = cloudinary.image('sample.jpg', options)
+    Object.entries(customAttributes).forEach ([key, value])->
+      expect(tag).to.contain("#{key}='#{value}'")
+
+  it "Attributes from 'attributes' dict should override existing attributes", ->
+    options = utils.extend({}, commonTrans, {alt: "original alt", attributes: {alt: "updated alt"}})
+    tag = cloudinary.image('sample.jpg', options)
+    expect(tag).to.contain("alt='updated alt'")
+
 
   sharedExamples "client_hints", (options)->
     it "should not use data-src or set responsive class", ->
@@ -82,12 +107,8 @@ describe 'image helper', ->
   describe "srcset", ->
     lastBreakpoint = 399
     breakpoints = [100, 200, 300, lastBreakpoint]
-    commonTrans =
-      effect: 'sepia',
-      cloud_name: 'test123',
-      client_hints: false
-    commonTransformationStr = 'e_sepia'
-    customAttributes = custom_attr1: 'custom_value1', custom_attr2: 'custom_value2'
+    before ->
+      helper.setupCache()
 
     it "Should create srcset attribute with provided breakpoints", ->
       tagWithBreakpoints = cloudinary.image('sample.jpg', utils.extend({}, commonTrans, srcset: breakpoints: breakpoints ) )
@@ -154,6 +175,15 @@ describe 'image helper', ->
       ))
       expected = getExpectedSrcsetTag('sample.jpg', 'e_sepia,h_500,w_500', '', breakpoints)
       expect(tag).to.eql(expected)
+    it "should use cached breakpoints", ->
+      Cache.set('sample.jpg', {}, BREAKPOINTS)
+      tag = cloudinary.image('sample.jpg', srcset: useCache: true)
+      console.log(tag)
+      srcset = tag.match(/srcset=['"]([^"']+)['"]/)[1]
+      expect(srcset).to.be.ok()
+      srcset = srcset.split(/, /)
+      expect(srcset.length).to.be(BREAKPOINTS.length)
+      BREAKPOINTS.forEach((bp,i)->expect(srcset[i].slice(-2)).to.eql("#{bp}w"))
 
     describe "errors", ->
       invalidBreakpoints= [

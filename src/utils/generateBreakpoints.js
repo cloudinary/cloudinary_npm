@@ -1,15 +1,11 @@
 
 /**
  * Helper function. Gets or populates srcset breakpoints using provided parameters
- * @private
  * Either the breakpoints or min_width, max_width, max_images must be provided.
  *
- * @param {object} srcset with either `breakpoints` or `min_width`, `max_width`, and `max_images`
- *
- * @param {number[]}  srcset.breakpoints An array of breakpoints.
- * @param {int}       srcset.min_width   Minimal width of the srcset images.
- * @param {int}       srcset.max_width   Maximal width of the srcset images.
- * @param {int}       srcset.max_images  Number of srcset images to generate.
+ * @module utils
+ * @private
+ * @param {srcset} srcset Options with either `breakpoints` or `min_width`, `max_width`, and `max_images`
  *
  * @return {number[]} Array of breakpoints
  *

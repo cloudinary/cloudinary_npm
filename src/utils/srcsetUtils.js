@@ -4,6 +4,7 @@ const utils = require('./index');
 const isEmpty = utils.isEmpty;
 const generateBreakpoints = require('./generateBreakpoints');
 const config = require('../../cloudinary').config;
+const Cache = require('./../Cache');
 
 /**
  * Options used to generate the srcset attribute.
@@ -44,6 +45,27 @@ function scaledUrl(public_id, width, transformation, options = {}) {
   configParams.raw_transformation = utils.generate_transformation_string([utils.extend({}, transformation), {crop: 'scale', width: width}]);
 
   return utils.url(public_id, configParams);
+}
+
+/**
+ * If cache is enabled, get the breakpoints from the cache. If the values were not found in the cache,
+ * or cache is not enabled, generate the values.
+ * @param {srcset} srcset The srcset configuration parameters
+ * @param {string} public_id
+ * @param {object} options
+ * @return {*|Array}
+ */
+function getOrGenerateBreakpoints(public_id, srcset={}, options={}) {
+  let  breakpoints = [];
+  if (srcset.useCache) {
+    breakpoints = Cache.get(public_id, options);
+    if (!breakpoints) {
+      breakpoints = [];
+    }
+  } else {
+    breakpoints = generateBreakpoints(srcset);
+  }
+  return breakpoints;
 }
 
 /**
@@ -97,7 +119,7 @@ function generateImageResponsiveAttributes(publicId, attributes={}, srcsetData={
 
   const generateSrcset = !attributes.srcset;
   if (generateSrcset || generateSizes) {
-    let breakpoints = generateBreakpoints(srcsetData);
+    let breakpoints = getOrGenerateBreakpoints(publicId, srcsetData, options);
 
     if (generateSrcset) {
       let transformation = srcsetData.transformation;

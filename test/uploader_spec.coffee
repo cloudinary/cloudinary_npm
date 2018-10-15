@@ -6,6 +6,7 @@ sinon = require('sinon')
 cloudinary = require("../cloudinary")
 fs = require('fs')
 Q = require('q')
+path = require('path');
 isFunction = require('lodash/isFunction')
 at = require('lodash/at')
 ClientRequest = require('_http_client').ClientRequest
@@ -89,9 +90,10 @@ describe "uploader", ->
     context ":invalidate", ->
       spy = undefined
       xhr = undefined
+      end = undefined
       before ->
-        spy = sinon.spy(ClientRequest.prototype, 'write')
         xhr = sinon.useFakeXMLHttpRequest()
+        spy = sinon.spy(ClientRequest.prototype, 'write')
       after ->
         spy.restore()
         xhr.restore()
@@ -450,6 +452,8 @@ describe "uploader", ->
 
   context ":responsive_breakpoints", ->
     context ":create_derived with different transformation settings", ->
+      before ->
+        helper.setupCache()
       it 'should return a responsive_breakpoints in the response', ()->
         cloudinary.v2.uploader.upload IMAGE_FILE, responsive_breakpoints: [{
           transformation: {effect: "sepia"},
@@ -475,6 +479,15 @@ describe "uploader", ->
           expect(at(result, "responsive_breakpoints[0].breakpoints[0].url")[0]).to.match(/\.jpg$/)
           expect(at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10")
           expect(at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/)
+          result.responsive_breakpoints.map (bp)->
+            format = path.extname(bp.breakpoints[0].url).slice(1)
+            cached = cloudinary.Cache.get(
+              result.public_id,
+              {raw_transformation: bp.transformation, format})
+            expect(cached).to.be.ok()
+            expect(cached.length).to.be(bp.breakpoints.length)
+            bp.breakpoints.forEach (o)->
+              expect(cached).to.contain(o.width)
 
   describe "async upload", ->
     mocked = helper.mockTest()

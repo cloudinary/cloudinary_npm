@@ -1,14 +1,16 @@
-var _ = require('lodash'),  cloudinary = module.exports;
+const _ = require('lodash');
+const cloudinary = module.exports;
 exports.config = require("./config");
 exports.utils = require("./utils");
 exports.uploader = require("./uploader");
 exports.api = require("./api");
 exports.PreloadedFile = require("./preloaded_file");
+exports.Cache = require('./cache');
 
 const optionConsume = cloudinary.utils.option_consume;
 const ensureOption = require('./utils/ensureOption').defaults(cloudinary.config());
 
-exports.url = function(public_id, options) {
+exports.url = function url(public_id, options) {
   options = _.extend({}, options);
   return cloudinary.utils.url(public_id, options);
 };

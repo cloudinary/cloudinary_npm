@@ -9,6 +9,10 @@ utils = require("../lib/utils")
 isFunction = require('lodash/isFunction')
 cloneDeep = require('lodash/cloneDeep')
 config = require("../lib/config")
+Cache = require('../lib/cache')
+FileKeyValueStorage = require('../lib/cache/FileKeyValueStorage')
+KeyValueCacheAdapter = require('../lib/cache/KeyValueCacheAdapter')
+
 http = require('http')
 https = require('https')
 if config().upload_prefix && config().upload_prefix[0..4] == 'http:'
@@ -205,6 +209,10 @@ exports.mockPromise = (mockBlock)->
     writeSpy.restore()
     xhr.restore()
   ).done()
+
+exports.setupCache = ->
+  if !Cache.getAdapter()
+    Cache.setAdapter(new KeyValueCacheAdapter( new FileKeyValueStorage()))
 
 ###*
   Upload an image to be tested on.
