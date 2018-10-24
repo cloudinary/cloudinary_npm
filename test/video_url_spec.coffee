@@ -3,8 +3,8 @@ dotenv.load()
 
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
-utils = require("../lib/utils")
-api = require("../lib/api")
+utils = cloudinary.utils
+
 Q = require('q')
 fs = require('fs')
 test_cloudinary_url = (public_id, options, expected_url, expected_options) ->

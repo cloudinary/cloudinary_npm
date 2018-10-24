@@ -1,10 +1,12 @@
-const ensurePresenceOf = require("./ensurePresenceOf");
+'use strict';
 
-const utils = require('./index');
-const isEmpty = utils.isEmpty;
-const generateBreakpoints = require('./generateBreakpoints');
-const config = require('../config');
-const Cache = require('../cache');
+var ensurePresenceOf = require("./ensurePresenceOf");
+
+var utils = require('./index');
+var isEmpty = utils.isEmpty;
+var generateBreakpoints = require('./generateBreakpoints');
+var config = require('../config');
+var Cache = require('../cache');
 
 /**
  * Options used to generate the srcset attribute.
@@ -39,10 +41,12 @@ const Cache = require('../cache');
  *
  * @return {string} Resulting URL of the item
  */
-function scaledUrl(public_id, width, transformation, options = {}) {
-  let configParams = utils.extractUrlParams(options);
+function scaledUrl(public_id, width, transformation) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var configParams = utils.extractUrlParams(options);
   transformation = transformation || options;
-  configParams.raw_transformation = utils.generate_transformation_string([utils.extend({}, transformation), {crop: 'scale', width: width}]);
+  configParams.raw_transformation = utils.generate_transformation_string([utils.extend({}, transformation), { crop: 'scale', width: width }]);
 
   return utils.url(public_id, configParams);
 }
@@ -55,8 +59,11 @@ function scaledUrl(public_id, width, transformation, options = {}) {
  * @param {object} options
  * @return {*|Array}
  */
-function getOrGenerateBreakpoints(public_id, srcset={}, options={}) {
-  let  breakpoints = [];
+function getOrGenerateBreakpoints(public_id) {
+  var srcset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var breakpoints = [];
   if (srcset.useCache) {
     breakpoints = Cache.get(public_id, options);
     if (!breakpoints) {
@@ -81,7 +88,9 @@ function getOrGenerateBreakpoints(public_id, srcset={}, options={}) {
 function generateSrcsetAttribute(public_id, breakpoints, transformation, options) {
   options = utils.clone(options);
   utils.patchFetchFormat(options);
-  return breakpoints.map(width=>`${scaledUrl(public_id, width, transformation, options)} ${width}w`).join(', ');
+  return breakpoints.map(function (width) {
+    return `${scaledUrl(public_id, width, transformation, options)} ${width}w`;
+  }).join(', ');
 }
 
 /**
@@ -90,8 +99,12 @@ function generateSrcsetAttribute(public_id, breakpoints, transformation, options
  * @param {number[]} breakpoints An array of breakpoints.
  * @return {string} Resulting sizes attribute value
  */
-function generateSizesAttribute(breakpoints=[]){
-  return breakpoints.map(width=>`(max-width: ${width}px) ${width}px`).join(', ');
+function generateSizesAttribute() {
+  var breakpoints = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+  return breakpoints.map(function (width) {
+    return `(max-width: ${width}px) ${width}px`;
+  }).join(', ');
 }
 
 /**
@@ -107,30 +120,34 @@ function generateSizesAttribute(breakpoints=[]){
  *
  * @return array The responsive attributes
  */
-function generateImageResponsiveAttributes(publicId, attributes={}, srcsetData={}, options={}){
+function generateImageResponsiveAttributes(publicId) {
+  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var srcsetData = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
   // Create both srcset and sizes here to avoid fetching breakpoints twice
 
-  let responsiveAttributes = {};
+  var responsiveAttributes = {};
   if (isEmpty(srcsetData)) {
     return responsiveAttributes;
   }
 
-  const generateSizes = (!attributes.sizes && srcsetData.sizes === true);
+  var generateSizes = !attributes.sizes && srcsetData.sizes === true;
 
-  const generateSrcset = !attributes.srcset;
+  var generateSrcset = !attributes.srcset;
   if (generateSrcset || generateSizes) {
-    let breakpoints = getOrGenerateBreakpoints(publicId, srcsetData, options);
+    var breakpoints = getOrGenerateBreakpoints(publicId, srcsetData, options);
 
     if (generateSrcset) {
-      let transformation = srcsetData.transformation;
-      let srcsetAttr = generateSrcsetAttribute(publicId, breakpoints, transformation, options);
+      var transformation = srcsetData.transformation;
+      var srcsetAttr = generateSrcsetAttribute(publicId, breakpoints, transformation, options);
       if (!isEmpty(srcsetAttr)) {
         responsiveAttributes.srcset = srcsetAttr;
       }
     }
 
     if (generateSizes) {
-      let sizesAttr = generateSizesAttribute(breakpoints);
+      var sizesAttr = generateSizesAttribute(breakpoints);
       if (!isEmpty(sizesAttr)) {
         responsiveAttributes.sizes = sizesAttr;
       }
@@ -148,15 +165,17 @@ function generateImageResponsiveAttributes(publicId, attributes={}, srcsetData={
  * @param {number|string} options.max_width
  * @return {string} a media query string
  */
-function generateMediaAttr(options={}){
-  let mediaQuery = [];
-  if(options.min_width != null){
+function generateMediaAttr() {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var mediaQuery = [];
+  if (options.min_width != null) {
     mediaQuery.push(`(min-width: ${options.min_width}px)`);
   }
-  if(options.max_width != null){
+  if (options.max_width != null) {
     mediaQuery.push(`(max-width: ${options.max_width}px)`);
   }
   return mediaQuery.join(' and ');
 }
 
-module.exports = {srcsetUrl: scaledUrl, generateSrcsetAttribute, generateSizesAttribute, generateMediaAttr, generateImageResponsiveAttributes};
+module.exports = { srcsetUrl: scaledUrl, generateSrcsetAttribute, generateSizesAttribute, generateMediaAttr, generateImageResponsiveAttributes };

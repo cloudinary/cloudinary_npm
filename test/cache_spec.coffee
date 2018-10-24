@@ -1,11 +1,12 @@
 expect = require("expect.js")
-Cache = require('../lib/cache')
-cloudinary = require('../cloudinary').v2;
-FileKeyValueStorage = require('../lib/cache/FileKeyValueStorage')
-KeyValueCacheAdapter = require('../lib/cache/KeyValueCacheAdapter')
+helper = require("./spechelper")
+
+cloudinary = require('../cloudinary').v2
+Cache = cloudinary.Cache
+FileKeyValueStorage = require("../#{helper.libPath}/cache/FileKeyValueStorage")
+KeyValueCacheAdapter = require("../#{helper.libPath}/cache/KeyValueCacheAdapter")
 path = require('path');
 
-helper = require("./spechelper")
 TEST_TAG        = helper.TEST_TAG
 IMAGE_FILE      = helper.IMAGE_FILE
 LARGE_RAW_FILE  = helper.LARGE_RAW_FILE

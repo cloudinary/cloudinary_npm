@@ -1,8 +1,12 @@
 require('dotenv').load(silent: true)
 http = require('http')
 expect = require("expect.js")
+helper = require("./spechelper")
+Q = require('q')
+fs = require('fs')
+os = require('os')
 cloudinary = require("../cloudinary")
-utils = require("../lib/utils")
+utils = cloudinary.utils
 {
   clone, 
   isString, 
@@ -10,18 +14,15 @@ utils = require("../lib/utils")
   only
 } = utils
 defaults = require('lodash/defaults')
-api = require("../lib/api")
-Q = require('q')
-fs = require('fs')
-os = require('os')
 
-helper = require("./spechelper")
-TEST_TAG        = helper.TEST_TAG
-sharedExamples = helper.sharedExamples
-itBehavesLike = helper.itBehavesLike
-test_cloudinary_url = helper.test_cloudinary_url
-generateBreakpoints = require('../lib/utils/generateBreakpoints')
-{srcsetUrl, generateSrcsetAttribute} = require('../lib/utils/srcsetUtils')
+TEST_TAG = helper.TEST_TAG
+{
+  sharedExamples
+  itBehavesLike
+  test_cloudinary_url
+} = helper
+generateBreakpoints = require("../#{helper.libPath}/utils/generateBreakpoints")
+{srcsetUrl, generateSrcsetAttribute} = require("../#{helper.libPath}/utils/srcsetUtils")
 
 # Defined globals
 cloud_name = ''
@@ -539,6 +540,7 @@ describe "utils", ->
     before ->
       configBck = cloudinary.config()
       cloudinary.config({cloud_name: 'test123', api_key : "1234", api_secret: "b"})
+      cloud_name = 'test123'
     after ->
       cloudinary.config(configBck)
 

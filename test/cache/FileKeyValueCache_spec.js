@@ -1,8 +1,10 @@
 const expect = require("expect.js");
+const helper = require("../spechelper");
+
 const fs = require('fs');
 const path = require('path');
-const FileKeyValueStorage = require('../../lib/cache/FileKeyValueStorage');
-const KeyValueCacheAdapter = require("../../src/cache/KeyValueCacheAdapter");
+const FileKeyValueStorage = require("../../" + helper.libPath + "/cache/FileKeyValueStorage");
+const KeyValueCacheAdapter = require("../../" + helper.libPath + "/cache/KeyValueCacheAdapter");
 const cwd = process.cwd();
 const KEY = "test_key";
 const VALUE = "test_value";

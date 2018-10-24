@@ -1,12 +1,17 @@
 require('dotenv').load(silent: true)
+helper = require("./spechelper")
+
 http = require('http')
 https = require('https')
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
 utils = cloudinary.v2.utils
 last = require('lodash/last')
-api = cloudinary.v2.api
-uploader = cloudinary.v2.uploader
+{
+  api
+  uploader
+} = cloudinary.v2
+
 zlib = require('zlib')
 sinon = require("sinon")
 ClientRequest = require('_http_client').ClientRequest
@@ -17,7 +22,6 @@ Q = require('q')
 fs = require('fs')
 os = require('os')
 
-helper = require("./spechelper")
 TEST_TAG = helper.TEST_TAG
 IMAGE_URL = helper.IMAGE_URL
 
@@ -97,7 +101,7 @@ describe "utils", ->
           res.on 'end', ->
             file.on 'close', ->
               list = execSync("unzip -l -qq #{filename}")
-              list = list.toString().split('\n').slice(3, -3)
+              list = list.toString().split('\n').slice(0, -1)
               list = (last(i.split(/[ ]+/)) for i in list) # keep only filenames
               expect(list.length).to.eql(2)
               expect(list).to.contain(publicId1 + ".jpg")

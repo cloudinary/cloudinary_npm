@@ -178,7 +178,6 @@ describe 'image helper', ->
     it "should use cached breakpoints", ->
       Cache.set('sample.jpg', {}, BREAKPOINTS)
       tag = cloudinary.image('sample.jpg', srcset: useCache: true)
-      console.log(tag)
       srcset = tag.match(/srcset=['"]([^"']+)['"]/)[1]
       expect(srcset).to.be.ok()
       srcset = srcset.split(/, /)

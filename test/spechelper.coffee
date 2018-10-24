@@ -1,17 +1,23 @@
 expect = require('expect.js')
-cloudinary = require("../cloudinary")
-utils = require("../lib/utils")
-{
-  isEmpty 
-  isFunction 
-  last
-} = utils
 isFunction = require('lodash/isFunction')
 cloneDeep = require('lodash/cloneDeep')
-config = require("../lib/config")
-Cache = require('../lib/cache')
-FileKeyValueStorage = require('../lib/cache/FileKeyValueStorage')
-KeyValueCacheAdapter = require('../lib/cache/KeyValueCacheAdapter')
+
+libPath = exports.libPath = if Number(process.versions.node[0]) < 8 then 'lib-es5' else 'lib'
+
+cloudinary = require("../cloudinary")
+{
+  utils
+  config
+  Cache
+} = cloudinary
+
+{
+  isEmpty 
+  last
+} = utils
+
+FileKeyValueStorage = require("../#{libPath}/cache/FileKeyValueStorage")
+KeyValueCacheAdapter = require("../#{libPath}/cache/KeyValueCacheAdapter")
 
 http = require('http')
 https = require('https')
@@ -82,18 +88,19 @@ expect.Assertion::beServedByCloudinary = (done)->
     done()
   @
 
-class sharedExamples
-  constructor: (name, examples)->
-    @allExamples ?= {}
-    if isFunction(examples)
-      @allExamples[name] = examples
-      examples
-    else
-      if @allExamples[name]?
-        return @allExamples[name]
+allExamples = null
+sharedExamples = do (allExamples, isFunction)->
+  (name, examples)->
+      allExamples ?= {}
+      if isFunction(examples)
+        allExamples[name] = examples
+        examples
       else
-        return ->
-          console.log("Shared example #{name} was not found!")
+        if allExamples[name]?
+          return allExamples[name]
+        else
+          return ->
+            console.log("Shared example #{name} was not found!")
 
 exports.sharedExamples = exports.sharedContext = sharedExamples
 

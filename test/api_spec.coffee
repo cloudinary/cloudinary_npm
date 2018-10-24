@@ -1,8 +1,9 @@
 require('dotenv').load(silent: true)
+helper = require("./spechelper")
 
 expect = require("expect.js")
 cloudinary = require("../cloudinary")
-utils = require("../lib/utils")
+utils = cloudinary.utils
 {
   matchesProperty,
   merge
@@ -15,7 +16,6 @@ ClientRequest = require('_http_client').ClientRequest
 http = require('http')
 Q = require('q')
 fs = require('fs')
-helper = require("./spechelper")
 mockTest = helper.mockTest
 
 sharedExamples = helper.sharedExamples
@@ -48,29 +48,23 @@ EXPLICIT_TRANSFORMATION = {width: 100, crop: "scale", overlay: "text:Arial_60:#{
 EXPLICIT_TRANSFORMATION2 = {width: 200, crop: "scale", overlay: "text:Arial_60:#{TEST_TAG}"}
 
 sharedExamples "a list with a cursor", (testFunc, args...)->
-  xhr = request = requestStub = requestSpy = writeSpy =undefined
-  before ->
-    xhr = sinon.useFakeXMLHttpRequest()
-    writeSpy = sinon.spy(ClientRequest.prototype, 'write')
-    requestSpy = sinon.spy(http, 'request')
-
-  after ->
-    writeSpy.restore()
-    requestSpy.restore()
-    xhr.restore()
 
   specify ":max_results", ()->
-    testFunc args..., max_results: 10
-    if writeSpy.called
-      sinon.assert.calledWith writeSpy, sinon.match(/max_results=10/)
-    else
-      sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/max_results=10/))
+    helper.mockPromise (xhr, writeSpy, requestSpy)->
+      testFunc args..., max_results: 10
+      if writeSpy.called
+        sinon.assert.calledWith writeSpy, sinon.match(/max_results=10/)
+      else
+        sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/max_results=10/))
+
+
   specify ":next_cursor", ()->
-    testFunc args..., next_cursor: 23452342
-    if writeSpy.called
-      sinon.assert.calledWith writeSpy, sinon.match(/next_cursor=23452342/)
-    else
-      sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/next_cursor=23452342/))
+    helper.mockPromise (xhr, writeSpy, requestSpy)->
+      testFunc args..., next_cursor: 23452342
+      if writeSpy.called
+        sinon.assert.calledWith writeSpy, sinon.match(/next_cursor=23452342/)
+      else
+        sinon.assert.calledWith requestSpy, sinon.match(query: sinon.match(/next_cursor=23452342/))
 
 sharedExamples "accepts next_cursor", (testFunc, args...)->
   xhr = request = requestStub = requestSpy = writeSpy =undefined
