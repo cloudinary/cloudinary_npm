@@ -1,4 +1,6 @@
-
+/**
+ * In-memory cache storage used in the cache tests.
+ */
 class DummyCacheStorage {
   constructor() {
     this.dummyCache = {};

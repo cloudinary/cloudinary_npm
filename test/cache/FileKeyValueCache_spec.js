@@ -4,26 +4,33 @@ const helper = require("../spechelper");
 const fs = require('fs');
 const path = require('path');
 const FileKeyValueStorage = require("../../" + helper.libPath + "/cache/FileKeyValueStorage");
-const KeyValueCacheAdapter = require("../../" + helper.libPath + "/cache/KeyValueCacheAdapter");
-const cwd = process.cwd();
+
 const KEY = "test_key";
 const VALUE = "test_value";
 const KEY2 = "test_key_2";
 const VALUE2= "test_value_2";
-var storage;
-var tmpPath;
-function getTestValue(key){
-  let storedValue = fs.readFileSync(storage.getFilename(key));
-  console.log("storedValue:", storedValue);
-  return JSON.parse(storedValue);
-}
+
 describe("FileKeyValueStorage", ()=>{
+  var storage;
+  var basefolder;
+
+  function getTestValue(key){
+    let storedValue = fs.readFileSync(storage.getFilename(key));
+    return JSON.parse(storedValue);
+  }
+
   before(()=>{
-    const { sep } = path;
-    var tmpPath = fs.mkdtempSync(`${cwd}${sep}`);
-    console.log("temp path:", tmpPath);
-    storage = new FileKeyValueStorage(tmpPath);
+    const cwd = process.cwd();
+    const {sep} = path;
+    basefolder = fs.mkdtempSync(`${cwd}${sep}`);
+    storage = new FileKeyValueStorage(basefolder);
   });
+
+  after(()=>{
+    storage.deleteBaseFolder();
+    expect(fs.accessSync(basefolder)).to.be(undefined);
+  });
+
   it("should set a value in a file", ()=>{
     storage.set(KEY, VALUE);
     let actual = getTestValue(KEY);

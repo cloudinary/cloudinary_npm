@@ -115,7 +115,6 @@ describe "api", ->
 
       Q.allSettled [
         cloudinary.v2.api.delete_resources_by_tag(TEST_TAG)
-        cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2)
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3)
@@ -355,20 +354,20 @@ describe "api", ->
     itBehavesLike "a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME
     itBehavesLike "a list with a cursor", cloudinary.v2.api.transformations
 
+    transformationName = "api_test_transformation3" + SUFFIX
+    after ->
+      Q.allSettled [
+        cloudinary.v2.api.delete_transformation(transformationName)
+        cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)]
+      .finally ->
+
     it "should allow listing transformations", () ->
       @timeout helper.TIMEOUT_MEDIUM
       cloudinary.v2.api.transformations()
       .then (result)->
-        transformation = find_by_attr(result.transformations, "name", EXPLICIT_TRANSFORMATION_NAME)
-        expect(result.next_cursor).not.to.be.empty()
-        expect(transformation).not.to.eql(undefined)
-        expect(transformation.used).to.be.ok()
-        previous_cursor = result.next_cursor
-        cloudinary.v2.api.transformations(next_cursor: result.next_cursor)
-        .then (result)-> [previous_cursor, result]
-      .then ([previous_cursor, result])->
-        expect(result).not.to.be.empty()
-        expect(result.next_cursor).not.to.eql(previous_cursor)
+        expect(result).to.have.key("transformations")
+        expect(result.transformations).not.to.be.empty()
+        expect(result.transformations[0]).to.have.key('used')
 
     it "should allow getting transformation metadata", () ->
       @timeout helper.TIMEOUT_MEDIUM
@@ -412,7 +411,7 @@ describe "api", ->
 
     it "should allow unsafe update of named transformation", ()->
       @timeout helper.TIMEOUT_MEDIUM
-      transformationName = "api_test_transformation3" + SUFFIX
+
       cloudinary.v2.api.create_transformation(transformationName, {crop: "scale", width: 102})
       .then (result) ->
         cloudinary.v2.api.update_transformation(transformationName, {unsafe_update: {crop: "scale", width: 103}})
@@ -652,7 +651,7 @@ describe "api", ->
           new RegExp("/resources/image/moderations/manual/#{status2}$").test(arg?.pathname)
         , "/resources/image/moderations/manual/#{status}")
         sinon.assert.calledWith request, sinon.match( (arg)->
-          /^moderations=true$/.test(arg?.query) 
+          "moderations=true" == arg?.query
         , "moderations=true")
 
   # For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
