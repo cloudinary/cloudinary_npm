@@ -1,4 +1,35 @@
 
+1.12.0 / 2018-11-08
+===================
+
+New functionality
+-----------------
+
+  * Add Responsive Breakpoints cache
+  * Add `picture` and `source` tags
+  * Add fetch support to overlay/underlay (#189)
+  * Add async param to uploader (#193)
+ 
+Other changes
+-------------
+
+  * Convert CoffeeScript source to JavaScript
+  * Refactor compiled coffee to proper JS
+  * Remove old lib files
+  * Move all sources from `src` to `lib`
+  * Move `cloudinary.js` inside the src folder
+  * Setup library and tests to run with either es6 or es5
+  * Apply babel to support older Node versions
+  * Refactor tests to use promises
+  * Fix Tests
+  * Refactor utils
+  * Move utils.js to utils folder
+  * Add `ensurePresenceOf` and `rimraf` utility functions
+  * Add `nyc` for coverage and update sinon
+  * Add "Join the Community" (#201)
+  * Use upload params in explicit API
+  * Fix raw convert test
+
 1.11.0 / 2018-03-19
 ===================
 
