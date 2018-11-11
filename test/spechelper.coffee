@@ -2,7 +2,7 @@ expect = require('expect.js')
 isFunction = require('lodash/isFunction')
 cloneDeep = require('lodash/cloneDeep')
 
-libPath = exports.libPath = if Number(process.versions.node[0]) < 8 then 'lib-es5' else 'lib'
+libPath = exports.libPath = if Number(process.versions.node.split('.')[0]) < 8 then 'lib-es5' else 'lib'
 
 cloudinary = require("../cloudinary")
 {
