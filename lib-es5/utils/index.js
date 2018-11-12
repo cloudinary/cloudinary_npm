@@ -48,6 +48,7 @@ var utf8_encode = require('./utf8_encode');
 var crc32 = require('./crc32');
 var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
+var entries = require('./entries');
 
 module.exports = {
   at,
@@ -394,7 +395,7 @@ exports.encode_double_array = function encode_double_array(array) {
 
 exports.encode_key_value = function encode_key_value(arg) {
   if (isObject(arg)) {
-    return Object.entries(args).map(function (_ref) {
+    return entries(args).map(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2),
           k = _ref2[0],
           v = _ref2[1];
@@ -409,7 +410,7 @@ exports.encode_key_value = function encode_key_value(arg) {
 exports.encode_context = function encode_context(arg) {
   var k, pairs, v;
   if (isObject(arg)) {
-    return Object.entries(arg).map(function (_ref3) {
+    return entries(arg).map(function (_ref3) {
       var _ref4 = _slicedToArray(_ref3, 2),
           k = _ref4[0],
           v = _ref4[1];
@@ -440,7 +441,7 @@ exports.build_custom_headers = function build_custom_headers(headers) {
   } else if (isArray(headers)) {
     return headers.join("\n");
   } else if (isObject(headers)) {
-    return Object.entries(headers).map(function (_ref5) {
+    return entries(headers).map(function (_ref5) {
       var _ref6 = _slicedToArray(_ref5, 2),
           k = _ref6[0],
           v = _ref6[1];
@@ -509,7 +510,7 @@ exports.generate_transformation_string = function generate_transformation_string
   if (isArray(effect)) {
     effect = effect.join(":");
   } else if (isObject(effect)) {
-    effect = Object.entries(effect).map(function (_ref9) {
+    effect = entries(effect).map(function (_ref9) {
       var _ref10 = _slicedToArray(_ref9, 2),
           key = _ref10[0],
           value = _ref10[1];
@@ -598,7 +599,7 @@ exports.generate_transformation_string = function generate_transformation_string
   });
 
   var variablesParam = utils.option_consume(options, "variables", []);
-  var variables = Object.entries(options).filter(function (_ref11) {
+  var variables = entries(options).filter(function (_ref11) {
     var _ref12 = _slicedToArray(_ref11, 2),
         key = _ref12[0],
         value = _ref12[1];
@@ -619,7 +620,7 @@ exports.generate_transformation_string = function generate_transformation_string
     return `${name}_${normalize_expression(value)}`;
   })).join(',');
 
-  var transformations = Object.entries(params).filter(function (_ref17) {
+  var transformations = entries(params).filter(function (_ref17) {
     var _ref18 = _slicedToArray(_ref17, 2),
         key = _ref18[0],
         value = _ref18[1];
@@ -982,7 +983,7 @@ exports.signed_preloaded_image = function signed_preloaded_image(result) {
 };
 
 exports.api_sign_request = function api_sign_request(params_to_sign, api_secret) {
-  var to_sign = Object.entries(params_to_sign).filter(function (_ref21) {
+  var to_sign = entries(params_to_sign).filter(function (_ref21) {
     var _ref22 = _slicedToArray(_ref21, 2),
         k = _ref22[0],
         v = _ref22[1];
@@ -1002,7 +1003,7 @@ exports.api_sign_request = function api_sign_request(params_to_sign, api_secret)
 
 exports.clear_blank = function clear_blank(hash) {
   var filtered_hash = {};
-  Object.entries(hash).filter(function (_ref25) {
+  entries(hash).filter(function (_ref25) {
     var _ref26 = _slicedToArray(_ref25, 2),
         k = _ref26[0],
         v = _ref26[1];
@@ -1359,7 +1360,7 @@ exports.build_streaming_profiles_param = function build_streaming_profiles_param
  * @return {string} A URI query string.
  */
 function hashToQuery(hash) {
-  return Object.entries(hash).reduce(function (entries, _ref29) {
+  return entries(hash).reduce(function (entries, _ref29) {
     var _ref30 = _slicedToArray(_ref29, 2),
         key = _ref30[0],
         value = _ref30[1];

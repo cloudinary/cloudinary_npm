@@ -15,6 +15,7 @@ var extend = require("lodash/extend");
 var isObject = require("lodash/isObject");
 var isString = require("lodash/isString");
 var isUndefined = require("lodash/isUndefined");
+var entries = require('./utils/entries');
 
 var cloudinary_config = void 0;
 
@@ -61,7 +62,7 @@ module.exports = function (new_config, new_value) {
         private_cdn: uri.pathname != null,
         secure_distribution: uri.pathname && uri.pathname.substring(1)
       };
-      Object.entries(parsedConfig).forEach(function (_ref) {
+      entries(parsedConfig).forEach(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             key = _ref2[0],
             value = _ref2[1];
@@ -71,7 +72,7 @@ module.exports = function (new_config, new_value) {
         }
       });
       if (uri.query != null) {
-        Object.entries(uri.query).forEach(function (_ref3) {
+        entries(uri.query).forEach(function (_ref3) {
           var _ref4 = _slicedToArray(_ref3, 2),
               key = _ref4[0],
               value = _ref4[1];

@@ -34,6 +34,7 @@ var extend = utils.extend,
     build_upload_params = utils.build_upload_params;
 
 var Cache = require('./cache');
+var entries = require('./utils/entries');
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -499,7 +500,7 @@ function call_api(action, callback, options, get_params) {
       return callback({ error });
     }
   };
-  var post_data = Object.entries(params).reduce(function (entries, _ref3) {
+  var post_data = entries(params).reduce(function (entries, _ref3) {
     var _ref4 = _slicedToArray(_ref3, 2),
         key = _ref4[0],
         value = _ref4[1];

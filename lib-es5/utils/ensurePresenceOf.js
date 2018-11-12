@@ -13,13 +13,11 @@
  *    }
  */
 function ensurePresenceOf(parameters) {
-  var missing = Object.entries(parameters).filter(function (param) {
-    return param[1] === undefined;
+  var missing = Object.keys(parameters).filter(function (key) {
+    return parameters[key] === undefined;
   });
   if (missing.length) {
-    console.error(missing.map(function (p) {
-      return p[0];
-    }).join(',') + " cannot be undefined");
+    console.error(missing.join(',') + " cannot be undefined");
   }
 }
 
