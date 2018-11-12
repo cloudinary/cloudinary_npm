@@ -1,3 +1,4 @@
+*
 .project
 src/
 samples/
@@ -6,3 +7,14 @@ test/
 .DS_Store
 .env
 .travis.yml
+!lib/**
+!lib-es5/**
+!package.json
+!babel.config.js
+!.npmignore
+!.gitignore
+!.babelrc
+!CHANGELOG.md
+!cloudinary.js
+!README.md
+
