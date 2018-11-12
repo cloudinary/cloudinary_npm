@@ -1,4 +1,10 @@
 
+1.13.0 / 2018-11-13
+===================
+
+  * Support listing of named transformations using the `named` parameter
+  * Fix Node version check. Fixes #217
+
 1.12.0 / 2018-11-08
 ===================
 
