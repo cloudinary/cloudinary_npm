@@ -387,7 +387,7 @@ exports.tags = function tags(callback) {
 exports.transformations = function transformations(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return call_api("get", ["transformations"], only(options, "next_cursor", "max_results"), callback, options);
+  return call_api("get", ["transformations"], only(options, "next_cursor", "max_results", "named"), callback, options);
 };
 
 exports.transformation = function transformation(transformation, callback) {

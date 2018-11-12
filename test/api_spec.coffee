@@ -409,6 +409,14 @@ describe "api", ->
         expect(transformation.info).to.eql([crop: "scale", width: 102])
         expect(transformation.used).not.to.be.ok()
 
+    it "should allow listing of named transformations", ()->
+      helper.mockPromise (xhr, write, request)->
+        cloudinary.v2.api.transformations(named: true)
+        sinon.assert.calledWith(request, sinon.match(
+          query: sinon.match('named=true')
+        ,
+          "named=true"
+        ))
     it "should allow unsafe update of named transformation", ()->
       @timeout helper.TIMEOUT_MEDIUM
 
