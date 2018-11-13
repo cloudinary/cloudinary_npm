@@ -1,4 +1,11 @@
 
+1.13.1 / 2018-11-13
+===================
+
+  * Filter files in the npm package
+  * Add polyfill for `Object.entries`
+  * Add `update_version` script
+
 1.13.0 / 2018-11-13
 ===================
 
