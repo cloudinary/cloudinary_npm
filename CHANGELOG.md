@@ -1,4 +1,9 @@
 
+1.13.2 / 2018-11-14
+===================
+
+  * Use a new timestamp for each chunk in `upload_large` API
+
 1.13.1 / 2018-11-13
 ===================
 
