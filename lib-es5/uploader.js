@@ -167,6 +167,7 @@ exports.upload_chunked_stream = function upload_chunked_stream(callback) {
     var chunk_start = sent;
     sent += buffer.length;
     options.content_range = `bytes ${chunk_start}-${sent - 1}/${is_last ? sent : -1}`;
+    params.timestamp = utils.timestamp();
     var finished_part = function finished_part(result) {
       if (result.error != null || is_last) {
         if (typeof callback === "function") {

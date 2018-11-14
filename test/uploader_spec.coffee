@@ -9,6 +9,7 @@ Q = require('q')
 path = require('path');
 isFunction = require('lodash/isFunction')
 at = require('lodash/at')
+uniq = require('lodash/uniq')
 ClientRequest = require('_http_client').ClientRequest
 require('jsdom-global')()
 
@@ -33,7 +34,10 @@ describe "uploader", ->
     config = cloudinary.config(true)
     if(!(config.api_key && config.api_secret))
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.")
-    cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+    Q.allSettled [
+      cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) unless cloudinary.config().keep_test_products
+      cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG, resource_type: "video") unless cloudinary.config().keep_test_products
+    ]
 
   beforeEach ->
     cloudinary.config(true)
@@ -387,18 +391,34 @@ describe "uploader", ->
           done()
         true
 
-    it "should support uploading large video files", (done) ->
+    it "should support uploading large video files", () ->
       @timeout helper.TIMEOUT_LONG * 10
-      fs.stat LARGE_VIDEO, (err, stat) ->
-        return done(new Error err.message) if err?
-        cloudinary.v2.uploader.upload_chunked LARGE_VIDEO, {resource_type: 'video', timeout: helper.TIMEOUT_LONG * 10, tags: UPLOAD_TAGS}, (error, result) ->
-          return done(new Error error.message) if error?
-          expect(result.bytes).to.eql(stat.size)
-          expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571")
-          cloudinary.v2.uploader.destroy result.public_id, ()->
-            done()
-          true
-        true
+      writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+      stat = fs.statSync( LARGE_VIDEO)
+      expect(stat).to.be.ok()
+      Q.denodeify(cloudinary.v2.uploader.upload_chunked)( LARGE_VIDEO, {chunk_size: 6000000, resource_type: 'video', timeout: helper.TIMEOUT_LONG * 10, tags: UPLOAD_TAGS})
+      .then (result)->
+        expect(result.bytes).to.eql(stat.size)
+        expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571")
+        timestamps = writeSpy.args.map((a)-> a[0].toString())
+          .filter((p) -> p.match(/timestamp/))
+          .map((p) -> p.match(/"timestamp"\s+(\d+)/)[1])
+        expect(timestamps.length).to.be.greaterThan(1)
+        expect(uniq(timestamps)).to.eql(timestamps)
+      .finally ->
+        writeSpy.restore()
+
+    it "should update timestamp for each chuck", ()->
+        writeSpy = sinon.spy(ClientRequest.prototype, 'write')
+        Q.denodeify(cloudinary.v2.uploader.upload_chunked)( LARGE_VIDEO, {chunk_size: 6000000, resource_type: 'video', timeout: helper.TIMEOUT_LONG * 10, tags: UPLOAD_TAGS})
+        .then ->
+          timestamps = writeSpy.args.map((a)-> a[0].toString())
+            .filter((p) -> p.match(/timestamp/))
+            .map((p) -> p.match(/"timestamp"\s+(\d+)/)[1])
+          expect(timestamps.length).to.be.greaterThan(1)
+          expect(uniq(timestamps)).to.eql(timestamps)
+        .finally ->
+          writeSpy.restore()
 
     it "should support uploading based on a url", (done) ->
       @timeout helper.TIMEOUT_MEDIUM
