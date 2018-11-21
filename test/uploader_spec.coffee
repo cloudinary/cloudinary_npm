@@ -344,7 +344,7 @@ describe "uploader", ->
     .then ()-> expect().fail()
     .catch (error)->
       expect(error).not.to.be undefined
-      expect(error.message).to.contain "is not a valid"
+      expect(error.message).to.contain "Detection is invalid"
 
       
   it "should support requesting background_removal", ()->
