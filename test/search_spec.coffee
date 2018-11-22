@@ -52,6 +52,7 @@ describe "search_api", ->
       expect(query).to.eql(with_field: ['context', 'tags'])
 
   describe "integration", ->
+    @timeout helper.TIMEOUT_LONG
     before "Verify Configuration", ->
       config = cloudinary.config(true)
       if(!(config.api_key && config.api_secret))
