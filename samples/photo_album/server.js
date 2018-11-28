@@ -26,7 +26,7 @@ app.use( methodOverride() );
 
 app.use(express.static(path.join(__dirname, '/public')));
 app.set('views', path.join(__dirname, '/views/'));
-app.use('/bower_components', express.static(path.join(__dirname, '/bower_components')));
+app.use('/node_modules', express.static(path.join(__dirname, '/node_modules')));
 app.engine('ejs', engine);
 app.set('view engine','ejs');
 
