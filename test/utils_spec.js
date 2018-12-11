@@ -1,57 +1,40 @@
-var Q, TEST_TAG, clone, cloud_name, cloudinary, defaults, expect, fs, generateBreakpoints, generateSrcsetAttribute, helper, http, isString, itBehavesLike, merge, only, os, root_path, sharedExamples, srcsetUrl, test_cloudinary_url, utils;
-
 require('dotenv').load({
   silent: true
 });
 
-http = require('http');
-
-expect = require("expect.js");
-
-helper = require("./spechelper");
-
-Q = require('q');
-
-fs = require('fs');
-
-os = require('os');
-
-cloudinary = require("../cloudinary");
-
-utils = cloudinary.utils;
-
-({clone, isString, merge, only} = utils);
-
-defaults = require('lodash/defaults');
-
-TEST_TAG = helper.TEST_TAG;
-
-({sharedExamples, itBehavesLike, test_cloudinary_url} = helper);
-
-generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
-
-({srcsetUrl, generateSrcsetAttribute} = require(`../${helper.libPath}/utils/srcsetUtils`));
+const expect = require("expect.js");
+const helper = require("./spechelper");
+const Q = require('q');
+const fs = require('fs');
+const os = require('os');
+const cloudinary = require("../cloudinary");
+const utils = cloudinary.utils;
+const {clone, isString, merge, only} = utils;
+const defaults = require('lodash/defaults');
+const TEST_TAG = helper.TEST_TAG;
+const {sharedExamples, itBehavesLike, test_cloudinary_url} = helper;
+const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
+const {srcsetUrl, generateSrcsetAttribute} = require(`../${helper.libPath}/utils/srcsetUtils`);
 
 // Defined globals
-cloud_name = '';
+var cloud_name = '';
 
-root_path = '';
+var root_path = '';
 
-describe("utils", function() {
+describe("utils", function () {
   var find_by_attr;
-  before("Verify Configuration", function() {
-    var config;
-    config = cloudinary.config(true);
+  before("Verify Configuration", function () {
+    var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
-      return expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
-  afterEach(function() {
+  afterEach(function () {
     return cloudinary.config(defaults({
       secure: null
     }, this.orig));
   });
-  beforeEach(function() {
+  beforeEach(function () {
     //    @cfg= cloudinary.config( {cloud_name:"test123", secure_distribution : null, private_cdn : false, secure : false, cname : null ,cdn_subdomain : false, api_key : "1234", api_secret: "b" })
     this.cfg = cloudinary.config({
       secure_distribution: null,
@@ -64,7 +47,7 @@ describe("utils", function() {
     cloud_name = cloudinary.config("cloud_name");
     return root_path = `http://res.cloudinary.com/${cloud_name}`;
   });
-  find_by_attr = function(elements, attr, value) {
+  find_by_attr = function (elements, attr, value) {
     var element, i, len;
     for (i = 0, len = elements.length; i < len; i++) {
       element = elements[i];
@@ -74,73 +57,73 @@ describe("utils", function() {
     }
     return void 0;
   };
-  it("should use cloud_name from config", function() {
+  it("should use cloud_name from config", function () {
     return test_cloudinary_url("test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should allow overriding cloud_name in options", function() {
+  it("should allow overriding cloud_name in options", function () {
     return test_cloudinary_url("test", {
       cloud_name: "test321"
     }, "http://res.cloudinary.com/test321/image/upload/test", {});
   });
-  it("should use default secure distribution if secure=true", function() {
+  it("should use default secure distribution if secure=true", function () {
     return test_cloudinary_url("test", {
       secure: true
     }, `https://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should allow overriding secure distribution if secure=true", function() {
+  it("should allow overriding secure distribution if secure=true", function () {
     return test_cloudinary_url("test", {
       secure: true,
       secure_distribution: "something.else.com"
     }, `https://something.else.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should take secure distribution from config if secure=true", function() {
+  it("should take secure distribution from config if secure=true", function () {
     cloudinary.config("secure_distribution", "config.secure.distribution.com");
     return test_cloudinary_url("test", {
       secure: true
     }, `https://config.secure.distribution.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should default to akamai if secure is given with private_cdn and no secure_distribution", function() {
+  it("should default to akamai if secure is given with private_cdn and no secure_distribution", function () {
     return test_cloudinary_url("test", {
       secure: true,
       private_cdn: true
     }, `https://${cloud_name}-res.cloudinary.com/image/upload/test`, {});
   });
-  it("should not add cloud_name if secure private_cdn and secure non akamai secure_distribution", function() {
+  it("should not add cloud_name if secure private_cdn and secure non akamai secure_distribution", function () {
     return test_cloudinary_url("test", {
       secure: true,
       private_cdn: true,
       secure_distribution: "something.cloudfront.net"
     }, "https://something.cloudfront.net/image/upload/test", {});
   });
-  it("should allow overriding private_cdn if private_cdn=true", function() {
+  it("should allow overriding private_cdn if private_cdn=true", function () {
     return test_cloudinary_url("test", {
       private_cdn: true
     }, `http://${cloud_name}-res.cloudinary.com/image/upload/test`, {});
   });
-  it("should allow overriding private_cdn if private_cdn=false", function() {
+  it("should allow overriding private_cdn if private_cdn=false", function () {
     cloudinary.config("private_cdn", true);
     return test_cloudinary_url("test", {
       private_cdn: false
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should allow overriding cname if cname=example.com", function() {
+  it("should allow overriding cname if cname=example.com", function () {
     return test_cloudinary_url("test", {
       cname: "example.com"
     }, `http://example.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should allow overriding cname if cname=false", function() {
+  it("should allow overriding cname if cname=false", function () {
     cloudinary.config("cname", "example.com");
     test_cloudinary_url("test", {
       cname: false
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
     return cloudinary.config("cname", null);
   });
-  it("should use format from options", function() {
+  it("should use format from options", function () {
     return test_cloudinary_url("test", {
       format: 'jpg'
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/test.jpg`, {});
   });
-  it("should support url_suffix in shared distribution", function() {
+  it("should support url_suffix in shared distribution", function () {
     test_cloudinary_url("test", {
       url_suffix: "hello"
     }, `http://res.cloudinary.com/${cloud_name}/images/test/hello`, {});
@@ -149,8 +132,8 @@ describe("utils", function() {
       angle: 0
     }, `http://res.cloudinary.com/${cloud_name}/images/a_0/test/hello`, {});
   });
-  it("should disallow url_suffix in non upload types", function() {
-    return expect(function() {
+  it("should disallow url_suffix in non upload types", function () {
+    expect(function () {
       return utils.url("test", {
         url_suffix: "hello",
         private_cdn: true,
@@ -158,21 +141,21 @@ describe("utils", function() {
       });
     }).to.be.throwError(/URL Suffix only supported for image\/upload, image\/private, image\/authenticated, video\/upload and raw\/upload/);
   });
-  it("should disallow url_suffix with / or .", function() {
-    expect(function() {
+  it("should disallow url_suffix with / or .", function () {
+    expect(function () {
       return utils.url("test", {
         url_suffix: "hello/world",
         private_cdn: true
       });
     }).to.be.throwError(/url_suffix should not include . or \//);
-    return expect(function() {
+    expect(function () {
       return utils.url("test", {
         url_suffix: "hello.world",
         private_cdn: true
       });
     }).to.be.throwError(/url_suffix should not include . or \//);
   });
-  it("should support url_suffix for private_cdn", function() {
+  it("should support url_suffix for private_cdn", function () {
     test_cloudinary_url("test", {
       url_suffix: "hello",
       private_cdn: true
@@ -183,16 +166,15 @@ describe("utils", function() {
       private_cdn: true
     }, `http://${cloud_name}-res.cloudinary.com/images/a_0/test/hello`, {});
   });
-  it("should put format after url_suffix", function() {
+  it("should put format after url_suffix", function () {
     return test_cloudinary_url("test", {
       url_suffix: "hello",
       private_cdn: true,
       format: "jpg"
     }, `http://${cloud_name}-res.cloudinary.com/images/test/hello.jpg`, {});
   });
-  it("should not sign the url_suffix", function() {
-    var expected_signature;
-    expected_signature = utils.url("test", {
+  it("should not sign the url_suffix", function () {
+    var expected_signature = utils.url("test", {
       format: "jpg",
       sign_url: true
     }).match(/s--[0-9A-Za-z_-]{8}--/).toString();
@@ -215,9 +197,8 @@ describe("utils", function() {
       sign_url: true
     }, `http://${cloud_name}-res.cloudinary.com/images/${expected_signature}/a_0/test/hello.jpg`, {});
   });
-  it("should sign the decoded form of a url", function() {
-    var expected_signature;
-    expected_signature = utils.url("%25a%20(b)", {
+  it("should sign the decoded form of a url", function () {
+    var expected_signature = utils.url("%25a%20(b)", {
       format: "jpg",
       sign_url: true
     }).match(/s--[0-9A-Za-z_-]{8}--/).toString();
@@ -226,28 +207,28 @@ describe("utils", function() {
       sign_url: true
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/${expected_signature}/%25a%20(b).jpg`, {});
   });
-  it("should support url_suffix for raw uploads", function() {
+  it("should support url_suffix for raw uploads", function () {
     return test_cloudinary_url("test", {
       url_suffix: "hello",
       private_cdn: true,
       resource_type: 'raw'
     }, `http://${cloud_name}-res.cloudinary.com/files/test/hello`, {});
   });
-  it("should support url_suffix for video uploads", function() {
+  it("should support url_suffix for video uploads", function () {
     return test_cloudinary_url("test", {
       url_suffix: "hello",
       private_cdn: true,
       resource_type: 'video'
     }, `http://${cloud_name}-res.cloudinary.com/videos/test/hello`, {});
   });
-  it("should support url_suffix for authenticated uploads", function() {
+  it("should support url_suffix for authenticated uploads", function () {
     return test_cloudinary_url("test", {
       url_suffix: "hello",
       private_cdn: true,
       type: 'authenticated'
     }, `http://${cloud_name}-res.cloudinary.com/authenticated_images/test/hello`, {});
   });
-  it("should support use_root_path in shared distribution", function() {
+  it("should support use_root_path in shared distribution", function () {
     test_cloudinary_url("test", {
       use_root_path: true,
       private_cdn: false
@@ -258,7 +239,7 @@ describe("utils", function() {
       angle: 0
     }, `http://res.cloudinary.com/${cloud_name}/a_0/test`, {});
   });
-  it("should support use_root_path for private_cdn", function() {
+  it("should support use_root_path for private_cdn", function () {
     test_cloudinary_url("test", {
       use_root_path: true,
       private_cdn: true
@@ -269,22 +250,22 @@ describe("utils", function() {
       angle: 0
     }, `http://${cloud_name}-res.cloudinary.com/a_0/test`, {});
   });
-  it("should support use_root_path together with url_suffix for private_cdn", function() {
+  it("should support use_root_path together with url_suffix for private_cdn", function () {
     return test_cloudinary_url("test", {
       use_root_path: true,
       url_suffix: "hello",
       private_cdn: true
     }, `http://${cloud_name}-res.cloudinary.com/test/hello`, {});
   });
-  it("should disllow use_root_path if not image/upload", function() {
-    expect(function() {
+  it("should disllow use_root_path if not image/upload", function () {
+    expect(function () {
       return utils.url("test", {
         use_root_path: true,
         private_cdn: true,
         type: 'facebook'
       });
     }).to.be.throwError(/Root path only supported for image\/upload/);
-    return expect(function() {
+    expect(function () {
       return utils.url("test", {
         use_root_path: true,
         private_cdn: true,
@@ -292,7 +273,7 @@ describe("utils", function() {
       });
     }).to.be.throwError(/Root path only supported for image\/upload/);
   });
-  it("should use width and height from options only if crop is given", function() {
+  it("should use width and height from options only if crop is given", function () {
     return test_cloudinary_url("test", {
       width: 100,
       height: 100,
@@ -302,7 +283,7 @@ describe("utils", function() {
       height: 100
     });
   });
-  it("should support initial width and height", function() {
+  it("should support initial width and height", function () {
     return test_cloudinary_url("test", {
       width: "iw",
       height: "ih",
@@ -312,7 +293,7 @@ describe("utils", function() {
       height: "ih"
     });
   });
-  it("should not pass width and height to html in case angle was used", function() {
+  it("should not pass width and height to html in case angle was used", function () {
     return test_cloudinary_url("test", {
       width: 100,
       height: 100,
@@ -320,7 +301,7 @@ describe("utils", function() {
       angle: 'auto'
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/a_auto,c_scale,h_100,w_100/test`, {});
   });
-  it("should use x, y, radius, prefix, gravity and quality from options", function() {
+  it("should use x, y, radius, prefix, gravity and quality from options", function () {
     test_cloudinary_url("test", {
       x: 1,
       y: 2,
@@ -335,8 +316,8 @@ describe("utils", function() {
       width: "0.5"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/c_crop,g_auto,w_0.5/test`, {});
   });
-  describe("gravity", function() {
-    it("should support auto", function() {
+  describe("gravity", function () {
+    it("should support auto", function () {
       test_cloudinary_url("test", {
         width: 100,
         height: 100,
@@ -356,8 +337,8 @@ describe("utils", function() {
         height: 100
       });
     });
-    it("should support focal gravity", function() {
-      return ["adv_face", "adv_faces", "adv_eyes", "face", "faces", "body", "no_faces"].map(function(focal) {
+    it("should support focal gravity", function () {
+      return ["adv_face", "adv_faces", "adv_eyes", "face", "faces", "body", "no_faces"].map(function (focal) {
         return test_cloudinary_url("test", {
           width: 100,
           height: 100,
@@ -369,8 +350,8 @@ describe("utils", function() {
         });
       });
     });
-    it("should support auto level with thumb cropping", function() {
-      return [0, 10, 100].map(function(level) {
+    it("should support auto level with thumb cropping", function () {
+      return [0, 10, 100].map(function (level) {
         test_cloudinary_url("test", {
           width: 100,
           height: 100,
@@ -391,7 +372,7 @@ describe("utils", function() {
         });
       });
     });
-    return it("should support custom_no_override", function() {
+    it("should support custom_no_override", function () {
       return test_cloudinary_url("test", {
         width: 100,
         height: 100,
@@ -403,18 +384,18 @@ describe("utils", function() {
       });
     });
   });
-  describe("transformation", function() {
-    it("should support named transformation", function() {
+  describe("transformation", function () {
+    it("should support named transformation", function () {
       return test_cloudinary_url("test", {
         transformation: "blip"
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/t_blip/test`, {});
     });
-    it("should support array of named transformations", function() {
+    it("should support array of named transformations", function () {
       return test_cloudinary_url("test", {
         transformation: ["blip", "blop"]
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/t_blip.blop/test`, {});
     });
-    it("should support base transformation", function() {
+    it("should support base transformation", function () {
       return test_cloudinary_url("test", {
         transformation: {
           x: 100,
@@ -427,7 +408,7 @@ describe("utils", function() {
         width: 100
       });
     });
-    it("should support array of base transformations", function() {
+    it("should support array of base transformations", function () {
       return test_cloudinary_url("test", {
         transformation: [
           {
@@ -446,9 +427,8 @@ describe("utils", function() {
         width: 100
       });
     });
-    it("should support array of transformations", function() {
-      var result;
-      result = utils.generate_transformation_string([
+    it("should support array of transformations", function () {
+      var result = utils.generate_transformation_string([
         {
           x: 100,
           y: 100,
@@ -459,9 +439,9 @@ describe("utils", function() {
           radius: 10
         }
       ]);
-      return expect(result).to.eql("c_fill,w_200,x_100,y_100/r_10");
+      expect(result).to.eql("c_fill,w_200,x_100,y_100/r_10");
     });
-    return it("should not include empty transformations", function() {
+    it("should not include empty transformations", function () {
       return test_cloudinary_url("test", {
         transformation: [
           {},
@@ -475,7 +455,7 @@ describe("utils", function() {
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/c_fill,x_100,y_100/test`, {});
     });
   });
-  it("should support size", function() {
+  it("should support size", function () {
     return test_cloudinary_url("test", {
       size: "10x10",
       crop: 'crop'
@@ -484,17 +464,17 @@ describe("utils", function() {
       height: "10"
     });
   });
-  it("should use type from options", function() {
+  it("should use type from options", function () {
     return test_cloudinary_url("test", {
       type: 'facebook'
     }, `http://res.cloudinary.com/${cloud_name}/image/facebook/test`, {});
   });
-  it("should use resource_type from options", function() {
+  it("should use resource_type from options", function () {
     return test_cloudinary_url("test", {
       resource_type: 'raw'
     }, `http://res.cloudinary.com/${cloud_name}/raw/upload/test`, {});
   });
-  it("should ignore http links only if type is not given", function() {
+  it("should ignore http links only if type is not given", function () {
     test_cloudinary_url("http://test", {
       type: null
     }, "http://test", {});
@@ -502,17 +482,17 @@ describe("utils", function() {
       type: "fetch"
     }, `http://res.cloudinary.com/${cloud_name}/image/fetch/http://test`, {});
   });
-  it("should escape fetch urls", function() {
+  it("should escape fetch urls", function () {
     return test_cloudinary_url("http://blah.com/hello?a=b", {
       type: "fetch"
     }, `http://res.cloudinary.com/${cloud_name}/image/fetch/http://blah.com/hello%3Fa%3Db`, {});
   });
-  it("should should escape http urls", function() {
+  it("should should escape http urls", function () {
     return test_cloudinary_url("http://www.youtube.com/watch?v=d9NF2edxy-M", {
       type: "youtube"
     }, `http://res.cloudinary.com/${cloud_name}/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M`, {});
   });
-  it("should support background", function() {
+  it("should support background", function () {
     test_cloudinary_url("test", {
       background: "red"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/b_red/test`, {});
@@ -520,12 +500,12 @@ describe("utils", function() {
       background: "#112233"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/b_rgb:112233/test`, {});
   });
-  it("should support default_image", function() {
+  it("should support default_image", function () {
     return test_cloudinary_url("test", {
       default_image: "default"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/d_default/test`, {});
   });
-  it("should support angle", function() {
+  it("should support angle", function () {
     test_cloudinary_url("test", {
       angle: "55"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/a_55/test`, {});
@@ -533,38 +513,38 @@ describe("utils", function() {
       angle: ["auto", "55"]
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/a_auto.55/test`, {});
   });
-  it("should support format for fetch urls", function() {
+  it("should support format for fetch urls", function () {
     return test_cloudinary_url("http://cloudinary.com/images/logo.png", {
       format: "jpg",
       type: "fetch"
     }, `http://res.cloudinary.com/${cloud_name}/image/fetch/f_jpg/http://cloudinary.com/images/logo.png`, {});
   });
-  it("should support effect", function() {
+  it("should support effect", function () {
     return test_cloudinary_url("test", {
       effect: "sepia"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/e_sepia/test`, {});
   });
-  it("should support effect with hash param", function() {
+  it("should support effect with hash param", function () {
     return test_cloudinary_url("test", {
       effect: {
         sepia: -10
       }
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/e_sepia:-10/test`, {});
   });
-  it("should support effect with array param", function() {
+  it("should support effect with array param", function () {
     return test_cloudinary_url("test", {
       effect: ["sepia", 10]
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/e_sepia:10/test`, {});
   });
-  describe("overlay and underlay", function() {
+  describe("overlay and underlay", function () {
     var layers_options, letter, param;
     param = 'overlay';
     letter = 'l';
     layers_options = [
       // [name,                    options,                                          result]
       ["string",
-      "text:hello",
-      "text:hello"],
+        "text:hello",
+        "text:hello"],
       [
         "string",
         {
@@ -635,10 +615,10 @@ describe("utils", function() {
         "fetch:aHR0cHM6Ly91cGxvYWQud2lraW1lZGlhLm9yZy93aWtpcGVkaWEvY29tbW9ucy8yLzJiLyVFQSVCMyVBMCVFQyVCMCVCRCVFQSVCMCVBRiVFQiVCMiU4Qy5qcGc="
       ],
       ["fetch explicit",
-      "fetch:http://cloudinary.com/images/old_logo.png",
-      "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc="]
+        "fetch:http://cloudinary.com/images/old_logo.png",
+        "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc="]
     ];
-    it(`should support ${param}`, function() {
+    it(`should support ${param}`, function () {
       var i, layer, len, name, opt, options, result, results;
       results = [];
       for (i = 0, len = layers_options.length; i < len; i++) {
@@ -650,75 +630,68 @@ describe("utils", function() {
       }
       return results;
     });
-    return it(`should not pass width/height to html for ${param}`, function() {
-      var opt;
-      opt = {
+    it(`should not pass width/height to html for ${param}`, function () {
+      var opt = {
         'height': 100,
         'width': 100
       };
       opt[param] = "text:hello";
-      return expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,${letter}_text:hello,w_100/test`).and.emptyOptions();
+      expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,${letter}_text:hello,w_100/test`).and.emptyOptions();
     });
   });
-  sharedExamples("a signed url", function(specific_options = {}, specific_transformation = "") {
+  sharedExamples("a signed url", function (specific_options = {}, specific_transformation = "") {
     var authenticated_image, authenticated_path, expected_transformation, options;
     this.timeout(helper.TIMEOUT_LONG);
     expected_transformation = ((specific_transformation.blank != null) || specific_transformation.match(/\/$/)) ? specific_transformation : `${specific_transformation}/`;
     authenticated_path = '';
     authenticated_image = {};
     options = {};
-    before(function(done) {
+    before(function () {
       cloudinary.v2.config(true);
-      cloudinary.v2.uploader.upload("http://res.cloudinary.com/demo/image/upload/sample.jpg", {
+      return cloudinary.v2.uploader.upload("http://res.cloudinary.com/demo/image/upload/sample.jpg", {
         type: 'authenticated',
         tags: TEST_TAG
-      }, function(error, result) {
-        if (error != null) {
-          return done(new Error(error.message));
-        }
+      }).then(function (result) {
         authenticated_image = result;
         authenticated_path = `${root_path}/image/authenticated`;
-        return done();
       });
-      return true;
     });
-    true;
-    beforeEach(function() {
+    beforeEach(function () {
       return options = merge({
         version: authenticated_image['version'],
         sign_url: true,
         type: "authenticated"
       }, specific_options);
     });
-    it("should correctly sign URL with version", function(done) {
-      return expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
+    it("should correctly sign URL with version", function (done) {
+      expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
-    it("should correctly sign URL with transformation and version", function(done) {
+    it("should correctly sign URL with transformation and version", function (done) {
       options["transformation"] = {
         crop: "crop",
         width: 10,
         height: 20
       };
-      return expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
+      expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
-    it("should correctly sign URL with transformation", function(done) {
+    it("should correctly sign URL with transformation", function (done) {
       options["transformation"] = {
         crop: "crop",
         width: 10,
         height: 20 // TODO duplicate?
       };
-      return expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
+      expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
-    return it("should correctly sign fetch URL", function(done) {
+    it("should correctly sign fetch URL", function (done) {
       options["type"] = "fetch";
-      return expect(["http://res.cloudinary.com/demo/sample.png", options]).to.produceUrl(new RegExp(`^${root_path}/image/fetch/s--[\\w-]+--/${expected_transformation}v${authenticated_image['version']}/http://res.cloudinary.com/demo/sample.png$`)).and.emptyOptions().and.beServedByCloudinary(done);
+      expect(["http://res.cloudinary.com/demo/sample.png", options]).to.produceUrl(new RegExp(`^${root_path}/image/fetch/s--[\\w-]+--/${expected_transformation}v${authenticated_image['version']}/http://res.cloudinary.com/demo/sample.png$`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
   });
-  describe("text", function() {
+  describe("text", function () {
     var text_encoded, text_layer;
     text_layer = "Hello World, /Nice to meet you?";
     text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
-    before(function(done) {
+    before(function (done) {
       var fileName, srt;
       cloudinary.v2.uploader.text(text_layer, {
         public_id: "test_text",
@@ -729,7 +702,7 @@ describe("utils", function() {
       });
       fileName = `${os.tmpdir()}/test_subtitles.srt`;
       srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
-      return fs.writeFile(fileName, srt, function(error) {
+      return fs.writeFile(fileName, srt, function (error) {
         if (error != null) {
           return done(new Error(error.message));
         }
@@ -739,7 +712,7 @@ describe("utils", function() {
           resource_type: 'raw',
           overwrite: true,
           tags: TEST_TAG
-        }, function(error, result) {
+        }, function (error, result) {
           if (error != null) {
             return done(new Error(error.message));
           }
@@ -750,16 +723,16 @@ describe("utils", function() {
     //    include_context "cleanup"
 
     // Overlay and underlay have the same code, so we test overlay only
-    return describe('overlay', function() {
+    describe('overlay', function () {
       var LAYERS_OPTIONS, i, layer, len, name, op, options, result;
       // [name, options, result]
       LAYERS_OPTIONS = [
         ["string",
-        "text:test_text:hello",
-        "text:test_text:hello"],
+          "text:test_text:hello",
+          "text:test_text:hello"],
         ["explicit layer parameter",
-        `text:test_text:${text_encoded}`,
-        `text:test_text:${text_encoded}`],
+          `text:test_text:${text_encoded}`,
+          `text:test_text:${text_encoded}`],
         [
           "text parameter",
           {
@@ -812,11 +785,10 @@ describe("utils", function() {
       for (i = 0, len = LAYERS_OPTIONS.length; i < len; i++) {
         layer = LAYERS_OPTIONS[i];
         [name, options, result] = layer;
-        it(`should support ${name}`, function(done) {
-          var opt;
-          opt = {};
+        it(`should support ${name}`, function (done) {
+          var opt = {};
           opt['overlay'] = options;
-          return expect(["sample", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
+          expect(["sample", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
         });
         if (!isString(options)) {
           op = {};
@@ -824,74 +796,73 @@ describe("utils", function() {
           itBehavesLike("a signed url", op, `l_${result}`);
         }
       }
-      return it("should not pass width/height to html for overlay", function() {
-        var opt;
-        opt = {};
+      it("should not pass width/height to html for overlay", function () {
+        var opt = {};
         opt['overlay'] = "text:test_text";
         opt["height"] = 100;
         opt["width"] = 100;
-        return expect(["sample", opt]).produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample`).and.emptyOptions();
+        expect(["sample", opt]).produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample`).and.emptyOptions();
       });
     });
   });
-  it("should use ssl_detected if secure is not given as parameter and not set to true in configuration", function() {
+  it("should use ssl_detected if secure is not given as parameter and not set to true in configuration", function () {
     return test_cloudinary_url("test", {
       ssl_detected: true
     }, `https://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should use secure if given over ssl_detected and configuration", function() {
+  it("should use secure if given over ssl_detected and configuration", function () {
     cloudinary.config("secure", true);
-    return test_cloudinary_url("test", {
+    test_cloudinary_url("test", {
       ssl_detected: true,
       secure: false
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should use secure: true from configuration over ssl_detected", function() {
+  it("should use secure: true from configuration over ssl_detected", function () {
     cloudinary.config("secure", true);
-    return test_cloudinary_url("test", {
+    test_cloudinary_url("test", {
       ssl_detected: false
     }, `https://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should support external cname", function() {
-    return test_cloudinary_url("test", {
+  it("should support external cname", function () {
+    test_cloudinary_url("test", {
       cname: "hello.com"
     }, `http://hello.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should support external cname with cdn_subdomain on", function() {
-    return test_cloudinary_url("test", {
+  it("should support external cname with cdn_subdomain on", function () {
+    test_cloudinary_url("test", {
       cname: "hello.com",
       cdn_subdomain: true
     }, `http://a2.hello.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should support cdn_subdomain with secure on if using shared_domain", function() {
-    return test_cloudinary_url("test", {
+  it("should support cdn_subdomain with secure on if using shared_domain", function () {
+    test_cloudinary_url("test", {
       secure: true,
       cdn_subdomain: true
     }, `https://res-2.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should support secure_cdn_subdomain false override with secure", function() {
-    return test_cloudinary_url("test", {
+  it("should support secure_cdn_subdomain false override with secure", function () {
+    test_cloudinary_url("test", {
       secure: true,
       cdn_subdomain: true,
       secure_cdn_subdomain: false
     }, `https://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should support secure_cdn_subdomain true override with secure", function() {
-    return test_cloudinary_url("test", {
+  it("should support secure_cdn_subdomain true override with secure", function () {
+    test_cloudinary_url("test", {
       secure: true,
       cdn_subdomain: true,
       secure_cdn_subdomain: true,
       private_cdn: true
     }, `https://${cloud_name}-res-2.cloudinary.com/image/upload/test`, {});
   });
-  it("should support string param", function() {
-    return test_cloudinary_url("test", {
+  it("should support string param", function () {
+    test_cloudinary_url("test", {
       effect: {
         sepia: 10
       }
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/e_sepia:10/test`, {});
   });
-  it("should support border", function() {
+  it("should support border", function () {
     test_cloudinary_url("test", {
       border: {
         width: 5
@@ -906,40 +877,38 @@ describe("utils", function() {
     test_cloudinary_url("test", {
       border: "1px_solid_blue"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/bo_1px_solid_blue/test`, {});
-    return test_cloudinary_url("test", {
+    test_cloudinary_url("test", {
       border: "2"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {
       border: "2"
     });
   });
-  it("should support flags", function() {
+  it("should support flags", function () {
     test_cloudinary_url("test", {
       flags: "abc"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/fl_abc/test`, {});
-    return test_cloudinary_url("test", {
+    test_cloudinary_url("test", {
       flags: ["abc", "def"]
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/fl_abc.def/test`, {});
   });
-  it("should support aspect ratio", function() {
+  it("should support aspect ratio", function () {
     test_cloudinary_url("test", {
       "aspect_ratio": "1.0"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/ar_1.0/test`, {});
-    return test_cloudinary_url("test", {
+    test_cloudinary_url("test", {
       "aspect_ratio": "3:2"
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/ar_3:2/test`, {});
   });
-  it("build_upload_params should not destroy options", function() {
-    var options;
-    options = {
+  it("build_upload_params should not destroy options", function () {
+    var options = {
       width: 100,
       crop: "scale"
     };
     expect(utils.build_upload_params(options)['transformation']).to.eql("c_scale,w_100");
-    return expect(Object.keys(options).length).to.eql(2);
+    expect(Object.keys(options).length).to.eql(2);
   });
-  it("build_explicit_api_params should support multiple eager transformations with a pipe", function() {
-    var options;
-    options = {
+  it("build_explicit_api_params should support multiple eager transformations with a pipe", function () {
+    var options = {
       eager: [
         {
           width: 100,
@@ -951,23 +920,22 @@ describe("utils", function() {
         }
       ]
     };
-    return expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100");
+    expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100");
   });
-  it("build_explicit_api_params should support moderation", function() {
-    return expect(utils.build_explicit_api_params('some_id', {
+  it("build_explicit_api_params should support moderation", function () {
+    expect(utils.build_explicit_api_params('some_id', {
       type: 'upload',
       moderation: 'manual'
     })[0]['moderation']).to.eql('manual');
   });
-  it("build_explicit_api_params should support phash", function() {
-    return expect(utils.build_explicit_api_params('some_id', {
+  it("build_explicit_api_params should support phash", function () {
+    expect(utils.build_explicit_api_params('some_id', {
       type: 'upload',
       phash: true
     })[0]['phash']).to.eql('1');
   });
-  it("archive_params should support multiple eager transformations with a pipe", function() {
-    var options;
-    options = {
+  it("archive_params should support multiple eager transformations with a pipe", function () {
+    var options = {
       transformations: [
         {
           width: 200,
@@ -979,9 +947,9 @@ describe("utils", function() {
         }
       ]
     };
-    return expect(utils.archive_params(options)['transformations']).to.eql("c_scale,w_200|c_fit,h_200");
+    expect(utils.archive_params(options)['transformations']).to.eql("c_scale,w_200|c_fit,h_200");
   });
-  it("build_upload_params canonize booleans", function() {
+  it("build_upload_params canonize booleans", function () {
     var actual, expected, options, params;
     options = {
       backup: true,
@@ -1009,23 +977,23 @@ describe("utils", function() {
     expect(utils.build_upload_params({
       backup: null
     })['backup']).to.eql(void 0);
-    return expect(utils.build_upload_params({})['backup']).to.eql(void 0);
+    expect(utils.build_upload_params({})['backup']).to.eql(void 0);
   });
-  it("should add version if public_id contains /", function() {
+  it("should add version if public_id contains /", function () {
     test_cloudinary_url("folder/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
-    return test_cloudinary_url("folder/test", {
+    test_cloudinary_url("folder/test", {
       version: 123
     }, `http://res.cloudinary.com/${cloud_name}/image/upload/v123/folder/test`, {});
   });
-  it("should not add version if public_id contains version already", function() {
-    return test_cloudinary_url("v1234/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
+  it("should not add version if public_id contains version already", function () {
+    test_cloudinary_url("v1234/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
   });
-  it("should allow to shorted image/upload urls", function() {
-    return test_cloudinary_url("test", {
+  it("should allow to shorted image/upload urls", function () {
+    test_cloudinary_url("test", {
       shorten: true
     }, `http://res.cloudinary.com/${cloud_name}/iu/test`, {});
   });
-  it("should escape public_ids", function() {
+  it("should escape public_ids", function () {
     var ref, results, source, target;
     ref = {
       "a b": "a%20b",
@@ -1043,10 +1011,9 @@ describe("utils", function() {
     }
     return results;
   });
-  context("sign URLs", function() {
-    var configBck;
-    configBck = void 0;
-    before(function() {
+  context("sign URLs", function () {
+    var configBck = void 0;
+    before(function () {
       configBck = cloudinary.config();
       return cloudinary.config({
         cloud_name: 'test123',
@@ -1054,10 +1021,10 @@ describe("utils", function() {
         api_secret: "b"
       });
     });
-    after(function() {
+    after(function () {
       return cloudinary.config(configBck);
     });
-    it("should correctly sign URLs", function() {
+    it("should correctly sign URLs", function () {
       test_cloudinary_url("image.jpg", {
         version: 1234,
         transformation: {
@@ -1088,19 +1055,18 @@ describe("utils", function() {
         type: 'authenticated',
         sign_url: true
       }, "http://res.cloudinary.com/test123/image/authenticated/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg", {});
-      return test_cloudinary_url("http://google.com/path/to/image.png", {
+      test_cloudinary_url("http://google.com/path/to/image.png", {
         type: "fetch",
         version: 1234,
         sign_url: true
       }, "http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png", {});
     });
-    return it("should correctly sign_request", function() {
-      var params;
-      params = utils.sign_request({
+    it("should correctly sign_request", function () {
+      var params = utils.sign_request({
         public_id: "folder/file",
         version: "1234"
       });
-      return expect(params).to.eql({
+      expect(params).to.eql({
         public_id: "folder/file",
         version: "1234",
         signature: "7a3349cbb373e4812118d625047ede50b90e7b67",
@@ -1108,7 +1074,7 @@ describe("utils", function() {
       });
     });
   });
-  it("should support responsive width", function() {
+  it("should support responsive width", function () {
     test_cloudinary_url("test", {
       width: 100,
       height: 100,
@@ -1121,7 +1087,7 @@ describe("utils", function() {
       width: 'auto',
       crop: 'pad'
     });
-    return test_cloudinary_url("test", {
+    test_cloudinary_url("test", {
       width: 100,
       height: 100,
       crop: "crop",
@@ -1130,27 +1096,27 @@ describe("utils", function() {
       responsive: true
     });
   });
-  describe("streaming_profile", function() {
-    return it('should support streaming_profile in options', function() {
-      return expect(utils.generate_transformation_string({
+  describe("streaming_profile", function () {
+    it('should support streaming_profile in options', function () {
+      expect(utils.generate_transformation_string({
         streaming_profile: "somë-profilé"
       })).to.eql("sp_somë-profilé");
     });
   });
-  describe("zoom", function() {
-    return it("should support a decimal value", function() {
-      return test_cloudinary_url("test", {
+  describe("zoom", function () {
+    it("should support a decimal value", function () {
+      test_cloudinary_url("test", {
         zoom: 1.2
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/z_1.2/test`, {});
     });
   });
-  describe("encode_double_array", function() {
-    return it("should correctly encode double arrays", function() {
+  describe("encode_double_array", function () {
+    it("should correctly encode double arrays", function () {
       expect(utils.encode_double_array([1, 2, 3, 4])).to.eql("1,2,3,4");
-      return expect(utils.encode_double_array([[1, 2, 3, 4], [5, 6, 7, 8]])).to.eql("1,2,3,4|5,6,7,8");
+      expect(utils.encode_double_array([[1, 2, 3, 4], [5, 6, 7, 8]])).to.eql("1,2,3,4|5,6,7,8");
     });
   });
-  it("should call validate_webhook_signature", function() {
+  it("should call validate_webhook_signature", function () {
     var data, orig, sig, timestamp;
     this.timeout(1000);
     data = '{"public_id":"117e5550-7bfa-11e4-80d7-f962166bd3be","version":1417727468}';
@@ -1164,10 +1130,9 @@ describe("utils", function() {
     expect(sig).to.eql('bac927006d3ce039ef7632e2c03189348d02924a');
     return cloudinary.config(orig);
   });
-  describe('Conditional Transformation', function() {
-    var configBck;
-    configBck = null;
-    before(function() {
+  describe('Conditional Transformation', function () {
+    var configBck = null;
+    before(function () {
       configBck = cloudinary.config();
       cloudinary.config({
         cloud_name: 'test123',
@@ -1176,13 +1141,12 @@ describe("utils", function() {
       });
       return cloud_name = 'test123';
     });
-    after(function() {
+    after(function () {
       return cloudinary.config(configBck);
     });
-    describe('with literal condition string', function() {
-      it("should include the if parameter as the first component in the transformation string", function() {
-        var url;
-        url = utils.url("sample", {
+    describe('with literal condition string', function () {
+      it("should include the if parameter as the first component in the transformation string", function () {
+        var url = utils.url("sample", {
           if: "w_lt_200",
           crop: "fill",
           height: 120,
@@ -1195,11 +1159,10 @@ describe("utils", function() {
           if: "w_lt_200",
           width: 80
         });
-        return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
       });
-      it("should allow multiple conditions when chaining transformations ", function() {
-        var url;
-        url = utils.url("sample", {
+      it("should allow multiple conditions when chaining transformations ", function () {
+        var url = utils.url("sample", {
           transformation: [
             {
               if: "w_lt_200",
@@ -1218,25 +1181,23 @@ describe("utils", function() {
             }
           ]
         });
-        return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_w_gt_400,c_fit,h_150,w_150/e_sepia/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_w_gt_400,c_fit,h_150,w_150/e_sepia/sample");
       });
-      return describe("including spaces and operators", function() {
-        return it("should translate operators", function() {
-          var url;
-          url = utils.url("sample", {
+      describe("including spaces and operators", function () {
+        it("should translate operators", function () {
+          var url = utils.url("sample", {
             if: "w < 200",
             crop: "fill",
             height: 120,
             width: 80
           });
-          return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
+          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
         });
       });
     });
     describe('with tags', () => {
-      return it("should allow multiple tags condition", function() {
-        var url;
-        url = utils.url("sample", {
+      it("should allow multiple tags condition", function () {
+        var url = utils.url("sample", {
           transformation: [
             {
               if: "!tag1:tag2:tag3!_in_tags",
@@ -1255,13 +1216,12 @@ describe("utils", function() {
             }
           ]
         });
-        return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_!tag1:tag2:tag3!_in_tags,c_fill,h_120,w_80/if_else,c_fit,h_150,w_150/e_sepia/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_!tag1:tag2:tag3!_in_tags,c_fill,h_120,w_80/if_else,c_fit,h_150,w_150/e_sepia/sample");
       });
     });
-    describe('if end', function() {
-      it("should include the if_end as the last parameter in its component", function() {
-        var url;
-        url = utils.url("sample", {
+    describe('if end', function () {
+      it("should include the if_end as the last parameter in its component", function () {
+        var url = utils.url("sample", {
           transformation: [
             {
               if: "w_lt_200"
@@ -1284,11 +1244,10 @@ describe("utils", function() {
             }
           ]
         });
-        return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200/c_fill,e_sharpen,h_120,w_80/e_brightness:50/co_red,e_shadow/if_end/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200/c_fill,e_sharpen,h_120,w_80/e_brightness:50/co_red,e_shadow/if_end/sample");
       });
-      it("should support if_else with transformation parameters", function() {
-        var url;
-        url = utils.url("sample", {
+      it("should support if_else with transformation parameters", function () {
+        var url = utils.url("sample", {
           transformation: [
             {
               if: "w_lt_200",
@@ -1304,11 +1263,10 @@ describe("utils", function() {
             }
           ]
         });
-        return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_else,c_fill,h_90,w_100/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_else,c_fill,h_90,w_100/sample");
       });
-      return it("if_else should be without any transformation parameters", function() {
-        var url;
-        url = utils.url("sample", {
+      it("if_else should be without any transformation parameters", function () {
+        var url = utils.url("sample", {
           transformation: [
             {
               if: "aspect_ratio_lt_0.7"
@@ -1328,22 +1286,21 @@ describe("utils", function() {
             }
           ]
         });
-        return expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_ar_lt_0.7/c_fill,h_120,w_80/if_else/c_fill,h_90,w_100/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_ar_lt_0.7/c_fill,h_120,w_80/if_else/c_fill,h_90,w_100/sample");
       });
     });
-    return describe('chaining conditions', function() {
-      return it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", function() {
-        var allOperators;
-        allOperators = 'if_' + 'w_eq_0_and' + '_h_ne_0_or' + '_ar_lt_0_and' + '_pc_gt_0_and' + '_fc_lte_0_and' + '_w_gte_0' + ',e_grayscale';
-        return expect(utils.url("sample", {
+    describe('chaining conditions', function () {
+      it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", function () {
+        var allOperators = 'if_' + 'w_eq_0_and' + '_h_ne_0_or' + '_ar_lt_0_and' + '_pc_gt_0_and' + '_fc_lte_0_and' + '_w_gte_0' + ',e_grayscale';
+        expect(utils.url("sample", {
           "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
           "effect": "grayscale"
         })).to.match(new RegExp(allOperators));
       });
     });
   });
-  describe('User Define Variables', function() {
-    it("array should define a set of variables", function() {
+  describe('User Define Variables', function () {
+    it("array should define a set of variables", function () {
       var options, t;
       options = {
         if: "face_count > 2",
@@ -1352,9 +1309,9 @@ describe("utils", function() {
         width: "$foo * 200"
       };
       t = cloudinary.utils.generate_transformation_string(options);
-      return expect(t).to.eql("if_fc_gt_2,$z_5,$foo_$z_mul_2,c_scale,w_$foo_mul_200");
+      expect(t).to.eql("if_fc_gt_2,$z_5,$foo_$z_mul_2,c_scale,w_$foo_mul_200");
     });
-    it("'$key' should define a variable", function() {
+    it("'$key' should define a variable", function () {
       var options, t;
       options = {
         transformation: [
@@ -1374,16 +1331,16 @@ describe("utils", function() {
         ]
       };
       t = cloudinary.utils.generate_transformation_string(options);
-      return expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
+      expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
     });
-    it("should support text values", function() {
-      return test_cloudinary_url("sample", {
+    it("should support text values", function () {
+      test_cloudinary_url("sample", {
         effect: "$efname:100",
         $efname: "!blur!"
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/$efname_!blur!,e_$efname:100/sample`, {});
     });
-    return it("should support string interpolation", function() {
-      return test_cloudinary_url("sample", {
+    it("should support string interpolation", function () {
+      test_cloudinary_url("sample", {
         crop: "scale",
         overlay: {
           text: "$(start)Hello $(name)$(ext), $(no ) $( no)$(end)",
@@ -1393,40 +1350,37 @@ describe("utils", function() {
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample`, {});
     });
   });
-  describe('generateBreakpoints', function() {
-    it('should accept breakpoints', function() {
-      return expect(generateBreakpoints({
+  describe('generateBreakpoints', function () {
+    it('should accept breakpoints', function () {
+      expect(generateBreakpoints({
         breakpoints: [1, 2, 3]
       })).to.eql([1, 2, 3]);
     });
-    return it('should accept min_width, max_width', function() {
-      return expect(generateBreakpoints({
+    it('should accept min_width, max_width', function () {
+      expect(generateBreakpoints({
         min_width: 100,
         max_width: 600,
         max_images: 7
       })).to.eql([100, 184, 268, 352, 436, 520, 600]);
     });
   });
-  describe('srcsetUrl', function() {
-    it('should generate url', function() {
-      var url;
-      url = srcsetUrl('sample.jpg', 101, {
+  describe('srcsetUrl', function () {
+    it('should generate url', function () {
+      var url = srcsetUrl('sample.jpg', 101, {
         width: 200,
         crop: 'scale'
       });
-      return expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,w_200/c_scale,w_101/sample.jpg`);
+      expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,w_200/c_scale,w_101/sample.jpg`);
     });
-    return it("should generate url without a transformation", function() {
-      var url;
-      url = srcsetUrl('sample.jpg', 101, {});
-      return expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,w_101/sample.jpg`);
+    it("should generate url without a transformation", function () {
+      var url = srcsetUrl('sample.jpg', 101, {});
+      expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,w_101/sample.jpg`);
     });
   });
-  return describe('generateSrcsetAttribute', function() {
-    return it("should generate a url for each breakpoint", function() {
-      var srcset;
-      srcset = generateSrcsetAttribute('sample', [1, 2, 3]);
-      return expect(srcset.split(', ').length).to.eql(3);
+  describe('generateSrcsetAttribute', function () {
+    it("should generate a url for each breakpoint", function () {
+      var srcset = generateSrcsetAttribute('sample', [1, 2, 3]);
+      expect(srcset.split(', ').length).to.eql(3);
     });
   });
 });

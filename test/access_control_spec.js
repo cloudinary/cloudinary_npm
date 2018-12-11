@@ -1,39 +1,37 @@
-var ClientRequest, cloudinary, escapeRegexp, expect, helper, http, isString, options, request, requestSpy, requestStub, sinon, utils, writeSpy, xhr;
-
 require('dotenv').load({
   silent: true
 });
 
-expect = require("expect.js");
+const expect = require("expect.js");
+const cloudinary = require("../cloudinary");
+const build_upload_params = cloudinary.utils.build_upload_params;
+const helper = require('./spechelper');
+const isString = require('lodash/isString');
+var options = null;
 
-cloudinary = require("../cloudinary");
-
-utils = cloudinary.utils;
-
-sinon = require('sinon');
-
-ClientRequest = require('_http_client').ClientRequest;
-
-http = require('http');
-
-helper = require('./spechelper');
-
-escapeRegexp = helper.escapeRegexp;
-
-isString = require('lodash/isString');
-
-xhr = request = requestStub = requestSpy = writeSpy = options = void 0;
+const ACL = {
+  access_type: 'anonymous',
+  start: new Date(Date.UTC(2019, 1, 22, 16, 20, 57)),
+  end: '2019-03-22 00:00 +0200'
+};
+const ACL_2 = {
+  access_type: 'anonymous',
+  start: '2019-02-22 16:20:57Z',
+  end: '2019-03-22 00:00 +0200'
+};
+const ACL_STRING = '{"access_type":"anonymous","start":"2019-02-22 16:20:57 +0200","end":"2019-03-22 00:00 +0200"}';
 
 describe("Access Control", function() {
-  var acl, acl_2, acl_string, config;
-  before("Verify Configuration", function() {});
-  config = cloudinary.config(true);
-  if (!(config.api_key && config.api_secret)) {
-    expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-  }
+  before("Verify Configuration", function() {
+    let config = cloudinary.config(true);
+    if (!(config.api_key && config.api_secret)) {
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
+    }
+
+  });
   this.timeout(helper.TIMEOUT_LONG);
   after(function() {
-    config = cloudinary.config(true);
+    let config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
@@ -47,49 +45,35 @@ describe("Access Control", function() {
       tags: [...helper.UPLOAD_TAGS, 'access_control_test']
     };
   });
-  acl = {
-    access_type: 'anonymous',
-    start: new Date(Date.UTC(2019, 1, 22, 16, 20, 57)),
-    end: '2019-03-22 00:00 +0200'
-  };
-  acl_2 = {
-    access_type: 'anonymous',
-    start: '2019-02-22 16:20:57Z',
-    end: '2019-03-22 00:00 +0200'
-  };
-  acl_string = '{"access_type":"anonymous","start":"2019-02-22 16:20:57 +0200","end":"2019-03-22 00:00 +0200"}';
-  return describe("build_upload_params", function() {
+  describe("build_upload_params", function() {
     it("should accept a Hash value", function() {
-      var params;
-      params = cloudinary.utils.build_upload_params({
-        access_control: acl
-      });
-      expect(params).to.have.key('access_control');
-      expect(isString(params.access_control)).to.be.ok();
-      return expect(params.access_control).to.match(/^\[.+\]$/);
-    });
-    it("should accept an array of Hash values", function() {
-      var j, params;
-      params = cloudinary.utils.build_upload_params({
-        access_control: [acl, acl_2]
+      let params = build_upload_params({
+        access_control: ACL
       });
       expect(params).to.have.key('access_control');
       expect(isString(params.access_control)).to.be.ok();
       expect(params.access_control).to.match(/^\[.+\]$/);
-      j = JSON.parse(params.access_control);
-      expect(j.length).to.be(2);
-      expect(j[0]["access_type"]).to.equal(acl.access_type);
-      expect(Date.parse(j[0]["start"])).to.equal(Date.parse(acl.start));
-      return expect(Date.parse(j[0]["end"])).to.equal(Date.parse(acl.end));
     });
-    return it("should accept a JSON string", function() {
-      var params;
-      params = cloudinary.utils.build_upload_params({
-        access_control: acl_string
+    it("should accept an array of Hash values", function() {
+      let params = build_upload_params({
+        access_control: [ACL, ACL_2]
       });
       expect(params).to.have.key('access_control');
       expect(isString(params.access_control)).to.be.ok();
-      return expect(params.access_control).to.equal(`[${acl_string}]`);
+      expect(params.access_control).to.match(/^\[.+\]$/);
+      let j = JSON.parse(params.access_control);
+      expect(j.length).to.be(2);
+      expect(j[0]["access_type"]).to.equal(ACL.access_type);
+      expect(Date.parse(j[0]["start"])).to.equal(Date.parse(ACL.start));
+      expect(Date.parse(j[0]["end"])).to.equal(Date.parse(ACL.end));
+    });
+    it("should accept a JSON string", function() {
+      let params = build_upload_params({
+        access_control: ACL_STRING
+      });
+      expect(params).to.have.key('access_control');
+      expect(isString(params.access_control)).to.be.ok();
+      expect(params.access_control).to.equal(`[${ACL_STRING}]`);
     });
   });
 });

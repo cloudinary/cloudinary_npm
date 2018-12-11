@@ -1,65 +1,41 @@
-var ClientRequest, EMPTY_IMAGE, IMAGE_FILE, LARGE_RAW_FILE, LARGE_VIDEO, Q, RAW_FILE, TEST_TAG, UPLOAD_TAGS, at, cloudinary, expect, fs, helper, http, https, isFunction, path, sinon, uniq, uploadImage;
-
 require('dotenv').load({
   silent: true
 });
 
-https = require('https');
-
-http = require('http');
-
-expect = require("expect.js");
-
-sinon = require('sinon');
-
-cloudinary = require("../cloudinary");
-
-fs = require('fs');
-
-Q = require('q');
-
-path = require('path');
-
-isFunction = require('lodash/isFunction');
-
-at = require('lodash/at');
-
-uniq = require('lodash/uniq');
-
-ClientRequest = require('_http_client').ClientRequest;
+const https = require('https');
+const http = require('http');
+const expect = require("expect.js");
+const sinon = require('sinon');
+const cloudinary = require("../cloudinary");
+const fs = require('fs');
+const Q = require('q');
+const path = require('path');
+const isFunction = require('lodash/isFunction');
+const at = require('lodash/at');
+const uniq = require('lodash/uniq');
+const ClientRequest = require('_http_client').ClientRequest;
+const helper = require("./spechelper");
+const TEST_TAG = helper.TEST_TAG;
+const IMAGE_FILE = helper.IMAGE_FILE;
+const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
+const LARGE_VIDEO = helper.LARGE_VIDEO;
+const EMPTY_IMAGE = helper.EMPTY_IMAGE;
+const RAW_FILE = helper.RAW_FILE;
+const UPLOAD_TAGS = helper.UPLOAD_TAGS;
+const uploadImage = helper.uploadImage;
 
 require('jsdom-global')();
 
-helper = require("./spechelper");
-
-TEST_TAG = helper.TEST_TAG;
-
-IMAGE_FILE = helper.IMAGE_FILE;
-
-LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
-
-LARGE_VIDEO = helper.LARGE_VIDEO;
-
-EMPTY_IMAGE = helper.EMPTY_IMAGE;
-
-RAW_FILE = helper.RAW_FILE;
-
-UPLOAD_TAGS = helper.UPLOAD_TAGS;
-
-uploadImage = helper.uploadImage;
-
 describe("uploader", function() {
   before("Verify Configuration", function() {
-    var config;
-    config = cloudinary.config(true);
+    var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
-      return expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
   this.timeout(helper.TIMEOUT_LONG);
   after(function() {
-    var config;
-    config = cloudinary.config(true);
+    var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
@@ -84,7 +60,7 @@ describe("uploader", function() {
         public_id: result.public_id,
         version: result.version
       }, cloudinary.config().api_secret);
-      return expect(result.signature).to.eql(expected_signature);
+      expect(result.signature).to.eql(expected_signature);
     });
   });
   it("should successfully upload url", function() {
@@ -98,7 +74,7 @@ describe("uploader", function() {
         public_id: result.public_id,
         version: result.version
       }, cloudinary.config().api_secret);
-      return expect(result.signature).to.eql(expected_signature);
+      expect(result.signature).to.eql(expected_signature);
     });
   });
   describe("rename", function() {
@@ -116,9 +92,9 @@ describe("uploader", function() {
       return Promise.all([uploadImage(), uploadImage()]).then(function(results) {
         return cloudinary.v2.uploader.rename(results[0].public_id, results[1].public_id);
       }).then(function() {
-        return expect().fail();
+        expect().fail();
       }).catch(function(error) {
-        return expect(error).to.be.ok();
+        expect(error).to.be.ok();
       });
     });
     it("should allow to rename to an existing ID, if overwrite is true", function() {
@@ -129,7 +105,7 @@ describe("uploader", function() {
       }).then(function({public_id}) {
         return cloudinary.v2.api.resource(public_id);
       }).then(function({format}) {
-        return expect(format).to.eql("png");
+        expect(format).to.eql("png");
       });
     });
     return context(":invalidate", function() {
@@ -145,11 +121,11 @@ describe("uploader", function() {
         spy.restore();
         return xhr.restore();
       });
-      return it("should should pass the invalidate value in rename to the server", function() {
+      it("should should pass the invalidate value in rename to the server", function() {
         cloudinary.v2.uploader.rename("first_id", "second_id", {
           invalidate: true
         });
-        return expect(spy.calledWith(sinon.match(function(arg) {
+        expect(spy.calledWith(sinon.match(function(arg) {
           return arg.toString().match(/name="invalidate"/);
         }))).to.be.ok();
       });
@@ -157,18 +133,17 @@ describe("uploader", function() {
   });
   describe("destroy", function() {
     this.timeout(helper.TIMEOUT_MEDIUM);
-    return it("should delete a resource", function() {
+    it("should delete a resource", function() {
       return uploadImage().then(function(result) {
-        var public_id;
-        public_id = result.public_id;
+        var public_id = result.public_id;
         return cloudinary.v2.uploader.destroy(public_id);
       }).then(function(result) {
         expect(result.result).to.eql("ok");
         return cloudinary.v2.api.resource(public_id);
       }).then(function() {
-        return expect().fail();
+        expect().fail();
       }).catch(function(error) {
-        return expect(error).to.be.ok();
+        expect(error).to.be.ok();
       });
     });
   });
@@ -182,15 +157,14 @@ describe("uploader", function() {
         }
       ]
     }).then(function(result) {
-      var url;
-      url = cloudinary.utils.url("sample", {
+      var url = cloudinary.utils.url("sample", {
         type: "upload",
         crop: "scale",
         width: "2.0",
         format: "jpg",
         version: result["version"]
       });
-      return expect(result.eager[0].url).to.eql(url);
+      expect(result.eager[0].url).to.eql(url);
     });
   });
   it("should support eager in upload", function() {
@@ -214,7 +188,7 @@ describe("uploader", function() {
         tags: UPLOAD_TAGS
       });
     });
-    return it("should support custom headers as array of strings e.g. [\"Link: 1\"]", function() {
+    it("should support custom headers as array of strings e.g. [\"Link: 1\"]", function() {
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         headers: ["Link: 1"],
         tags: UPLOAD_TAGS
@@ -226,7 +200,7 @@ describe("uploader", function() {
       tags: UPLOAD_TAGS
     }).then(function(result) {
       expect(result.width).to.within(50, 70);
-      return expect(result.height).to.within(5, 15);
+      expect(result.height).to.within(5, 15);
     });
   });
   it("should successfully upload stream", function(done) {
@@ -267,7 +241,7 @@ describe("uploader", function() {
         });
       }).then(function([firstId, secondId]) {
         return cloudinary.v2.api.resource(secondId).then(function(r1) {
-          return expect(r1.tags).to.contain("tag1");
+          expect(r1.tags).to.contain("tag1");
         }).then(function() {
           return [firstId, secondId];
         });
@@ -278,7 +252,7 @@ describe("uploader", function() {
       }).then(function([firstId, secondId, result]) {
         expect(result["public_ids"]).to.contain(firstId);
         expect(result["public_ids"]).to.contain(secondId);
-        return expect(result["public_ids"]).to.not.contain('noSuchId');
+        expect(result["public_ids"]).to.not.contain('noSuchId');
       });
     });
     it("should keep existing tags when adding a new tag", function() {
@@ -293,22 +267,21 @@ describe("uploader", function() {
       }).then(function(publicId) {
         return cloudinary.v2.api.resource(publicId);
       }).then(function(result) {
-        return expect(result.tags).to.contain("tag1").and.contain("tag2");
+        expect(result.tags).to.contain("tag1").and.contain("tag2");
       });
     });
-    return it("should replace existing tag", function() {
+    it("should replace existing tag", function() {
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         tags: ["tag1", "tag2", TEST_TAG]
       }).then(function(result) {
-        var public_id;
-        public_id = result.public_id;
+        var public_id = result.public_id;
         return cloudinary.v2.uploader.replace_tag("tag3Å", public_id).then(function() {
           return public_id;
         });
       }).then(function(public_id) { // TODO this also tests non ascii characters
         return cloudinary.v2.api.resource(public_id);
       }).then(function(result) {
-        return expect(result.tags).to.eql(["tag3Å"]);
+        expect(result.tags).to.eql(["tag3Å"]);
       });
     });
   });
@@ -342,12 +315,11 @@ describe("uploader", function() {
         expect(public_ids).to.not.contain('noSuchId');
         return cloudinary.v2.api.resource(second_id);
       }).then(function({context}) {
-        return expect(context).to.be(void 0);
+        expect(context).to.be(void 0);
       });
     });
-    return it("should upload with context containing reserved characters", function() {
-      var context;
-      context = {
+    it("should upload with context containing reserved characters", function() {
+      var context = {
         key1: 'value1',
         key2: 'valu\e2',
         key3: 'val=u|e3',
@@ -360,7 +332,7 @@ describe("uploader", function() {
           context: true
         });
       }).then(function(result) {
-        return expect(result.context.custom).to.eql(context);
+        expect(result.context.custom).to.eql(context);
       });
     });
   });
@@ -370,10 +342,10 @@ describe("uploader", function() {
       timeout: 1,
       tags: UPLOAD_TAGS
     }).then(function() {
-      return expect().fail();
+      expect().fail();
     }).catch(function({error}) {
       expect(error.http_code).to.eql(499);
-      return expect(error.message).to.eql("Request Timeout");
+      expect(error.message).to.eql("Request Timeout");
     });
   });
   it("should upload a file and base public id on the filename if use_filename is set to true", function() {
@@ -382,7 +354,7 @@ describe("uploader", function() {
       use_filename: true,
       tags: UPLOAD_TAGS
     }).then(function({public_id}) {
-      return expect(public_id).to.match(/logo_[a-zA-Z0-9]{6}/);
+      expect(public_id).to.match(/logo_[a-zA-Z0-9]{6}/);
     });
   });
   it("should upload a file and set the filename as the public_id if use_filename is set to true and unique_filename is set to false", function() {
@@ -391,7 +363,7 @@ describe("uploader", function() {
       unique_filename: false,
       tags: UPLOAD_TAGS
     }).then(function(result) {
-      return expect(result.public_id).to.eql("logo");
+      expect(result.public_id).to.eql("logo");
     });
   });
   describe("allowed_formats", function() {
@@ -400,7 +372,7 @@ describe("uploader", function() {
         allowed_formats: ["png"],
         tags: UPLOAD_TAGS
       }).then(function(result) {
-        return expect(result.format).to.eql("png");
+        expect(result.format).to.eql("png");
       });
     });
     it("should prevent non whitelisted formats from being uploaded", function() {
@@ -408,18 +380,18 @@ describe("uploader", function() {
         allowed_formats: ["jpg"],
         tags: UPLOAD_TAGS
       }).then(function() {
-        return expect().fail();
+        expect().fail();
       }).catch(function(error) {
-        return expect(error.http_code).to.eql(400);
+        expect(error.http_code).to.eql(400);
       });
     });
-    return it("should allow non whitelisted formats if type is specified and convert to that type", function() {
+    it("should allow non whitelisted formats if type is specified and convert to that type", function() {
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         allowed_formats: ["jpg"],
         format: "jpg",
         tags: UPLOAD_TAGS
       }).then(function(result) {
-        return expect(result.format).to.eql("jpg");
+        expect(result.format).to.eql("jpg");
       });
     });
   });
@@ -461,7 +433,7 @@ describe("uploader", function() {
       });
     }).then(function(info) {
       expect(info.faces).to.eql(different_coordinates);
-      return expect(info.coordinates).to.eql({
+      expect(info.coordinates).to.eql({
         faces: different_coordinates,
         custom: [custom_coordinates]
       });
@@ -481,7 +453,7 @@ describe("uploader", function() {
       });
     }).then(function({context}) {
       expect(context.custom.caption).to.eql("some caption");
-      return expect(context.custom.alt).to.eql("alternative");
+      expect(context.custom.alt).to.eql("alternative");
     });
   });
   it("should support requesting manual moderation", function() {
@@ -490,7 +462,7 @@ describe("uploader", function() {
       tags: UPLOAD_TAGS
     }).then(function(result) {
       expect(result.moderation[0].status).to.eql("pending");
-      return expect(result.moderation[0].kind).to.eql("manual");
+      expect(result.moderation[0].kind).to.eql("manual");
     });
   });
   it("should support requesting ocr analysis", function() {
@@ -498,7 +470,7 @@ describe("uploader", function() {
       ocr: "adv_ocr",
       tags: UPLOAD_TAGS
     }).then(function(result) {
-      return expect(result.info.ocr).to.have.key("adv_ocr");
+      expect(result.info.ocr).to.have.key("adv_ocr");
     });
   });
   it("should support requesting raw conversion", function() {
@@ -507,10 +479,10 @@ describe("uploader", function() {
       resource_type: "raw",
       tags: UPLOAD_TAGS
     }).then(function() {
-      return expect().fail();
+      expect().fail();
     }).catch(function(error) {
       expect(error != null).to.be(true);
-      return expect(error.message).to.contain("Raw convert is invalid");
+      expect(error.message).to.contain("Raw convert is invalid");
     });
   });
   it("should support requesting categorization", function() {
@@ -518,9 +490,9 @@ describe("uploader", function() {
       categorization: "illegal",
       tags: UPLOAD_TAGS
     }).then(function() {
-      return expect().fail();
+      expect().fail();
     }).catch(function(error) {
-      return expect(error != null).to.be(true);
+      expect(error != null).to.be(true);
     });
   });
   it("should support requesting detection", function() {
@@ -528,10 +500,10 @@ describe("uploader", function() {
       detection: "illegal",
       tags: UPLOAD_TAGS
     }).then(function() {
-      return expect().fail();
+      expect().fail();
     }).catch(function(error) {
       expect(error).not.to.be(void 0);
-      return expect(error.message).to.contain("Detection is invalid");
+      expect(error.message).to.contain("Detection is invalid");
     });
   });
   it("should support requesting background_removal", function() {
@@ -539,10 +511,10 @@ describe("uploader", function() {
       background_removal: "illegal",
       tags: UPLOAD_TAGS
     }).then(function() {
-      return expect().fail();
+      expect().fail();
     }).catch(function(error) {
       expect(error != null).to.be(true);
-      return expect(error.message).to.contain("is invalid");
+      expect(error.message).to.contain("is invalid");
     });
   });
   describe("upload_chunked", function() {
@@ -629,25 +601,20 @@ describe("uploader", function() {
           return p.match(/"timestamp"\s+(\d+)/)[1];
         });
         expect(timestamps.length).to.be.greaterThan(1);
-        if (process.versions.node && process.versions.node[0] === '4') {
-          timestamps.pop(); // hack - node 4 duplicates the last entry
-        }
-        return expect(uniq(timestamps)).to.eql(timestamps);
+        expect(uniq(timestamps)).to.eql(uniq(timestamps)); // uniq b/c last timestamp may be duplicated
       }).finally(function() {
         return writeSpy.restore();
       });
     });
     it("should update timestamp for each chuck", function() {
-      var writeSpy;
-      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+      var writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
         timeout: helper.TIMEOUT_LONG * 10,
         tags: UPLOAD_TAGS
       }).then(function() {
-        var timestamps;
-        timestamps = writeSpy.args.map(function(a) {
+        var timestamps = writeSpy.args.map(function(a) {
           return a[0].toString();
         }).filter(function(p) {
           return p.match(/timestamp/);
@@ -655,12 +622,12 @@ describe("uploader", function() {
           return p.match(/"timestamp"\s+(\d+)/)[1];
         });
         expect(timestamps.length).to.be.greaterThan(1);
-        return expect(uniq(timestamps)).to.eql(timestamps);
+        expect(uniq(timestamps)).to.eql(uniq(timestamps));
       }).finally(function() {
         return writeSpy.restore();
       });
     });
-    return it("should support uploading based on a url", function(done) {
+    it("should support uploading based on a url", function(done) {
       this.timeout(helper.TIMEOUT_MEDIUM);
       cloudinary.v2.uploader.upload_large("http://cloudinary.com/images/old_logo.png", {
         tags: UPLOAD_TAGS
@@ -695,9 +662,9 @@ describe("uploader", function() {
     return cloudinary.v2.uploader.upload(EMPTY_IMAGE, {
       tags: UPLOAD_TAGS
     }).then(function() {
-      return expect().fail("server should return an error when uploading an empty file");
+      expect().fail("server should return an error when uploading an empty file");
     }).catch(function(error) {
-      return expect(error.message.toLowerCase()).to.contain("empty");
+      expect(error.message.toLowerCase()).to.contain("empty");
     });
   });
   it("should successfully upload with pipes", function(done) {
@@ -721,7 +688,7 @@ describe("uploader", function() {
   });
   it("should fail with http.Agent (non secure)", function() {
     this.timeout(helper.TIMEOUT_LONG);
-    return expect(cloudinary.v2.uploader.upload_stream).withArgs({
+    expect(cloudinary.v2.uploader.upload_stream).withArgs({
       agent: new http.Agent
     }, function(error, result) {}).to.throwError();
   });
@@ -738,7 +705,7 @@ describe("uploader", function() {
         public_id: result.public_id,
         version: result.version
       }, cloudinary.config().api_secret);
-      return expect(result.signature).to.eql(expected_signature);
+      expect(result.signature).to.eql(expected_signature);
     });
     file_reader = fs.createReadStream(IMAGE_FILE);
     return file_reader.pipe(upload);
@@ -748,7 +715,7 @@ describe("uploader", function() {
       before(function() {
         return helper.setupCache();
       });
-      return it('should return a responsive_breakpoints in the response', function() {
+      it('should return a responsive_breakpoints in the response', function() {
         return cloudinary.v2.uploader.upload(IMAGE_FILE, {
           responsive_breakpoints: [
             {
@@ -792,7 +759,7 @@ describe("uploader", function() {
             expect(cached).to.be.ok();
             expect(cached.length).to.be(bp.breakpoints.length);
             return bp.breakpoints.forEach(function(o) {
-              return expect(cached).to.contain(o.width);
+              expect(cached).to.contain(o.width);
             });
           });
         });
@@ -800,9 +767,8 @@ describe("uploader", function() {
     });
   });
   describe("async upload", function() {
-    var mocked;
-    mocked = helper.mockTest();
-    return it("should pass `async` value to the server", function() {
+    var mocked = helper.mockTest();
+    it("should pass `async` value to the server", function() {
       cloudinary.v2.uploader.upload(IMAGE_FILE, {
         async: true,
         transformation: {
@@ -825,7 +791,7 @@ describe("uploader", function() {
       return xhr.restore();
     });
     describe(":invalidate", function() {
-      return it("should should pass the invalidate value to the server", function() {
+      it("should should pass the invalidate value to the server", function() {
         cloudinary.v2.uploader.explicit("cloudinary", {
           type: "twitter_name",
           eager: [
@@ -840,7 +806,7 @@ describe("uploader", function() {
         return sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('invalidate', 1)));
       });
     });
-    return it("should support raw_convert", function() {
+    it("should support raw_convert", function() {
       cloudinary.v2.uploader.explicit("cloudinary", {
         raw_convert: "google_speech",
         tags: [TEST_TAG]
@@ -866,9 +832,9 @@ describe("uploader", function() {
     expect(input_element.getAttribute("data-max-chunk-size")).to.match(/1234/);
     expect(input_element.getAttribute("class")).to.match(/cloudinary-fileupload/);
     expect(input_element.getAttribute("name")).to.be('file');
-    return expect(input_element.getAttribute("type")).to.be('file');
+    expect(input_element.getAttribute("type")).to.be('file');
   });
-  return describe("access_control", function() {
+  describe("access_control", function() {
     var acl, acl_string, options, requestSpy, writeSpy;
     writeSpy = void 0;
     requestSpy = void 0;
@@ -891,7 +857,7 @@ describe("uploader", function() {
       end: '2019-03-22 00:00 +0200'
     };
     acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
-    return it("should allow the user to define ACL in the upload parameters", function() {
+    it("should allow the user to define ACL in the upload parameters", function() {
       options.access_control = [acl];
       return uploadImage(options).then((resource) => {
         var response_acl;
@@ -901,7 +867,7 @@ describe("uploader", function() {
         expect(response_acl.length).to.be(1);
         expect(response_acl[0]["access_type"]).to.be("anonymous");
         expect(Date.parse(response_acl[0]["start"])).to.be(Date.parse(acl.start));
-        return expect(Date.parse(response_acl[0]["end"])).to.be(Date.parse(acl.end));
+        expect(Date.parse(response_acl[0]["end"])).to.be(Date.parse(acl.end));
       });
     });
   });

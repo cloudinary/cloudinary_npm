@@ -1,70 +1,51 @@
-var BREAKPOINTS, Cache, EMPTY_IMAGE, FORMAT_1, FileKeyValueStorage, IMAGE_FILE, KeyValueCacheAdapter, LARGE_RAW_FILE, LARGE_VIDEO, PUBLIC_ID, RAW_FILE, TEST_TAG, TRANSFORAMTION_1_RB, TRANSFORMATION_1, UPLOAD_TAGS, c, cache, cloudinary, expect, helper, options, path;
+var options;
 
-expect = require("expect.js");
+const expect = require("expect.js");
+const helper = require("./spechelper");
+const cloudinary = require('../cloudinary').v2;
+const Cache = cloudinary.Cache;
+const FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
+const KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAdapter`);
+const path = require('path');
+const TEST_TAG = helper.TEST_TAG;
+const IMAGE_FILE = helper.IMAGE_FILE;
+const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
+const LARGE_VIDEO = helper.LARGE_VIDEO;
+const EMPTY_IMAGE = helper.EMPTY_IMAGE;
+const RAW_FILE = helper.RAW_FILE;
+const UPLOAD_TAGS = helper.UPLOAD_TAGS;
+const PUBLIC_ID = "dummy";
+const BREAKPOINTS = [5, 3, 7, 5];
 
-helper = require("./spechelper");
-
-cloudinary = require('../cloudinary').v2;
-
-Cache = cloudinary.Cache;
-
-FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
-
-KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAdapter`);
-
-path = require('path');
-
-TEST_TAG = helper.TEST_TAG;
-
-IMAGE_FILE = helper.IMAGE_FILE;
-
-LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
-
-LARGE_VIDEO = helper.LARGE_VIDEO;
-
-EMPTY_IMAGE = helper.EMPTY_IMAGE;
-
-RAW_FILE = helper.RAW_FILE;
-
-UPLOAD_TAGS = helper.UPLOAD_TAGS;
-
-PUBLIC_ID = "dummy";
-
-BREAKPOINTS = [5, 3, 7, 5];
-
-TRANSFORMATION_1 = {
+const TRANSFORMATION_1 = {
   angle: 45,
   crop: 'scale'
 };
 
-FORMAT_1 = 'png';
+const FORMAT_1 = 'png';
+const TRANSFORAMTION_1_RB = [206, 50];
+var cache;
 
-TRANSFORAMTION_1_RB = [206, 50];
-
-cache = c = options = void 0;
-
-describe("Cache", function() {
-  before(function() {
+describe("Cache", function () {
+  before(function () {
     return Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
   });
-  it("should be initialized", function() {
+  it("should be initialized", function () {
     return expect(Cache).to.be.ok();
   });
-  it("should set and get a value", function() {
+  it("should set and get a value", function () {
     Cache.set(PUBLIC_ID, {}, BREAKPOINTS);
     return expect(Cache.get(PUBLIC_ID, {})).to.eql(BREAKPOINTS);
   });
-  describe("Upload integration", function() {
+  describe("Upload integration", function () {
     this.timeout(helper.TIMEOUT_LONG);
-    before(function() {
-      return options = {
+    before(function () {
+      options = {
         tags: UPLOAD_TAGS,
         responsive_breakpoints: [
           {
             create_derived: false,
-            transformation: {
-              angle: 90
-            },
+            transformation: {angle: 90},
             format: 'gif'
           },
           {
@@ -78,10 +59,8 @@ describe("Cache", function() {
         ]
       };
     });
-    this.timeout(helper.TIMEOUT_LONG);
-    after(function() {
-      var config;
-      config = cloudinary.config(true);
+    after(function () {
+      let config = cloudinary.config(true);
       if (!(config.api_key && config.api_secret)) {
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
       }
@@ -89,26 +68,25 @@ describe("Cache", function() {
         return cloudinary.api.delete_resources_by_tag(helper.TEST_TAG);
       }
     });
-    return it("should save responsive breakpoints to cache after upload", function() {
-      return cloudinary.uploader.upload(IMAGE_FILE, options).then(function(results) {
-        var format, public_id, resource_type, type;
-        ({public_id, type, resource_type, format} = results);
-        return results.responsive_breakpoints.forEach(function(bp) {
-          var cachedBp;
-          cachedBp = Cache.get(results.public_id, {
-            public_id,
-            type,
-            resource_type,
-            raw_transformation: bp.transformation,
-            format: path.extname(bp.breakpoints[0].url).slice(1)
+    it("should save responsive breakpoints to cache after upload", function () {
+      return cloudinary.uploader.upload(IMAGE_FILE, options)
+        .then(function (results) {
+          let public_id = results.public_id;
+          let type = results.type;
+          let resource_type = results.resource_type;
+          results.responsive_breakpoints.forEach(function (bp) {
+            let cachedBp = Cache.get(results.public_id, {
+              public_id,
+              type,
+              resource_type,
+              raw_transformation: bp.transformation,
+              format: path.extname(bp.breakpoints[0].url).slice(1)
+            });
+            expect(cachedBp).to.eql(bp.breakpoints.map(i => i.width));
           });
-          expect(cachedBp).to.eql(bp.breakpoints.map(function(i) {
-            return i.width;
-          }));
-          return bp;
         });
-      });
     });
   });
-  return it("should create srcset from cache", function() {});
+  it("should create srcset from cache", function () {
+  });
 });
