@@ -1,13 +1,10 @@
-var cloudinary, expect;
-
-expect = require("expect.js");
-
-cloudinary = require("../cloudinary.js");
+const expect = require("expect.js");
+const cloudinary = require("../cloudinary.js");
 
 describe("cloudinary", function() {
   var layer, layers;
   beforeEach(function() {
-    return cloudinary.config({
+    cloudinary.config({
       cloud_name: "test123",
       api_key: 'a',
       api_secret: 'b',
@@ -15,9 +12,8 @@ describe("cloudinary", function() {
     });
   });
   it("should use cloud_name from config", function() {
-    var result;
-    result = cloudinary.utils.url("test");
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/test");
+    var result = cloudinary.utils.url("test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/test");
   });
   it("should allow overriding cloud_name in options", function() {
     var options, result;
@@ -26,7 +22,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test321/image/upload/test");
+    expect(result).to.eql("http://res.cloudinary.com/test321/image/upload/test");
   });
   it("should use format from options", function() {
     var options, result;
@@ -35,7 +31,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/test.jpg");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/test.jpg");
   });
   it("should use default secure distribution if secure=true", function() {
     var options, result;
@@ -44,7 +40,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("https://res.cloudinary.com/test123/image/upload/test");
+    expect(result).to.eql("https://res.cloudinary.com/test123/image/upload/test");
   });
   it("should default to akamai if secure is given with private_cdn and no secure_distribution", function() {
     var options, result;
@@ -54,7 +50,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("https://test123-res.cloudinary.com/image/upload/test");
+    expect(result).to.eql("https://test123-res.cloudinary.com/image/upload/test");
   });
   it("should not add cloud_name if secure private_cdn and secure non akamai secure_distribution", function() {
     var options, result;
@@ -65,7 +61,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("https://something.cloudfront.net/image/upload/test");
+    expect(result).to.eql("https://something.cloudfront.net/image/upload/test");
   });
   it("should not add cloud_name if private_cdn and not secure", function() {
     var options, result;
@@ -74,7 +70,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://test123-res.cloudinary.com/image/upload/test");
+    expect(result).to.eql("http://test123-res.cloudinary.com/image/upload/test");
   });
   it("should use width and height from options only if crop is given", function() {
     var options, result;
@@ -98,7 +94,7 @@ describe("cloudinary", function() {
       width: 100,
       height: 100
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/test");
   });
   it("should not pass width and height to html in case of fit or limit crop", function() {
     var options, result;
@@ -117,7 +113,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fit,h_100,w_100/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fit,h_100,w_100/test");
   });
   it("should not pass width and height to html in case angle was used", function() {
     var options, result;
@@ -129,7 +125,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/a_auto,c_scale,h_100,w_100/test");
-    return expect(options).to.eql({});
+    expect(options).to.eql({});
   });
   it("should use x, y, radius, opacity, prefix, gravity and quality from options", function() {
     var options, result;
@@ -144,11 +140,10 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/g_center,o_20,p_a,q_0.4,r_3,x_1,y_2/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/g_center,o_20,p_a,q_0.4,r_3,x_1,y_2/test");
   });
   describe(":quality", function() {
-    var upload_path;
-    upload_path = "http://res.cloudinary.com/test123/image/upload";
+    var upload_path = "http://res.cloudinary.com/test123/image/upload";
     it("support a percent value", function() {
       expect(cloudinary.utils.url("test", {
         x: 1,
@@ -158,7 +153,7 @@ describe("cloudinary", function() {
         quality: 80,
         prefix: "a"
       }), `${upload_path}/g_center,p_a,q_80,r_3,x_1,y_2/test`);
-      return expect(cloudinary.utils.url("test", {
+      expect(cloudinary.utils.url("test", {
         x: 1,
         y: 2,
         radius: 3,
@@ -167,7 +162,7 @@ describe("cloudinary", function() {
         prefix: "a"
       }), `${upload_path}/g_center,p_a,q_80:444,r_3,x_1,y_2/test`);
     });
-    return it("should support auto value", function() {
+    it("should support auto value", function() {
       expect(cloudinary.utils.url("test", {
         x: 1,
         y: 2,
@@ -176,7 +171,7 @@ describe("cloudinary", function() {
         quality: "auto",
         prefix: "a"
       }), `${upload_path}/g_center,p_a,q_auto,r_3,x_1,y_2/test`);
-      return expect(cloudinary.utils.url("test", {
+      expect(cloudinary.utils.url("test", {
         x: 1,
         y: 2,
         radius: 3,
@@ -193,7 +188,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/t_blip/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/t_blip/test");
   });
   it("should support array of named transformations", function() {
     var options, result;
@@ -202,7 +197,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/t_blip.blop/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/t_blip.blop/test");
   });
   it("should support base transformation", function() {
     var options, result;
@@ -219,7 +214,7 @@ describe("cloudinary", function() {
     expect(options).to.eql({
       width: 100
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fill,x_100,y_100/c_crop,w_100/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fill,x_100,y_100/c_crop,w_100/test");
   });
   it("should support array of base transformations", function() {
     var options, result;
@@ -242,7 +237,7 @@ describe("cloudinary", function() {
     expect(options).to.eql({
       width: 100
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fill,w_200,x_100,y_100/r_10/c_crop,w_100/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fill,w_200,x_100,y_100/r_10/c_crop,w_100/test");
   });
   it("should not include empty transformations", function() {
     var options, result;
@@ -259,7 +254,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fill,x_100,y_100/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_fill,x_100,y_100/test");
   });
   it("should support size", function() {
     var options, result;
@@ -272,7 +267,7 @@ describe("cloudinary", function() {
       width: "10",
       height: "10"
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,h_10,w_10/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,h_10,w_10/test");
   });
   it("should use type from options", function() {
     var options, result;
@@ -281,7 +276,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/facebook/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/facebook/test");
   });
   it("should use resource_type from options", function() {
     var options, result;
@@ -290,7 +285,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/raw/upload/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/raw/upload/test");
   });
   it("should ignore http links only if type is not given ", function() {
     var options, result;
@@ -305,7 +300,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("http://example.com/", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/fetch/http://example.com/");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/fetch/http://example.com/");
   });
   it("should escape fetch urls", function() {
     var options, result;
@@ -314,7 +309,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("http://blah.com/hello?a=b", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/fetch/http://blah.com/hello%3Fa%3Db");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/fetch/http://blah.com/hello%3Fa%3Db");
   });
   it("should escape http urls", function() {
     var options, result;
@@ -323,7 +318,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("http://www.youtube.com/watch?v=d9NF2edxy-M", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M");
   });
   it("should support background", function() {
     var options, result;
@@ -338,7 +333,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/b_rgb:112233/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/b_rgb:112233/test");
   });
   it("should support default_image", function() {
     var options, result;
@@ -347,7 +342,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/d_default/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/d_default/test");
   });
   it("should support angle", function() {
     var options, result;
@@ -356,7 +351,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/a_12/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/a_12/test");
   });
   it("should support format for fetch urls", function() {
     var options, result;
@@ -366,7 +361,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("http://cloudinary.com/images/logo.png", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/fetch/f_jpg/http://cloudinary.com/images/logo.png");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/fetch/f_jpg/http://cloudinary.com/images/logo.png");
   });
   it("should support effect", function() {
     var options, result;
@@ -375,7 +370,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/e_sepia/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/e_sepia/test");
   });
   it("should support effect with param", function() {
     var options, result;
@@ -384,7 +379,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/e_sepia:10/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/e_sepia:10/test");
   });
   layers = {
     overlay: "l",
@@ -397,7 +392,7 @@ describe("cloudinary", function() {
       options[layer] = "text:hello";
       result = cloudinary.utils.url("test", options);
       expect(options).to.eql({});
-      return expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/${layers[layer]}_text:hello/test`);
+      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/${layers[layer]}_text:hello/test`);
     });
     it(`should not pass width/height to html for ${layer}`, function() {
       var options, result;
@@ -408,11 +403,11 @@ describe("cloudinary", function() {
       options[layer] = "text:hello";
       result = cloudinary.utils.url("test", options);
       expect(options).to.eql({});
-      return expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/h_100,${layers[layer]}_text:hello,w_100/test`);
+      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/h_100,${layers[layer]}_text:hello,w_100/test`);
     });
   }
   it("should correctly sign api requests", function() {
-    return expect(cloudinary.utils.api_sign_request({
+    expect(cloudinary.utils.api_sign_request({
       hello: null,
       goodbye: 12,
       world: "problem",
@@ -420,7 +415,7 @@ describe("cloudinary", function() {
     }, "1234")).to.eql("f05cfe85cee78e7e997b3c7da47ba212dcbf1ea5");
   });
   it("should correctly build signed preloaded image", function() {
-    return expect(cloudinary.utils.signed_preloaded_image({
+    expect(cloudinary.utils.signed_preloaded_image({
       resource_type: "image",
       version: 1251251251,
       public_id: "abcd",
@@ -435,7 +430,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/dn_150/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/dn_150/test");
   });
   it("should support page", function() {
     var options, result;
@@ -444,7 +439,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/pg_5/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/pg_5/test");
   });
   it("should support external cname", function() {
     var options, result;
@@ -453,7 +448,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://hello.com/test123/image/upload/test");
+    expect(result).to.eql("http://hello.com/test123/image/upload/test");
   });
   it("should support external cname with cdn_subdomain on", function() {
     var options, result;
@@ -463,7 +458,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://a2.hello.com/test123/image/upload/test");
+    expect(result).to.eql("http://a2.hello.com/test123/image/upload/test");
   });
   it("should support border", function() {
     var options, result;
@@ -489,7 +484,7 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/bo_1px_solid_blue/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/bo_1px_solid_blue/test");
   });
   it("should support flags", function() {
     var options, result;
@@ -504,28 +499,25 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fl_abc.def/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fl_abc.def/test");
   });
   it("should add version if public_id contains /", function() {
-    var result;
-    result = cloudinary.utils.url("folder/test");
+    var result = cloudinary.utils.url("folder/test");
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/v1/folder/test");
     result = cloudinary.utils.url("folder/test", {
       version: 123
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/v123/folder/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/v123/folder/test");
   });
   it("should not add version if public_id contains version already", function() {
-    var result;
-    result = cloudinary.utils.url("v1234/test");
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/v1234/test");
+    var result = cloudinary.utils.url("v1234/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/v1234/test");
   });
   it("should allow to shorted image/upload urls", function() {
-    var result;
-    result = cloudinary.utils.url("test", {
+    var result = cloudinary.utils.url("test", {
       shorten: true
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/iu/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/iu/test");
   });
   it("should escape public_ids", function() {
     var result, results, source, target, tests;
@@ -542,7 +534,6 @@ describe("cloudinary", function() {
       result = cloudinary.utils.url(source);
       results.push(expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target));
     }
-    return results;
   });
   it("should correctly sign a url", function() {
     var actual, expected;
@@ -568,18 +559,17 @@ describe("cloudinary", function() {
       height: 20,
       sign_url: true
     });
-    return expect(actual).to.eql(expected);
+    expect(actual).to.eql(expected);
   });
   it("should correctly sign_request", function() {
-    var params;
-    params = cloudinary.utils.sign_request({
+    var params = cloudinary.utils.sign_request({
       public_id: "folder/file",
       version: "1234"
     }, {
       api_key: '1234',
       api_secret: 'b'
     });
-    return expect(params).to.eql({
+    expect(params).to.eql({
       public_id: "folder/file",
       version: "1234",
       signature: "7a3349cbb373e4812118d625047ede50b90e7b67",
@@ -587,8 +577,7 @@ describe("cloudinary", function() {
     });
   });
   it("should correctly process_request_params", function() {
-    var params;
-    params = cloudinary.utils.process_request_params({
+    var params = cloudinary.utils.process_request_params({
       public_id: "folder/file",
       version: "1234",
       colors: void 0
@@ -608,7 +597,7 @@ describe("cloudinary", function() {
       api_key: '1234',
       api_secret: 'b'
     });
-    return expect(params).to.eql({
+    expect(params).to.eql({
       public_id: "folder/file",
       version: "1234",
       signature: "7a3349cbb373e4812118d625047ede50b90e7b67",
@@ -616,14 +605,13 @@ describe("cloudinary", function() {
     });
   });
   it("should support preloaded identifier format", function() {
-    var result;
-    result = cloudinary.utils.url("raw/private/v123456/document.docx");
+    var result = cloudinary.utils.url("raw/private/v123456/document.docx");
     expect(result).to.eql("http://res.cloudinary.com/test123/raw/private/v123456/document.docx");
     result = cloudinary.utils.url("image/private/v123456/img.jpg", {
       crop: "scale",
       width: "1.0"
     });
-    return expect(result).to.eql("http://res.cloudinary.com/test123/image/private/c_scale,w_1.0/v123456/img.jpg");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/private/c_scale,w_1.0/v123456/img.jpg");
   });
   it("should add responsive width transformation", function() {
     var options, result;
@@ -652,37 +640,35 @@ describe("cloudinary", function() {
     };
     result = cloudinary.utils.url("test", options);
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,h_100,w_100/c_pad,w_auto/test");
-    return expect(options).to.eql({
+    expect(options).to.eql({
       responsive: true
     });
   });
   describe("getUserAgent", function() {
-    var platform;
-    platform = "";
+    var platform = "";
     before(function() {
       platform = cloudinary.utils.userPlatform;
-      return cloudinary.utils.userPlatform = "";
+      cloudinary.utils.userPlatform = "";
     });
     after(function() {
-      return cloudinary.utils.userPlatform = platform;
+      cloudinary.utils.userPlatform = platform;
     });
-    return it("should add a user platform to USER_AGENT", function() {
+    it("should add a user platform to USER_AGENT", function() {
       cloudinary.utils.userPlatform = "Spec/1.0 (Test)";
-      return expect(cloudinary.utils.getUserAgent()).to.match(/Spec\/1.0 \(Test\) CloudinaryNodeJS\/[\d.]+/);
+      expect(cloudinary.utils.getUserAgent()).to.match(/Spec\/1.0 \(Test\) CloudinaryNodeJS\/[\d.]+/);
     });
   });
-  return describe("config", function() {
-    var urlBackup;
-    urlBackup = process.env.CLOUDINARY_URL;
+  describe("config", function() {
+    var urlBackup = process.env.CLOUDINARY_URL;
     after(function() {
       process.env.CLOUDINARY_URL = urlBackup;
-      return cloudinary.config(true);
+      cloudinary.config(true);
     });
-    return it("should allow nested values in CLOUDINARY_URL", function() {
+    it("should allow nested values in CLOUDINARY_URL", function() {
       var ref;
       process.env.CLOUDINARY_URL = "cloudinary://key:secret@test123?foo[bar]=value";
       cloudinary.config(true);
-      return expect((ref = cloudinary.config().foo) != null ? ref.bar : void 0).to.eql('value');
+      expect((ref = cloudinary.config().foo) != null ? ref.bar : void 0).to.eql('value');
     });
   });
 });
