@@ -4,7 +4,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var PRELOADED_CLOUDINARY_PATH, PreloadedFile, config, utils;
+var PRELOADED_CLOUDINARY_PATH, config, utils;
 
 utils = require("./utils");
 
@@ -12,7 +12,7 @@ config = require("./config");
 
 PRELOADED_CLOUDINARY_PATH = /^([^\/]+)\/([^\/]+)\/v(\d+)\/([^#]+)#([^\/]+)$/;
 
-PreloadedFile = function () {
+var PreloadedFile = function () {
   function PreloadedFile(file_info) {
     _classCallCheck(this, PreloadedFile);
 
@@ -57,25 +57,25 @@ PreloadedFile = function () {
   }, {
     key: "identifier",
     value: function identifier() {
-      return "v" + this.version + "/" + this.filename;
+      return `v${this.version}/${this.filename}`;
     }
   }, {
     key: "toString",
     value: function toString() {
-      return this.resource_type + "/" + this.type + "/v" + this.version + "/" + this.filename + "#" + this.signature;
+      return `${this.resource_type}/${this.type}/v${this.version}/${this.filename}#${this.signature}`;
     }
   }, {
     key: "toJSON",
     value: function toJSON() {
-      var key, ref, result, val;
-      result = {};
-      ref = this;
-      for (key in ref) {
-        val = ref[key];
+      var _this = this;
+
+      var result = {};
+      Object.getOwnPropertyNames(this).forEach(function (key) {
+        var val = _this[key];
         if (typeof val !== 'function') {
           result[key] = val;
         }
-      }
+      });
       return result;
     }
   }]);
