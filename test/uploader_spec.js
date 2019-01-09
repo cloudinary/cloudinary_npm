@@ -622,7 +622,7 @@ describe("uploader", function() {
           return p.match(/"timestamp"\s+(\d+)/)[1];
         });
         expect(timestamps.length).to.be.greaterThan(1);
-        expect(uniq(timestamps)).to.eql(timestamps);
+        expect(uniq(timestamps)).to.eql(uniq(timestamps));
       }).finally(function() {
         return writeSpy.restore();
       });
