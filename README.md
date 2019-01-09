@@ -63,14 +63,20 @@ Each request to our secure APIs (e.g., image uploads, eager sprite generation) m
 
 Setting the `cloud_name`, `api_key` and `api_secret` parameters can be done either directly in each call to a Cloudinary method, by calling the cloudinary.config(), or by using the CLOUDINARY_URL environment variable.
 
+### Require the Cloudinary library
+
+```js
+var cloudinary = require('cloudinary').v2
+```
+
 ### Overriding the request agent
 To override the request agent pass the agent into any method that makes a
 request and it will be used instead of the normal https agent. e.g
-```js
 
+```js
 cloudinary.uploader.upload_stream(
-  function(result) { console.log(result); },
-  { agent: myAgent }
+  { agent: myAgent },
+  function(error, result) { console.log(result); }
 );
 
 ```
@@ -81,21 +87,29 @@ Any image uploaded to Cloudinary can be transformed and embedded using powerful 
 
 The following example generates the url for accessing an uploaded `sample` image while transforming it to fill a 100x150 rectangle:
 
-    cloudinary.url("sample.jpg", {width: 100, height: 150, crop: "fill"})
+```js
+cloudinary.url("sample.jpg", {width: 100, height: 150, crop: "fill"})
+```
 
 Another example, emedding a smaller version of an uploaded image while generating a 90x90 face detection based thumbnail:
 
-    cloudinary.url("woman.jpg", {width: 90, height: 90, crop: "thumb", gravity: "face"})
+```js
+cloudinary.url("woman.jpg", {width: 90, height: 90, crop: "thumb", gravity: "face"});
+```
 
 You can provide either a Facebook name or a numeric ID of a Facebook profile or a fan page.
 
 Embedding a Facebook profile to match your graphic design is very simple:
 
-    cloudinary.url("billclinton.jpg", {width: 90, height: 130, type: "facebook", crop: "fill", gravity: "north_west"})
+```js
+cloudinary.url("billclinton.jpg", {width: 90, height: 130, type: "facebook", crop: "fill", gravity: "north_west"});
+```
 
 Same goes for Twitter:
 
-    cloudinary.url("billclinton.jpg", {type: "twitter_name"})
+```js
+cloudinary.url("billclinton.jpg", {type: "twitter_name"});
+```
 
 ![](https://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](https://cloudinary.com/documentation/node_image_manipulation) for more information about displaying and transforming images in Node.js**.
 
@@ -105,35 +119,50 @@ Assuming you have your Cloudinary configuration parameters defined (`cloud_name`
 
 The following example uploads a local JPG to the cloud:
 
- 	var cloudinary = require('cloudinary')
-
-    cloudinary.uploader.upload("my_picture.jpg", function(result) { console.log(result) })
+```js
+var cloudinary = require('cloudinary').v2;
+cloudinary.uploader.upload("my_picture.jpg", function(error, result) { console.log(result) });
+```
 
 Below is an example of an upload's result:
 
- 	{ public_id: '4srvcynxrf5j87niqcx6w',
- 	  version: 1340625837,
- 	  signature: '01234567890abcdef01234567890abcdef012345',
- 	  width: 200,
- 	  height: 200,
- 	  format: 'jpg',
- 	  resource_type: 'image',
- 	  url: 'http://res.cloudinary.com/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg',
- 	  secure_url: 'https://res.cloudinary.com/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg' }
+```json
+{
+  "public_id": "4srvcynxrf5j87niqcx6w",
+  "version": 1340625837,
+  "signature": "01234567890abcdef01234567890abcdef012345",
+  "width": 200,
+  "height": 200,
+  "format": "jpg",
+  "resource_type": "image",
+  "url": "http://res.cloudinary.com/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg",
+  "secure_url": "https://res.cloudinary.com/demo/image/upload/v1340625837/4srvcynxrf5j87niqcx6w.jpg"
+}
+```
 
 The uploaded image is assigned a randomly generated public ID. The image is immediately available for download through a CDN:
 
-    cloudinary.url("abcfrmo8zul1mafopawefg.jpg")
+```js
+cloudinary.url("abcfrmo8zul1mafopawefg.jpg");
 
-    http://res.cloudinary.com/demo/image/upload/abcfrmo8zul1mafopawefg.jpg
-
+// http://res.cloudinary.com/demo/image/upload/abcfrmo8zul1mafopawefg.jpg
+```
 You can also specify your own public ID:
 
-    cloudinary.uploader.upload("http://www.example.com/image.jpg", function(result) { console.log(result) }, {public_id: 'sample_remote'})
+```js
+cloudinary.uploader.upload(
+  "http://www.example.com/image.jpg", 
+  {public_id: 'sample_remote'}, 
+  function(error, result) { 
+    console.log(result) 
+  }
+);
 
-    cloudinary.url("sample_remote.jpg")
+cloudinary.url("sample_remote.jpg")
 
-    http://res.cloudinary.com/demo/image/upload/sample_remote.jpg
+// http://res.cloudinary.com/demo/image/upload/sample_remote.jpg
+
+```
 
 ![](https://res.cloudinary.com/cloudinary/image/upload/see_more_bullet.png) **See [our documentation](https://cloudinary.com/documentation/node_image_upload) for plenty more options of uploading to the cloud from your Node.js code or directly from the browser**.
 
@@ -141,29 +170,37 @@ You can also specify your own public ID:
 
 You can use cloudinary.upload_stream to write to the uploader as a stream:
 
-    var fs = require('fs');
-    var stream = cloudinary.uploader.upload_stream(function(result) { console.log(result); });
-    var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
+```js
+var fs = require('fs');
+var stream = cloudinary.uploader.upload_stream(function(error, result) { console.log(result); });
+var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
+```
 
 #### Version 1.1 upload_stream change notes
 The `upload_stream` method was modified to return a `Transform` stream object, we advise to change the `on('data')` and `on('end')` to pipe API:
 
-    var file_reader = fs.createReadStream('my_picture.jpg').pipe(stream);
+```js
+var file_reader = fs.createReadStream('my_picture.jpg').pipe(stream);
 
+```
 if you still need to use event chanining, you can wrap `stream.write` and `stream.end` with wrapper functions
 
-    var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'}).
-      on('data', function(data){stream.write(data)}).on('end', function(){stream.end()});
-
+```js
+var file_reader = fs.createReadStream('my_picture.jpg', {encoding: 'binary'})
+  .on('data', function(data){stream.write(data)})
+  .on('end', function(){stream.end()});
+```
 ### cloudinary.image
 
 Returns an html image tag pointing to Cloudinary.
 
 Usage:
 
-    cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"})
+```js
+cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"})
 
-    // <img src='http://res.cloudinary.com/demo/image/upload/c_fill,h_100,w_100/sample.png' height='100' width='100'/>
+// <img src='http://res.cloudinary.com/demo/image/upload/c_fill,h_100,w_100/sample.png' height='100' width='100'/>
+```
 
 ### Samples
 
