@@ -159,6 +159,13 @@ describe("Cloudinary::Utils for video", function() {
           });
         });
       });
+      it('should support start_offset `auto`', function() {
+        var op = {
+          resource_type: 'video',
+          start_offset: 'auto'
+        };
+        test_cloudinary_url("video_id", op, `${upload_path}/so_auto/video_id`, {});
+      });
     });
     describe("when given existing relevant parameters: 'quality', :background, :crop, :width, :height, :gravity, :overlay", function() {
       [
