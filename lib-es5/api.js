@@ -117,9 +117,8 @@ function call_api(method, uri, params, callback, options) {
   };
   var request = https.request(request_options, handle_response);
   request.on("error", function (e) {
-    return typeof callback === "function" ? callback({
-      error: e
-    }) : void 0;
+    deferred.reject(e);
+    return typeof callback === "function" ? callback({ error: e }) : void 0;
   });
   request.setTimeout(ensureOption(options, "timeout", 60000));
   if (method !== "GET") {
