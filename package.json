@@ -30,7 +30,8 @@
     "jsdom-global": "2.1.1",
     "mocha": "^5.0.0",
     "nyc": "^13.0.1",
-    "sinon": "^6.1.4"
+    "sinon": "^6.1.4",
+    "webpack-cli": "^3.2.1"
   },
   "scripts": {
     "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
