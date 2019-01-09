@@ -517,6 +517,14 @@ describe("uploader", function() {
       expect(error.message).to.contain("is invalid");
     });
   });
+  it("should support requesting analysis", function() {
+    return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      quality_analysis: true,
+      tags: UPLOAD_TAGS
+    }).then(function (result) {
+      expect(result).to.have.key("quality_analysis");
+    });
+  });
   describe("upload_chunked", function() {
     this.timeout(helper.TIMEOUT_LONG * 10);
     it("should specify chunk size", function(done) {
@@ -801,9 +809,11 @@ describe("uploader", function() {
             }
           ],
           invalidate: true,
+          quality_analysis: true,
           tags: [TEST_TAG]
         });
-        return sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('invalidate', 1)));
+        sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('invalidate', 1)));
+        sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('quality_analysis', 1)));
       });
     });
     it("should support raw_convert", function() {
