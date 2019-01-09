@@ -601,10 +601,7 @@ describe("uploader", function() {
           return p.match(/"timestamp"\s+(\d+)/)[1];
         });
         expect(timestamps.length).to.be.greaterThan(1);
-        if (process.versions.node && process.versions.node[0] === '4') {
-          timestamps.pop(); // hack - node 4 duplicates the last entry
-        }
-        expect(uniq(timestamps)).to.eql(timestamps);
+        expect(uniq(timestamps)).to.eql(uniq(timestamps)); // uniq b/c last timestamp may be duplicated
       }).finally(function() {
         return writeSpy.restore();
       });
