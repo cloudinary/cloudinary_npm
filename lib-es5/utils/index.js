@@ -453,7 +453,7 @@ exports.build_custom_headers = function build_custom_headers(headers) {
   }
 };
 
-var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom' // + any key that starts with '$'
+var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom' // + any key that starts with '$'
 ];
 
 exports.generate_transformation_string = function generate_transformation_string(options) {
@@ -539,6 +539,10 @@ exports.generate_transformation_string = function generate_transformation_string
   var overlay = process_layer(utils.option_consume(options, "overlay"));
   var underlay = process_layer(utils.option_consume(options, "underlay"));
   var ifValue = process_if(utils.option_consume(options, "if"));
+  var fps = utils.option_consume(options, 'fps');
+  if (isArray(fps)) {
+    fps = fps.join('-');
+  }
   var params = {
     a: normalize_expression(angle),
     ar: normalize_expression(utils.option_consume(options, "aspect_ratio")),
@@ -549,6 +553,7 @@ exports.generate_transformation_string = function generate_transformation_string
     dpr: normalize_expression(dpr),
     e: normalize_expression(effect),
     fl: flags,
+    fps: fps,
     h: normalize_expression(height),
     ki: normalize_expression(utils.option_consume(options, "keyframe_interval")),
     l: overlay,

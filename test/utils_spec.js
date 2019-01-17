@@ -1383,4 +1383,17 @@ describe("utils", function () {
       expect(srcset.split(', ').length).to.eql(3);
     });
   });
+  describe( 'fps', function(){
+    [
+      [{fps: "24-29.97"}, "fps_24-29.97"],
+      [{fps: 24}, "fps_24"],
+      [{fps: 24.5}, "fps_24.5"],
+      [{fps: "24"}, "fps_24"],
+      [{fps: "-24"}, "fps_-24"],
+      [{fps: [24, 29.97]}, "fps_24-29.97"],
+    ].forEach(function([option, expected]){
+      expect(cloudinary.utils.generate_transformation_string(option)).to.eql(expected);
+    })
+
+  })
 });
