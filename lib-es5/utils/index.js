@@ -425,7 +425,7 @@ exports.encode_context = function encode_context(arg) {
 
 exports.build_eager = function build_eager(transformations) {
   return utils.build_array(transformations).map(function (transformation) {
-    return [utils.generate_transformation_string(clone(transformation)), transformation.format].filter(utils.present).join('/');
+    return isString(transformation) ? transformation : [utils.generate_transformation_string(clone(transformation)), transformation.format].filter(utils.present).join('/');
   }).join('|');
 };
 

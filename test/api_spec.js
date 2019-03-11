@@ -400,6 +400,34 @@ describe("api", function() {
         return expect(error.http_code).to.eql(404);
       });
     });
+    describe("deleting resources by transformations", function() {
+      const mocked = helper.mockTest();
+      it("should be supported by delete_resources", function() {
+        const transformations = "c_crop,w_100";
+        cloudinary.v2.api.delete_resources("api_test", {transformations});
+        sinon.assert.calledWith(mocked.write, sinon.match(helper.apiParamMatcher('transformations', transformations)));
+      });
+      it("should be supported by delete_resources_by_prefix", function() {
+        const transformations = "c_crop,w_100";
+        cloudinary.v2.api.delete_resources_by_prefix("api_test_by", {transformations});
+        sinon.assert.calledWith(mocked.write, sinon.match(helper.apiParamMatcher('transformations', transformations)));
+      });
+      it("should be supported by delete_resources_by_tag", function() {
+        const transformations = "c_crop,w_100";
+        cloudinary.v2.api.delete_resources_by_tag("api_test_tag", {transformations});
+        sinon.assert.calledWith(mocked.write, sinon.match(helper.apiParamMatcher('transformations', transformations)));
+      });
+      it("should be supported by delete_all_resources", function() {
+        const transformations = [
+          "c_crop,w_100", {
+            crop: "scale",
+            width: 107
+          }
+        ];
+        cloudinary.v2.api.delete_all_resources({transformations});
+        sinon.assert.calledWith(mocked.write, sinon.match(helper.apiParamMatcher('transformations', "c_crop,w_100|c_scale,w_107")));
+      });
+    });
     describe("delete_resources_by_prefix", function() {
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
       return it("should allow deleting resources by prefix", function() {

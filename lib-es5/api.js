@@ -139,7 +139,11 @@ function transformationString(transformation) {
 function deleteResourcesParams(options) {
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return extend(params, only(options, "keep_original", "invalidate", "next_cursor", "transformations"));
+  extend(params, only(options, "keep_original", "invalidate", "next_cursor", "transformations"));
+  if (params["transformations"]) {
+    params["transformations"] = utils.build_eager(params["transformations"]);
+  }
+  return params;
 }
 
 exports.ping = function ping(callback) {
