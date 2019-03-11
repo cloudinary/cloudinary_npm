@@ -873,6 +873,25 @@ describe("uploader", function() {
     expect(input_element.getAttribute("name")).to.be('file');
     expect(input_element.getAttribute("type")).to.be('file');
   });
+  describe(":quality_override", function() {
+    const mocked = helper.mockTest();
+    const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
+    function testValue(quality) {
+      return it("should pass '" + quality + "'", function() {
+        cloudinary.v2.uploader.upload(IMAGE_FILE, {
+          "quality_override": quality
+        });
+        sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", quality));
+      });
+    }
+    qualityValues.forEach(value => testValue(value));
+    it("should be supported by explicit api", function() {
+      cloudinary.v2.uploader.explicit("cloudinary", {
+        "quality_override": "auto:best"
+      });
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", "auto:best"));
+    });
+  });
   describe("access_control", function() {
     var acl, acl_string, options, requestSpy, writeSpy;
     writeSpy = void 0;
