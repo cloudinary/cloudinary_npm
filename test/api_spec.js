@@ -29,7 +29,8 @@ const PUBLIC_ID_3 = PUBLIC_ID + "_3";
 const PUBLIC_ID_4 = PUBLIC_ID + "_4";
 const PUBLIC_ID_5 = PUBLIC_ID + "_5";
 const PUBLIC_ID_6 = PUBLIC_ID + "_6";
-const NAMED_TRANSFORMATION = "npm_api_test_transformation" + SUFFIX;
+const NAMED_TRANSFORMATION = "npm_api_test_transformation_" + SUFFIX;
+const NAMED_TRANSFORMATION2 = "npm_api_test_transformation_2_" + SUFFIX;
 const API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX;
 const API_TEST_UPLOAD_PRESET2 = "npm_api_test_upload_preset_2_" + SUFFIX;
 const API_TEST_UPLOAD_PRESET3 = "npm_api_test_upload_preset_3_" + SUFFIX;
@@ -469,7 +470,13 @@ describe("api", function() {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
     transformationName = "api_test_transformation3" + SUFFIX;
     after(function() {
-      return Q.allSettled([cloudinary.v2.api.delete_transformation(transformationName), cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)]).finally(function() {});
+      return Q.allSettled(
+        [
+          cloudinary.v2.api.delete_transformation(transformationName),
+          cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION),
+          cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION2)
+        ]
+      ).finally(function() {});
     });
     it("should allow listing transformations", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -509,62 +516,84 @@ describe("api", function() {
         expect(transformation.allowed_for_strict).not.to.be.ok();
       });
     });
-    it("should allow creating named transformation", function() {
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION, {
-        crop: "scale",
-        width: 102
-      }).then(()=> cloudinary.v2.api.transformation(NAMED_TRANSFORMATION)
-      ).then(function(transformation) {
-        expect(transformation).not.to.eql(void 0);
-        expect(transformation.allowed_for_strict).to.be.ok();
-        expect(transformation.info).to.eql([
-          {
-            crop: "scale",
-            width: 102
-          }
-        ]);
-        expect(transformation.used).not.to.be.ok();
-      });
-    });
-    it("should allow listing of named transformations", function() {
-      return helper.mockPromise(function(xhr, write, request) {
-        cloudinary.v2.api.transformations({
-          named: true
-        });
-        return sinon.assert.calledWith(request, sinon.match({
-          query: sinon.match('named=true')
-        }, "named=true"));
-      });
-    });
-    it("should allow unsafe update of named transformation", function() {
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.create_transformation(transformationName, {
-        crop: "scale",
-        width: 102
-      }).then(result => cloudinary.v2.api.update_transformation(transformationName, {
-        unsafe_update: {
+    describe("Named Transformations", function(){
+      it("should allow creating named transformation", function() {
+        this.timeout(helper.TIMEOUT_MEDIUM);
+        return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION, {
           crop: "scale",
-          width: 103
-        }
-      })).then(result => cloudinary.v2.api.transformation(transformationName)
-      ).then(transformation => {
-        expect(transformation).not.to.eql(void 0);
-        expect(transformation.info).to.eql([
-          {
+          width: 102
+        }).then(()=> cloudinary.v2.api.transformation(NAMED_TRANSFORMATION)
+        ).then(function(transformation) {
+          expect(transformation).not.to.eql(void 0);
+          expect(transformation.allowed_for_strict).to.be.ok();
+          expect(transformation.info).to.eql([
+            {
+              crop: "scale",
+              width: 102
+            }
+          ]);
+          expect(transformation.used).not.to.be.ok();
+        });
+      });
+      it("should allow creating named transformation with an empty format", function() {
+        this.timeout(helper.TIMEOUT_MEDIUM);
+        return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION2, {
+          crop: "scale",
+          width: 102,
+          format: ''
+        }).then(()=> cloudinary.v2.api.transformation(NAMED_TRANSFORMATION2)
+        ).then(function(transformation) {
+          expect(transformation).not.to.eql(void 0);
+          expect(transformation.allowed_for_strict).to.be.ok();
+          expect(transformation.info).to.eql([
+            {
+              crop: "scale",
+              width: 102,
+              extension: 'none'
+            }
+          ]);
+          expect(transformation.used).not.to.be.ok();
+        });
+      });
+      it("should allow listing of named transformations", function() {
+        return helper.mockPromise(function(xhr, write, request) {
+          cloudinary.v2.api.transformations({
+            named: true
+          });
+          return sinon.assert.calledWith(request, sinon.match({
+            query: sinon.match('named=true')
+          }, "named=true"));
+        });
+      });
+      it("should allow unsafe update of named transformation", function() {
+        this.timeout(helper.TIMEOUT_MEDIUM);
+        return cloudinary.v2.api.create_transformation(transformationName, {
+          crop: "scale",
+          width: 102
+        }).then(result => cloudinary.v2.api.update_transformation(transformationName, {
+          unsafe_update: {
             crop: "scale",
             width: 103
           }
-        ]);
-        expect(transformation.used).not.to.be.ok();
+        })).then(result => cloudinary.v2.api.transformation(transformationName)
+        ).then(transformation => {
+          expect(transformation).not.to.eql(void 0);
+          expect(transformation.info).to.eql([
+            {
+              crop: "scale",
+              width: 103
+            }
+          ]);
+          expect(transformation.used).not.to.be.ok();
+        });
       });
-    });
-    it("should allow deleting named transformation", function() {
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION).then(()=>{
-        return cloudinary.v2.api.transformation(NAMED_TRANSFORMATION);
-      }).then(()=> expect().fail()
-      ).catch(({error}) => expect(error.http_code).to.eql(404));
+      it("should allow deleting named transformation", function() {
+        this.timeout(helper.TIMEOUT_MEDIUM);
+        return cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION).then(()=>{
+          return cloudinary.v2.api.transformation(NAMED_TRANSFORMATION);
+        }).then(()=> expect().fail()
+        ).catch(({error}) => expect(error.http_code).to.eql(404));
+      });
     });
     it("should allow deleting implicit transformation", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);

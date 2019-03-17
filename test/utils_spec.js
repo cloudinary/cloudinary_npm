@@ -907,47 +907,73 @@ describe("utils", function () {
     expect(utils.build_upload_params(options)['transformation']).to.eql("c_scale,w_100");
     expect(Object.keys(options).length).to.eql(2);
   });
-  it("build_explicit_api_params should support multiple eager transformations with a pipe", function () {
-    var options = {
-      eager: [
-        {
-          width: 100,
-          crop: "scale"
-        },
-        {
-          height: 100,
-          crop: "fit"
-        }
-      ]
-    };
-    expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,w_100|c_fit,h_100");
-  });
-  it("build_explicit_api_params should support moderation", function () {
-    expect(utils.build_explicit_api_params('some_id', {
-      type: 'upload',
-      moderation: 'manual'
-    })[0]['moderation']).to.eql('manual');
+  describe('build_eager', function () {
+    const scaled = (options) => Object.assign({
+        width: 100,
+        height: 200,
+        crop: 'scale'
+      },
+      options
+    );
+    const sepia = (options) => Object.assign({
+      width: 400,
+      crop: 'lfill',
+      effect: 'sepia'
+    }, options);
+    [
+      ['should support strings',
+        ['c_scale,h_200,w_100', 'c_lfill,e_sepia,w_400/jpg'],
+        'c_scale,h_200,w_100|c_lfill,e_sepia,w_400/jpg'],
+      ['should concatenate transformations using pipe',
+        [scaled(), sepia()],
+        'c_scale,h_200,w_100|c_lfill,e_sepia,w_400'],
+      ['should support transformations with multiple components',
+        [{transformation: [scaled(), sepia()]}, sepia()],
+        'c_scale,h_200,w_100/c_lfill,e_sepia,w_400|c_lfill,e_sepia,w_400'],
+      ['should concatenate format at the end of the transformation',
+        ([scaled({format: 'gif'}), sepia()]),
+        'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400'],
+      ['should support an empty format',
+        ([scaled({format: ''}), sepia()]),
+        'c_scale,h_200,w_100/|c_lfill,e_sepia,w_400'],
+      ['should treat a null format as none',
+        ([scaled({format: null}), sepia()]),
+        'c_scale,h_200,w_100|c_lfill,e_sepia,w_400'],
+      ['should concatenate format at the end of the transformation',
+        ([scaled({format: 'gif'}), sepia({format: 'jpg'})]),
+        'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400/jpg'],
+      ['should support transformations with multiple components and format',
+        [{transformation: [scaled(), sepia()], format: 'gif'}, sepia()],
+        'c_scale,h_200,w_100/c_lfill,e_sepia,w_400/gif|c_lfill,e_sepia,w_400'],
+    ].forEach(function ([subject, input, expected]) {
+      it(subject, function () {
+        expect(utils.build_eager(input)).to.eql(expected);
+      })
+    });
+    it("build_explicit_api_params should support multiple eager transformations with a pipe", function () {
+      var options = {
+        eager: [scaled(), sepia()]
+      };
+      expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
+    });
+    it("build_explicit_api_params should support moderation", function () {
+      expect(utils.build_explicit_api_params('some_id', {
+        type: 'upload',
+        moderation: 'manual'
+      })[0]['moderation']).to.eql('manual');
+    });
+    it("archive_params should support multiple eager transformations with a pipe", function () {
+      var options = {
+        transformations: [scaled(), sepia()]
+      };
+      expect(utils.archive_params(options)['transformations']).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
+    });
   });
   it("build_explicit_api_params should support phash", function () {
     expect(utils.build_explicit_api_params('some_id', {
       type: 'upload',
       phash: true
     })[0]['phash']).to.eql('1');
-  });
-  it("archive_params should support multiple eager transformations with a pipe", function () {
-    var options = {
-      transformations: [
-        {
-          width: 200,
-          crop: "scale"
-        },
-        {
-          height: 200,
-          crop: "fit"
-        }
-      ]
-    };
-    expect(utils.archive_params(options)['transformations']).to.eql("c_scale,w_200|c_fit,h_200");
   });
   it("build_upload_params canonize booleans", function () {
     var actual, expected, options, params;

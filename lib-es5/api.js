@@ -19,6 +19,8 @@ var Q = require('q');
 
 var api = module.exports;
 
+var TRANSFORMATIONS_URI = "transformations";
+
 function call_api(method, uri, params, callback, options) {
   var handle_response = void 0,
       query_params = void 0;
@@ -386,46 +388,43 @@ exports.tags = function tags(callback) {
 exports.transformations = function transformations(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return call_api("get", ["transformations"], only(options, "next_cursor", "max_results", "named"), callback, options);
+  var params = only(options, "next_cursor", "max_results", "named");
+  return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
 exports.transformation = function transformation(transformation, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var uri = void 0;
-  uri = ["transformations", transformationString(transformation)];
-  return call_api("get", uri, only(options, "next_cursor", "max_results"), callback, options);
+  var params = only(options, "next_cursor", "max_results");
+  params.transformation = utils.build_eager(transformation);
+  return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
 exports.delete_transformation = function delete_transformation(transformation, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var uri = void 0;
-  uri = ["transformations", transformationString(transformation)];
-  return call_api("delete", uri, {}, callback, options);
+  var params = {};
+  params.transformation = utils.build_eager(transformation);
+  return call_api("delete", TRANSFORMATIONS_URI, params, callback, options);
 };
 
 exports.update_transformation = function update_transformation(transformation, updates, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = void 0,
-      uri = void 0;
-  uri = ["transformations", transformationString(transformation)];
-  params = only(updates, "allowed_for_strict");
+  var params = only(updates, "allowed_for_strict");
+  params.transformation = utils.build_eager(transformation);
   if (updates.unsafe_update != null) {
-    params.unsafe_update = transformationString(updates.unsafe_update);
+    params.unsafe_update = utils.build_eager(updates.unsafe_update);
   }
-  return call_api("put", uri, params, callback, options);
+  return call_api("put", TRANSFORMATIONS_URI, params, callback, options);
 };
 
 exports.create_transformation = function create_transformation(name, definition, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var uri = void 0;
-  uri = ["transformations", name];
-  return call_api("post", uri, {
-    transformation: transformationString(definition)
-  }, callback, options);
+  var params = { name };
+  params.transformation = utils.build_eager(definition);
+  return call_api("post", TRANSFORMATIONS_URI, params, callback, options);
 };
 
 exports.upload_presets = function upload_presets(callback) {

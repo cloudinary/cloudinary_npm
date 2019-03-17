@@ -425,7 +425,9 @@ exports.encode_context = function encode_context(arg) {
 
 exports.build_eager = function build_eager(transformations) {
   return utils.build_array(transformations).map(function (transformation) {
-    return [utils.generate_transformation_string(clone(transformation)), transformation.format].filter(utils.present).join('/');
+    var transformationString = utils.generate_transformation_string(clone(transformation));
+    var format = transformation.format;
+    return format == null ? transformationString : `${transformationString}/${format}`;
   }).join('|');
 };
 
@@ -458,6 +460,9 @@ var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_freq
 ];
 
 exports.generate_transformation_string = function generate_transformation_string(options) {
+  if (utils.isString(options)) {
+    return options;
+  }
   if (isArray(options)) {
     return options.map(function (t) {
       return utils.generate_transformation_string(clone(t));
