@@ -10,7 +10,7 @@ describe("video tag helper", function () {
   DEFAULT_UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload/";
   beforeEach(function () {
     cloudinary.config(true); // Reset
-    return cloudinary.config({
+    cloudinary.config({
       cloud_name: "test123",
       api_secret: "1234"
     });

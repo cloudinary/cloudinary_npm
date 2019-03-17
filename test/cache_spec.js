@@ -28,14 +28,14 @@ var cache;
 
 describe("Cache", function () {
   before(function () {
-    return Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
+    Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
   });
   it("should be initialized", function () {
-    return expect(Cache).to.be.ok();
+    expect(Cache).to.be.ok();
   });
   it("should set and get a value", function () {
     Cache.set(PUBLIC_ID, {}, BREAKPOINTS);
-    return expect(Cache.get(PUBLIC_ID, {})).to.eql(BREAKPOINTS);
+    expect(Cache.get(PUBLIC_ID, {})).to.eql(BREAKPOINTS);
   });
   describe("Upload integration", function () {
     this.timeout(helper.TIMEOUT_LONG);
@@ -65,7 +65,7 @@ describe("Cache", function () {
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
       }
       if (!cloudinary.config().keep_test_products) {
-        return cloudinary.api.delete_resources_by_tag(helper.TEST_TAG);
+        cloudinary.api.delete_resources_by_tag(helper.TEST_TAG);
       }
     });
     it("should save responsive breakpoints to cache after upload", function () {

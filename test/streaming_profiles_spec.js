@@ -25,13 +25,13 @@ describe('Cloudinary::Api', function () {
   after(function (done) {
     var config = cloudinary.config(true);
     if (cloudinary.config().keep_test_products) {
-      return done();
+      done();
     } else {
       if (!(config.api_key && config.api_secret)) {
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
       }
       Q.allSettled([cloudinary.v2.api.delete_streaming_profile(test_id_1), cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'), cloudinary.v2.api.delete_streaming_profile(test_id_3)]).finally(function () {
-        return done();
+        done();
       });
       return true;
     }

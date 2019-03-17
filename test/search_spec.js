@@ -114,7 +114,7 @@ describe("search_api", function () {
         if (!(config.api_key && config.api_secret)) {
           expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
         }
-        return cloudinary.v2.api.delete_resources_by_tag(SEARCH_TAG);
+        cloudinary.v2.api.delete_resources_by_tag(SEARCH_TAG);
       }
     });
     it(`should return all images tagged with ${SEARCH_TAG}`, function () {
@@ -159,7 +159,7 @@ describe("search_api", function () {
         .then(function (results) {
           expect(results['resources'].length).to.eql(3);
           results['resources'].forEach(function (res) {
-            return expect(Object.keys(res['context'])).to.eql(['stage']);
+            expect(Object.keys(res['context'])).to.eql(['stage']);
           });
         });
     });
