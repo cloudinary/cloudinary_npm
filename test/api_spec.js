@@ -184,7 +184,7 @@ describe("api", function() {
     it("should allow listing resource_types", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.resource_types().then(function(result) {
-        return expect(result.resource_types).to.contain("image");
+        expect(result.resource_types).to.contain("image");
       });
     });
     it("should allow listing resources", function() {
@@ -199,7 +199,7 @@ describe("api", function() {
       }).then(function(result) {
         let resource = findByAttr(result.resources, "public_id", publicId);
         expect(resource).not.to.eql(void 0);
-        return expect(resource.type).to.eql("upload");
+        expect(resource.type).to.eql("upload");
       });
     });
     it("should allow listing resources by type", function () {
@@ -250,7 +250,7 @@ describe("api", function() {
     it("should allow listing resources by context key and value", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.resources_by_context(contextKey, "test").then(function(result) {
-        return expect(result.resources).to.have.length(1);
+        expect(result.resources).to.have.length(1);
       });
     });
     it("should allow listing resources by public ids", function() {
@@ -379,7 +379,7 @@ describe("api", function() {
           .to.not.be.empty();
         return cloudinary.v2.api.resource(PUBLIC_ID_3);
       }).then(function(result) {
-        return expect(result.derived.length).to.eql(0);
+        expect(result.derived.length).to.eql(0);
       });
     });
     it("should allow deleting resources", function() {
@@ -395,10 +395,10 @@ describe("api", function() {
       }).then(function(result) {
         return cloudinary.v2.api.resource(PUBLIC_ID_3);
       }).then(()=>{
-        return expect().fail();
+        expect().fail();
       }).catch(function({error}) {
         expect(error).to.be.an(Object);
-        return expect(error.http_code).to.eql(404);
+        expect(error.http_code).to.eql(404);
       });
     });
     describe("delete_resources_by_prefix", function() {
@@ -416,14 +416,14 @@ describe("api", function() {
         ).then(()=>expect().fail()
         ).catch(function({error}) {
           expect(error).to.be.an(Object);
-          return expect(error.http_code).to.eql(404);
+          expect(error.http_code).to.eql(404);
         });
       });
     });
     describe("delete_resources_by_tag", function() {
       let deleteTestTag = TEST_TAG + "_delete";
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
-      return it("should allow deleting resources by tags", function() {
+      it("should allow deleting resources by tags", function() {
         this.timeout(helper.TIMEOUT_MEDIUM);
         return cloudinary.v2.uploader.upload(IMAGE_FILE, {
           public_id: PUBLIC_ID_4,
@@ -436,7 +436,7 @@ describe("api", function() {
         ).then(()=>expect().fail()
         ).catch(({error}) => {
           expect(error).to.be.an(Object);
-          return expect(error.http_code).to.eql(404);
+          expect(error.http_code).to.eql(404);
         });
       });
     });
@@ -457,7 +457,7 @@ describe("api", function() {
       }).then((result) => expect(result.tags).to.contain(TEST_TAG)
       );
     });
-    return it("should allow listing tag by prefix if not found", function() {
+    it("should allow listing tag by prefix if not found", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.tags({
         prefix: "api_test_no_such_tag"
@@ -483,21 +483,21 @@ describe("api", function() {
       return cloudinary.v2.api.transformations().then(function(result) {
         expect(result).to.have.key("transformations");
         expect(result.transformations).not.to.be.empty();
-        return expect(result.transformations[0]).to.have.key('used');
+        expect(result.transformations[0]).to.have.key('used');
       });
     });
     it("should allow getting transformation metadata", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then(function(transformation) {
         expect(transformation).not.to.eql(void 0);
-        return expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
+        expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
     it("should allow getting transformation metadata by info", function() {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION).then(function(transformation) {
         expect(transformation).not.to.eql(void 0);
-        return expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
+        expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
     it("should allow updating transformation allowed_for_strict", function() {
@@ -664,7 +664,7 @@ describe("api", function() {
       ).then(() => expect().fail()
       ).catch(({error}) => expect(error.message).to.contain("Can't find"));
     });
-    return it("should allow updating upload_presets", function() {
+    it("should allow updating upload_presets", function() {
       var name ='';
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.create_upload_preset({
@@ -706,7 +706,7 @@ describe("api", function() {
           sinon.assert.calledWith(request, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
           sinon.assert.calledWith(request, sinon.match(arg => "DELETE" === arg.method, "DELETE"));
           sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
-          return sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
+          sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
         });
       });
     });
@@ -724,13 +724,13 @@ describe("api", function() {
         return xhr.restore();
       });
       it("should support changing moderation status with notification-url", function() {
-        cloudinary.v2.api.update("sample", {
+        return cloudinary.v2.api.update("sample", {
           moderation_status: "approved",
           notification_url: "http://example.com"
         });
         if (writeSpy.called) {
           sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
-          return sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
+          sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
         }
       });
     });
@@ -800,7 +800,7 @@ describe("api", function() {
         public_id: helper.TEST_TAG,
         tags: [...helper.UPLOAD_TAGS, 'access_control_test']
       };
-      return it("should allow the user to define ACL in the update parameters2", function() {
+      it("should allow the user to define ACL in the update parameters2", function() {
         return helper.mockPromise((xhr, writeSpy, requestSpy) => {
           options.access_control = [acl];
           cloudinary.v2.api.update("id", options);
@@ -964,7 +964,7 @@ describe("api", function() {
         tags: UPLOAD_TAGS.concat([publishTestTag])
       }).then(result => {
         publishTestId = result.public_id;
-        return idsToDelete.push(publishTestId);
+        idsToDelete.push(publishTestId);
       });
     });
     after(function() {
@@ -1005,7 +1005,7 @@ describe("api", function() {
         expect(published[0].url).to.match(/\/upload\//);
       });
     });
-    return it("should return empty when explicit given type doesn't match resource", function() {
+    it("should return empty when explicit given type doesn't match resource", function() {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "private"
@@ -1050,7 +1050,7 @@ describe("api", function() {
         expect(resource.public_id).to.be(publicId);
         expect(resource.access_mode).to.be('public');
       }));
-    return it("should update access mode by tag", ()=>
+    it("should update access mode by tag", ()=>
       cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag).then(result => {
         var resource;
         expect(result.updated).to.be.an('array');

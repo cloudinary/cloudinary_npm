@@ -48,7 +48,7 @@ describe("uploader", function() {
     ]);
   });
   beforeEach(function() {
-    return cloudinary.config(true);
+    cloudinary.config(true);
   });
   it("should successfully upload file", function() {
     this.timeout(helper.TIMEOUT_LONG);
@@ -245,16 +245,16 @@ describe("uploader", function() {
         version: result.version
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
-      return done();
+      done();
     });
     file_reader = fs.createReadStream(IMAGE_FILE, {
       encoding: 'binary'
     });
     file_reader.on('data', function(chunk) {
-      return stream.write(chunk, 'binary');
+      stream.write(chunk, 'binary');
     });
-    return file_reader.on('end', function() {
-      return stream.end();
+    file_reader.on('end', function() {
+      stream.end();
     });
   });
   describe("tags", function() {
@@ -321,7 +321,7 @@ describe("uploader", function() {
     before(function() {
       return Q.all([uploadImage(), uploadImage()]).spread(function(result1, result2) {
         first_id = result1.public_id;
-        return second_id = result2.public_id;
+        second_id = result2.public_id;
       });
     });
     it("should add context to existing resources", function() {
@@ -486,6 +486,7 @@ describe("uploader", function() {
     });
   });
   it("should support requesting manual moderation", function() {
+    this.timeout(helper.TIMEOUT_LONG);
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       moderation: "manual",
       tags: UPLOAD_TAGS
@@ -564,55 +565,51 @@ describe("uploader", function() {
           tags: UPLOAD_TAGS
         }, function(error, result) {
           if (error != null) {
-            return done(new Error(error.message));
+            done(new Error(error.message));
           }
           expect(result.bytes).to.eql(stat.size);
           expect(result.etag).to.eql("4c13724e950abcb13ec480e10f8541f5");
           return done();
         });
-        return true;
       });
     });
     it("should return error if value is less than 5MB", function(done) {
-      return fs.stat(LARGE_RAW_FILE, function(err, stat) {
+      fs.stat(LARGE_RAW_FILE, function(err, stat) {
         cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
           chunk_size: 40000,
           tags: UPLOAD_TAGS
         }, function(error, result) {
           expect(error.message).to.eql("All parts except EOF-chunk must be larger than 5mb");
-          return done();
+          done();
         });
-        return true;
       });
     });
     it("should support uploading a small raw file", function(done) {
-      return fs.stat(RAW_FILE, function(err, stat) {
+      fs.stat(RAW_FILE, function(err, stat) {
         cloudinary.v2.uploader.upload_large(RAW_FILE, {
           tags: UPLOAD_TAGS
         }, function(error, result) {
           if (error != null) {
-            return done(new Error(error.message));
+            done(new Error(error.message));
           }
           expect(result.bytes).to.eql(stat.size);
           expect(result.etag).to.eql("ffc265d8d1296247972b4d478048e448");
-          return done();
+          done();
         });
-        return true;
       });
     });
     it("should support uploading a small image file", function(done) {
-      return fs.stat(IMAGE_FILE, function(err, stat) {
-        cloudinary.v2.uploader.upload_chunked(IMAGE_FILE, {
+      fs.stat(IMAGE_FILE, function(err, stat) {
+        return cloudinary.v2.uploader.upload_chunked(IMAGE_FILE, {
           tags: UPLOAD_TAGS
         }, function(error, result) {
           if (error != null) {
-            return done(new Error(error.message));
+            done(new Error(error.message));
           }
           expect(result.bytes).to.eql(stat.size);
           expect(result.etag).to.eql("7dc60722d4653261648038b579fdb89e");
-          return done();
+          done();
         });
-        return true;
       });
     });
     it("should support uploading large video files", function() {
@@ -640,10 +637,10 @@ describe("uploader", function() {
         expect(timestamps.length).to.be.greaterThan(1);
         expect(uniq(timestamps)).to.eql(uniq(timestamps)); // uniq b/c last timestamp may be duplicated
       }).finally(function() {
-        return writeSpy.restore();
+        writeSpy.restore();
       });
     });
-    it("should update timestamp for each chuck", function() {
+    it("should update timestamp for each chunk", function() {
       var writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
@@ -661,7 +658,7 @@ describe("uploader", function() {
         expect(timestamps.length).to.be.greaterThan(1);
         expect(uniq(timestamps)).to.eql(uniq(timestamps));
       }).finally(function() {
-        return writeSpy.restore();
+        writeSpy.restore();
       });
     });
     it("should support uploading based on a url", function(done) {
@@ -670,28 +667,28 @@ describe("uploader", function() {
         tags: UPLOAD_TAGS
       }, function(error, result) {
         if (error != null) {
-          return done(new Error(error.message));
+          done(new Error(error.message));
         }
         expect(result.etag).to.eql("7dc60722d4653261648038b579fdb89e");
-        return done();
+        done();
       });
-      return true;
     });
   });
   it("should support unsigned uploading using presets", function() {
     this.timeout(helper.TIMEOUT_LONG);
+    let presetName;
     return cloudinary.v2.api.create_upload_preset({
       folder: "upload_folder",
       unsigned: true,
       tags: UPLOAD_TAGS
     }).then(function(preset) {
+      presetName = preset.name;
       return cloudinary.v2.uploader.unsigned_upload(IMAGE_FILE, preset.name, {
         tags: UPLOAD_TAGS
-      }).then(function(result) {
-        return [preset.name, result.public_id];
       });
-    }).then(function([presetName, public_id]) {
+    }).then(function({public_id}) {
       expect(public_id).to.match(/^upload_folder\/[a-z0-9]+$/);
+    }).finally(function() {
       return cloudinary.v2.api.delete_upload_preset(presetName);
     });
   });
@@ -718,10 +715,10 @@ describe("uploader", function() {
         version: result.version
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
-      return done();
+      done();
     });
     file_reader = fs.createReadStream(IMAGE_FILE);
-    return file_reader.pipe(upload);
+    file_reader.pipe(upload);
   });
   it("should fail with http.Agent (non secure)", function() {
     this.timeout(helper.TIMEOUT_LONG);
@@ -745,12 +742,12 @@ describe("uploader", function() {
       expect(result.signature).to.eql(expected_signature);
     });
     file_reader = fs.createReadStream(IMAGE_FILE);
-    return file_reader.pipe(upload);
+    file_reader.pipe(upload);
   });
   context(":responsive_breakpoints", function() {
-    return context(":create_derived with different transformation settings", function() {
+    context(":create_derived with different transformation settings", function() {
       before(function() {
-        return helper.setupCache();
+        helper.setupCache();
       });
       it('should return a responsive_breakpoints in the response', function() {
         return cloudinary.v2.uploader.upload(IMAGE_FILE, {
@@ -786,7 +783,7 @@ describe("uploader", function() {
           expect(at(result, "responsive_breakpoints[0].breakpoints[0].url")[0]).to.match(/\.jpg$/);
           expect(at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10");
           expect(at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/);
-          return result.responsive_breakpoints.map(function(bp) {
+          result.responsive_breakpoints.map(function(bp) {
             var cached, format;
             format = path.extname(bp.breakpoints[0].url).slice(1);
             cached = cloudinary.Cache.get(result.public_id, {
@@ -795,7 +792,7 @@ describe("uploader", function() {
             });
             expect(cached).to.be.ok();
             expect(cached.length).to.be(bp.breakpoints.length);
-            return bp.breakpoints.forEach(function(o) {
+            bp.breakpoints.forEach(function(o) {
               expect(cached).to.contain(o.width);
             });
           });
@@ -812,7 +809,7 @@ describe("uploader", function() {
           effect: "sepia"
         }
       });
-      return sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("async", 1)));
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("async", 1)));
     });
   });
   describe("explicit", function() {
@@ -850,7 +847,7 @@ describe("uploader", function() {
         raw_convert: "google_speech",
         tags: [TEST_TAG]
       });
-      return sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('raw_convert', 'google_speech')));
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('raw_convert', 'google_speech')));
     });
   });
   it("should create an image upload tag with required properties", function() {
@@ -881,14 +878,14 @@ describe("uploader", function() {
     beforeEach(function() {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       requestSpy = sinon.spy(http, 'request');
-      return options = {
+      options = {
         public_id: helper.TEST_TAG,
         tags: [...helper.UPLOAD_TAGS, 'access_control_test']
       };
     });
     afterEach(function() {
       requestSpy.restore();
-      return writeSpy.restore();
+      writeSpy.restore();
     });
     acl = {
       access_type: 'anonymous',
