@@ -7,7 +7,6 @@ const cloudinary = require("../cloudinary");
 const build_upload_params = cloudinary.utils.build_upload_params;
 const helper = require('./spechelper');
 const isString = require('lodash/isString');
-var options = null;
 
 const ACL = {
   access_type: 'anonymous',
@@ -27,23 +26,6 @@ describe("Access Control", function() {
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
-
-  });
-  this.timeout(helper.TIMEOUT_LONG);
-  after(function() {
-    let config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-    if (!cloudinary.config().keep_test_products) {
-      return cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG);
-    }
-  });
-  beforeEach(function() {
-    return options = {
-      public_id: helper.TEST_TAG,
-      tags: [...helper.UPLOAD_TAGS, 'access_control_test']
-    };
   });
   describe("build_upload_params", function() {
     it("should accept a Hash value", function() {
