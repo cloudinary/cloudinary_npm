@@ -458,6 +458,14 @@ exports.sub_folders = function sub_folders(path, callback) {
   return call_api("get", uri, {}, callback, options);
 };
 
+exports.delete_folder = function delete_folder(path, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var uri = void 0;
+  uri = ["folders", path];
+  return call_api("delete", uri, {}, callback, options);
+};
+
 exports.upload_mappings = function upload_mappings(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 

@@ -33,6 +33,7 @@ v1_adapters(exports, api, {
   create_upload_preset: 0,
   root_folders: 0,
   sub_folders: 1,
+  delete_folder: 1,
   upload_mappings: 0,
   upload_mapping: 1,
   delete_upload_mapping: 1,
