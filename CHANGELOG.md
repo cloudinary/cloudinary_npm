@@ -1,4 +1,30 @@
 
+1.14.0 / 2019-03-26
+===================
+
+New functionality
+-----------------
+
+  * Support format in transformation API
+  * Add support for `start_offset` value `auto`
+  * Add support for gs:// urls in uploader
+  * Add support for the `quality_analysis` upload parameter. Fixes #171
+  * Add `fps` transformation parameter (#230)
+
+Other changes
+-------------
+
+  * Update code samples in the README file. Fixes #135
+  * Reject deferred on request error. Fixes #136
+  * Refactor test code after conversion from CoffeeScript
+  * Convert test code from CoffeeScript to JavaScript
+  * Merge pull request #208 from cloudinary/fix_update_samples_readme
+  * Fix the "upload large" test for node 4
+  * Remove bower from the sample code
+  * Add timeout to search integration tests
+  * Fix detection test
+  * Fix broken links in node sample project readme
+
 1.13.2 / 2018-11-14
 ===================
 
