@@ -542,7 +542,7 @@ function post(url, post_data, boundary, file, callback, options) {
   var file_header;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
   if (file != null || options.stream) {
-    var filename = options.stream ? "file" : path.basename(file);
+    var filename = path.basename(options.filename || (options.stream ? "file" : file));
     file_header = Buffer.from(encodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary');
   }
   var post_options = require('url').parse(url);

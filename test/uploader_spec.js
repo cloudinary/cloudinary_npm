@@ -257,6 +257,28 @@ describe("uploader", function() {
       return stream.end();
     });
   });
+  it("should support `filename` option for stream", function(done) {
+    const stream = cloudinary.v2.uploader.upload_stream({
+      tags: UPLOAD_TAGS,
+      filename: "custom-file-name"
+    }, function(error, result) {
+      expect(result['original_filename']).to.eql("custom-file-name");
+      done();
+    });
+    const file_reader = fs.createReadStream(IMAGE_FILE, {encoding: 'binary'});
+    file_reader.on('data', chunk => stream.write(chunk, 'binary'));
+    file_reader.on('end', () => stream.end());
+  });
+  it("should support filename overriding with options", function() {
+    this.timeout(helper.TIMEOUT_LONG);
+    return uploadImage({
+      tags: UPLOAD_TAGS,
+      filename: "custom-file-name"
+    }).then(function(result) {
+      expect(result['original_filename']).to.eql("custom-file-name");
+    });
+  });
+
   describe("tags", function() {
     this.timeout(helper.TIMEOUT_MEDIUM);
     it("should add tags to existing resources", function() {
