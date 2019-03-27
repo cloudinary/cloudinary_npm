@@ -228,9 +228,12 @@ function process_if(ifValue) {
  * Parse layer options
  * @private
  * @param {object|*} layer The layer to parse.
+ * @param {boolean} forUrl Serialize layer to be used in URL, rather than passing as a body parameter
  * @return {string} layer transformation string
  */
 function process_layer(layer) {
+  var forUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
   var result = '';
   if (isPlainObject(layer)) {
     if (layer["resource_type"] === "fetch" || layer["url"] != null) {
@@ -267,7 +270,10 @@ function process_layer(layer) {
           }
           var re = /\$\([a-zA-Z]\w*\)/g;
           var start = 0;
-          var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
+          var textSource = decodeURIComponent(text);
+          if (forUrl) {
+            textSource = smart_escape(text, /[,\/]/g);
+          }
           text = "";
           var res = void 0;
           while (res = re.exec(textSource)) {
@@ -343,7 +349,7 @@ exports.build_upload_params = function build_upload_params(options) {
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options["responsive_breakpoints"]),
     return_delete_token: utils.as_safe_bool(options.return_delete_token),
     timestamp: exports.timestamp(),
-    transformation: utils.generate_transformation_string(clone(options)),
+    transformation: utils.generate_transformation_string(clone(options), false),
     type: options.type,
     unique_filename: utils.as_safe_bool(options.unique_filename),
     upload_preset: options.upload_preset,
@@ -460,12 +466,14 @@ var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_freq
 ];
 
 exports.generate_transformation_string = function generate_transformation_string(options) {
+  var forUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
   if (utils.isString(options)) {
     return options;
   }
   if (isArray(options)) {
     return options.map(function (t) {
-      return utils.generate_transformation_string(clone(t));
+      return utils.generate_transformation_string(clone(t), forUrl);
     }).filter(utils.present).join('/');
   }
   var responsive_width = utils.option_consume(options, "responsive_width", config().responsive_width);
@@ -501,11 +509,11 @@ exports.generate_transformation_string = function generate_transformation_string
   if (base_transformations.length !== 0 && filter(base_transformations, isObject).length > 0) {
     base_transformations = map(base_transformations, function (base_transformation) {
       if (isObject(base_transformation)) {
-        return utils.generate_transformation_string(clone(base_transformation));
+        return utils.generate_transformation_string(clone(base_transformation), forUrl);
       } else {
         return utils.generate_transformation_string({
           transformation: base_transformation
-        });
+        }, forUrl);
       }
     });
   } else {
@@ -542,8 +550,8 @@ exports.generate_transformation_string = function generate_transformation_string
     options["start_offset"] = _split_range2[0];
     options["end_offset"] = _split_range2[1];
   }
-  var overlay = process_layer(utils.option_consume(options, "overlay"));
-  var underlay = process_layer(utils.option_consume(options, "underlay"));
+  var overlay = process_layer(utils.option_consume(options, "overlay"), forUrl);
+  var underlay = process_layer(utils.option_consume(options, "underlay"), forUrl);
   var ifValue = process_if(utils.option_consume(options, "if"));
   var fps = utils.option_consume(options, 'fps');
   if (isArray(fps)) {

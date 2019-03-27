@@ -796,6 +796,16 @@ describe("utils", function () {
           itBehavesLike("a signed url", op, `l_${result}`);
         }
       }
+      it("should encode commas and slashes only once in build_upload_params", function () {
+        const options = {
+          overlay: {
+            text:"Hello,World/",
+            font_family:"arial",
+            font_size: '30'
+          }
+        };
+        expect(utils.build_upload_params(options)['transformation']).to.eql("l_text:arial_30:Hello%2CWorld%2F");
+      });
       it("should not pass width/height to html for overlay", function () {
         var opt = {};
         opt['overlay'] = "text:test_text";
