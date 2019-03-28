@@ -176,6 +176,23 @@ describe("uploader", function() {
       });
     });
   });
+  it("should support `async` option in explicit api", function() {
+      return cloudinary.v2.uploader.explicit("sample", {
+          type: "facebook",
+          eager: [
+              {
+                  crop: "scale",
+                  width: "2.0"
+              }
+          ],
+          async: true
+      }).then(function(result) {
+          expect(result.status).to.eql('pending');
+          expect(result.resource_type).to.eql('image');
+          expect(result.type).to.eql('facebook');
+          expect(result.public_id).to.eql('sample');
+      });
+  });
   it("should successfully call explicit api", function() {
     return cloudinary.v2.uploader.explicit("sample", {
       type: "upload",
