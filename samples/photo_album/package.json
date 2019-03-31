@@ -4,7 +4,7 @@
   "description": "Cloudinary Express demo",
   "main": "server.js",
   "scripts": {
-    "debug": "./node_modules/.bin/supervisor -e 'js|ejs|node|coffee' server.js"
+    "debug": "./node_modules/.bin/supervisor -e 'js|ejs|node' server.js"
   },
   "author": "",
   "license": "ISC",
@@ -22,7 +22,6 @@
     "method-override": "^2.1.2"
   },
   "devDependencies": {
-    "coffee-script": "^1.10.0",
     "supervisor": "^0.6.0"
   }
 }
