@@ -22,7 +22,6 @@ var cloud_name = '';
 var root_path = '';
 
 describe("utils", function () {
-  var find_by_attr;
   before("Verify Configuration", function () {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -47,16 +46,7 @@ describe("utils", function () {
     cloud_name = cloudinary.config("cloud_name");
     root_path = `http://res.cloudinary.com/${cloud_name}`;
   });
-  find_by_attr = function (elements, attr, value) {
-    var element, i, len;
-    for (i = 0, len = elements.length; i < len; i++) {
-      element = elements[i];
-      if (element[attr] === value) {
-        return element;
-      }
-    }
-    return void 0;
-  };
+  
   it("should use cloud_name from config", function () {
     test_cloudinary_url("test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
