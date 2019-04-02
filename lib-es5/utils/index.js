@@ -49,6 +49,7 @@ var crc32 = require('./crc32');
 var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
+var isRemoteUrl = require('./isRemoteUrl');
 
 module.exports = {
   at,
@@ -60,6 +61,7 @@ module.exports = {
   isEmpty,
   isNumber,
   isObject,
+  isRemoteUrl,
   isString,
   isUndefined,
   keys,

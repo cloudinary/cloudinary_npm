@@ -1418,4 +1418,23 @@ describe("utils", function () {
       expect(srcset.split(', ').length).to.eql(3);
     });
   });
+  describe('isRemoteUrl', function (){
+    it('should identify remote URLs correctly', function () {
+      [
+        "ftp://ftp.cloudinary.com/images/old_logo.png",
+        "http://cloudinary.com/images/old_logo.png",
+        "https://cloudinary.com/images/old_logo.png",
+        "s3://s3-us-west-2.amazonaws.com/cloudinary/images/old_logo.png",
+        "gs://cloudinary/images/old_logo.png",
+        "data:image/gif;charset=utf8;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        "data:image/gif;param1=value1;param2=value2;base64," +
+        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        cloudinary.BLANK
+      ].forEach( src=> expect(utils.isRemoteUrl(src) || src ).to.eql(true))
+    });
+    it('should return false for a local file', function () {
+      expect(utils.isRemoteUrl(helper.IMAGE_FILE)).not.to.be.ok();
+    });
+
+  })
 });
