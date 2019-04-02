@@ -35,6 +35,7 @@ var extend = utils.extend,
 
 var Cache = require('./cache');
 var entries = require('./utils/entries');
+var isRemoteUrl = utils.isRemoteUrl;
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -67,7 +68,7 @@ exports.upload = function upload(file, callback) {
 
   return call_api("upload", callback, options, function () {
     var params = build_upload_params(options);
-    if (file != null && file.match(/^ftp:|^https?:|^gs:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/)) {
+    if (file != null && isRemoteUrl(file)) {
       return [params, { file: file }];
     } else {
       return [params, {}, file];
