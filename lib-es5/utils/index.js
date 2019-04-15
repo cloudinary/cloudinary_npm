@@ -1163,7 +1163,7 @@ function join_pair(key, value) {
 
 /**
  * If the given value is a string, replaces single or double quotes with character entities
- *
+ * @private
  * @param {*} value The string to encode quotes in
  * @returns {*} Encoded string or original value if not a string
  */
