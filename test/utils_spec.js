@@ -178,7 +178,7 @@ describe("utils", function () {
           private_cdn: true,
           type: 'facebook'
         });
-      }).to.be.throwError(/URL Suffix only supported for image\/upload, image\/private, image\/authenticated, video\/upload and raw\/upload/);
+      }).to.throwError(/URL Suffix only supported for image\/upload, image\/private, image\/authenticated, video\/upload and raw\/upload/);
     });
     it("should disallow url_suffix with / or .", function () {
       expect(function () {
@@ -186,13 +186,13 @@ describe("utils", function () {
           url_suffix: "hello/world",
           private_cdn: true
         });
-      }).to.be.throwError(/url_suffix should not include . or \//);
+      }).to.throwError(/url_suffix should not include . or \//);
       expect(function () {
         utils.url("test", {
           url_suffix: "hello.world",
           private_cdn: true
         });
-      }).to.be.throwError(/url_suffix should not include . or \//);
+      }).to.throwError(/url_suffix should not include . or \//);
     });
     it("should support url_suffix for private_cdn", function () {
       test_cloudinary_url("test", {
@@ -303,14 +303,14 @@ describe("utils", function () {
           private_cdn: true,
           type: 'facebook'
         });
-      }).to.be.throwError(/Root path only supported for image\/upload/);
+      }).to.throwError(/Root path only supported for image\/upload/);
       expect(function () {
         utils.url("test", {
           use_root_path: true,
           private_cdn: true,
           resource_type: 'raw'
         });
-      }).to.be.throwError(/Root path only supported for image\/upload/);
+      }).to.throwError(/Root path only supported for image\/upload/);
     });
     it("should use width and height from options only if crop is given", function () {
       test_cloudinary_url("test", {
