@@ -340,6 +340,25 @@ describe("utils", function () {
         angle: 'auto'
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/a_auto,c_scale,h_100,w_100/test`, {});
     });
+    it("should disallow radius arrays that contain 0 or more than 4 values", function () {
+      expect(function () {
+        return utils.url("test", {
+          radius: [10, 20, 30, 10, 20]
+        });
+      }).to.throwError(/Radius array should contain between 1 and 4 values/);
+      expect(function () {
+        return utils.url("test", {
+          radius: []
+        });
+      }).to.throwError(/Radius array should contain between 1 and 4 values/);
+    });
+    it("should disallow radius arrays containing null values", function () {
+      expect(function () {
+        return utils.url("test", {
+          radius: [null, 20, 30, 10]
+        });
+      }).to.throwError(/Corner: Cannot be null/);
+    });
     it("should use x, y, radius, prefix, gravity and quality from options", function () {
       test_cloudinary_url("test", {
         x: 1,
@@ -1438,3 +1457,4 @@ describe("utils", function () {
 
   })
 });
+
