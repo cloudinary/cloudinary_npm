@@ -2,7 +2,7 @@
 var dotenv = require('dotenv');
 dotenv.load();
 var cloudinary = require('cloudinary').v2;
-if (typeof(process.env.CLOUDINARY_URL)=='undefined') {
+if (typeof(process.env.CLOUDINARY_URL)==='undefined') {
   console.warn('!! cloudinary config is undefined !!');
   console.warn('export CLOUDINARY_URL or set dotenv file');
 }else{
@@ -45,7 +45,7 @@ function wirePreRequest(app) {
     res.locals.req = req;
     res.locals.res = res;
 
-    if (typeof(process.env.CLOUDINARY_URL)=='undefined') {
+    if (typeof(process.env.CLOUDINARY_URL)==='undefined') {
       throw new Error('Missing CLOUDINARY_URL environment variable');
     }else{
       // Expose cloudinary package to view

@@ -31,7 +31,7 @@ function create_through_server(req, res) {
   // and then saved to the database.
 
   // file was not uploaded redirecting to upload 
-  if (req.files.image.ws.bytesWritten == 0) {
+  if (req.files.image.ws.bytesWritten === 0) {
     res.redirect('/photos/add');
     return;
   }
@@ -124,7 +124,7 @@ function create_direct(req, res) {
   result.photo = photo;
   // image was not uploaded, returning to edit form
   if (!req.body.image_id) {
-    if (req.body.type == 'direct') {
+    if (req.body.type === 'direct') {
       res.redirect('/photos/add_direct');
     } else {
       res.redirect('/photos/add_direct_unsigned');

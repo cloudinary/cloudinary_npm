@@ -117,7 +117,7 @@ cloudinary.uploader.upload('http://res.cloudinary.com/demo/image/upload/couple.j
 function waitForAllUploads(id, err, image) {
   uploads[id] = image;
   var ids = Object.keys(uploads);
-  if (ids.length==6) {
+  if (ids.length===6) {
     console.log();
     console.log ('**  uploaded all files ('+ids.join(',')+') to cloudinary');
     performTransformations();
