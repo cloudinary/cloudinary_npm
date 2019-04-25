@@ -165,9 +165,7 @@ describe("uploader", function () {
         sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
         sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
         sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
-
-      }
-      );
+      });
     });
   });
 });

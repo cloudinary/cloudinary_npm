@@ -1148,15 +1148,16 @@ describe("utils", function () {
         });
       });
     });
-
   });
+
   describe('build_eager', function () {
-    const scaled = options => Object.assign({
-      width: 100,
-      height: 200,
-      crop: 'scale'
-    },
-    options
+    const scaled = options => Object.assign(
+      {
+        width: 100,
+        height: 200,
+        crop: 'scale'
+      },
+      options
     );
     const sepia = options => Object.assign({
       width: 400,

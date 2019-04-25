@@ -2,10 +2,10 @@
 var dotenv = require('dotenv');
 dotenv.load();
 var cloudinary = require('cloudinary').v2;
-if (typeof(process.env.CLOUDINARY_URL)==='undefined') {
+if (typeof (process.env.CLOUDINARY_URL) === 'undefined') {
   console.warn('!! cloudinary config is undefined !!');
   console.warn('export CLOUDINARY_URL or set dotenv file');
-}else{
+} else {
   console.log('cloudinary config:');
   console.log(cloudinary.config());
 }
@@ -14,8 +14,8 @@ var path = require('path');
 // Start express server
 var schema = require('./config/schema');
 var express = require('express');
-var engine  = require('ejs-locals');
-var app = express(); 
+var engine = require('ejs-locals');
+var app = express();
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 app.use(bodyParser.json());
@@ -41,13 +41,13 @@ wirePostRequest(app);
 
 function wirePreRequest(app) {
   app.use(function (req, res, next) {
-    console.log(req.method +" "+ req.url);
+    console.log(req.method + " " + req.url);
     res.locals.req = req;
     res.locals.res = res;
 
-    if (typeof(process.env.CLOUDINARY_URL)==='undefined') {
+    if (typeof (process.env.CLOUDINARY_URL) === 'undefined') {
       throw new Error('Missing CLOUDINARY_URL environment variable');
-    }else{
+    } else {
       // Expose cloudinary package to view
       res.locals.cloudinary = cloudinary;
       next();
@@ -60,11 +60,11 @@ function wirePostRequest(app) {
     if (err.message && (~err.message.indexOf('not found') || (~err.message.indexOf('Cast to ObjectId failed')))) {
       return next();
     }
-    console.log('error (500) '+err.message);
+    console.log('error (500) ' + err.message);
     console.log(err.stack);
     if (~err.message.indexOf('CLOUDINARY_URL')) {
       res.status(500).render('errors/dotenv', { error: err });
-    }else{
+    } else {
       res.status(500).render('errors/500', { error: err });
     }
   });
@@ -82,4 +82,3 @@ app.use(function (req, res, next) {
 var server = app.listen(process.env.PORT || 9000, function () {
   console.log('Listening on port %d', server.address().port);
 });
-

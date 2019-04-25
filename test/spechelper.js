@@ -240,9 +240,9 @@ exports.mockTest = function () {
 /**
 @callback mockBlock
 A test block
-@param xhr 
-@param writeSpy 
-@param requestSpy 
+@param xhr
+@param writeSpy
+@param requestSpy
 @return {*} a promise or a value
 */
 /**

@@ -206,8 +206,8 @@ describe("api", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         tags: UPLOAD_TAGS
-      }).then(({ public_id }) =>
-        cloudinary.v2.api.resources({ type: "upload" })
+      }).then(
+        ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result])
       ).then(([public_id, result]) => {
         let resource = findByAttr(result.resources, "public_id", public_id);
@@ -278,14 +278,10 @@ describe("api", function () {
           max_results: 500,
           direction: "desc"
         })
-      ).then(([resultAsc, resultDesc]) =>
-        [
-          resultAsc.resources.map(r => r.public_id),
-          resultDesc.resources.map(r => r.public_id),
-        ]
-      ).then(([asc, desc]) =>
-        expect(asc.reverse()).to.eql(desc)
-      );
+      ).then(([resultAsc, resultDesc]) => [
+        resultAsc.resources.map(r => r.public_id),
+        resultDesc.resources.map(r => r.public_id),
+      ]).then(([asc, desc]) => expect(asc.reverse()).to.eql(desc));
     });
     it("should allow listing resources by start_at", function () {
       let start_at = new Date().toString();
@@ -305,10 +301,8 @@ describe("api", function () {
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         tags: UPLOAD_TAGS,
         eager: [EXPLICIT_TRANSFORMATION]
-      }).then(({ public_id }) =>
-        cloudinary.v2.api.resource(public_id)
-          .then(resource => [public_id, resource])
-      )
+      }).then(({ public_id }) => cloudinary.v2.api.resource(public_id)
+        .then(resource => [public_id, resource]))
         .then(([public_id, resource]) => {
           expect(resource).not.to.eql(void 0);
           expect(resource.public_id).to.eql(public_id);
@@ -328,8 +322,8 @@ describe("api", function () {
             crop: "scale"
           }
         ]
-      }).then(({ public_id }) =>
-        cloudinary.v2.api.resource(public_id)
+      }).then(
+        ({ public_id }) => cloudinary.v2.api.resource(public_id)
           .then(resource => [public_id, resource])
       ).then(([public_id, resource]) => {
         expect(resource).not.to.eql(void 0);
@@ -367,10 +361,10 @@ describe("api", function () {
             eager: [EXPLICIT_TRANSFORMATION,
               EXPLICIT_TRANSFORMATION2]
           })
-      ]).then(results =>
-        cloudinary.v2.api.delete_derived_by_transformation(
-          [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2])
-      ).then(result => cloudinary.v2.api.resource(PUBLIC_ID_1)
+      ]).then(results => cloudinary.v2.api.delete_derived_by_transformation(
+        [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2]
+      )).then(
+        result => cloudinary.v2.api.resource(PUBLIC_ID_1)
       ).then((result) => {
         expect(result.derived.length).to.eql(0);
         return cloudinary.v2.api.resource(PUBLIC_ID_2);
@@ -408,12 +402,15 @@ describe("api", function () {
         return cloudinary.v2.uploader.upload(IMAGE_FILE, {
           public_id: "api_test_by_prefix",
           tags: UPLOAD_TAGS
-        }).then(r => cloudinary.v2.api.resource("api_test_by_prefix")
+        }).then(
+          r => cloudinary.v2.api.resource("api_test_by_prefix")
         ).then(function (resource) {
           expect(resource).not.to.eql(void 0);
           return cloudinary.v2.api.delete_resources_by_prefix("api_test_by");
-        }).then(() => cloudinary.v2.api.resource("api_test_by_prefix")
-        ).then(() => expect().fail()
+        }).then(
+          () => cloudinary.v2.api.resource("api_test_by_prefix")
+        ).then(
+          () => expect().fail()
         ).catch(function ({ error }) {
           expect(error).to.be.an(Object);
           expect(error.http_code).to.eql(404);
@@ -428,12 +425,15 @@ describe("api", function () {
         return cloudinary.v2.uploader.upload(IMAGE_FILE, {
           public_id: PUBLIC_ID_4,
           tags: UPLOAD_TAGS.concat([deleteTestTag])
-        }).then(result => cloudinary.v2.api.resource(PUBLIC_ID_4)
+        }).then(
+          result => cloudinary.v2.api.resource(PUBLIC_ID_4)
         ).then(function (resource) {
           expect(resource).to.be.ok();
           return cloudinary.v2.api.delete_resources_by_tag(deleteTestTag);
-        }).then(result => cloudinary.v2.api.resource(PUBLIC_ID_4)
-        ).then(() => expect().fail()
+        }).then(
+          result => cloudinary.v2.api.resource(PUBLIC_ID_4)
+        ).then(
+          () => expect().fail()
         ).catch(({ error }) => {
           expect(error).to.be.an(Object);
           expect(error.http_code).to.eql(404);
@@ -454,8 +454,7 @@ describe("api", function () {
       return cloudinary.v2.api.tags({
         prefix: TEST_TAG.slice(0, -1),
         max_results: 500
-      }).then(result => expect(result.tags).to.contain(TEST_TAG)
-      );
+      }).then(result => expect(result.tags).to.contain(TEST_TAG));
     });
     it("should allow listing tag by prefix if not found", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -504,7 +503,8 @@ describe("api", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.update_transformation(EXPLICIT_TRANSFORMATION_NAME, {
         allowed_for_strict: true
-      }).then(() => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      }).then(
+        () => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
       ).then(function (transformation) {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.allowed_for_strict).to.be.ok();
@@ -522,7 +522,8 @@ describe("api", function () {
         return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION, {
           crop: "scale",
           width: 102
-        }).then(() => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION)
+        }).then(
+          () => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION)
         ).then(function (transformation) {
           expect(transformation).not.to.eql(void 0);
           expect(transformation.allowed_for_strict).to.be.ok();
@@ -541,7 +542,8 @@ describe("api", function () {
           crop: "scale",
           width: 102,
           format: ''
-        }).then(() => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION2)
+        }).then(
+          () => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION2)
         ).then(function (transformation) {
           expect(transformation).not.to.eql(void 0);
           expect(transformation.allowed_for_strict).to.be.ok();
@@ -575,7 +577,8 @@ describe("api", function () {
             crop: "scale",
             width: 103
           }
-        })).then(result => cloudinary.v2.api.transformation(transformationName)
+        })).then(
+          result => cloudinary.v2.api.transformation(transformationName)
         ).then((transformation) => {
           expect(transformation).not.to.eql(void 0);
           expect(transformation.info).to.eql([
@@ -591,7 +594,8 @@ describe("api", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
         return cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION).then(() => {
           return cloudinary.v2.api.transformation(NAMED_TRANSFORMATION);
-        }).then(() => expect().fail()
+        }).then(
+          () => expect().fail()
         ).catch(({ error }) => expect(error.http_code).to.eql(404));
       });
     });
@@ -600,8 +604,10 @@ describe("api", function () {
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then(function (transformation) {
         expect(transformation).to.be.an(Object);
         return cloudinary.v2.api.delete_transformation(EXPLICIT_TRANSFORMATION_NAME);
-      }).then(() => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
-      ).then(transformation => expect().fail()
+      }).then(
+        () => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)
+      ).then(
+        transformation => expect().fail()
       ).catch(({ error }) => expect(error.http_code).to.eql(404));
     });
   });
@@ -615,15 +621,15 @@ describe("api", function () {
           name: name,
           folder: "folder"
         }))
-      ).then(() => cloudinary.v2.api.upload_presets()
-      ).then(({ presets }) => presets.map(p => p.name)
-      ).then(presetList =>
-        PRESET_NAMES.forEach(p => expect(presetList).to.contain(p))
-      ).finally(() =>
-        Q.allSettled(
-          PRESET_NAMES.map(name => cloudinary.v2.api.delete_upload_preset(name))
-        )
-      );
+      ).then(
+        () => cloudinary.v2.api.upload_presets()
+      ).then(
+        ({ presets }) => presets.map(p => p.name)
+      ).then(
+        presetList => PRESET_NAMES.forEach(p => expect(presetList).to.contain(p))
+      ).finally(() => Q.allSettled(
+        PRESET_NAMES.map(name => cloudinary.v2.api.delete_upload_preset(name))
+      ));
     });
     it("should allow getting a single upload_preset", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -657,15 +663,18 @@ describe("api", function () {
       return cloudinary.v2.api.create_upload_preset({
         name: API_TEST_UPLOAD_PRESET4,
         folder: "folder"
-      }
-      ).then(() => cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4)
-      ).then(() => cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)
-      ).then(() => cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4)
-      ).then(() => expect().fail()
+      }).then(
+        () => cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4)
+      ).then(
+        () => cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4)
+      ).then(
+        () => cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4)
+      ).then(
+        () => expect().fail()
       ).catch(({ error }) => expect(error.message).to.contain("Can't find"));
     });
     it("should allow updating upload_presets", function () {
-      var name ='';
+      var name = '';
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.create_upload_preset({
         folder: "folder"
@@ -676,7 +685,8 @@ describe("api", function () {
         colors: true,
         unsigned: true,
         disallow_public_id: true
-      }))).then(() => cloudinary.v2.api.upload_preset(name)
+      }))).then(
+        () => cloudinary.v2.api.upload_preset(name)
       ).then((preset) => {
         expect(preset.name).to.eql(name);
         expect(preset.unsigned).to.eql(true);
@@ -704,7 +714,7 @@ describe("api", function () {
           };
           cloudinary.v2.api.delete_all_resources(options);
           sinon.assert.calledWith(request, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
-          sinon.assert.calledWith(request, sinon.match(arg => "DELETE" === arg.method, "DELETE"));
+          sinon.assert.calledWith(request, sinon.match(arg => arg.method === "DELETE", "DELETE"));
           sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
           sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
         });
@@ -738,18 +748,17 @@ describe("api", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         moderation: "manual"
-      }).then(upload_result =>
-        cloudinary.v2.api.update(upload_result.public_id, {
-          moderation_status: "approved"
-        })
-      ).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
+      }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
+        moderation_status: "approved"
+      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
     });
     it("should support requesting ocr info", () => {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           ocr: "illegal"
-        })).then(() => expect().fail()
+        })).then(
+          () => expect().fail()
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting raw conversion", () => {
@@ -757,7 +766,8 @@ describe("api", function () {
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           raw_convert: "illegal"
-        })).then(() => expect().fail()
+        })).then(
+          () => expect().fail()
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting categorization", function () {
@@ -777,7 +787,8 @@ describe("api", function () {
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           detection: "illegal"
-        })).then(() => expect().fail()
+        })).then(
+          () => expect().fail()
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting background_removal", function () {
@@ -785,7 +796,8 @@ describe("api", function () {
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           background_removal: "illegal"
-        })).then(() => expect().fail()
+        })).then(
+          () => expect().fail()
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     describe("access_control", function () {
@@ -805,27 +817,29 @@ describe("api", function () {
           options.access_control = [acl];
           cloudinary.v2.api.update("id", options);
           return sinon.assert.calledWith(
-            writeSpy, sinon.match(arg => helper.apiParamMatcher('access_control', `[${acl_string}]`)(arg)));
+            writeSpy, sinon.match(arg => helper.apiParamMatcher('access_control', `[${acl_string}]`)(arg))
+          );
         });
       });
     });
   });
   it("should support listing by moderation kind and value", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
-    return helper.mockPromise((xhr, write, request) =>
-      ["approved", "pending", "rejected"].forEach((stat) => {
-        var status, status2;
-        status = stat;
-        status2 = status;
-        request.resetHistory();
-        cloudinary.v2.api.resources_by_moderation("manual", status2, {
-          moderations: true
-        });
-        sinon.assert.calledWith(request, sinon.match(
-          arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : void 0), `/resources/image/moderations/manual/${status}`));
-        sinon.assert.calledWith(request, sinon.match(
-          arg => "moderations=true" === (arg != null ? arg.query : void 0), "moderations=true"));
-      }));
+    return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
+      var status, status2;
+      status = stat;
+      status2 = status;
+      request.resetHistory();
+      cloudinary.v2.api.resources_by_moderation("manual", status2, {
+        moderations: true
+      });
+      sinon.assert.calledWith(request, sinon.match(
+        arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : void 0), `/resources/image/moderations/manual/${status}`
+      ));
+      sinon.assert.calledWith(request, sinon.match(
+        arg => (arg != null ? arg.query : void 0) === "moderations=true", "moderations=true"
+      ));
+    }));
   });
   // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   // Replace `it` with  `it.skip` below if you want to disable it.
@@ -887,30 +901,28 @@ describe("api", function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
 
     const publicId = "api_test_restore" + SUFFIX;
-    before(() =>
-      cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        public_id: publicId,
-        backup: true,
-        tags: UPLOAD_TAGS
-      }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
-        expect(resource).not.to.be(null);
-        expect(resource["bytes"]).to.eql(3381);
-        return cloudinary.v2.api.delete_resources(publicId);
-      }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
-        expect(resource).not.to.be(null);
-        expect(resource["bytes"]).to.eql(0);
-        expect(resource["placeholder"]).to.eql(true);
-      }));
-    it('should restore a deleted resource', () =>
-      cloudinary.v2.api.restore(publicId).then((response) => {
-        let info = response[publicId];
-        expect(info).not.to.be(null);
-        expect(info["bytes"]).to.eql(3381);
-        return cloudinary.v2.api.resource(publicId);
-      }).then((resource) => {
-        expect(resource).not.to.be(null);
-        expect(resource["bytes"]).to.eql(3381);
-      }));
+    before(() => cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      public_id: publicId,
+      backup: true,
+      tags: UPLOAD_TAGS
+    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+      expect(resource).not.to.be(null);
+      expect(resource["bytes"]).to.eql(3381);
+      return cloudinary.v2.api.delete_resources(publicId);
+    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+      expect(resource).not.to.be(null);
+      expect(resource["bytes"]).to.eql(0);
+      expect(resource["placeholder"]).to.eql(true);
+    }));
+    it('should restore a deleted resource', () => cloudinary.v2.api.restore(publicId).then((response) => {
+      let info = response[publicId];
+      expect(info).not.to.be(null);
+      expect(info["bytes"]).to.eql(3381);
+      return cloudinary.v2.api.resource(publicId);
+    }).then((resource) => {
+      expect(resource).not.to.be(null);
+      expect(resource["bytes"]).to.eql(3381);
+    }));
   });
   describe('mapping', function () {
     let deleteMapping = false;
@@ -940,14 +952,14 @@ describe("api", function () {
           expect(result["template"]).to.eql("http://res.cloudinary.com");
           return cloudinary.v2.api.upload_mappings();
         }).then((result) => {
-          expect(result["mappings"].find(({ folder, template }) => folder===mapping && template==="http://res.cloudinary.com"
-          )).to.be.ok();
+          expect(result["mappings"].find(({ folder, template }) => folder === mapping && template === "http://res.cloudinary.com")).to.be.ok();
           return cloudinary.v2.api.delete_upload_mapping(mapping);
         }).then((result) => {
           deleteMapping = false;
           return cloudinary.v2.api.upload_mappings();
         }).then(
-          ({ mappings }) => expect(mappings.find(({ folder }) => folder===mapping)).not.to.be.ok());
+          ({ mappings }) => expect(mappings.find(({ folder }) => folder === mapping)).not.to.be.ok()
+        );
     });
   });
   describe("publish", function () {
@@ -1032,32 +1044,29 @@ describe("api", function () {
         expect(result.access_mode).to.be("authenticated");
       });
     });
-    it("should update access mode by ids", () =>
-      cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
-        var resource;
-        expect(result.updated).to.be.an('array');
-        expect(result.updated.length).to.be(1);
-        resource = result.updated[0];
-        expect(resource.public_id).to.be(publicId);
-        expect(resource.access_mode).to.be('public');
-      }));
-    it("should update access mode by prefix", () =>
-      cloudinary.v2.api.update_resources_access_mode_by_prefix("public", publicId.slice(0, -2)).then((result) => {
-        var resource;
-        expect(result.updated).to.be.an('array');
-        expect(result.updated.length).to.be(1);
-        resource = result.updated[0];
-        expect(resource.public_id).to.be(publicId);
-        expect(resource.access_mode).to.be('public');
-      }));
-    it("should update access mode by tag", () =>
-      cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag).then((result) => {
-        var resource;
-        expect(result.updated).to.be.an('array');
-        expect(result.updated.length).to.be(1);
-        resource = result.updated[0];
-        expect(resource.public_id).to.be(publicId);
-        expect(resource.access_mode).to.be('public');
-      }));
+    it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
+      var resource;
+      expect(result.updated).to.be.an('array');
+      expect(result.updated.length).to.be(1);
+      resource = result.updated[0];
+      expect(resource.public_id).to.be(publicId);
+      expect(resource.access_mode).to.be('public');
+    }));
+    it("should update access mode by prefix", () => cloudinary.v2.api.update_resources_access_mode_by_prefix("public", publicId.slice(0, -2)).then((result) => {
+      var resource;
+      expect(result.updated).to.be.an('array');
+      expect(result.updated.length).to.be(1);
+      resource = result.updated[0];
+      expect(resource.public_id).to.be(publicId);
+      expect(resource.access_mode).to.be('public');
+    }));
+    it("should update access mode by tag", () => cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag).then((result) => {
+      var resource;
+      expect(result.updated).to.be.an('array');
+      expect(result.updated.length).to.be(1);
+      resource = result.updated[0];
+      expect(resource.public_id).to.be(publicId);
+      expect(resource.access_mode).to.be('public');
+    }));
   });
 });

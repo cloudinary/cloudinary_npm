@@ -8,7 +8,7 @@ const FileKeyValueStorage = require("../../" + helper.libPath + "/cache/FileKeyV
 const KEY = "test_key";
 const VALUE = "test_value";
 const KEY2 = "test_key_2";
-const VALUE2= "test_value_2";
+const VALUE2 = "test_value_2";
 
 describe("FileKeyValueStorage", () => {
   var storage;

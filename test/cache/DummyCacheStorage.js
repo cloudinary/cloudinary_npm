@@ -17,10 +17,10 @@ class DummyCacheStorage {
   delete(key) {
     delete this.dummyCache[key];
   }
+
   clear() {
     this.dummyCache = {};
   }
-
 }
 
 module.exports = DummyCacheStorage;

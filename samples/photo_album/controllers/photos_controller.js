@@ -30,14 +30,14 @@ function create_through_server(req, res) {
   // The upload metadata (e.g. image size) is then added to the photo  model (photo.image)
   // and then saved to the database.
 
-  // file was not uploaded redirecting to upload 
+  // file was not uploaded redirecting to upload
   if (req.files.image.ws.bytesWritten === 0) {
     res.redirect('/photos/add');
     return;
   }
 
   var photo = new Photo(req.body);
-  // Get temp file path 
+  // Get temp file path
   var imageFile = req.files.image.path;
   // Upload file to Cloudinary
   cloudinary.uploader.upload(imageFile, { tags: 'express_sample' })

@@ -33,7 +33,6 @@ describe("KeyValueCacheAdapter", () => {
     let actualValue = cache.get(...parameters);
 
     expect(actualValue).to.eql(value);
-
   });
   it("should delete values from the cache", () => {
     cache.set(...parameters, value);
@@ -53,5 +52,3 @@ describe("KeyValueCacheAdapter", () => {
     expect(deletedValue2).to.be(null);
   });
 });
-
-
