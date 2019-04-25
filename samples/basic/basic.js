@@ -57,7 +57,6 @@ cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample' })
   });
 
 
-
 // Public Id
 cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample', public_id: 'my_favorite_pizza' }, function (err, image) {
   console.log();

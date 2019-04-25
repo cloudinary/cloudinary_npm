@@ -433,7 +433,6 @@ describe("utils", function () {
         type: "youtube"
       }, `http://res.cloudinary.com/${cloud_name}/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M`, {});
     });
-
   });
   describe('transformation parameters', function () {
     describe("gravity", function () {
@@ -808,7 +807,6 @@ describe("utils", function () {
       ].forEach(function ([option, expected]) {
         expect(cloudinary.utils.generate_transformation_string(option)).to.eql(expected);
       });
-
     });
     describe('Conditional Transformation', function () {
       var configBck = null;
@@ -1436,6 +1434,5 @@ describe("utils", function () {
     it('should return false for a local file', function () {
       expect(utils.isRemoteUrl(helper.IMAGE_FILE)).not.to.be.ok();
     });
-
   });
 });
