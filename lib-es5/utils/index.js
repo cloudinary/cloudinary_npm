@@ -211,6 +211,23 @@ function normalize_expression(expression) {
 }
 
 /**
+ * Parse custom_function options
+ * @private
+ * @param {object|*} customFunction a custom function object containing function_type and source values
+ * @return {string|*} custom_function transformation string
+ */
+function process_custom_function(customFunction) {
+  if (!isObject(customFunction)) {
+    return customFunction;
+  }
+  if (customFunction.function_type === "remote") {
+    return [customFunction.function_type, base64EncodeURL(customFunction.source)].join(":");
+  } else {
+    return [customFunction.function_type, customFunction.source].join(":");
+  }
+}
+
+/**
  * Parse "if" parameter
  * Translates the condition if provided.
  * @private
@@ -546,6 +563,7 @@ exports.generate_transformation_string = function generate_transformation_string
   var underlay = process_layer(utils.option_consume(options, "underlay"));
   var ifValue = process_if(utils.option_consume(options, "if"));
   var fps = utils.option_consume(options, 'fps');
+  var custom_function = process_custom_function(utils.option_consume(options, "custom_function"));
   if (isArray(fps)) {
     fps = fps.join('-');
   }
@@ -559,6 +577,7 @@ exports.generate_transformation_string = function generate_transformation_string
     dpr: normalize_expression(dpr),
     e: normalize_expression(effect),
     fl: flags,
+    fn: custom_function,
     fps: fps,
     h: normalize_expression(height),
     ki: normalize_expression(utils.option_consume(options, "keyframe_interval")),
