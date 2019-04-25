@@ -592,11 +592,10 @@ describe("api", function () {
       });
       it("should allow deleting named transformation", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
-        return cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION).then(() => {
-          return cloudinary.v2.api.transformation(NAMED_TRANSFORMATION);
-        }).then(
-          () => expect().fail()
-        ).catch(({ error }) => expect(error.http_code).to.eql(404));
+        return cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)
+          .then(() => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION))
+          .then(() => expect().fail())
+          .catch(({ error }) => expect(error.http_code).to.eql(404));
       });
     });
     it("should allow deleting implicit transformation", function () {
