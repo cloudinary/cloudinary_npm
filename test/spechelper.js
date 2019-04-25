@@ -197,7 +197,7 @@ exports.apiParamMatcher = function (name, value) {
   @return a new escaped string
 */
 exports.escapeRegexp = function (s) {
-  return s.replace(/[{\[\].*+()}]/g, (c) => '\\' + c);
+  return s.replace(/[{\[\].*+()}]/g, c => '\\' + c);
 };
 
 /**
