@@ -152,6 +152,6 @@ describe("video tag helper", function () {
     };
     cloudinary.video('hello', options);
     expect(options.video_codec).to.eql('auto');
-    expect(options.autoplay).to.be.true;
+    expect(options.autoplay).to.be(true);
   });
 });
