@@ -4,10 +4,10 @@ dotenv.load();
 var cloudinary = require('cloudinary').v2;
 if (typeof(process.env.CLOUDINARY_URL)=='undefined') {
   console.warn('!! cloudinary config is undefined !!');
-  console.warn('export CLOUDINARY_URL or set dotenv file')
+  console.warn('export CLOUDINARY_URL or set dotenv file');
 }else{
   console.log('cloudinary config:');
-  console.log(cloudinary.config())
+  console.log(cloudinary.config());
 }
 console.log('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
 var path = require('path');
@@ -46,28 +46,28 @@ function wirePreRequest(app) {
     res.locals.res = res;
 
     if (typeof(process.env.CLOUDINARY_URL)=='undefined') {
-      throw new Error('Missing CLOUDINARY_URL environment variable')
+      throw new Error('Missing CLOUDINARY_URL environment variable');
     }else{
       // Expose cloudinary package to view
       res.locals.cloudinary = cloudinary;
-      next()
+      next();
     }
-  })
+  });
 }
 
 function wirePostRequest(app) {
   app.use(function (err, req, res, next) {
     if (err.message && (~err.message.indexOf('not found') || (~err.message.indexOf('Cast to ObjectId failed')))) {
-      return next()
+      return next();
     }
     console.log('error (500) '+err.message);
     console.log(err.stack);
     if (~err.message.indexOf('CLOUDINARY_URL')) {
-      res.status(500).render('errors/dotenv', { error: err })
+      res.status(500).render('errors/dotenv', { error: err });
     }else{
-      res.status(500).render('errors/500', { error: err })
+      res.status(500).render('errors/500', { error: err });
     }
-  })
+  });
 }
 
 // Assume 404 since no middleware responded
@@ -76,7 +76,7 @@ app.use(function (req, res, next) {
   res.status(404).render('errors/404', {
     url: req.url,
     error: 'Not found'
-  })
+  });
 });
 
 var server = app.listen(process.env.PORT || 9000, function () {

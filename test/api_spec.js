@@ -298,7 +298,7 @@ describe("api", function () {
         sinon.assert.calledWith(requestSpy, sinon.match({
           query: sinon.match(`start_at=${encodeURIComponent(start_at)}`)
         }));
-      })
+      });
     });
     it("should allow get resource metadata", function () {
       this.timeout(helper.TIMEOUT_LONG);
@@ -338,7 +338,7 @@ describe("api", function () {
         let derived_resource_id = resource.derived[0].id;
         // ignore results and pass-through the public_id
         return cloudinary.v2.api.delete_derived_resources(derived_resource_id)
-          .then(() => public_id)
+          .then(() => public_id);
       }).then(public_id => cloudinary.v2.api.resource(public_id))
         .then((resource) => {
           expect(resource).not.to.eql(void 0);

@@ -174,7 +174,7 @@ describe("search_api", function () {
           results['resources'].forEach(function (res) {
             expect(Object.keys(res['context'])).to.eql(['stage']);
             expect(res.image_metadata).to.be.ok();
-            expect(res['tags'].length).to.eql(4)
+            expect(res['tags'].length).to.eql(4);
           });
         });
     });

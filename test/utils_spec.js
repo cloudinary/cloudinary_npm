@@ -807,9 +807,9 @@ describe("utils", function () {
         [{ fps: [24, 29.97] }, "fps_24-29.97"],
       ].forEach(function ([option, expected]) {
         expect(cloudinary.utils.generate_transformation_string(option)).to.eql(expected);
-      })
+      });
 
-    })
+    });
     describe('Conditional Transformation', function () {
       var configBck = null;
       before(function () {
@@ -1191,7 +1191,7 @@ describe("utils", function () {
     ].forEach(function ([subject, input, expected]) {
       it(subject, function () {
         expect(utils.build_eager(input)).to.eql(expected);
-      })
+      });
     });
     it("build_explicit_api_params should support multiple eager transformations with a pipe", function () {
       var options = {
@@ -1430,11 +1430,11 @@ describe("utils", function () {
         "data:image/gif;param1=value1;param2=value2;base64," +
         "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
         cloudinary.BLANK
-      ].forEach(src => expect(utils.isRemoteUrl(src) || src).to.eql(true))
+      ].forEach(src => expect(utils.isRemoteUrl(src) || src).to.eql(true));
     });
     it('should return false for a local file', function () {
       expect(utils.isRemoteUrl(helper.IMAGE_FILE)).not.to.be.ok();
     });
 
-  })
+  });
 });

@@ -25,8 +25,8 @@ describe("KeyValueCacheAdapter", () => {
         ["public_id", "upload", "image", null, null]
       ]
     ].forEach(([key, args]) => {
-      expect(KeyValueCacheAdapter.generateCacheKey.apply(this, args)).to.eql(key)
-    })
+      expect(KeyValueCacheAdapter.generateCacheKey.apply(this, args)).to.eql(key);
+    });
   });
   it("should set and get values", () => {
     cache.set(...parameters, value);
@@ -51,7 +51,7 @@ describe("KeyValueCacheAdapter", () => {
     let deletedValue2 = cache.get(...parameters2);
     expect(deletedValue).to.be(null);
     expect(deletedValue2).to.be(null);
-  })
+  });
 });
 
 

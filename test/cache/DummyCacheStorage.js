@@ -18,7 +18,7 @@ class DummyCacheStorage {
     delete this.dummyCache[key];
   }
   clear() {
-    this.dummyCache = {}
+    this.dummyCache = {};
   }
 
 }

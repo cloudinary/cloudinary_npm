@@ -7,8 +7,8 @@ var multipartMiddleware = multipart();
 
 function index(req, res) {
   Photo.all().then(function (photos) {
-    res.render('photos/index', { photos: photos })
-  })
+    res.render('photos/index', { photos: photos });
+  });
 }
 
 function add_through_server(req, res) {
@@ -20,8 +20,8 @@ function add_through_server(req, res) {
     .finally(function () {
       res.render('photos/add', {
         photo: photo
-      })
-    })
+      });
+    });
 }
 
 function create_through_server(req, res) {
@@ -49,7 +49,7 @@ function create_through_server(req, res) {
       return photo.save();
     })
     .then(function (photo) {
-      console.log('** photo saved')
+      console.log('** photo saved');
     })
     .finally(function () {
       res.render('photos/create_through_server', { photo: photo, upload: photo.image });
@@ -88,11 +88,11 @@ function add_direct_unsigned(req, res) {
     photo.title = "My Photo #" + (amount + 1) + " (direct unsigned)";
   })
     .then(function () {
-      return cloudinary.api.upload_preset(preset_name)
+      return cloudinary.api.upload_preset(preset_name);
     })
     .then(function (preset) {
       if (!preset.settings.return_delete_token) {
-        return cloudinary.api.update_upload_preset(preset_name, { return_delete_token: true })
+        return cloudinary.api.update_upload_preset(preset_name, { return_delete_token: true });
       }
     })
     .catch(function (err) {
@@ -104,7 +104,7 @@ function add_direct_unsigned(req, res) {
         name: preset_name,
         folder: "preset_folder",
         return_delete_token: true
-      })
+      });
     })
     .finally(function (preset) {
       res.render('photos/add_direct_unsigned',
@@ -112,8 +112,8 @@ function add_direct_unsigned(req, res) {
           photo: photo,
           cloudinary_cors: cloudinary_cors,
           preset_name: preset_name
-        })
-    })
+        });
+    });
 }
 
 function create_direct(req, res) {
@@ -125,9 +125,9 @@ function create_direct(req, res) {
   // image was not uploaded, returning to edit form
   if (!req.body.image_id) {
     if (req.body.type == 'direct') {
-      res.redirect('/photos/add_direct')
+      res.redirect('/photos/add_direct');
     } else {
-      res.redirect('/photos/add_direct_unsigned')
+      res.redirect('/photos/add_direct_unsigned');
     }
     return;
   }
@@ -135,15 +135,15 @@ function create_direct(req, res) {
   // check that image resolved from image_id is valid
   if (image.is_valid()) {
     photo.image = image.toJSON();
-    console.dir(photo.image)
+    console.dir(photo.image);
   }
   photo.save().then(function (photo) {
-    console.log('** photo saved')
+    console.log('** photo saved');
   })
     .catch(function (err) {
       result.error = err;
       console.log('** error while uploading file');
-      console.dir(err)
+      console.dir(err);
     }).finally(function () {
       res.render('photos/create_direct', { photo: photo, upload: photo.image });
     });

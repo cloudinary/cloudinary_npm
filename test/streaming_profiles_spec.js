@@ -76,7 +76,7 @@ describe('Cloudinary::Api', function () {
     it('should list streaming profile', function () {
       return api.list_streaming_profiles().then(function (result) {
         expect(result).to.have.key('data');
-        PREDEFINED_PROFILES.forEach(profile => expect(result['data'].some(p => p.name === profile)).to.be.ok())
+        PREDEFINED_PROFILES.forEach(profile => expect(result['data'].some(p => p.name === profile)).to.be.ok());
       });
     });
   });
