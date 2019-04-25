@@ -50,7 +50,7 @@ describe('source helper', function () {
   });
   it("should generate source tag with media query", function () {
     var expectedMedia, expectedTag, media, tag;
-    media = {min_width, max_width};
+    media = { min_width, max_width };
     tag = cloudinary.source(FULL_PUBLIC_ID, {
       media: media
     });

@@ -10,38 +10,38 @@ const VALUE = "test_value";
 const KEY2 = "test_key_2";
 const VALUE2= "test_value_2";
 
-describe("FileKeyValueStorage", ()=>{
+describe("FileKeyValueStorage", () => {
   var storage;
   var basefolder;
 
-  function getTestValue(key){
+  function getTestValue(key) {
     let storedValue = fs.readFileSync(storage.getFilename(key));
     return JSON.parse(storedValue);
   }
 
-  before(()=>{
+  before(() => {
     const cwd = process.cwd();
-    const {sep} = path;
+    const { sep } = path;
     basefolder = fs.mkdtempSync(`${cwd}${sep}`);
     storage = new FileKeyValueStorage(basefolder);
   });
 
-  after(()=>{
+  after(() => {
     storage.deleteBaseFolder();
     expect(fs.accessSync(basefolder)).to.be(undefined);
   });
 
-  it("should set a value in a file", ()=>{
+  it("should set a value in a file", () => {
     storage.set(KEY, VALUE);
     let actual = getTestValue(KEY);
     expect(actual).to.eql(VALUE);
   });
-  it("should get a value from a file", ()=>{
+  it("should get a value from a file", () => {
     storage.set(KEY, VALUE);
     let actual = storage.get(KEY);
     expect(actual).to.eql(VALUE);
   });
-  it("should remove all files", ()=>{
+  it("should remove all files", () => {
     storage.set(KEY, VALUE);
     storage.set(KEY2, VALUE2);
     expect(storage.getFilename(KEY)).not.to.eql(storage.getFilename(KEY2));

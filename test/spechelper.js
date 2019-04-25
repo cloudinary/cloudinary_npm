@@ -10,9 +10,9 @@ libPath = exports.libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'l
 
 cloudinary = require("../cloudinary");
 
-({utils, config, Cache} = cloudinary);
+({ utils, config, Cache } = cloudinary);
 
-({isEmpty, last} = utils);
+({ isEmpty, last } = utils);
 
 FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
 
@@ -48,7 +48,7 @@ exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
 
 exports.TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDK's tests
 
-exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; //identifies resources created in the current test run
+exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; // identifies resources created in the current test run
 
 exports.UPLOAD_TAGS = [exports.TEST_TAG, exports.TEST_TAG_PREFIX, exports.SDK_TAG];
 
@@ -66,7 +66,7 @@ exports.ICON_FILE = "test/resources/favicon.ico";
 
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
-exports.test_cloudinary_url = function(public_id, options, expected_url, expected_options) {
+exports.test_cloudinary_url = function (public_id, options, expected_url, expected_options) {
   var url;
   url = utils.url(public_id, options);
   expect(url).to.eql(expected_url);
@@ -74,33 +74,33 @@ exports.test_cloudinary_url = function(public_id, options, expected_url, expecte
   return url;
 };
 
-expect.Assertion.prototype.produceUrl = function(url) {
+expect.Assertion.prototype.produceUrl = function (url) {
   var actual, actualOptions, options, public_id;
   [public_id, options] = this.obj;
   actualOptions = cloneDeep(options);
   actual = utils.url(public_id, actualOptions);
-  this.assert(actual.match(url), function() {
+  this.assert(actual.match(url), function () {
     return `expected '${public_id}' and ${JSON.stringify(options)} to produce '${url}' but got '${actual}'`;
-  }, function() {
+  }, function () {
     return `expected '${public_id}' and ${JSON.stringify(options)} not to produce '${url}' but got '${actual}'`;
   });
   return this;
 };
 
-expect.Assertion.prototype.emptyOptions = function() {
+expect.Assertion.prototype.emptyOptions = function () {
   var actual, options, public_id;
   [public_id, options] = this.obj;
   actual = cloneDeep(options);
   utils.url(public_id, actual);
-  this.assert(isEmpty(actual), function() {
+  this.assert(isEmpty(actual), function () {
     return `expected '${public_id}' and ${JSON.stringify(options)} to produce empty options but got ${JSON.stringify(actual)}`;
-  }, function() {
+  }, function () {
     return `expected '${public_id}' and ${JSON.stringify(options)} not to produce empty options`;
   });
   return this;
 };
 
-expect.Assertion.prototype.beServedByCloudinary = function(done) {
+expect.Assertion.prototype.beServedByCloudinary = function (done) {
   var actual, actualOptions, callHttp, options, public_id;
   [public_id, options] = this.obj;
   actualOptions = cloneDeep(options);
@@ -111,9 +111,9 @@ expect.Assertion.prototype.beServedByCloudinary = function(done) {
     callHttp = http;
   }
   callHttp.get(actual, (res) => {
-    this.assert(res.statusCode === 200, function() {
+    this.assert(res.statusCode === 200, function () {
       return `Expected to get ${actual} but server responded with "${res.statusCode}: ${res.headers['x-cld-error']}"`;
-    }, function() {
+    }, function () {
       return `Expeted not to get ${actual}.`;
     });
     return done();
@@ -123,8 +123,8 @@ expect.Assertion.prototype.beServedByCloudinary = function(done) {
 
 allExamples = null;
 
-sharedExamples = (function(allExamples, isFunction) {
-  return function(name, examples) {
+sharedExamples = (function (allExamples, isFunction) {
+  return function (name, examples) {
     if (allExamples == null) {
       allExamples = {};
     }
@@ -135,7 +135,7 @@ sharedExamples = (function(allExamples, isFunction) {
       if (allExamples[name] != null) {
         return allExamples[name];
       } else {
-        return function() {
+        return function () {
           return console.log(`Shared example ${name} was not found!`);
         };
       }
@@ -145,13 +145,13 @@ sharedExamples = (function(allExamples, isFunction) {
 
 exports.sharedExamples = exports.sharedContext = sharedExamples;
 
-exports.itBehavesLike = function(name, ...args) {
-  return context(`behaves like ${name}`, function() {
+exports.itBehavesLike = function (name, ...args) {
+  return context(`behaves like ${name}`, function () {
     return sharedExamples(name).apply(this, args);
   });
 };
 
-exports.includeContext = function(name, ...args) {
+exports.includeContext = function (name, ...args) {
   return sharedExamples(name).apply(this, args);
 };
 
@@ -163,8 +163,8 @@ Create a matcher method for upload parameters
 @param value {Any} the parameter value
 @return {(arg)->Boolean} the matcher function
 */
-exports.uploadParamMatcher = function(name, value) {
-  return function(arg) {
+exports.uploadParamMatcher = function (name, value) {
+  return function (arg) {
     var return_part;
     return_part = 'Content-Disposition: form-data; name="' + name + '"\r\n\r\n';
     return_part += String(value);
@@ -180,12 +180,12 @@ exports.uploadParamMatcher = function(name, value) {
   @param value {Any} the parameter value
   @return {(arg)->Boolean} the matcher function
 */
-exports.apiParamMatcher = function(name, value) {
+exports.apiParamMatcher = function (name, value) {
   var expected, params;
   params = {};
   params[name] = value;
   expected = querystring.stringify(params);
-  return function(arg) {
+  return function (arg) {
     return new RegExp(expected).test(arg);
   };
 };
@@ -196,7 +196,7 @@ exports.apiParamMatcher = function(name, value) {
   @param {string} s the string to escape
   @return a new escaped string
 */
-exports.escapeRegexp = function(s) {
+exports.escapeRegexp = function (s) {
   return s.replace(/[{\[\].*+()}]/g, (c) => {
     return '\\' + c;
   });
@@ -221,15 +221,15 @@ describe("some topic", function() {
 </pre>
 @return {object} the mocked objects: `xhr`, `write`, `request`
 */
-exports.mockTest = function() {
+exports.mockTest = function () {
   var mocked;
   mocked = {};
-  before(function() {
+  before(function () {
     mocked.xhr = sinon.useFakeXMLHttpRequest();
     mocked.write = sinon.spy(ClientRequest.prototype, 'write');
     return mocked.request = sinon.spy(api_http, 'request');
   });
-  after(function() {
+  after(function () {
     mocked.request.restore();
     mocked.write.restore();
     return mocked.xhr.restore();
@@ -252,31 +252,31 @@ Can be called inside `it` functions
 @param {mockBlock} the test function, accepting (xhr, write, request)
 @return {Promise}
 */
-exports.mockPromise = function(mockBlock) {
+exports.mockPromise = function (mockBlock) {
   var requestSpy, writeSpy, xhr;
   xhr = void 0;
   writeSpy = void 0;
   requestSpy = void 0;
-  return Q.Promise(function(resolve, reject, notify) {
+  return Q.Promise(function (resolve, reject, notify) {
     var mock, result;
     xhr = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     requestSpy = sinon.spy(api_http, 'request');
-    mock = {xhr, writeSpy, requestSpy};
+    mock = { xhr, writeSpy, requestSpy };
     result = mockBlock(xhr, writeSpy, requestSpy);
     if (isFunction(result != null ? result.then : void 0)) {
       return result.then(resolve);
     } else {
       return resolve(result);
     }
-  }).finally(function() {
+  }).finally(function () {
     requestSpy.restore();
     writeSpy.restore();
     return xhr.restore();
   }).done();
 };
 
-exports.setupCache = function() {
+exports.setupCache = function () {
   if (!Cache.getAdapter()) {
     return Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
   }
@@ -286,6 +286,6 @@ exports.setupCache = function() {
   Upload an image to be tested on.
   @callback the callback receives the public_id of the uploaded image
 */
-exports.uploadImage = function(options) {
+exports.uploadImage = function (options) {
   return cloudinary.v2.uploader.upload(exports.IMAGE_FILE, options);
 };

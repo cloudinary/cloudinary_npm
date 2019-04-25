@@ -8,12 +8,12 @@ const utils = cloudinary.utils;
 const KEY = "00112233FF99";
 const ALT_KEY = "CCBB2233FF00";
 
-describe("authToken", function() {
+describe("authToken", function () {
   var urlBackup = null;
-  before(function() {
+  before(function () {
     urlBackup = process.env.CLOUDINARY_URL;
   });
-  beforeEach(function() {
+  beforeEach(function () {
     process.env.CLOUDINARY_URL = "cloudinary://a:b@test123";
     cloudinary.config(true);
     cloudinary.config().auth_token = {
@@ -22,11 +22,11 @@ describe("authToken", function() {
       start_time: 11111111
     };
   });
-  after(function() {
+  after(function () {
     process.env.CLOUDINARY_URL = urlBackup;
     cloudinary.config(true);
   });
-  it("should generate with start and window", function() {
+  it("should generate with start and window", function () {
     let token = utils.generate_auth_token({
       start_time: 1111111111,
       acl: "/image/*",
@@ -34,13 +34,13 @@ describe("authToken", function() {
     });
     expect(token).to.eql("__cld_token__=st=1111111111~exp=1111111411~acl=%2fimage%2f*~hmac=1751370bcc6cfe9e03f30dd1a9722ba0f2cdca283fa3e6df3342a00a7528cc51");
   });
-  describe("authenticated url", function() {
-    beforeEach(function() {
+  describe("authenticated url", function () {
+    beforeEach(function () {
       cloudinary.config({
         private_cdn: true
       });
     });
-    it("should add token if authToken is globally set and signed = true", function() {
+    it("should add token if authToken is globally set and signed = true", function () {
       let url = cloudinary.url("sample.jpg", {
         sign_url: true,
         resource_type: "image",
@@ -49,7 +49,7 @@ describe("authToken", function() {
       });
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=8db0d753ee7bbb9e2eaf8698ca3797436ba4c20e31f44527e43b6a6e995cfdb3");
     });
-    it("should add token for 'public' resource", function() {
+    it("should add token for 'public' resource", function () {
       let url = cloudinary.url("sample.jpg", {
         sign_url: true,
         resource_type: "image",
@@ -58,14 +58,14 @@ describe("authToken", function() {
       });
       expect(url).to.eql("http://test123-res.cloudinary.com/image/public/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=c2b77d9f81be6d89b5d0ebc67b671557e88a40bcf03dd4a6997ff4b994ceb80e");
     });
-    it("should not add token if signed is false", function() {
+    it("should not add token if signed is false", function () {
       let url = cloudinary.url("sample.jpg", {
         type: "authenticated",
         version: "1486020273"
       });
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg");
     });
-    it("should not add token if authToken is globally set but null auth token is explicitly set and signed = true", function() {
+    it("should not add token if authToken is globally set but null auth token is explicitly set and signed = true", function () {
       let url = cloudinary.url("sample.jpg", {
         auth_token: false,
         sign_url: true,
@@ -74,7 +74,7 @@ describe("authToken", function() {
       });
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/s--v2fTPYTu--/v1486020273/sample.jpg");
     });
-    it("explicit authToken should override global setting", function() {
+    it("explicit authToken should override global setting", function () {
       let url = cloudinary.url("sample.jpg", {
         sign_url: true,
         auth_token: {
@@ -90,7 +90,7 @@ describe("authToken", function() {
       });
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/c_scale,w_300/sample.jpg?__cld_token__=st=222222222~exp=222222322~hmac=7d276841d70c4ecbd0708275cd6a82e1f08e47838fbb0bceb2538e06ddfa3029");
     });
-    it("should compute expiration as start time + duration", function() {
+    it("should compute expiration as start time + duration", function () {
       let token = {
         start_time: 11111111,
         duration: 300
@@ -105,8 +105,8 @@ describe("authToken", function() {
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=8db0d753ee7bbb9e2eaf8698ca3797436ba4c20e31f44527e43b6a6e995cfdb3");
     });
   });
-  describe("authentication token", function() {
-    it("should generate token string", function() {
+  describe("authentication token", function () {
+    it("should generate token string", function () {
       let user = "foobar"; // we can't rely on the default "now" value in tests
       let tokenOptions = {
         key: KEY,
@@ -118,7 +118,7 @@ describe("authToken", function() {
       expect(cookieToken).to.eql("__cld_token__=st=222222222~exp=222222522~acl=%2f*%2ft_foobar~hmac=8e39600cc18cec339b21fe2b05fcb64b98de373355f8ce732c35710d8b10259f");
     });
   });
-  it("should add token to an image tag url", function() {
+  it("should add token to an image tag url", function () {
     let tag = cloudinary.image("sample.jpg", {
       sign_url: true,
       type: "authenticated",

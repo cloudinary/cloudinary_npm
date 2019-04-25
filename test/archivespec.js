@@ -138,7 +138,7 @@ describe("uploader", function () {
         target_tags: [TEST_TAG, ARCHIVE_TAG],
         mode: 'create',
         skip_transformation_name: true
-      }).then(result => {
+      }).then((result) => {
         archive_result = result;
       });
     });
@@ -154,19 +154,19 @@ describe("uploader", function () {
     this.timeout(helper.TIMEOUT_LONG);
     it('should call create_archive with "zip" format and ignore missing resources', function () {
       helper.mockPromise(function (xhr, write) {
-          uploader.create_zip({
-            tags: TEST_TAG,
-            public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],
-            resource_type: "raw",
-            allow_missing: true
-          });
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
+        uploader.create_zip({
+          tags: TEST_TAG,
+          public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],
+          resource_type: "raw",
+          allow_missing: true
+        });
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
 
-        }
+      }
       );
     });
   });

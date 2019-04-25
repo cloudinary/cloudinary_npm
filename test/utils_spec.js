@@ -9,12 +9,12 @@ const fs = require('fs');
 const os = require('os');
 const cloudinary = require("../cloudinary");
 const utils = cloudinary.utils;
-const {clone, isString, merge, only} = utils;
+const { clone, isString, merge, only } = utils;
 const defaults = require('lodash/defaults');
 const TEST_TAG = helper.TEST_TAG;
-const {sharedExamples, itBehavesLike, test_cloudinary_url} = helper;
+const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
-const {srcsetUrl, generateSrcsetAttribute} = require(`../${helper.libPath}/utils/srcsetUtils`);
+const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
 
 // Defined globals
 var cloud_name = '';
@@ -435,7 +435,7 @@ describe("utils", function () {
     });
 
   });
-  describe('transformation parameters', function(){
+  describe('transformation parameters', function () {
     describe("gravity", function () {
       it("should support auto", function () {
         test_cloudinary_url("test", {
@@ -797,15 +797,15 @@ describe("utils", function () {
         }, `http://res.cloudinary.com/${cloud_name}/image/upload/z_1.2/test`, {});
       });
     });
-    describe('fps', function(){
+    describe('fps', function () {
       [
-        [{fps: "24-29.97"}, "fps_24-29.97"],
-        [{fps: 24}, "fps_24"],
-        [{fps: 24.5}, "fps_24.5"],
-        [{fps: "24"}, "fps_24"],
-        [{fps: "-24"}, "fps_-24"],
-        [{fps: [24, 29.97]}, "fps_24-29.97"],
-      ].forEach(function([option, expected]){
+        [{ fps: "24-29.97" }, "fps_24-29.97"],
+        [{ fps: 24 }, "fps_24"],
+        [{ fps: 24.5 }, "fps_24.5"],
+        [{ fps: "24" }, "fps_24"],
+        [{ fps: "-24" }, "fps_-24"],
+        [{ fps: [24, 29.97] }, "fps_24-29.97"],
+      ].forEach(function ([option, expected]) {
         expect(cloudinary.utils.generate_transformation_string(option)).to.eql(expected);
       })
 
@@ -1151,14 +1151,14 @@ describe("utils", function () {
 
   });
   describe('build_eager', function () {
-    const scaled = (options) => Object.assign({
-        width: 100,
-        height: 200,
-        crop: 'scale'
-      },
-      options
+    const scaled = options => Object.assign({
+      width: 100,
+      height: 200,
+      crop: 'scale'
+    },
+    options
     );
-    const sepia = (options) => Object.assign({
+    const sepia = options => Object.assign({
       width: 400,
       crop: 'lfill',
       effect: 'sepia'
@@ -1171,22 +1171,22 @@ describe("utils", function () {
         [scaled(), sepia()],
         'c_scale,h_200,w_100|c_lfill,e_sepia,w_400'],
       ['should support transformations with multiple components',
-        [{transformation: [scaled(), sepia()]}, sepia()],
+        [{ transformation: [scaled(), sepia()] }, sepia()],
         'c_scale,h_200,w_100/c_lfill,e_sepia,w_400|c_lfill,e_sepia,w_400'],
       ['should concatenate format at the end of the transformation',
-        ([scaled({format: 'gif'}), sepia()]),
+        ([scaled({ format: 'gif' }), sepia()]),
         'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400'],
       ['should support an empty format',
-        ([scaled({format: ''}), sepia()]),
+        ([scaled({ format: '' }), sepia()]),
         'c_scale,h_200,w_100/|c_lfill,e_sepia,w_400'],
       ['should treat a null format as none',
-        ([scaled({format: null}), sepia()]),
+        ([scaled({ format: null }), sepia()]),
         'c_scale,h_200,w_100|c_lfill,e_sepia,w_400'],
       ['should concatenate format at the end of the transformation',
-        ([scaled({format: 'gif'}), sepia({format: 'jpg'})]),
+        ([scaled({ format: 'gif' }), sepia({ format: 'jpg' })]),
         'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400/jpg'],
       ['should support transformations with multiple components and format',
-        [{transformation: [scaled(), sepia()], format: 'gif'}, sepia()],
+        [{ transformation: [scaled(), sepia()], format: 'gif' }, sepia()],
         'c_scale,h_200,w_100/c_lfill,e_sepia,w_400/gif|c_lfill,e_sepia,w_400'],
     ].forEach(function ([subject, input, expected]) {
       it(subject, function () {
@@ -1418,7 +1418,7 @@ describe("utils", function () {
       expect(srcset.split(', ').length).to.eql(3);
     });
   });
-  describe('isRemoteUrl', function (){
+  describe('isRemoteUrl', function () {
     it('should identify remote URLs correctly', function () {
       [
         "ftp://ftp.cloudinary.com/images/old_logo.png",
@@ -1430,7 +1430,7 @@ describe("utils", function () {
         "data:image/gif;param1=value1;param2=value2;base64," +
         "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
         cloudinary.BLANK
-      ].forEach( src=> expect(utils.isRemoteUrl(src) || src ).to.eql(true))
+      ].forEach(src => expect(utils.isRemoteUrl(src) || src).to.eql(true))
     });
     it('should return false for a local file', function () {
       expect(utils.isRemoteUrl(helper.IMAGE_FILE)).not.to.be.ok();

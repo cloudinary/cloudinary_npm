@@ -45,7 +45,7 @@ describe("Cache", function () {
         responsive_breakpoints: [
           {
             create_derived: false,
-            transformation: {angle: 90},
+            transformation: { angle: 90 },
             format: 'gif'
           },
           {
