@@ -1,4 +1,25 @@
-var Cache, ClientRequest, FileKeyValueStorage, KeyValueCacheAdapter, Q, allExamples, api_http, cloneDeep, cloudinary, config, expect, http, https, isEmpty, isFunction, last, libPath, querystring, ref, sharedExamples, sinon, utils;
+var Cache,
+  ClientRequest,
+  FileKeyValueStorage,
+  KeyValueCacheAdapter,
+  Q,
+  allExamples,
+  api_http,
+  cloneDeep,
+  cloudinary,
+  config,
+  expect,
+  http,
+  https,
+  isEmpty,
+  isFunction,
+  last,
+  libPath,
+  querystring,
+  ref,
+  sharedExamples,
+  sinon,
+  utils;
 
 expect = require('expect.js');
 

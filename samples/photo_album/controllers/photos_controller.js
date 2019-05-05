@@ -77,7 +77,8 @@ function add_direct_unsigned(req, res) {
   var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
 
   // Set a unique unsigned upload preset name (for demo purposes only).
-  // In 'real life' scenario the preset name will be meaningful and will be set via online console or API not related to the actual upload
+  // In 'real life' scenario the preset name will be meaningful and will be set
+  // via online console or API not related to the actual upload
   var sha1 = crypto.createHash('sha1');
   sha1.update(cloudinary.config('api_key') + cloudinary.config('api_secret'));
   var preset_name = "sample_" + sha1.digest('hex');

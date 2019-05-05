@@ -34,7 +34,8 @@ describe("utils", function () {
     }, this.orig));
   });
   beforeEach(function () {
-    //    @cfg= cloudinary.config( {cloud_name:"test123", secure_distribution : null, private_cdn : false, secure : false, cname : null ,cdn_subdomain : false, api_key : "1234", api_secret: "b" })
+    // eslint-disable-next-line max-len
+    // @cfg= cloudinary.config( {cloud_name:"test123", secure_distribution : null, private_cdn : false, secure : false, cname : null ,cdn_subdomain : false, api_key : "1234", api_secret: "b" })
     this.cfg = cloudinary.config({
       secure_distribution: null,
       private_cdn: false,
