@@ -178,4 +178,10 @@ function generateMediaAttr() {
   return mediaQuery.join(' and ');
 }
 
-module.exports = { srcsetUrl: scaledUrl, generateSrcsetAttribute, generateSizesAttribute, generateMediaAttr, generateImageResponsiveAttributes };
+module.exports = {
+  srcsetUrl: scaledUrl,
+  generateSrcsetAttribute,
+  generateSizesAttribute,
+  generateMediaAttr,
+  generateImageResponsiveAttributes
+};

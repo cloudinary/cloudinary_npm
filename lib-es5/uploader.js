@@ -141,8 +141,6 @@ var Chunkable = function (_Writable) {
   return Chunkable;
 }(Writable);
 
-;
-
 exports.upload_large_stream = function upload_large_stream(_unused_, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 

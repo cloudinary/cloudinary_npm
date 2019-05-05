@@ -199,7 +199,6 @@ function textStyle(layer) {
  * @return {Object|String} a normalized String of the input value if possible otherwise the value itself
  */
 function normalize_expression(expression) {
-
   if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/)) {
     return expression;
   }
@@ -398,7 +397,7 @@ exports.encode_double_array = function encode_double_array(array) {
 
 exports.encode_key_value = function encode_key_value(arg) {
   if (isObject(arg)) {
-    return entries(args).map(function (_ref) {
+    return entries(arg).map(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2),
           k = _ref2[0],
           v = _ref2[1];
@@ -530,7 +529,7 @@ exports.generate_transformation_string = function generate_transformation_string
   if (isObject(border)) {
     border = `${border.width != null ? border.width : 2}px_solid_${(border.color != null ? border.color : "black").replace(/^#/, 'rgb:')}`;
   } else if (/^\d+$/.exec(border)) {
-    //fallback to html border attributes
+    // fallback to html border attributes
     options.border = border;
     border = void 0;
   }
@@ -866,7 +865,7 @@ function finalize_source(source, format, url_suffix) {
   } else {
     source = encodeURIComponent(decodeURIComponent(source)).replace(/%3A/g, ":").replace(/%2F/g, "/");
     source_to_sign = source;
-    if (!!url_suffix) {
+    if (url_suffix) {
       if (url_suffix.match(/[\.\/]/)) {
         throw new Error('url_suffix should not include . or /');
       }
@@ -924,12 +923,15 @@ function finalize_resource_type(resource_type, type, url_suffix, use_root_path, 
 }
 // cdn_subdomain and secure_cdn_subdomain
 // 1) Customers in shared distribution (e.g. res.cloudinary.com)
-//   if cdn_domain is true uses res-[1-5].cloudinary.com for both http and https. Setting secure_cdn_subdomain to false disables this for https.
+//    if cdn_domain is true uses res-[1-5].cloudinary.com for both http and https.
+//    Setting secure_cdn_subdomain to false disables this for https.
 // 2) Customers with private cdn
-//   if cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for http
-//   if secure_cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for https (please contact support if you require this)
+//    if cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for http
+//    if secure_cdn_domain is true uses cloudname-res-[1-5].cloudinary.com for https
+//      (please contact support if you require this)
 // 3) Customers with cname
-//   if cdn_domain is true uses a[1-5].cname for http. For https, uses the same naming scheme as 1 for shared distribution and as 2 for private distribution.
+//    if cdn_domain is true uses a[1-5].cname for http.
+//    For https, uses the same naming scheme as 1 for shared distribution and as 2 for private distribution.
 
 function unsigned_url_prefix(source, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution) {
   var prefix = void 0;
@@ -966,7 +968,7 @@ function unsigned_url_prefix(source, cloud_name, private_cdn, cdn_subdomain, sec
   return prefix;
 }
 // Based on CGI::unescape. In addition does not escape / :
-//smart_escape = (string)->
+// smart_escape = (string)->
 //  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/")
 function smart_escape(string) {
   var unsafe = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : /([^a-zA-Z0-9_.\-\/:]+)/g;
@@ -1100,7 +1102,8 @@ exports.zip_download_url = function zip_download_url(tag) {
 /**
  * Returns a URL that when invokes creates an archive and returns it.
  * @param {object} options
- * @param {string} [options.resource_type="image"]  The resource type of files to include in the archive. Must be one of :image | :video | :raw
+ * @param {string} [options.resource_type="image"] The resource type of files to include in the archive.
+ *   Must be one of :image | :video | :raw
  * @param {string} [options.type="upload"] The specific file type of resources: :upload|:private|:authenticated
  * @param {string|Array} [options.tags] list of tags to include in the archive
  * @param {string|Array<string>} [options.public_ids] list of public_ids to include in the archive
@@ -1113,15 +1116,18 @@ exports.zip_download_url = function zip_download_url(tag) {
  * @param {string} [options.target_format="zip"]
  * @param {string} [options.target_public_id]  public ID of the generated raw resource.
  *   Relevant only for the create mode. If not specified, random public ID is generated.
- * @param {boolean} [options.flatten_folders=false] If true, flatten public IDs with folders to be in the root of the archive.
- *   Add numeric counter to the file name in case of a name conflict.
+ * @param {boolean} [options.flatten_folders=false] If true, flatten public IDs with folders to be in the root
+ *   of the archive. Add numeric counter to the file name in case of a name conflict.
  * @param {boolean} [options.flatten_transformations=false] If true, and multiple transformations are given,
  *   flatten the folder structure of derived images and store the transformation details on the file name instead.
- * @param {boolean} [options.use_original_filename] Use the original file name of included images (if available) instead of the public ID.
- * @param {boolean} [options.async=false] If true, return immediately and perform the archive creation in the background.
+ * @param {boolean} [options.use_original_filename] Use the original file name of included images
+ *   (if available) instead of the public ID.
+ * @param {boolean} [options.async=false] If true, return immediately and perform archive creation in the background.
  *   Relevant only for the create mode.
- * @param {string} [options.notification_url]  URL to send an HTTP post request (webhook) when the archive creation is completed.
- * @param {string|Array<string>} [options.target_tags=]  array. Allows assigning one or more tag to the generated archive file (for later housekeeping via the admin API).
+ * @param {string} [options.notification_url] URL to send an HTTP post request (webhook) to when the
+ *   archive creation is completed.
+ * @param {string|Array<string>} [options.target_tags=] Allows assigning one or more tags to the generated archive file
+ *   (for later housekeeping via the admin API).
  * @param {string} [options.keep_derived=false] keep the derived images used for generating the archive
  * @return {String} archive url
  */
@@ -1278,17 +1284,19 @@ function norm_range_value(value) {
 function process_video_params(param) {
   switch (param.constructor) {
     case Object:
-      var video = "";
-      if ('codec' in param) {
-        video = param['codec'];
-        if ('profile' in param) {
-          video += ":" + param['profile'];
-          if ('level' in param) {
-            video += ":" + param['level'];
+      {
+        var video = "";
+        if ('codec' in param) {
+          video = param['codec'];
+          if ('profile' in param) {
+            video += ":" + param['profile'];
+            if ('level' in param) {
+              video += ":" + param['level'];
+            }
           }
         }
+        return video;
       }
-      return video;
     case String:
       return param;
     default:

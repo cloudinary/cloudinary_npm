@@ -79,7 +79,7 @@ var Search = function () {
       if (callback === null) {
         callback = options;
       }
-      options || (options = {});
+      options = options || {};
       return api.search(this.to_query(), options, callback);
     }
   }], [{
