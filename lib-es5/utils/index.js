@@ -458,8 +458,7 @@ exports.build_custom_headers = function build_custom_headers(headers) {
   }
 };
 
-var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom' // + any key that starts with '$'
-];
+var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'sources', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom'];
 
 exports.generate_transformation_string = function generate_transformation_string(options) {
   if (utils.isString(options)) {
@@ -1325,6 +1324,18 @@ exports.archive_params = function archive_params() {
     type: options.type,
     use_original_filename: exports.as_safe_bool(options.use_original_filename)
   };
+};
+
+exports.create_source_tag = function create_source_tag(src, source_type) {
+  var codecs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  var video_type = source_type === 'ogv' ? 'ogg' : source_type;
+  var mime_type = `video/${video_type}`;
+  if (!isEmpty(codecs)) {
+    var codecs_str = isArray(codecs) ? codecs.join(', ') : codecs;
+    mime_type += `; codecs=${codecs_str}`;
+  }
+  return `<source ${utils.html_attrs({ src, type: mime_type })}>`;
 };
 
 exports.build_explicit_api_params = function build_explicit_api_params(public_id) {

@@ -123,6 +123,7 @@ exports.video = function video(public_id, options) {
   public_id = public_id.replace(/\.(mp4|ogv|webm)$/, '');
   var source_types = optionConsume(options, 'source_types', []);
   var source_transformation = optionConsume(options, 'source_transformation', {});
+  var sources = optionConsume(options, 'sources', []);
   var fallback = optionConsume(options, 'fallback_content', '');
 
   if (source_types.length === 0) source_types = cloudinary.utils.DEFAULT_VIDEO_SOURCE_TYPES;
@@ -145,29 +146,35 @@ exports.video = function video(public_id, options) {
   var html = '<video ';
 
   if (!video_options.hasOwnProperty('resource_type')) video_options.resource_type = 'video';
-  var multi_source = _.isArray(source_types) && source_types.length > 1;
+  var multi_source_types = _.isArray(source_types) && source_types.length > 1;
+  var has_sources = _.isArray(sources) && sources.length > 0;
   var source = public_id;
-  if (!multi_source) {
+  if (!multi_source_types && !has_sources) {
     source = source + '.' + cloudinary.utils.build_array(source_types)[0];
   }
   var src = cloudinary.utils.url(source, video_options);
-  if (!multi_source) video_options.src = src;
+  if (!multi_source_types && !has_sources) video_options.src = src;
   if (video_options.hasOwnProperty("html_width")) video_options.width = optionConsume(video_options, 'html_width');
   if (video_options.hasOwnProperty("html_height")) video_options.height = optionConsume(video_options, 'html_height');
   html = html + cloudinary.utils.html_attrs(video_options) + '>';
-  if (multi_source) {
-    html += source_types.map(function (source_type) {
-      var transformation = source_transformation[source_type] || {};
+  if (multi_source_types && !has_sources) {
+    sources = source_types.map(function (source_type) {
+      return {
+        type: source_type,
+        transformations: source_transformation[source_type] || {}
+      };
+    });
+  }
+  if (_.isArray(sources) && sources.length > 0) {
+    html += sources.map(function (source_data) {
+      var source_type = source_data.type;
+      var codecs = source_data.codecs;
+      var transformation = source_data.transformations || {};
       var src = cloudinary.utils.url(source + "." + source_type, _.extend({ resource_type: 'video' }, _.cloneDeep(options), _.cloneDeep(transformation)));
-      var video_type = source_type === 'ogv' ? 'ogg' : source_type;
-      var type = "video/" + video_type;
-      return `<source ${cloudinary.utils.html_attrs({ src, type })}>`;
+      return cloudinary.utils.create_source_tag(src, source_type, codecs);
     }).join('');
   }
-
-  html = html + fallback;
-  html = html + '</video>';
-  return html;
+  return `${html}${fallback}</video>`;
 };
 
 /**

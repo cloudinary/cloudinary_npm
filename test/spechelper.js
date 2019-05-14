@@ -66,6 +66,27 @@ exports.ICON_FILE = "test/resources/favicon.ico";
 
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
+exports.SAMPLE_VIDEO_SOURCES = [
+  {
+    type: 'mp4',
+    codecs: 'hev1',
+    transformations: { video_codec: 'h265' },
+  },
+  {
+    type: 'webm',
+    codecs: 'vp9',
+    transformations: { video_codec: 'vp9' },
+  },
+  {
+    type: 'mp4',
+    transformations: { video_codec: 'auto' },
+  },
+  {
+    type: 'webm',
+    transformations: { video_codec: 'auto' },
+  },
+];
+
 exports.test_cloudinary_url = function(public_id, options, expected_url, expected_options) {
   var url;
   url = utils.url(public_id, options);
