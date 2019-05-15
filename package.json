@@ -15,14 +15,6 @@
     "q": "^1.5.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.26.0",
-    "babel-runtime": "^6.26.0",
     "dotenv": "4.x",
     "expect.js": "0.3.x",
     "jsdoc": "^3.5.5",
@@ -34,14 +26,11 @@
     "webpack-cli": "^3.2.1"
   },
   "scripts": {
-    "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
-    "compile": "node_modules/.bin/babel lib --out-dir lib-es5 --delete-dir-on-start --verbose",
-    "test-es6": "which node && node node_modules/.bin/mocha --ui bdd -R spec --recursive test/",
-    "test-es5": "node node_modules/.bin/mocha -R spec --recursive --require 'babel-register' --require 'babel-polyfill' test/",
+    "test": "node_modules/.bin/mocha --ui bdd -R spec --recursive test/",
     "docs": "npm run compile && node_modules/.bin/jsdoc -d docs -r -p lib/*"
   },
   "optionalDependencies": {},
   "engines": {
-    "node": ">=0.6"
+    "node": ">=8.0.0"
   }
 }
