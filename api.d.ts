@@ -2,10 +2,12 @@ interface Common {
     config(new_config: any, new_value: any)
 
     // TODO: is `utils` part of the official API?
+    //       if not, why is it exposed at runtime?
     utils: any
     // TODO: add uploader details
     uploader: any
     // TODO: is `api` part of the official API?
+    //       if not, why is it exposed at runtime?
     api: any
 
     PreloadedFile: {
@@ -14,6 +16,110 @@ interface Common {
 
     Cache: CacheInterface
 
+
+    // TODO: document the URL options
+    url(public_id: string, options?: any): string
+
+    /**
+     * Generate an HTML img tag with a Cloudinary URL
+     * @param source A Public ID or a URL
+     * @param options Configuration options
+     * @param options.srcset srcset options
+     * @param options.attributes HTML attributes
+     * @param options.html_width (deprecated) The HTML tag width
+     * @param options.html_height (deprecated) The HTML tag height
+     * @param options.client_hints Don't implement the client side responsive function.
+     *                  This argument can override the the same option in the global configuration.
+     * @param options.responsive Setup the tag for the client side responsive function.
+     * @param options.hidpi Setup the tag for the client side auto dpr function.
+     * @param options.responsive_placeholder A place holder image URL to use with.
+     *                  the client side responsive function
+     * @return An HTML img tag
+     */
+    image(source: string, options: {
+        srcset?: any,
+        attributes?: any,
+        html_width?: number,
+        html_height?: number
+        client_hints?: boolean,
+        responsive?: boolean,
+        hidpi?: boolean,
+        responsive_placeholder?: boolean
+    }): string
+
+    /**
+     * Creates an HTML video tag for the provided public_id
+     * @param  public_id the resource public ID
+     * @param options for the resource and HTML tag
+     * @param options.source_types Specify which
+     *        source type the tag should include. defaults to webm, mp4 and ogv.
+     * @param options.source_transformation specific transformations
+     *        to use for a specific source type.
+     * @param options.poster image URL or
+     *        poster options that may include a <tt>public_id</tt> key and
+     *        poster-specific transformations
+     *
+     * @example <caption>Example of generating a video tag:</caption>
+     * cloudinary.video("mymovie.mp4");
+     * cloudinary.video("mymovie.mp4", {source_types: 'webm'});
+     * cloudinary.video("mymovie.ogv", {poster: "myspecialplaceholder.jpg"});
+     * cloudinary.video("mymovie.webm", {source_types: ['webm', 'mp4'], poster: {effect: 'sepia'}});
+     * @return  HTML video tag
+     */
+    video(public_id: string, options?: {
+        source_types?: string | string[],
+        source_transformations?: string,
+        poster?: string | object
+    }): string
+
+    /**
+     * Generate a <code>source</code> tag.
+     * @param public_id
+     * @param {object} options
+     * @param {srcset} options.srcset arguments required to generate the srcset attribute.
+     * @param {object} options.attributes HTML tag attributes
+     * @return {string}
+     */
+    source(public_id: string, options?: {
+        srcset?: any,
+        attributes?: any
+    }): string
+
+    /**
+     * Generate a <code>picture</code> HTML tag.<br>
+     *   The sources argument defines different transformations to apply for each
+     *   media query.
+     * @param public_id
+     * @param options
+     * @param options.sources a list of source arguments. A source tag will be rendered for each item
+     * @param options.sources.min_width a minimum width query
+     * @param options.sources.max_width a maximum width query
+     * @param options.sources.transformation the transformation to apply to the source tag.
+     * @return A picture HTML tag
+     * @example
+     *
+     * cloudinary.picture("sample", {
+     *   sources: [
+     *     {min_width: 1600, transformation: {crop: 'fill', width: 800, aspect_ratio: 2}},
+     *     {min_width: 500, transformation: {crop: 'fill', width: 600, aspect_ratio: 2.3}},
+     *     {transformation: {crop: 'crop', width: 400, gravity: 'auto'}},
+     *     ]}
+     * );
+     */
+    picture(public_id: string, options?: {
+        sources?: {
+            min_width?: number
+            max_width?: number,
+            transformation?: TransformationOptions
+        }
+    }): string
+
+    cloudinary_js_config(): string
+
+    CF_SHARED_CDN: string
+    AKAMAI_SHARED_CDN: string
+    SHARED_CDN: string
+    BLANK: string
 }
 
 interface V1 extends Common {
@@ -121,6 +227,7 @@ declare interface CacheGetSetOptions extends TransformationOptions {
 }
 
 // TODO: are the transformation params identical to the TransformationOptions passed by JavaScript APIs?
+// TODO: what are the types of each of these sub-options?
 declare interface TransformationOptions {
     angle?: any,
     aspect_ratio?: any,
