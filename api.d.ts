@@ -1,4 +1,5 @@
 interface Common {
+    // TODO: obtain signatures for the `config` method
     config(new_config: any, new_value: any)
 
     // TODO: is `utils` part of the official API?
@@ -124,7 +125,7 @@ interface Common {
 
 interface V1 extends Common {
     // TODO: are these part of the official API?
-    api: any
+    api: API_V1
     uploader: any
 
     v2: V2
@@ -132,10 +133,112 @@ interface V1 extends Common {
 
 interface V2 extends Common {
     // TODO: are these part of the official API?
-    api: any
+    api: API_V2
     uploader: any
 
     search()
+}
+
+declare interface API_V1 {
+    ping(callback: Function, options?: any): Promise<any>
+
+    usage(callback: Function, options?: any): Promise<any>
+
+    resource_types(callback: Function, options?: any): Promise<any>
+
+    resources(callback: Function, options?: any): Promise<any>
+
+    resources_by_tag(tag: any, callback: Function, options?: any): Promise<any>
+
+    resources_by_context(key: any, value: any, callback: Function, options?: any): Promise<any>
+
+    resources_by_moderation(kind: any, status: any, callback: Function, options?: any): Promise<any>
+
+    resources_by_ids(public_ids: any, callback: Function, options?: any): Promise<any>
+
+    resource(public_id: any, callback: Function, options?: any): Promise<any>
+
+    restore(public_ids: any, callback: Function, options?: any): Promise<any>
+
+    update(public_id: any, callback: Function, options?: any): Promise<any>
+
+    delete_resources(public_ids: any, callback: Function, options?: any): Promise<any>
+
+    delete_resources_by_prefix(prefix: any, callback: Function, options?: any): Promise<any>
+
+    delete_resources_by_tag(tag: any, callback: Function, options?: any): Promise<any>
+
+    delete_all_resources(callback: Function, options?: any): Promise<any>
+
+    delete_derived_by_transformation(public_ids: any, transformations: any, callback: Function, options?: any): Promise<any>
+
+    tags(callback: Function, options?: any): Promise<any>
+
+    transformations(callback: Function, options?: any): Promise<any>
+
+    transformation(transformation: any, callback: Function, options?: any): Promise<any>
+
+    delete_transformation(transformation: any, callback: Function, options?: any): Promise<any>
+
+    update_transformation(transformation: any, updates: any, callback: Function, options?: any): Promise<any>
+
+    create_transformation(name: any, definition: any, callback: Function, options?: any): Promise<any>
+
+    upload_presets(callback: Function, options?: any): Promise<any>
+
+    upload_preset(name: any, callback: Function, options?: any): Promise<any>
+
+    delete_upload_preset(name: any, callback: Function, options?: any): Promise<any>
+
+    update_upload_preset(name: any, callback: Function, options?: any): Promise<any>
+
+    create_upload_preset(callback: Function, options?: any): Promise<any>
+
+    root_folders(callback: Function, options?: any): Promise<any>
+
+    sub_folders(path: any, callback: Function, options?: any): Promise<any>
+
+    upload_mappings(callback: Function, options?: any): Promise<any>
+
+    upload_mapping(name: any, callback: Function, options?: any): Promise<any>
+
+    delete_upload_mapping(name: any, callback: Function, options?: any): Promise<any>
+
+    update_upload_mapping(name: any, callback: Function, options?: any): Promise<any>
+
+    create_upload_mapping(name: any, callback: Function, options?: any): Promise<any>
+
+    publishResource(byKey: any, value: any, callback: Function, options: any): Promise<any>
+
+    publish_by_prefix(prefix: any, callback: Function, options: any): Promise<any>
+
+    publish_by_tag(tag: any, callback: Function, options: any): Promise<any>
+
+    publish_by_ids(public_ids: any, callback: Function, options: any): Promise<any>
+
+    list_streaming_profiles(callback: Function, options: any): Promise<any>
+
+    get_streaming_profile(name: any, callback: Function, options?: any): Promise<any>
+
+    delete_streaming_profile(name: any, callback: Function, options?: any): Promise<any>
+
+    update_streaming_profile(name: any, callback: Function, options?: any): Promise<any>
+
+    create_streaming_profile(name: any, callback: Function, options?: any): Promise<any>
+
+    updateResourcesAccessMode(access_mode: any, byKey: any, value: any, callback: Function, options: any): Promise<any>
+
+    search(params: any, callback: Function, options?: any): Promise<any>
+
+    update_resources_access_mode_by_prefix(access_mode: any, prefix: any, callback: Function, options: any): Promise<any>
+
+    update_resources_access_mode_by_tag(access_mode: any, tag: any, callback: Function, options: any): Promise<any>
+
+    update_resources_access_mode_by_ids(access_mode: any, ids: any, callback: Function, options: any): Promise<any>
+}
+
+declare interface API_V2 {
+
 }
 
 declare class PreloadedFile {
