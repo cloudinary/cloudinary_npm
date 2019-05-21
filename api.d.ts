@@ -7,16 +7,12 @@ interface Common {
     utils: any
     // TODO: add uploader details
     uploader: any
-    // TODO: is `api` part of the official API?
-    //       if not, why is it exposed at runtime?
-    api: any
 
     PreloadedFile: {
         new(file_info: any): PreloadedFile
     }
 
     Cache: CacheInterface
-
 
     // TODO: document the URL options
     url(public_id: string, options?: any): string
@@ -139,6 +135,8 @@ interface V2 extends Common {
     search()
 }
 
+// TODO: it seems from the code that potentially these methods
+//       may return a none promise (see call_api).
 declare interface API_V1 {
     ping(callback: Function, options?: any): Promise<any>
 
@@ -238,6 +236,16 @@ declare interface API_V1 {
 }
 
 declare interface API_V2 {
+
+}
+
+declare interface Uploader_V1 {
+    unsigned_upload_stream(params: any, callback: Function, options?: any): Promise<any>
+
+
+}
+
+declare interface Uploader_V2 {
 
 }
 
