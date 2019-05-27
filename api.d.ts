@@ -168,6 +168,8 @@ declare interface API_V1 {
 
     delete_all_resources(callback?: Function, options?: any): Promise<any>
 
+    // TODO: missing 'delete_derived_resources'
+
     delete_derived_by_transformation(public_ids: any, transformations: any, callback?: Function, options?: any): Promise<any>
 
     tags(callback?: Function, options?: any): Promise<any>
@@ -237,6 +239,15 @@ declare interface API_V1 {
 
 declare interface API_V2 {
 
+    // TODO: this seems to be what 'v1_adapter()' does
+    //   - Keep the old API
+    //   - and allow removing callback in favor of options
+
+    // TODO: This raises the question regarding the return  type.
+    //   Was the promise support added later? if a callback is provided
+    //   is the return type void? need to inspect the code...
+    ping(callback?: Function, options?: any): Promise<any>
+    ping(options?: any): Promise<any>
 }
 
 declare interface Uploader_V1 {
