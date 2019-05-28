@@ -51,6 +51,11 @@ var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
 
+try {
+  // eslint-disable-next-line global-require
+  exports.VERSION = require('../../package.json').version;
+} catch (error) {}
+
 module.exports = {
   at,
   clone,
@@ -83,10 +88,6 @@ exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net";
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com";
 
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
-
-try {
-  exports.VERSION = require('../../package.json').version;
-} catch (error) {}
 
 exports.USER_AGENT = `CloudinaryNodeJS/${exports.VERSION}`;
 

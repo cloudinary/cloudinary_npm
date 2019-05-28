@@ -22,6 +22,7 @@ var fs = require('fs');
 var path = require('path');
 var Q = require('q');
 var Writable = require("stream").Writable;
+var urlLib = require('url');
 
 var defaultsDeep = require('lodash/defaultsDeep');
 
@@ -544,7 +545,7 @@ function post(url, post_data, boundary, file, callback, options) {
     var filename = options.stream ? "file" : path.basename(file);
     file_header = Buffer.from(encodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary');
   }
-  var post_options = require('url').parse(url);
+  var post_options = urlLib.parse(url);
   var headers = {
     'Content-Type': `multipart/form-data; boundary=${boundary}`,
     'User-Agent': utils.getUserAgent()

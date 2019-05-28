@@ -2,20 +2,17 @@
 
 var config = require("./config");
 var ensureOption = require('./utils/ensureOption').defaults(config());
-
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
 var utils = require("./utils");
-
 var extend = utils.extend,
     includes = utils.includes,
     isString = utils.isString,
     only = utils.only,
     ensurePresenceOf = utils.ensurePresenceOf;
 
-
 var querystring = require("querystring");
-
 var Q = require('q');
+var url = require('url');
 
 var api = module.exports;
 
@@ -43,7 +40,7 @@ function call_api(method, uri, params, callback, options) {
   if (method === "GET") {
     api_url += "?" + query_params;
   }
-  var request_options = require('url').parse(api_url);
+  var request_options = url.parse(api_url);
   request_options = extend(request_options, {
     method: method,
     headers: {
