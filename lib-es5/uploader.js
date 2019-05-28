@@ -107,7 +107,7 @@ var Chunkable = function (_Writable) {
     _this.active = true;
     _this.on('finish', function () {
       if (_this.active) {
-        return _this.emit('ready', _this.buffer, true, function () {});
+        _this.emit('ready', _this.buffer, true, function () {});
       }
     });
     return _this;
@@ -119,19 +119,19 @@ var Chunkable = function (_Writable) {
       var _this2 = this;
 
       if (!this.active) {
-        return done();
+        done();
       }
       if (this.buffer.length + data.length <= this.chunk_size) {
         this.buffer = Buffer.concat([this.buffer, data], this.buffer.length + data.length);
-        return done();
+        done();
       } else {
         var grab = this.chunk_size - this.buffer.length;
         this.buffer = Buffer.concat([this.buffer, data.slice(0, grab)], this.buffer.length + grab);
-        return this.emit('ready', this.buffer, false, function (active) {
+        this.emit('ready', this.buffer, false, function (active) {
           _this2.active = active;
           if (_this2.active) {
             _this2.buffer = data.slice(grab);
-            return done();
+            done();
           }
         });
       }
@@ -465,7 +465,7 @@ function call_api(action, callback, options, get_params) {
     } else if (res.error) {
       errorRaised = true;
       deferred.reject(res);
-      return callback(res);
+      callback(res);
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
       res.on("data", function (d) {
@@ -484,12 +484,12 @@ function call_api(action, callback, options, get_params) {
           cacheResults(result, options);
           deferred.resolve(result);
         }
-        return callback(result);
+        callback(result);
       });
       res.on("error", function (error) {
         errorRaised = true;
         deferred.reject(error);
-        return callback({ error });
+        callback({ error });
       });
     } else {
       var error = {
@@ -497,7 +497,7 @@ function call_api(action, callback, options, get_params) {
         http_code: res.statusCode
       };
       deferred.reject(error);
-      return callback({ error });
+      callback({ error });
     }
   };
   var post_data = entries(params).reduce(function (entries, _ref3) {

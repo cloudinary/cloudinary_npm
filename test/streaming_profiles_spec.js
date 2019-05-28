@@ -22,18 +22,16 @@ describe('Cloudinary::Api', function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
-  after(function (done) {
-    var config = cloudinary.config(true);
+  after(function () {
+    cloudinary.config(true);
     if (cloudinary.config().keep_test_products) {
-      done();
+      return Q.resolve();
     } else {
-      if (!(config.api_key && config.api_secret)) {
-        expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-      }
-      Q.allSettled([cloudinary.v2.api.delete_streaming_profile(test_id_1), cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'), cloudinary.v2.api.delete_streaming_profile(test_id_3)]).finally(function () {
-        done();
-      });
-      return true;
+      return Q.allSettled([
+        cloudinary.v2.api.delete_streaming_profile(test_id_1),
+        cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'),
+        cloudinary.v2.api.delete_streaming_profile(test_id_3),
+      ]);
     }
   });
   describe('create_streaming_profile', function () {

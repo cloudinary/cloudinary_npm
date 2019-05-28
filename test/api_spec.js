@@ -175,7 +175,7 @@ describe("api", function () {
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2),
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3),
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4),
-      ]).finally(function () {});
+      ]);
     }
   });
 
@@ -736,11 +736,12 @@ describe("api", function () {
         return cloudinary.v2.api.update("sample", {
           moderation_status: "approved",
           notification_url: "http://example.com",
+        }).then(function () {
+          if (writeSpy.called) {
+            sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
+            sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
+          }
         });
-        if (writeSpy.called) {
-          sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
-          sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
-        }
       });
     });
     it("should support setting manual moderation status", () => {

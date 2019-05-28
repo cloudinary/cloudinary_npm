@@ -16,7 +16,7 @@ module.exports = {
     "camelcase": "off",
     // "class-methods-use-this": "off",
     // "comma-dangle": "off",
-    "consistent-return": "off",
+    // "consistent-return": "off",
     "dot-notation": "off",
     "func-names": "off",
     "global-require": "off",

@@ -93,9 +93,11 @@ function call_api(method, uri, params, callback, options) {
         } else {
           deferred.resolve(result);
         }
-        return typeof callback === "function" ? callback(result) : void 0;
+        if (typeof callback === "function") {
+          callback(result);
+        }
       });
-      return res.on("error", function (e) {
+      res.on("error", function (e) {
         error = true;
         var err_obj = {
           error: {
@@ -104,7 +106,9 @@ function call_api(method, uri, params, callback, options) {
           }
         };
         deferred.reject(err_obj.error);
-        return typeof callback === "function" ? callback(err_obj) : void 0;
+        if (typeof callback === "function") {
+          callback(err_obj);
+        }
       });
     } else {
       var err_obj = {
@@ -114,7 +118,9 @@ function call_api(method, uri, params, callback, options) {
         }
       };
       deferred.reject(err_obj.error);
-      return typeof callback === "function" ? callback(err_obj) : void 0;
+      if (typeof callback === "function") {
+        callback(err_obj);
+      }
     }
   };
   var request = https.request(request_options, handle_response);

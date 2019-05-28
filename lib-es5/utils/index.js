@@ -190,6 +190,8 @@ function textStyle(layer) {
     keywords.unshift(font_size);
     keywords.unshift(font_family);
     return compact(keywords).join("_");
+  } else {
+    return null;
   }
 }
 
@@ -457,8 +459,7 @@ exports.build_custom_headers = function build_custom_headers(headers) {
   }
 };
 
-var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom' // + any key that starts with '$'
-];
+var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom'];
 
 exports.generate_transformation_string = function generate_transformation_string(options) {
   if (utils.isString(options)) {
@@ -1254,8 +1255,9 @@ function split_range(range) {
     case String:
       if (OFFSET_ANY_PATTERN_RE.test(range)) {
         return range.split("..");
+      } else {
+        return range;
       }
-      break;
     case Array:
       return [first(range), last(range)];
     default:
@@ -1343,7 +1345,7 @@ exports.build_explicit_api_params = function build_explicit_api_params(public_id
 
 exports.generate_responsive_breakpoints_string = function generate_responsive_breakpoints_string(breakpoints) {
   if (breakpoints == null) {
-    return;
+    return null;
   }
   breakpoints = clone(breakpoints);
   if (!isArray(breakpoints)) {

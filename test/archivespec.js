@@ -61,7 +61,7 @@ sharedExamples('archive', function () {
   });
   after(function () {
     if (!cloudinary.config().keep_test_products) {
-      return api.delete_resources_by_tag(ARCHIVE_TAG);
+      api.delete_resources_by_tag(ARCHIVE_TAG);
     }
   });
 });

@@ -297,7 +297,7 @@ exports.mockPromise = function (mockBlock) {
 
 exports.setupCache = function () {
   if (!Cache.getAdapter()) {
-    return Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
+    Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
   }
 };
 
