@@ -122,7 +122,7 @@ interface Common {
 interface V1 extends Common {
     // TODO: are these part of the official API?
     api: API_V1
-    uploader: any
+    uploader: Uploader_V1
 
     v2: V2
 }
@@ -130,7 +130,7 @@ interface V1 extends Common {
 interface V2 extends Common {
     // TODO: are these part of the official API?
     api: API_V2
-    uploader: any
+    uploader: Uploader_V2
 
     search()
 }
@@ -237,6 +237,7 @@ declare interface API_V1 {
     update_resources_access_mode_by_ids(access_mode: any, ids: any, errCallback?: Function, options?: any): Promise<any>
 }
 
+// TODO: extend V1 api instead of duplication
 declare interface API_V2 {
 
     ping(errCallback?: Function, options?: any): Promise<any>
@@ -435,9 +436,70 @@ declare interface API_V2 {
 }
 
 declare interface Uploader_V1 {
-    unsigned_upload_stream(params: any, errCallback?: Function, options?: any): Promise<any>
+    unsigned_upload_stream(upload_preset: any, errCallback?: Function, options?: any): Promise<any>
 
+    upload_stream(errCallback?: Function, options?: any): Promise<any>
 
+    unsigned_upload(file: any, upload_preset: any, errCallback?: Function, options?: any): Promise<any>
+
+    upload(file: any, errCallback?: Function, options?: any): Promise<any>
+
+    upload_large(path: any, errCallback?: Function, options?: any): Promise<any>
+
+    upload_chunked(path: any, errCallback?: Function, options?: any): Promise<any>
+
+    upload_large_stream(_unused_: any, errCallback?: Function, options?: any): Promise<any>
+
+    upload_chunked_stream(errCallback?: Function, options?: any): Promise<any>
+
+    explicit(public_id: any, errCallback?: Function, options?: any): Promise<any>
+
+    create_archive(errCallback?: Function, options?: any): Promise<any>
+
+    create_zip(errCallback?: Function, options?: any): Promise<any>
+
+    destroy(public_id: any, errCallback?: Function, options?: any): Promise<any>
+
+    rename(from_public_id: any, to_public_id: any, errCallback?: Function, options?: any): Promise<any>
+
+    text(text: string, errCallback?: Function, options?: {
+        public_id: string,
+        font_family: string,
+        font_size: string,
+        font_color: string,
+        text_align: string,
+        font_weight: string,
+        font_style: string,
+        background: string,
+        opacity: string,
+        text_decoration: string
+    }): Promise<any>
+
+    generate_sprite(tag: any, errCallback?: Function, options?: any): Promise<any>
+
+    multi(tag: any, errCallback?: Function, options?: any): Promise<any>
+
+    explode(public_id: any, errCallback?: Function, options?: any): Promise<any>
+
+    add_tag(tag: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    remove_tag(tag: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    remove_all_tags(public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    replace_tag(tag: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    add_context(context: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    remove_all_context(public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    upload_tag_params(options?: any): Object
+
+    upload_url(options?: any): any[]
+
+    image_upload_tag(field:any, options?: any): string
+
+    unsigned_image_upload_tag(field:any, upload_preset:string, options?: any): string
 }
 
 declare interface Uploader_V2 {
