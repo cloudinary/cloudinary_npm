@@ -66,33 +66,33 @@ describe("utils", function () {
     });
     beforeEach(function () {
       options = merge({
-        version: authenticated_image['version'],
+        version: authenticated_image.version,
         sign_url: true,
         type: "authenticated",
       }, specific_options);
     });
     it("should correctly sign URL with version", function (done) {
-      expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
+      expect([`${authenticated_image.public_id}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/${expected_transformation}v${authenticated_image.version}/${authenticated_image.public_id}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
     it("should correctly sign URL with transformation and version", function (done) {
-      options["transformation"] = {
+      options.transformation = {
         crop: "crop",
         width: 10,
         height: 20,
       };
-      expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
+      expect([`${authenticated_image.public_id}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image.version}/${authenticated_image.public_id}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
     it("should correctly sign URL with transformation", function (done) {
-      options["transformation"] = {
+      options.transformation = {
         crop: "crop",
         width: 10,
         height: 20, // TODO duplicate?
       };
-      expect([`${authenticated_image['public_id']}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image['version']}/${authenticated_image['public_id']}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
+      expect([`${authenticated_image.public_id}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image.version}/${authenticated_image.public_id}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
     it("should correctly sign fetch URL", function (done) {
-      options["type"] = "fetch";
-      expect(["http://res.cloudinary.com/demo/sample.png", options]).to.produceUrl(new RegExp(`^${root_path}/image/fetch/s--[\\w-]+--/${expected_transformation}v${authenticated_image['version']}/http://res.cloudinary.com/demo/sample.png$`)).and.emptyOptions().and.beServedByCloudinary(done);
+      options.type = "fetch";
+      expect(["http://res.cloudinary.com/demo/sample.png", options]).to.produceUrl(new RegExp(`^${root_path}/image/fetch/s--[\\w-]+--/${expected_transformation}v${authenticated_image.version}/http://res.cloudinary.com/demo/sample.png$`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
   });
 
@@ -677,7 +677,7 @@ describe("utils", function () {
         width: 100,
         crop: "scale",
       };
-      expect(utils.build_upload_params(options)['transformation']).to.eql("c_scale,w_100");
+      expect(utils.build_upload_params(options).transformation).to.eql("c_scale,w_100");
       expect(Object.keys(options).length).to.eql(2);
     });
     describe("overlay and underlay", function () {
@@ -1129,20 +1129,20 @@ describe("utils", function () {
           [name, options, result] = layer;
           it(`should support ${name}`, function (done) {
             var opt = {};
-            opt['overlay'] = options;
+            opt.overlay = options;
             expect(["sample", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
           });
           if (!isString(options)) {
             op = {};
-            op['overlay'] = options;
+            op.overlay = options;
             itBehavesLike("a signed url", op, `l_${result}`);
           }
         }
         it("should not pass width/height to html for overlay", function () {
           var opt = {};
-          opt['overlay'] = "text:test_text";
-          opt["height"] = 100;
-          opt["width"] = 100;
+          opt.overlay = "text:test_text";
+          opt.height = 100;
+          opt.width = 100;
           expect(["sample", opt]).produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample`).and.emptyOptions();
         });
       });
@@ -1197,26 +1197,26 @@ describe("utils", function () {
       var options = {
         eager: [scaled(), sepia()],
       };
-      expect(utils.build_explicit_api_params('some_id', options)[0]['eager']).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
+      expect(utils.build_explicit_api_params('some_id', options)[0].eager).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
     });
     it("build_explicit_api_params should support moderation", function () {
       expect(utils.build_explicit_api_params('some_id', {
         type: 'upload',
         moderation: 'manual',
-      })[0]['moderation']).to.eql('manual');
+      })[0].moderation).to.eql('manual');
     });
     it("archive_params should support multiple eager transformations with a pipe", function () {
       var options = {
         transformations: [scaled(), sepia()],
       };
-      expect(utils.archive_params(options)['transformations']).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
+      expect(utils.archive_params(options).transformations).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
     });
   });
   it("build_explicit_api_params should support phash", function () {
     expect(utils.build_explicit_api_params('some_id', {
       type: 'upload',
       phash: true,
-    })[0]['phash']).to.eql('1');
+    })[0].phash).to.eql('1');
   });
   it("build_upload_params canonize booleans", function () {
     var actual, expected, options, params;
@@ -1245,8 +1245,8 @@ describe("utils", function () {
     expect(expected).to.eql(actual);
     expect(utils.build_upload_params({
       backup: null,
-    })['backup']).to.eql(void 0);
-    expect(utils.build_upload_params({})['backup']).to.eql(void 0);
+    }).backup).to.eql(void 0);
+    expect(utils.build_upload_params({}).backup).to.eql(void 0);
   });
   it("should add version if public_id contains /", function () {
     test_cloudinary_url("folder/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});

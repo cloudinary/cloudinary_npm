@@ -209,7 +209,7 @@ describe("uploader", function () {
         crop: "scale",
         width: "2.0",
         format: "jpg",
-        version: result["version"],
+        version: result.version,
       });
       expect(result.eager[0].url).to.eql(url);
     });
@@ -297,9 +297,9 @@ describe("uploader", function () {
           return [firstId, secondId, result];
         });
       }).then(function ([firstId, secondId, result]) {
-        expect(result["public_ids"]).to.contain(firstId);
-        expect(result["public_ids"]).to.contain(secondId);
-        expect(result["public_ids"]).to.not.contain('noSuchId');
+        expect(result.public_ids).to.contain(firstId);
+        expect(result.public_ids).to.contain(secondId);
+        expect(result.public_ids).to.not.contain('noSuchId');
       });
     });
     it("should keep existing tags when adding a new tag", function () {
@@ -917,11 +917,11 @@ describe("uploader", function () {
         var response_acl;
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('access_control', `[${acl_string}]`)));
         expect(resource).to.have.key('access_control');
-        response_acl = resource["access_control"];
+        response_acl = resource.access_control;
         expect(response_acl.length).to.be(1);
-        expect(response_acl[0]["access_type"]).to.be("anonymous");
-        expect(Date.parse(response_acl[0]["start"])).to.be(Date.parse(acl.start));
-        expect(Date.parse(response_acl[0]["end"])).to.be(Date.parse(acl.end));
+        expect(response_acl[0].access_type).to.be("anonymous");
+        expect(Date.parse(response_acl[0].start)).to.be(Date.parse(acl.start));
+        expect(Date.parse(response_acl[0].end)).to.be(Date.parse(acl.end));
       });
     });
   });

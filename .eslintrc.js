@@ -17,7 +17,7 @@ module.exports = {
     // "class-methods-use-this": "off",
     // "comma-dangle": "off",
     // "consistent-return": "off",
-    "dot-notation": "off",
+    // "dot-notation": "off",
     "func-names": "off",
     "global-require": "off",
     "guard-for-in": "off",

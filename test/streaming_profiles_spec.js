@@ -74,7 +74,7 @@ describe('Cloudinary::Api', function () {
     it('should list streaming profile', function () {
       return api.list_streaming_profiles().then(function (result) {
         expect(result).to.have.key('data');
-        PREDEFINED_PROFILES.forEach(profile => expect(result['data'].some(p => p.name === profile)).to.be.ok());
+        PREDEFINED_PROFILES.forEach(profile => expect(result.data.some(p => p.name === profile)).to.be.ok());
       });
     });
   });
@@ -97,10 +97,10 @@ describe('Cloudinary::Api', function () {
         return api.delete_streaming_profile(test_id_2);
       }).then(function (result) {
         expect(result).to.have.key('message');
-        expect(result['message']).to.eql('deleted');
+        expect(result.message).to.eql('deleted');
         return api.list_streaming_profiles();
       }).then(function (result) {
-        expect(result['data'].map(p => p['name'])).not.to.contain(test_id_2);
+        expect(result.data.map(p => p.name)).not.to.contain(test_id_2);
       });
     });
   });
@@ -108,9 +108,9 @@ describe('Cloudinary::Api', function () {
     it('should get a specific streaming profile', function () {
       return api.get_streaming_profile(PREDEFINED_PROFILES[1])
         .then(function (result) {
-          expect(keys(result['data'])).to.contain('name');
-          expect(keys(result['data'])).to.contain('display_name');
-          expect(keys(result['data'])).to.contain('representations');
+          expect(keys(result.data)).to.contain('name');
+          expect(keys(result.data)).to.contain('display_name');
+          expect(keys(result.data)).to.contain('representations');
         });
     });
   });
@@ -146,10 +146,10 @@ describe('Cloudinary::Api', function () {
         expect(result).to.be.ok();
         return api.get_streaming_profile(test_id_3);
       }).then(function (result) {
-        result = result['data'];
-        expect(result['representations'].length).to.eql(1);
+        result = result.data;
+        expect(result.representations.length).to.eql(1);
         // Notice transformation is always returned as an array; numeric values represented as numbers, not strings
-        expect(result['representations'][0]).to.eql({
+        expect(result.representations[0]).to.eql({
           transformation: [
             {
               crop: 'scale',

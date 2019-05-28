@@ -162,8 +162,8 @@ var LAYER_KEYWORD_PARAMS = {
 };
 
 function textStyle(layer) {
-  var font_family = layer["font_family"];
-  var font_size = layer["font_size"];
+  var font_family = layer.font_family;
+  var font_size = layer.font_size;
   var keywords = [];
   for (var attr in LAYER_KEYWORD_PARAMS) {
     var default_value = LAYER_KEYWORD_PARAMS[attr];
@@ -172,11 +172,11 @@ function textStyle(layer) {
       keywords.push(attr_value);
     }
   }
-  var letter_spacing = layer["letter_spacing"];
+  var letter_spacing = layer.letter_spacing;
   if (letter_spacing) {
     keywords.push(`letter_spacing_${letter_spacing}`);
   }
-  var line_spacing = layer["line_spacing"];
+  var line_spacing = layer.line_spacing;
   if (line_spacing) {
     keywords.push(`line_spacing_${line_spacing}`);
   }
@@ -236,14 +236,14 @@ function process_if(ifValue) {
 function process_layer(layer) {
   var result = '';
   if (isPlainObject(layer)) {
-    if (layer["resource_type"] === "fetch" || layer["url"] != null) {
-      result = `fetch:${base64EncodeURL(layer['url'])}`;
+    if (layer.resource_type === "fetch" || layer.url != null) {
+      result = `fetch:${base64EncodeURL(layer.url)}`;
     } else {
-      var public_id = layer["public_id"];
-      var format = layer["format"];
-      var resource_type = layer["resource_type"] || "image";
-      var type = layer["type"] || "upload";
-      var text = layer["text"];
+      var public_id = layer.public_id;
+      var format = layer.format;
+      var resource_type = layer.resource_type || "image";
+      var type = layer.type || "upload";
+      var text = layer.text;
       var style = null;
       var components = [];
       if (!isEmpty(public_id)) {
@@ -343,7 +343,7 @@ exports.build_upload_params = function build_upload_params(options) {
     proxy: options.proxy,
     public_id: options.public_id,
     quality_analysis: utils.as_safe_bool(options.quality_analysis),
-    responsive_breakpoints: utils.generate_responsive_breakpoints_string(options["responsive_breakpoints"]),
+    responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints),
     return_delete_token: utils.as_safe_bool(options.return_delete_token),
     timestamp: exports.timestamp(),
     transformation: utils.generate_transformation_string(clone(options)),
@@ -471,8 +471,8 @@ exports.generate_transformation_string = function generate_transformation_string
     }).filter(utils.present).join('/');
   }
   var responsive_width = utils.option_consume(options, "responsive_width", config().responsive_width);
-  var width = options["width"];
-  var height = options["height"];
+  var width = options.width;
+  var height = options.height;
   var size = utils.option_consume(options, "size");
   if (size) {
     var _size$split, _size$split2;
@@ -481,18 +481,18 @@ exports.generate_transformation_string = function generate_transformation_string
 
     var _ref8 = _slicedToArray(_ref7, 2);
 
-    options["width"] = _ref8[0];
-    options["height"] = _ref8[1];
+    options.width = _ref8[0];
+    options.height = _ref8[1];
   }
   var has_layer = options.overlay || options.underlay;
   var crop = utils.option_consume(options, "crop");
   var angle = utils.build_array(utils.option_consume(options, "angle")).join(".");
   var no_html_sizes = has_layer || utils.present(angle) || crop === "fit" || crop === "limit" || responsive_width;
   if (width && (width.toString().indexOf("auto") === 0 || no_html_sizes || parseFloat(width) < 1)) {
-    delete options["width"];
+    delete options.width;
   }
   if (height && (no_html_sizes || parseFloat(height) < 1)) {
-    delete options["height"];
+    delete options.height;
   }
   var background = utils.option_consume(options, "background");
   background = background && background.replace(/^#/, "rgb:");
@@ -536,13 +536,13 @@ exports.generate_transformation_string = function generate_transformation_string
   }
   var flags = utils.build_array(utils.option_consume(options, "flags")).join(".");
   var dpr = utils.option_consume(options, "dpr", config().dpr);
-  if (options["offset"] != null) {
+  if (options.offset != null) {
     var _split_range = split_range(utils.option_consume(options, "offset"));
 
     var _split_range2 = _slicedToArray(_split_range, 2);
 
-    options["start_offset"] = _split_range2[0];
-    options["end_offset"] = _split_range2[1];
+    options.start_offset = _split_range2[0];
+    options.end_offset = _split_range2[1];
   }
   var overlay = process_layer(utils.option_consume(options, "overlay"));
   var underlay = process_layer(utils.option_consume(options, "underlay"));
@@ -602,8 +602,8 @@ exports.generate_transformation_string = function generate_transformation_string
       params[short] = value;
     }
   }
-  if (params["vc"] != null) {
-    params["vc"] = process_video_params(params["vc"]);
+  if (params.vc != null) {
+    params.vc = process_video_params(params.vc);
   }
   ["so", "eo", "du"].forEach(function (short) {
     if (params[short] !== undefined) {
@@ -986,7 +986,7 @@ exports.api_url = function api_url() {
 
   var cloudinary = ensureOption(options, "upload_prefix", "https://api.cloudinary.com");
   var cloud_name = ensureOption(options, "cloud_name");
-  var resource_type = options["resource_type"] || "image";
+  var resource_type = options.resource_type || "image";
   return [cloudinary, "v1_1", cloud_name, resource_type, action].join("/");
 };
 
@@ -1064,7 +1064,7 @@ exports.webhook_signature = function webhook_signature(data, timestamp) {
 exports.process_request_params = function process_request_params(params, options) {
   if (options.unsigned != null && options.unsigned) {
     params = exports.clear_blank(params);
-    delete params["timestamp"];
+    delete params.timestamp;
   } else {
     params = exports.sign_request(params, options);
   }
@@ -1289,11 +1289,11 @@ function process_video_params(param) {
       {
         var video = "";
         if ('codec' in param) {
-          video = param['codec'];
+          video = param.codec;
           if ('profile' in param) {
-            video += ":" + param['profile'];
+            video += ":" + param.profile;
             if ('level' in param) {
-              video += ":" + param['level'];
+              video += ":" + param.level;
             }
           }
         }
@@ -1366,8 +1366,8 @@ exports.build_streaming_profiles_param = function build_streaming_profiles_param
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   var params = utils.only(options, "display_name", "representations");
-  if (isArray(params["representations"])) {
-    params["representations"] = JSON.stringify(params["representations"].map(function (r) {
+  if (isArray(params.representations)) {
+    params.representations = JSON.stringify(params.representations.map(function (r) {
       return {
         transformation: utils.generate_transformation_string(r.transformation)
       };

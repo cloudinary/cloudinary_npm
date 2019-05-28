@@ -34,7 +34,7 @@ function call_api(method, uri, params, callback, options) {
   method = method.toUpperCase();
   var api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
   var content_type = 'application/x-www-form-urlencoded';
-  if (options['content_type'] === 'json') {
+  if (options.content_type === 'json') {
     query_params = JSON.stringify(params);
     content_type = 'application/json';
   } else {
@@ -81,12 +81,12 @@ function call_api(method, uri, params, callback, options) {
             }
           };
         }
-        if (result["error"]) {
-          result["error"]["http_code"] = res.statusCode;
+        if (result.error) {
+          result.error.http_code = res.statusCode;
         } else {
-          result["rate_limit_allowed"] = parseInt(res.headers["x-featureratelimit-limit"]);
-          result["rate_limit_reset_at"] = new Date(res.headers["x-featureratelimit-reset"]);
-          result["rate_limit_remaining"] = parseInt(res.headers["x-featureratelimit-remaining"]);
+          result.rate_limit_allowed = parseInt(res.headers["x-featureratelimit-limit"]);
+          result.rate_limit_reset_at = new Date(res.headers["x-featureratelimit-reset"]);
+          result.rate_limit_remaining = parseInt(res.headers["x-featureratelimit-remaining"]);
         }
         if (result.error) {
           deferred.reject(result);
@@ -175,8 +175,8 @@ exports.resources = function resources(callback) {
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = options["type"];
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = options.type;
   uri = ["resources", resource_type];
   if (type != null) {
     uri.push(type);
@@ -193,7 +193,7 @@ exports.resources_by_tag = function resources_by_tag(tag, callback) {
   var ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
@@ -205,7 +205,7 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
       ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
   uri = ["resources", resource_type, "context"];
   params = only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
   params.key = key;
@@ -221,7 +221,7 @@ exports.resources_by_moderation = function resources_by_moderation(kind, status,
   var ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
   uri = ["resources", resource_type, "moderations", kind, status];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
@@ -235,8 +235,8 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
   params = only(options, "tags", "context", "moderations");
   params["public_ids[]"] = public_ids;
@@ -251,8 +251,8 @@ exports.resource = function resource(public_id, callback) {
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, public_id];
   return call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
 };
@@ -265,8 +265,8 @@ exports.restore = function restore(public_ids, callback) {
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, "restore"];
   return call_api("post", uri, {
     public_ids: public_ids
@@ -282,8 +282,8 @@ exports.update = function update(public_id, callback) {
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, public_id];
   params = utils.updateable_resource_params(options);
   if (options.moderation_status != null) {
@@ -300,8 +300,8 @@ exports.delete_resources = function delete_resources(public_ids, callback) {
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     "public_ids[]": public_ids
@@ -316,8 +316,8 @@ exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     prefix: prefix
@@ -330,7 +330,7 @@ exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback
   var ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("delete", uri, deleteResourcesParams(options), callback, options);
 };
@@ -344,8 +344,8 @@ exports.delete_all_resources = function delete_all_resources(callback) {
       type = void 0,
       uri = void 0;
 
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  type = (ref1 = options.type) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     all: true
@@ -369,14 +369,14 @@ exports.delete_derived_by_transformation = function delete_derived_by_transforma
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = options["resource_type"] || "image";
-  type = options["type"] || "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = "resources/" + resource_type + "/" + type;
   params = extend({
     "public_ids[]": public_ids
   }, only(options, "invalidate"));
-  params["keep_original"] = true;
-  params["transformations"] = utils.build_eager(transformations);
+  params.keep_original = true;
+  params.transformations = utils.build_eager(transformations);
   return call_api("delete", uri, params, callback, options);
 };
 
@@ -386,7 +386,7 @@ exports.tags = function tags(callback) {
   var ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = (ref = options.resource_type) != null ? ref : "image";
   uri = ["tags", resource_type];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options);
 };
@@ -523,7 +523,7 @@ exports.update_upload_mapping = function update_upload_mapping(name, callback) {
 
   var params = void 0;
   params = only(options, "template");
-  params["folder"] = name;
+  params.folder = name;
   return call_api("put", 'upload_mappings', params, callback, options);
 };
 
@@ -532,7 +532,7 @@ exports.create_upload_mapping = function create_upload_mapping(name, callback) {
 
   var params = void 0;
   params = only(options, "template");
-  params["folder"] = name;
+  params.folder = name;
   return call_api("post", 'upload_mappings', params, callback, options);
 };
 
@@ -602,7 +602,7 @@ exports.create_streaming_profile = function create_streaming_profile(name, callb
 
   var params = void 0;
   params = utils.build_streaming_profiles_param(options);
-  params["name"] = name;
+  params.name = name;
   return call_api("post", 'streaming_profiles', params, callback, options);
 };
 
@@ -626,7 +626,7 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
 exports.search = function search(params, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  options['content_type'] = 'json';
+  options.content_type = 'json';
   return call_api("post", "resources/search", params, callback, options);
 };
 

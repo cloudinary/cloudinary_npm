@@ -41,7 +41,7 @@ function chainTransformations(options) {
   var urlOptions = cloudinary.utils.extractUrlParams(options);
   var currentTransformation = cloudinary.utils.extractTransformationParams(options);
   transformation = cloudinary.utils.build_array(transformation);
-  urlOptions["transformation"] = [currentTransformation].concat(_toConsumableArray(transformation));
+  urlOptions.transformation = [currentTransformation].concat(_toConsumableArray(transformation));
   return urlOptions;
 }
 
@@ -66,8 +66,8 @@ exports.image = function image(source, options) {
   var srcsetParam = optionConsume(localOptions, 'srcset');
   var attributes = optionConsume(localOptions, 'attributes', {});
   var src = cloudinary.utils.url(source, localOptions);
-  if ("html_width" in localOptions) localOptions["width"] = optionConsume(localOptions, "html_width");
-  if ("html_height" in localOptions) localOptions["height"] = optionConsume(localOptions, "html_height");
+  if ("html_width" in localOptions) localOptions.width = optionConsume(localOptions, "html_width");
+  if ("html_height" in localOptions) localOptions.height = optionConsume(localOptions, "html_height");
 
   var client_hints = optionConsume(localOptions, "client_hints", cloudinary.config().client_hints);
   var responsive = optionConsume(localOptions, "responsive");
@@ -78,7 +78,7 @@ exports.image = function image(source, options) {
     var classes = [responsive ? "cld-responsive" : "cld-hidpi"];
     var current_class = optionConsume(localOptions, "class");
     if (current_class) classes.push(current_class);
-    localOptions["class"] = classes.join(" ");
+    localOptions.class = classes.join(" ");
     src = optionConsume(localOptions, "responsive_placeholder", cloudinary.config().responsive_placeholder);
     if (src === "blank") {
       src = cloudinary.BLANK;

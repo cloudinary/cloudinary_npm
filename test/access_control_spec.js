@@ -45,9 +45,9 @@ describe("Access Control", function () {
       expect(params.access_control).to.match(/^\[.+\]$/);
       let j = JSON.parse(params.access_control);
       expect(j.length).to.be(2);
-      expect(j[0]["access_type"]).to.equal(ACL.access_type);
-      expect(Date.parse(j[0]["start"])).to.equal(Date.parse(ACL.start));
-      expect(Date.parse(j[0]["end"])).to.equal(Date.parse(ACL.end));
+      expect(j[0].access_type).to.equal(ACL.access_type);
+      expect(Date.parse(j[0].start)).to.equal(Date.parse(ACL.start));
+      expect(Date.parse(j[0].end)).to.equal(Date.parse(ACL.end));
     });
     it("should accept a JSON string", function () {
       let params = build_upload_params({

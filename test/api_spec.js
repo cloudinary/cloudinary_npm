@@ -726,11 +726,11 @@ describe("api", function () {
       xhr = request = requestStub = requestSpy = writeSpy = void 0;
       before(function () {
         xhr = sinon.useFakeXMLHttpRequest();
-        return writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+        writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       });
       after(function () {
         writeSpy.restore();
-        return xhr.restore();
+        xhr.restore();
       });
       it("should support changing moderation status with notification-url", function () {
         return cloudinary.v2.api.update("sample", {
@@ -907,21 +907,21 @@ describe("api", function () {
       tags: UPLOAD_TAGS,
     }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
       expect(resource).not.to.be(null);
-      expect(resource["bytes"]).to.eql(3381);
+      expect(resource.bytes).to.eql(3381);
       return cloudinary.v2.api.delete_resources(publicId);
     }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
       expect(resource).not.to.be(null);
-      expect(resource["bytes"]).to.eql(0);
-      expect(resource["placeholder"]).to.eql(true);
+      expect(resource.bytes).to.eql(0);
+      expect(resource.placeholder).to.eql(true);
     }));
     it('should restore a deleted resource', () => cloudinary.v2.api.restore(publicId).then((response) => {
       let info = response[publicId];
       expect(info).not.to.be(null);
-      expect(info["bytes"]).to.eql(3381);
+      expect(info.bytes).to.eql(3381);
       return cloudinary.v2.api.resource(publicId);
     }).then((resource) => {
       expect(resource).not.to.be(null);
-      expect(resource["bytes"]).to.eql(3381);
+      expect(resource.bytes).to.eql(3381);
     }));
   });
   describe('mapping', function () {
@@ -943,16 +943,16 @@ describe("api", function () {
         tags: UPLOAD_TAGS,
       }).then(result => deleteMapping = cloudinary.v2.api.upload_mapping(mapping))
         .then((result) => {
-          expect(result['template']).to.eql("http://cloudinary.com");
+          expect(result.template).to.eql("http://cloudinary.com");
           return cloudinary.v2.api.update_upload_mapping(mapping, {
             template: "http://res.cloudinary.com",
           });
         }).then(result => cloudinary.v2.api.upload_mapping(mapping))
         .then((result) => {
-          expect(result["template"]).to.eql("http://res.cloudinary.com");
+          expect(result.template).to.eql("http://res.cloudinary.com");
           return cloudinary.v2.api.upload_mappings();
         }).then((result) => {
-          expect(result["mappings"].find(({ folder, template }) => folder === mapping && template === "http://res.cloudinary.com")).to.be.ok();
+          expect(result.mappings.find(({ folder, template }) => folder === mapping && template === "http://res.cloudinary.com")).to.be.ok();
           return cloudinary.v2.api.delete_upload_mapping(mapping);
         }).then((result) => {
           deleteMapping = false;

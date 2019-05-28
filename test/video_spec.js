@@ -45,16 +45,16 @@ describe("video tag helper", function () {
     };
     expected_url = VIDEO_UPLOAD_PATH + "ac_acc,ki_2.0,so_3,vc_h264/movie";
     expect(cloudinary.video("movie", options)).to.eql(`<video height='100' poster='${expected_url}.jpg' src='${expected_url}.mp4' width='200'></video>`);
-    delete options['source_types'];
+    delete options.source_types;
     expect(cloudinary.video("movie", options)).to.eql(`<video height='100' poster='${expected_url}.jpg' width='200'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
-    delete options['html_height'];
-    delete options['html_width'];
-    options['width'] = 250;
-    options['crop'] = 'scale';
+    delete options.html_height;
+    delete options.html_width;
+    options.width = 250;
+    options.crop = 'scale';
     expected_url = VIDEO_UPLOAD_PATH + "ac_acc,c_scale,ki_2.0,so_3,vc_h264,w_250/movie";
     expect(cloudinary.video("movie", options)).to.eql(`<video poster='${expected_url}.jpg' width='250'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
     expected_url = VIDEO_UPLOAD_PATH + "ac_acc,c_fit,ki_2.0,so_3,vc_h264,w_250/movie";
-    options['crop'] = 'fit';
+    options.crop = 'fit';
     expect(cloudinary.video("movie", options)).to.eql(`<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
   });
   it("should generate video tag with fallback", function () {
