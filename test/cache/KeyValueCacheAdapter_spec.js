@@ -18,12 +18,12 @@ describe("KeyValueCacheAdapter", () => {
     [
       [ // valid values
         "467d06e5a695b15468f9362e5a58d44de523026b",
-        ["public_id", "upload", "image", "w_100", "jpg"]
+        ["public_id", "upload", "image", "w_100", "jpg"],
       ],
       [ // allow empty values
         "1576396c59fc50ac8dc37b75e1184268882c9bc2",
-        ["public_id", "upload", "image", null, null]
-      ]
+        ["public_id", "upload", "image", null, null],
+      ],
     ].forEach(([key, args]) => {
       expect(KeyValueCacheAdapter.generateCacheKey.apply(this, args)).to.eql(key);
     });

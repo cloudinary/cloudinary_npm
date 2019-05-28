@@ -1,5 +1,5 @@
 require('dotenv').load({
-  silent: true
+  silent: true,
 });
 
 const helper = require("./spechelper");
@@ -40,23 +40,23 @@ sharedExamples('archive', function () {
           public_id: PUBLIC_ID1,
           tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
-            effect: "blackwhite"
-          }
+            effect: "blackwhite",
+          },
         }),
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID2,
           tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
-            effect: "blackwhite"
-          }
+            effect: "blackwhite",
+          },
         }),
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID_RAW,
           resource_type: "raw",
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG])
-        })
+          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+        }),
     ]);
   });
   after(function () {
@@ -84,7 +84,7 @@ describe("utils", function () {
         target_public_id: 'gem_archive_test',
         public_ids: [PUBLIC_ID2, PUBLIC_ID1],
         target_tags: ARCHIVE_TAG,
-        expires_at: Date.now() / 1000 + 60 // expiration after 60 seconds
+        expires_at: Date.now() / 1000 + 60, // expiration after 60 seconds
       });
     });
     describe('public_ids', function () {
@@ -137,7 +137,7 @@ describe("uploader", function () {
         public_ids: [PUBLIC_ID2, PUBLIC_ID1],
         target_tags: [TEST_TAG, ARCHIVE_TAG],
         mode: 'create',
-        skip_transformation_name: true
+        skip_transformation_name: true,
       }).then((result) => {
         archive_result = result;
       });
@@ -158,7 +158,7 @@ describe("uploader", function () {
           tags: TEST_TAG,
           public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],
           resource_type: "raw",
-          allow_missing: true
+          allow_missing: true,
         });
         sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
         sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));

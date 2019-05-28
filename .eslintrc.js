@@ -15,7 +15,7 @@ module.exports = {
   "rules": {
     "camelcase": "off",
     // "class-methods-use-this": "off",
-    "comma-dangle": "off",
+    // "comma-dangle": "off",
     "consistent-return": "off",
     "dot-notation": "off",
     "func-names": "off",

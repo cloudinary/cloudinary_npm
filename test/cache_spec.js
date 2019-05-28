@@ -19,7 +19,7 @@ const BREAKPOINTS = [5, 3, 7, 5];
 
 const TRANSFORMATION_1 = {
   angle: 45,
-  crop: 'scale'
+  crop: 'scale',
 };
 
 const FORMAT_1 = 'png';
@@ -46,17 +46,17 @@ describe("Cache", function () {
           {
             create_derived: false,
             transformation: { angle: 90 },
-            format: 'gif'
+            format: 'gif',
           },
           {
             create_derived: false,
             transformation: TRANSFORMATION_1,
-            format: FORMAT_1
+            format: FORMAT_1,
           },
           {
-            create_derived: false
-          }
-        ]
+            create_derived: false,
+          },
+        ],
       };
     });
     after(function () {
@@ -80,7 +80,7 @@ describe("Cache", function () {
               type,
               resource_type,
               raw_transformation: bp.transformation,
-              format: path.extname(bp.breakpoints[0].url).slice(1)
+              format: path.extname(bp.breakpoints[0].url).slice(1),
             });
             expect(cachedBp).to.eql(bp.breakpoints.map(i => i.width));
           });
