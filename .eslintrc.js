@@ -1,4 +1,4 @@
-{
+module.exports = {
   "env": {
     "commonjs": true,
     "es6": true,
@@ -13,7 +13,6 @@
     "ecmaVersion": 2018
   },
   "rules": {
-    "array-callback-return": "off",
     "camelcase": "off",
     "class-methods-use-this": "off",
     "comma-dangle": "off",

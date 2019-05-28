@@ -458,7 +458,7 @@ describe("utils", function () {
         });
       });
       it("should support focal gravity", function () {
-        ["adv_face", "adv_faces", "adv_eyes", "face", "faces", "body", "no_faces"].map(function (focal) {
+        ["adv_face", "adv_faces", "adv_eyes", "face", "faces", "body", "no_faces"].forEach(function (focal) {
           test_cloudinary_url("test", {
             width: 100,
             height: 100,
@@ -471,7 +471,7 @@ describe("utils", function () {
         });
       });
       it("should support auto level with thumb cropping", function () {
-        [0, 10, 100].map(function (level) {
+        [0, 10, 100].forEach(function (level) {
           test_cloudinary_url("test", {
             width: 100,
             height: 100,

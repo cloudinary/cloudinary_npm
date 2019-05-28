@@ -801,7 +801,7 @@ describe("uploader", function () {
           expect(at(result, "responsive_breakpoints[0].breakpoints[0].url")[0]).to.match(/\.jpg$/);
           expect(at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10");
           expect(at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/);
-          result.responsive_breakpoints.map(function (bp) {
+          result.responsive_breakpoints.forEach(function (bp) {
             var cached, format;
             format = path.extname(bp.breakpoints[0].url).slice(1);
             cached = cloudinary.Cache.get(result.public_id, {
