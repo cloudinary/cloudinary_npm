@@ -43,18 +43,6 @@ var PreloadedFile = function () {
       return this.signature === expected_signature;
     }
   }, {
-    key: "split_format",
-    value: function split_format(identifier) {
-      var format, last_dot, public_id;
-      last_dot = identifier.lastIndexOf(".");
-      if (last_dot === -1) {
-        return [identifier, null];
-      }
-      public_id = identifier.substr(0, last_dot);
-      format = identifier.substr(last_dot + 1);
-      return [public_id, format];
-    }
-  }, {
     key: "identifier",
     value: function identifier() {
       return `v${this.version}/${this.filename}`;
@@ -77,6 +65,18 @@ var PreloadedFile = function () {
         }
       });
       return result;
+    }
+  }], [{
+    key: "split_format",
+    value: function split_format(identifier) {
+      var format, last_dot, public_id;
+      last_dot = identifier.lastIndexOf(".");
+      if (last_dot === -1) {
+        return [identifier, null];
+      }
+      public_id = identifier.substr(0, last_dot);
+      format = identifier.substr(last_dot + 1);
+      return [public_id, format];
     }
   }]);
 
