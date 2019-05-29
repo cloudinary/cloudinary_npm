@@ -1,12 +1,10 @@
 interface Common {
-    // TODO: obtain signatures for the `config` method
     config(new_config: any, new_value: any)
 
-    // TODO: is `utils` part of the official API?
-    //       if not, why is it exposed at runtime?
+    // TODO: the utils module seems to mix both internal and potentially external utils
+    //       which are an external API and which are only internal?
+    //       Could this be represented at runtime by avoiding the exposure of "internal APIs"?
     utils: any
-    // TODO: add uploader details
-    uploader: any
 
     PreloadedFile: {
         new(file_info: any): PreloadedFile
@@ -14,7 +12,6 @@ interface Common {
 
     Cache: CacheInterface
 
-    // TODO: document the URL options
     url(public_id: string, options?: any): string
 
     /**
@@ -120,7 +117,6 @@ interface Common {
 }
 
 interface V1 extends Common {
-    // TODO: are these part of the official API?
     api: API_V1
     uploader: Uploader_V1
 
@@ -128,15 +124,50 @@ interface V1 extends Common {
 }
 
 interface V2 extends Common {
-    // TODO: are these part of the official API?
     api: API_V2
     uploader: Uploader_V2
 
-    search()
+    Search: typeof Search
 }
 
-// TODO: it seems from the code that potentially these methods
-//       may return a none promise (see call_api).
+declare class Search {
+    constructor()
+
+    static instance(): Search
+
+    static expression(value: any): Search
+
+    static max_results(value: any): Search
+
+    static next_cursor(value: any): Search
+
+    static aggregate(value: any): Search
+
+    static with_field(value: any): Search
+
+    static sort_by(field_name: string, dir: string): Search
+
+    expression(value: any): Search
+
+    max_results(value: any): Search
+
+    next_cursor(value: any): Search
+
+    aggregate(value: any): Search
+
+    with_field(value: any): Search
+
+    sort_by(field_name: string, dir: string): Search
+
+    to_query(): {
+        sort_by: any[],
+        aggregate: any[],
+        with_field: any[]
+    }
+
+    execute(options: any, errCallback: Function): Promise<any>
+}
+
 declare interface API_V1 {
     ping(errCallback?: Function, options?: any): Promise<any>
 
@@ -237,200 +268,103 @@ declare interface API_V1 {
     update_resources_access_mode_by_ids(access_mode: any, ids: any, errCallback?: Function, options?: any): Promise<any>
 }
 
-// TODO: extend V1 api instead of duplication
-declare interface API_V2 {
-
-    ping(errCallback?: Function, options?: any): Promise<any>
+declare interface API_V2 extends API_V1 {
 
     ping(options?: any): Promise<any>
 
-    usage(errCallback?: Function, options?: any): Promise<any>
-
     usage(options?: any): Promise<any>
-
-    resource_types(errCallback?: Function, options?: any): Promise<any>
 
     resource_types(options?: any): Promise<any>
 
-    resources(errCallback?: Function, options?: any): Promise<any>
-
     resources(options?: any): Promise<any>
-
-    resources_by_tag(tag: any, errCallback?: Function, options?: any): Promise<any>
 
     resources_by_tag(tag: any, options?: any): Promise<any>
 
-    resources_by_context(key: any, value: any, errCallback?: Function, options?: any): Promise<any>
-
     resources_by_context(key: any, value: any, options?: any): Promise<any>
-
-    resources_by_moderation(kind: any, status: any, errCallback?: Function, options?: any): Promise<any>
 
     resources_by_moderation(kind: any, status: any, options?: any): Promise<any>
 
-    resources_by_ids(public_ids: any, errCallback?: Function, options?: any): Promise<any>
-
     resources_by_ids(public_ids: any, options?: any): Promise<any>
-
-    resource(public_id: any, errCallback?: Function, options?: any): Promise<any>
 
     resource(public_id: any, options?: any): Promise<any>
 
-    restore(public_ids: any, errCallback?: Function, options?: any): Promise<any>
-
     restore(public_ids: any, options?: any): Promise<any>
-
-    update(public_id: any, errCallback?: Function, options?: any): Promise<any>
 
     update(public_id: any, options?: any): Promise<any>
 
-    delete_resources(public_ids: any, errCallback?: Function, options?: any): Promise<any>
-
     delete_resources(public_ids: any, options?: any): Promise<any>
-
-    delete_resources_by_prefix(prefix: any, errCallback?: Function, options?: any): Promise<any>
 
     delete_resources_by_prefix(prefix: any, options?: any): Promise<any>
 
-    delete_resources_by_tag(tag: any, errCallback?: Function, options?: any): Promise<any>
-
     delete_resources_by_tag(tag: any, options?: any): Promise<any>
-
-    delete_all_resources(errCallback?: Function, options?: any): Promise<any>
 
     delete_all_resources(options?: any): Promise<any>
 
     // TODO: missing 'delete_derived_resources'
 
-    delete_derived_by_transformation(public_ids: any, transformations: any, errCallback?: Function, options?: any): Promise<any>
-
     delete_derived_by_transformation(public_ids: any, transformations: any, options?: any): Promise<any>
-
-    tags(errCallback?: Function, options?: any): Promise<any>
 
     tags(options?: any): Promise<any>
 
-    transformations(errCallback?: Function, options?: any): Promise<any>
-
     transformations(options?: any): Promise<any>
-
-    transformation(transformation: any, errCallback?: Function, options?: any): Promise<any>
 
     transformation(transformation: any, options?: any): Promise<any>
 
-    delete_transformation(transformation: any, errCallback?: Function, options?: any): Promise<any>
-
     delete_transformation(transformation: any, options?: any): Promise<any>
-
-    update_transformation(transformation: any, updates: any, errCallback?: Function, options?: any): Promise<any>
 
     update_transformation(transformation: any, updates: any, options?: any): Promise<any>
 
-    create_transformation(name: any, definition: any, errCallback?: Function, options?: any): Promise<any>
-
     create_transformation(name: any, definition: any, options?: any): Promise<any>
-
-    upload_presets(errCallback?: Function, options?: any): Promise<any>
 
     upload_presets(options?: any): Promise<any>
 
-    upload_preset(name: any, errCallback?: Function, options?: any): Promise<any>
-
     upload_preset(name: any, options?: any): Promise<any>
-
-    delete_upload_preset(name: any, errCallback?: Function, options?: any): Promise<any>
 
     delete_upload_preset(name: any, options?: any): Promise<any>
 
-    update_upload_preset(name: any, errCallback?: Function, options?: any): Promise<any>
-
     update_upload_preset(name: any, options?: any): Promise<any>
-
-    create_upload_preset(errCallback?: Function, options?: any): Promise<any>
 
     create_upload_preset(options?: any): Promise<any>
 
-    root_folders(errCallback?: Function, options?: any): Promise<any>
-
     root_folders(options?: any): Promise<any>
-
-    sub_folders(path: any, errCallback?: Function, options?: any): Promise<any>
 
     sub_folders(path: any, options?: any): Promise<any>
 
-    upload_mappings(errCallback?: Function, options?: any): Promise<any>
-
     upload_mappings(options?: any): Promise<any>
-
-    upload_mapping(name: any, errCallback?: Function, options?: any): Promise<any>
 
     upload_mapping(name: any, options?: any): Promise<any>
 
-    delete_upload_mapping(name: any, errCallback?: Function, options?: any): Promise<any>
-
     delete_upload_mapping(name: any, options?: any): Promise<any>
-
-    update_upload_mapping(name: any, errCallback?: Function, options?: any): Promise<any>
 
     update_upload_mapping(name: any, options?: any): Promise<any>
 
-    create_upload_mapping(name: any, errCallback?: Function, options?: any): Promise<any>
-
     create_upload_mapping(name: any, options?: any): Promise<any>
-
-    publishResource(byKey: any, value: any, errCallback?: Function, options?: any): Promise<any>
 
     publishResource(byKey: any, value: any, options?: any): Promise<any>
 
-    publish_by_prefix(prefix: any, errCallback?: Function, options?: any): Promise<any>
-
     publish_by_prefix(prefix: any, options?: any): Promise<any>
-
-    publish_by_tag(tag: any, errCallback?: Function, options?: any): Promise<any>
 
     publish_by_tag(tag: any, options?: any): Promise<any>
 
-    publish_by_ids(public_ids: any, errCallback?: Function, options?: any): Promise<any>
-
     publish_by_ids(public_ids: any, options?: any): Promise<any>
-
-    list_streaming_profiles(errCallback?: Function, options?: any): Promise<any>
 
     list_streaming_profiles(options?: any): Promise<any>
 
-    get_streaming_profile(name: any, errCallback?: Function, options?: any): Promise<any>
-
     get_streaming_profile(name: any, options?: any): Promise<any>
-
-    delete_streaming_profile(name: any, errCallback?: Function, options?: any): Promise<any>
 
     delete_streaming_profile(name: any, options?: any): Promise<any>
 
-    update_streaming_profile(name: any, errCallback?: Function, options?: any): Promise<any>
-
     update_streaming_profile(name: any, options?: any): Promise<any>
-
-    create_streaming_profile(name: any, errCallback?: Function, options?: any): Promise<any>
 
     create_streaming_profile(name: any, options?: any): Promise<any>
 
-    updateResourcesAccessMode(access_mode: any, byKey: any, value: any, errCallback?: Function, options?: any): Promise<any>
-
     updateResourcesAccessMode(access_mode: any, byKey: any, value: any, options?: any): Promise<any>
-
-    search(params: any, errCallback?: Function, options?: any): Promise<any>
 
     search(params: any, options?: any): Promise<any>
 
-    update_resources_access_mode_by_prefix(access_mode: any, prefix: any, errCallback?: Function, options?: any): Promise<any>
-
     update_resources_access_mode_by_prefix(access_mode: any, prefix: any, options?: any): Promise<any>
 
-    update_resources_access_mode_by_tag(access_mode: any, tag: any, errCallback?: Function, options?: any): Promise<any>
-
     update_resources_access_mode_by_tag(access_mode: any, tag: any, options?: any): Promise<any>
-
-    update_resources_access_mode_by_ids(access_mode: any, ids: any, errCallback?: Function, options?: any): Promise<any>
 
     update_resources_access_mode_by_ids(access_mode: any, ids: any, options?: any): Promise<any>
 }
@@ -446,17 +380,14 @@ declare interface Uploader_V1 {
 
     upload_large(path: any, errCallback?: Function, options?: any): Promise<any>
 
-    upload_chunked(path: any, errCallback?: Function, options?: any): Promise<any>
-
+    // TODO: this seem to be missing in uploader V2, is this intentional?
     upload_large_stream(_unused_: any, errCallback?: Function, options?: any): Promise<any>
+
+    upload_chunked(path: any, errCallback?: Function, options?: any): Promise<any>
 
     upload_chunked_stream(errCallback?: Function, options?: any): Promise<any>
 
     explicit(public_id: any, errCallback?: Function, options?: any): Promise<any>
-
-    create_archive(errCallback?: Function, options?: any): Promise<any>
-
-    create_zip(errCallback?: Function, options?: any): Promise<any>
 
     destroy(public_id: any, errCallback?: Function, options?: any): Promise<any>
 
@@ -487,23 +418,90 @@ declare interface Uploader_V1 {
 
     remove_all_tags(public_ids: any[], errCallback?: Function, options?: any): Promise<any>
 
-    replace_tag(tag: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
-
     add_context(context: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
 
     remove_all_context(public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    replace_tag(tag: any, public_ids: any[], errCallback?: Function, options?: any): Promise<any>
+
+    create_archive(errCallback?: Function, options?: any): Promise<any>
+
+    create_zip(errCallback?: Function, options?: any): Promise<any>
+
+    direct_upload(errCallback?: Function, options?: any): Promise<any>
 
     upload_tag_params(options?: any): Object
 
     upload_url(options?: any): any[]
 
-    image_upload_tag(field:any, options?: any): string
+    image_upload_tag(field: any, options?: any): string
 
-    unsigned_image_upload_tag(field:any, upload_preset:string, options?: any): string
+    unsigned_image_upload_tag(field: any, upload_preset: string, options?: any): string
 }
 
-declare interface Uploader_V2 {
+// @ts-ignore
+// It seems we cannot provide mismatching method overloads in extending
+// interfaces, One the APIs will be more detailed (fewer 'any') we will need
+// To **duplicate** the definitions from V1 to V2.
+declare interface Uploader_V2 extends Uploader_V1 {
 
+    unsigned_upload_stream(upload_preset: any, options?: any): Promise<any>
+
+    upload_stream(options?: any): Promise<any>
+
+    unsigned_upload(file: any, upload_preset: any, options?: any): Promise<any>
+
+    upload(file: any, options?: any): Promise<any>
+
+    upload_large(path: any, options?: any): Promise<any>
+
+    // TODO: this seem to be missing in uploader V2, is this intentional?
+    // upload_large_stream(_unused_: any,  options?: any): Promise<any>
+
+    upload_chunked(path: any, options?: any): Promise<any>
+
+    upload_chunked_stream(options?: any): Promise<any>
+
+    explicit(public_id: any, options?: any): Promise<any>
+
+    destroy(public_id: any, options?: any): Promise<any>
+
+    rename(from_public_id: any, to_public_id: any, options?: any): Promise<any>
+
+    text(text: string, options?: {
+        public_id: string,
+        font_family: string,
+        font_size: string,
+        font_color: string,
+        text_align: string,
+        font_weight: string,
+        font_style: string,
+        background: string,
+        opacity: string,
+        text_decoration: string
+    }): Promise<any>
+
+    generate_sprite(tag: any, options?: any): Promise<any>
+
+    multi(tag: any, options?: any): Promise<any>
+
+    explode(public_id: any, options?: any): Promise<any>
+
+    add_tag(tag: any, public_ids: any[], options?: any): Promise<any>
+
+    remove_tag(tag: any, public_ids: any[], options?: any): Promise<any>
+
+    remove_all_tags(public_ids: any[], options?: any): Promise<any>
+
+    add_context(context: any, public_ids: any[], options?: any): Promise<any>
+
+    remove_all_context(public_ids: any[], options?: any): Promise<any>
+
+    replace_tag(tag: any, public_ids: any[], options?: any): Promise<any>
+
+    create_archive(options?: any): Promise<any>
+
+    create_zip(options?: any): Promise<any>
 }
 
 declare class PreloadedFile {
