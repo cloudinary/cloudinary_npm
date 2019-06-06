@@ -51,11 +51,6 @@ var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
 
-try {
-  // eslint-disable-next-line global-require
-  exports.VERSION = require('../../package.json').version;
-} catch (error) {}
-
 module.exports = {
   at,
   clone,
@@ -75,6 +70,11 @@ module.exports = {
 };
 exports = module.exports;
 var utils = module.exports;
+
+try {
+  // eslint-disable-next-line global-require
+  utils.VERSION = require('../../package.json').version;
+} catch (error) {}
 
 exports.generate_auth_token = function generate_auth_token(options) {
   var token_options = Object.assign({}, config().auth_token, options);
@@ -166,13 +166,13 @@ function textStyle(layer) {
   var font_family = layer.font_family;
   var font_size = layer.font_size;
   var keywords = [];
-  for (var attr in LAYER_KEYWORD_PARAMS) {
+  Object.keys(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
     var default_value = LAYER_KEYWORD_PARAMS[attr];
     var attr_value = layer[attr] || default_value;
     if (attr_value !== default_value) {
       keywords.push(attr_value);
     }
-  }
+  });
   var letter_spacing = layer.letter_spacing;
   if (letter_spacing) {
     keywords.push(`letter_spacing_${letter_spacing}`);
@@ -576,33 +576,18 @@ exports.generate_transformation_string = function generate_transformation_string
     y: normalize_expression(utils.option_consume(options, "y")),
     z: normalize_expression(utils.option_consume(options, "zoom"))
   };
-  var simple_params = {
-    audio_codec: "ac",
-    audio_frequency: "af",
-    bit_rate: 'br',
-    color_space: "cs",
-    default_image: "d",
-    delay: "dl",
-    density: "dn",
-    duration: "du",
-    end_offset: "eo",
-    fetch_format: "f",
-    gravity: "g",
-    page: "pg",
-    prefix: "p",
-    start_offset: "so",
-    streaming_profile: "sp",
-    video_codec: "vc",
-    video_sampling: "vs"
-  };
+  var simple_params = [["audio_codec", "ac"], ["audio_frequency", "af"], ["bit_rate", 'br'], ["color_space", "cs"], ["default_image", "d"], ["delay", "dl"], ["density", "dn"], ["duration", "du"], ["end_offset", "eo"], ["fetch_format", "f"], ["gravity", "g"], ["page", "pg"], ["prefix", "p"], ["start_offset", "so"], ["streaming_profile", "sp"], ["video_codec", "vc"], ["video_sampling", "vs"]];
 
-  for (var param in simple_params) {
-    var short = simple_params[param];
-    var value = utils.option_consume(options, param);
+  simple_params.forEach(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 2),
+        name = _ref12[0],
+        short = _ref12[1];
+
+    var value = utils.option_consume(options, name);
     if (value !== undefined) {
       params[short] = value;
     }
-  }
+  });
   if (params.vc != null) {
     params.vc = process_video_params(params.vc);
   }
@@ -613,37 +598,37 @@ exports.generate_transformation_string = function generate_transformation_string
   });
 
   var variablesParam = utils.option_consume(options, "variables", []);
-  var variables = entries(options).filter(function (_ref11) {
-    var _ref12 = _slicedToArray(_ref11, 2),
-        key = _ref12[0],
-        value = _ref12[1];
-
-    return key.startsWith('$');
-  }).map(function (_ref13) {
+  var variables = entries(options).filter(function (_ref13) {
     var _ref14 = _slicedToArray(_ref13, 2),
         key = _ref14[0],
         value = _ref14[1];
 
+    return key.startsWith('$');
+  }).map(function (_ref15) {
+    var _ref16 = _slicedToArray(_ref15, 2),
+        key = _ref16[0],
+        value = _ref16[1];
+
     delete options[key];
     return `${key}_${normalize_expression(value)}`;
-  }).sort().concat(variablesParam.map(function (_ref15) {
-    var _ref16 = _slicedToArray(_ref15, 2),
-        name = _ref16[0],
-        value = _ref16[1];
+  }).sort().concat(variablesParam.map(function (_ref17) {
+    var _ref18 = _slicedToArray(_ref17, 2),
+        name = _ref18[0],
+        value = _ref18[1];
 
     return `${name}_${normalize_expression(value)}`;
   })).join(',');
 
-  var transformations = entries(params).filter(function (_ref17) {
-    var _ref18 = _slicedToArray(_ref17, 2),
-        key = _ref18[0],
-        value = _ref18[1];
-
-    return utils.present(value);
-  }).map(function (_ref19) {
+  var transformations = entries(params).filter(function (_ref19) {
     var _ref20 = _slicedToArray(_ref19, 2),
         key = _ref20[0],
         value = _ref20[1];
+
+    return utils.present(value);
+  }).map(function (_ref21) {
+    var _ref22 = _slicedToArray(_ref21, 2),
+        key = _ref22[0],
+        value = _ref22[1];
 
     return key + '_' + value;
   }).sort().join(',');
@@ -1000,16 +985,16 @@ exports.signed_preloaded_image = function signed_preloaded_image(result) {
 };
 
 exports.api_sign_request = function api_sign_request(params_to_sign, api_secret) {
-  var to_sign = entries(params_to_sign).filter(function (_ref21) {
-    var _ref22 = _slicedToArray(_ref21, 2),
-        k = _ref22[0],
-        v = _ref22[1];
-
-    return utils.present(v);
-  }).map(function (_ref23) {
+  var to_sign = entries(params_to_sign).filter(function (_ref23) {
     var _ref24 = _slicedToArray(_ref23, 2),
         k = _ref24[0],
         v = _ref24[1];
+
+    return utils.present(v);
+  }).map(function (_ref25) {
+    var _ref26 = _slicedToArray(_ref25, 2),
+        k = _ref26[0],
+        v = _ref26[1];
 
     return `${k}=${utils.build_array(v).join(",")}`;
   }).sort().join("&");
@@ -1020,16 +1005,16 @@ exports.api_sign_request = function api_sign_request(params_to_sign, api_secret)
 
 exports.clear_blank = function clear_blank(hash) {
   var filtered_hash = {};
-  entries(hash).filter(function (_ref25) {
-    var _ref26 = _slicedToArray(_ref25, 2),
-        k = _ref26[0],
-        v = _ref26[1];
-
-    return utils.present(v);
-  }).forEach(function (_ref27) {
+  entries(hash).filter(function (_ref27) {
     var _ref28 = _slicedToArray(_ref27, 2),
         k = _ref28[0],
         v = _ref28[1];
+
+    return utils.present(v);
+  }).forEach(function (_ref29) {
+    var _ref30 = _slicedToArray(_ref29, 2),
+        k = _ref30[0],
+        v = _ref30[1];
 
     filtered_hash[k] = v;
   });
@@ -1221,13 +1206,11 @@ function v1_adapter(name, num_pass_args, v1) {
   };
 }
 exports.v1_adapters = function v1_adapters(exports, v1, mapping) {
-  var name, num_pass_args, results;
-  results = [];
-  for (name in mapping) {
-    num_pass_args = mapping[name];
-    results.push(exports[name] = v1_adapter(name, num_pass_args, v1));
-  }
-  return results;
+  return Object.keys(mapping).map(function (name) {
+    var num_pass_args = mapping[name];
+    exports[name] = v1_adapter(name, num_pass_args, v1);
+    return exports[name];
+  });
 };
 
 exports.as_safe_bool = function as_safe_bool(value) {
@@ -1384,10 +1367,10 @@ exports.build_streaming_profiles_param = function build_streaming_profiles_param
  * @return {string} A URI query string.
  */
 function hashToQuery(hash) {
-  return entries(hash).reduce(function (entries, _ref29) {
-    var _ref30 = _slicedToArray(_ref29, 2),
-        key = _ref30[0],
-        value = _ref30[1];
+  return entries(hash).reduce(function (entries, _ref31) {
+    var _ref32 = _slicedToArray(_ref31, 2),
+        key = _ref32[0],
+        value = _ref32[1];
 
     if (isArray(value)) {
       key = key.endsWith('[]') ? key : key + '[]';
@@ -1399,10 +1382,10 @@ function hashToQuery(hash) {
       entries.push([key, value]);
     }
     return entries;
-  }, []).map(function (_ref31) {
-    var _ref32 = _slicedToArray(_ref31, 2),
-        key = _ref32[0],
-        value = _ref32[1];
+  }, []).map(function (_ref33) {
+    var _ref34 = _slicedToArray(_ref33, 2),
+        key = _ref34[0],
+        value = _ref34[1];
 
     return `${querystring.escape(key)}=${querystring.escape(value)}`;
   }).join('&');

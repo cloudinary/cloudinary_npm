@@ -381,18 +381,18 @@ describe("cloudinary", function () {
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/e_sepia:10/test");
   });
-  layers = {
-    overlay: "l",
-    underlay: "u",
-  };
-  for (layer in layers) {
+  layers = [
+    ["overlay", "l"],
+    ["underlay", "u"],
+  ];
+  layers.forEach(([layer, short]) => {
     it(`should support ${layer}`, function () {
-      var options, result;
-      options = {};
+      var result;
+      let options = {};
       options[layer] = "text:hello";
       result = cloudinary.utils.url("test", options);
       expect(options).to.eql({});
-      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/${layers[layer]}_text:hello/test`);
+      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/${short}_text:hello/test`);
     });
     it(`should not pass width/height to html for ${layer}`, function () {
       var options, result;
@@ -403,9 +403,9 @@ describe("cloudinary", function () {
       options[layer] = "text:hello";
       result = cloudinary.utils.url("test", options);
       expect(options).to.eql({});
-      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/h_100,${layers[layer]}_text:hello,w_100/test`);
+      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/h_100,${short}_text:hello,w_100/test`);
     });
-  }
+  });
   it("should correctly sign api requests", function () {
     expect(cloudinary.utils.api_sign_request({
       hello: null,
@@ -520,20 +520,18 @@ describe("cloudinary", function () {
     expect(result).to.eql("http://res.cloudinary.com/test123/iu/test");
   });
   it("should escape public_ids", function () {
-    var result, results, source, target, tests;
-    tests = {
-      "a b": "a%20b",
-      "a+b": "a%2Bb",
-      "a%20b": "a%20b",
-      "a-b": "a-b",
-      "a??b": "a%3F%3Fb",
-    };
-    results = [];
-    for (source in tests) {
-      target = tests[source];
-      result = cloudinary.utils.url(source);
-      results.push(expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target));
-    }
+    const tests = [
+      // [source, target]
+      ["a b", "a%20b"],
+      ["a+b", "a%2Bb"],
+      ["a%20b", "a%20b"],
+      ["a-b", "a-b"],
+      ["a??b", "a%3F%3Fb"],
+    ];
+    tests.forEach(([source, target]) => {
+      let result = cloudinary.utils.url(source);
+      expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target);
+    });
   });
   it("should correctly sign a url", function () {
     var actual, expected;

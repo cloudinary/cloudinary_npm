@@ -1264,21 +1264,19 @@ describe("utils", function () {
   });
   it("should escape public_ids", function () {
     var ref, results, source, target;
-    ref = {
-      "a b": "a%20b",
-      "a+b": "a%2Bb",
-      "a%20b": "a%20b",
-      "a-b": "a-b",
-      "a??b": "a%3F%3Fb",
-      "parentheses(interject)": "parentheses(interject)",
-      "abcαβγאבג": "abc%CE%B1%CE%B2%CE%B3%D7%90%D7%91%D7%92",
-    };
-    results = [];
-    for (source in ref) {
-      target = ref[source];
-      results.push(expect(utils.url(source)).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/${target}`));
-    }
-    return results;
+    const expressions = [
+      // [source, target]
+      ["a b", "a%20b"],
+      ["a+b", "a%2Bb"],
+      ["a%20b", "a%20b"],
+      ["a-b", "a-b"],
+      ["a??b", "a%3F%3Fb"],
+      ["parentheses(interject)", "parentheses(interject)"],
+      ["abcαβγאבג", "abc%CE%B1%CE%B2%CE%B3%D7%90%D7%91%D7%92"],
+    ];
+    expressions.forEach(([source, target]) => {
+      expect(utils.url(source)).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/${target}`);
+    });
   });
   context("sign URLs", function () {
     var configBck = void 0;
