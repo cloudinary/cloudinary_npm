@@ -1,5 +1,6 @@
 const expect = require('expect.js');
 const cloudinary = require('../cloudinary');
+
 const extend = cloudinary.utils.extend;
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 

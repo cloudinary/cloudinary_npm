@@ -3,7 +3,9 @@ const helper = require("../spechelper");
 
 const cloudinary = require('../../cloudinary').v2;
 const DummyCacheStorage = require('./DummyCacheStorage');
-const KeyValueCacheAdapter = require("../../" + helper.libPath + "/cache/KeyValueCacheAdapter");
+
+const KeyValueCacheAdapter = require(`../../${helper.libPath}/cache/KeyValueCacheAdapter`);
+
 var cache;
 var parameters = ["public_id", "upload", "image", "w_100", "jpg"];
 var value = [100, 200, 300, 399];

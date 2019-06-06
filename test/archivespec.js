@@ -6,15 +6,14 @@ const helper = require("./spechelper");
 const https = require('https');
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary");
-const utils = cloudinary.v2.utils;
 const last = require('lodash/last');
-const api = cloudinary.v2.api;
-const uploader = cloudinary.v2.uploader;
 const sinon = require("sinon");
 const execSync = require('child_process').execSync;
 const Q = require('q');
 const fs = require('fs');
 const os = require('os');
+
+const { utils, api, uploader } = cloudinary.v2;
 const TEST_TAG = helper.TEST_TAG;
 const IMAGE_URL = helper.IMAGE_URL;
 const sharedExamples = helper.sharedExamples;

@@ -15,6 +15,7 @@ const at = require('lodash/at');
 const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
 const helper = require("./spechelper");
+
 const TEST_TAG = helper.TEST_TAG;
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;

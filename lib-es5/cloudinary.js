@@ -3,13 +3,14 @@
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var _ = require('lodash');
-var cloudinary = module.exports;
 exports.config = require("./config");
 exports.utils = require("./utils");
 exports.uploader = require("./uploader");
 exports.api = require("./api");
 exports.PreloadedFile = require("./preloaded_file");
 exports.Cache = require('./cache');
+
+var cloudinary = module.exports;
 
 var optionConsume = cloudinary.utils.option_consume;
 var ensureOption = require('./utils/ensureOption').defaults(cloudinary.config());

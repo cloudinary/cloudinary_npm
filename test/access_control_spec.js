@@ -4,9 +4,10 @@ require('dotenv').load({
 
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary");
-const build_upload_params = cloudinary.utils.build_upload_params;
 const helper = require('./spechelper');
 const isString = require('lodash/isString');
+
+const build_upload_params = cloudinary.utils.build_upload_params;
 
 const ACL = {
   access_type: 'anonymous',

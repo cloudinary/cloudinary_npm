@@ -7,6 +7,7 @@ const cloudinary = require("../cloudinary");
 const keys = require('lodash/keys');
 const Q = require('q');
 const helper = require("./spechelper");
+
 const api = cloudinary.v2.api;
 
 describe('Cloudinary::Api', function () {

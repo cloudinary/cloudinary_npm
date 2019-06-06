@@ -21,7 +21,7 @@ module.exports = {
     "func-names": "off",
     // "global-require": "off",
     // "guard-for-in": "off",
-    "import/newline-after-import": "off",
+    // "import/newline-after-import": "off",
     "import/no-dynamic-require": "off",
     "import/order": "off",
     "max-len": [

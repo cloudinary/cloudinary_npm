@@ -4,15 +4,16 @@ var config = require("./config");
 var ensureOption = require('./utils/ensureOption').defaults(config());
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
 var utils = require("./utils");
+var querystring = require("querystring");
+var Q = require('q');
+var url = require('url');
+
 var extend = utils.extend,
     includes = utils.includes,
     isString = utils.isString,
     only = utils.only,
     ensurePresenceOf = utils.ensurePresenceOf;
 
-var querystring = require("querystring");
-var Q = require('q');
-var url = require('url');
 
 var api = module.exports;
 

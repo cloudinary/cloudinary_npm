@@ -1,10 +1,8 @@
 const expect = require('expect.js');
 const cloudinary = require('../cloudinary');
-const utils = cloudinary.utils;
-const helper = require("./spechelper");
-const sharedExamples = helper.sharedExamples;
-const includeContext = helper.includeContext;
-const extend = require('lodash/extend');
+const { setupCache, sharedExamples, includeContext } = require("./spechelper");
+
+const { extend, isEmpty } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 const Cache = cloudinary.Cache;
@@ -79,7 +77,7 @@ describe('image helper', function () {
     expect(options.flags).to.eql('progressive');
   });
   it("Should consume custom attributes from 'attributes' key", function () {
-    var tag = cloudinary.image('sample.jpg', utils.extend({
+    var tag = cloudinary.image('sample.jpg', extend({
       attributes: customAttributes,
     }, commonTrans));
     Object.entries(customAttributes).forEach(function ([key, value]) {
@@ -88,7 +86,7 @@ describe('image helper', function () {
   });
   it("Should consume custom attributes as is from options", function () {
     var options, tag;
-    options = utils.extend({}, commonTrans, customAttributes);
+    options = extend({}, commonTrans, customAttributes);
     tag = cloudinary.image('sample.jpg', options);
     Object.entries(customAttributes).forEach(function ([key, value]) {
       expect(tag).to.contain(`${key}='${value}'`);
@@ -96,7 +94,7 @@ describe('image helper', function () {
   });
   it("Attributes from 'attributes' dict should override existing attributes", function () {
     var options, tag;
-    options = utils.extend({}, commonTrans, {
+    options = extend({}, commonTrans, {
       alt: "original alt",
       attributes: {
         alt: "updated alt",
@@ -178,11 +176,11 @@ describe('image helper', function () {
     var lastBreakpoint = 399;
     var breakpoints = [100, 200, 300, lastBreakpoint];
     before(function () {
-      helper.setupCache();
+      setupCache();
     });
     it("Should create srcset attribute with provided breakpoints", function () {
       var expected, tagWithBreakpoints;
-      tagWithBreakpoints = cloudinary.image('sample.jpg', utils.extend({}, commonTrans, {
+      tagWithBreakpoints = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           breakpoints: breakpoints,
         },
@@ -350,7 +348,7 @@ describe('image helper', function () {
       ].forEach(([srcset, subject]) => {
         it("Should throw an exception when " + subject, function () {
           expect(function () {
-            cloudinary.image('sample.jpg', utils.extend({
+            cloudinary.image('sample.jpg', extend({
               srcset: srcset,
             }, commonTrans));
           }).to.throwException();
@@ -375,7 +373,7 @@ function getExpectedSrcsetTag(publicId, commonTrans, customTrans, breakpoints, a
   if (!customTrans) {
     customTrans = commonTrans;
   }
-  if (!utils.isEmpty(breakpoints)) {
+  if (!isEmpty(breakpoints)) {
     attributes.srcset = breakpoints.map(width => `${UPLOAD_PATH}/${customTrans}/c_scale,w_${width}/${publicId} ${width}w`).join(', ');
   }
   let tag = `<img src='${UPLOAD_PATH}/${commonTrans}/${publicId}'`;

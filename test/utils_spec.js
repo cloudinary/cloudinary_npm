@@ -8,13 +8,16 @@ const Q = require('q');
 const fs = require('fs');
 const os = require('os');
 const cloudinary = require("../cloudinary");
-const utils = cloudinary.utils;
-const { clone, isString, merge, only } = utils;
 const defaults = require('lodash/defaults');
-const TEST_TAG = helper.TEST_TAG;
-const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
+
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
+
+const utils = cloudinary.utils;
+const { clone, isString, merge, only } = utils;
+const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
+
+const TEST_TAG = helper.TEST_TAG;
 
 // Defined globals
 var cloud_name = '';

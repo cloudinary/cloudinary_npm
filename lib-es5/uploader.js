@@ -28,20 +28,22 @@ var defaultsDeep = require('lodash/defaultsDeep');
 
 var UploadStream = require('./upload_stream');
 var utils = require("./utils");
-var extend = utils.extend,
+var Cache = require('./cache');
+var entries = require('./utils/entries');
+
+var build_upload_params = utils.build_upload_params,
+    extend = utils.extend,
     includes = utils.includes,
     isArray = utils.isArray,
     isObject = utils.isObject,
-    build_upload_params = utils.build_upload_params;
+    isRemoteUrl = utils.isRemoteUrl,
+    merge = utils.merge;
 
-var Cache = require('./cache');
-var entries = require('./utils/entries');
-var isRemoteUrl = utils.isRemoteUrl;
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  return exports.upload_stream(callback, utils.merge(options, {
+  return exports.upload_stream(callback, merge(options, {
     unsigned: true,
     upload_preset: upload_preset
   }));
@@ -58,7 +60,7 @@ exports.upload_stream = function upload_stream(callback) {
 exports.unsigned_upload = function unsigned_upload(file, upload_preset, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  return exports.upload(file, callback, utils.merge(options, {
+  return exports.upload(file, callback, merge(options, {
     unsigned: true,
     upload_preset: upload_preset
   }));
@@ -685,7 +687,7 @@ exports.image_upload_tag = function image_upload_tag(field) {
 exports.unsigned_image_upload_tag = function unsigned_image_upload_tag(field, upload_preset) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  return exports.image_upload_tag(field, utils.merge(options, {
+  return exports.image_upload_tag(field, merge(options, {
     unsigned: true,
     upload_preset: upload_preset
   }));

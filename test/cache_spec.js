@@ -1,18 +1,15 @@
 var options;
-
+const { describe, before, it } = require('mocha');
 const expect = require("expect.js");
 const helper = require("./spechelper");
 const cloudinary = require('../cloudinary').v2;
-const Cache = cloudinary.Cache;
+const path = require('path');
+
 const FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
 const KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAdapter`);
-const path = require('path');
-const TEST_TAG = helper.TEST_TAG;
+
+const Cache = cloudinary.Cache;
 const IMAGE_FILE = helper.IMAGE_FILE;
-const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
-const LARGE_VIDEO = helper.LARGE_VIDEO;
-const EMPTY_IMAGE = helper.EMPTY_IMAGE;
-const RAW_FILE = helper.RAW_FILE;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const PUBLIC_ID = "dummy";
 const BREAKPOINTS = [5, 3, 7, 5];
@@ -24,7 +21,6 @@ const TRANSFORMATION_1 = {
 
 const FORMAT_1 = 'png';
 const TRANSFORAMTION_1_RB = [206, 50];
-var cache;
 
 describe("Cache", function () {
   before(function () {

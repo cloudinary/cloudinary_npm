@@ -3,6 +3,7 @@ const helper = require("../spechelper");
 
 const fs = require('fs');
 const path = require('path');
+
 const FileKeyValueStorage = require("../../" + helper.libPath + "/cache/FileKeyValueStorage");
 
 const KEY = "test_key";

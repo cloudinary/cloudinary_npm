@@ -10,12 +10,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var CACHE = Symbol.for("com.cloudinary.cache");
 var CACHE_ADAPTER = Symbol.for("com.cloudinary.cacheAdapter");
-var utils = require('./utils');
-var ensurePresenceOf = utils.ensurePresenceOf;
+
+var _require = require('./utils'),
+    ensurePresenceOf = _require.ensurePresenceOf,
+    generate_transformation_string = _require.generate_transformation_string;
 
 /**
  * The adapter used to communicate with the underlying cache storage
  */
+
 
 var CacheAdapter = function () {
   function CacheAdapter(storage) {
@@ -100,7 +103,7 @@ var Cache = {
       return undefined;
     }
     ensurePresenceOf({ publicId });
-    var transformation = utils.generate_transformation_string(_extends({}, options));
+    var transformation = generate_transformation_string(_extends({}, options));
     return this.adapter.get(publicId, options.type || 'upload', options.resource_type || 'image', transformation, options.format);
   },
   /**
@@ -115,7 +118,7 @@ var Cache = {
       return undefined;
     }
     ensurePresenceOf({ publicId, value });
-    var transformation = utils.generate_transformation_string(_extends({}, options));
+    var transformation = generate_transformation_string(_extends({}, options));
     return this.adapter.set(publicId, options.type || 'upload', options.resource_type || 'image', transformation, options.format, value);
   },
   /**

@@ -2,11 +2,12 @@ require('dotenv').load({
   silent: true,
 });
 
+const fs = require('fs');
+const Q = require('q');
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary");
+
 const utils = cloudinary.utils;
-const Q = require('q');
-const fs = require('fs');
 
 
 function test_cloudinary_url(public_id, options, expected_url, expected_options) {

@@ -6,6 +6,7 @@ const expect = require('expect.js');
 const cloudinary = require('../cloudinary');
 const helper = require("./spechelper");
 const Q = require('q');
+
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
