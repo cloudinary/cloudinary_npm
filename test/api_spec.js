@@ -449,7 +449,7 @@ describe("api", function () {
         max_results: 500,
       }).then(result => expect(result.tags).not.to.be.empty());
     });
-    it("should allow listing tag by prefix ", () => {
+    it("should allow listing tag by prefix ", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.tags({
         prefix: TEST_TAG.slice(0, -1),
@@ -744,7 +744,7 @@ describe("api", function () {
         });
       });
     });
-    it("should support setting manual moderation status", () => {
+    it("should support setting manual moderation status", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         moderation: "manual",
@@ -752,7 +752,7 @@ describe("api", function () {
         moderation_status: "approved",
       })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
     });
-    it("should support requesting ocr info", () => {
+    it("should support requesting ocr info", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
@@ -761,7 +761,7 @@ describe("api", function () {
           () => expect().fail(),
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
-    it("should support requesting raw conversion", () => {
+    it("should support requesting raw conversion", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
@@ -985,7 +985,7 @@ describe("api", function () {
         type: "authenticated",
       });
     });
-    it("should publish by public id", () => {
+    it("should publish by public id", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "authenticated",
@@ -997,7 +997,7 @@ describe("api", function () {
         expect(published[0].url).to.match(/\/upload\//);
       });
     });
-    it("should publish by prefix", () => {
+    it("should publish by prefix", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_prefix(publishTestId.slice(0, -1)).then((result) => {
         let published = result.published;
