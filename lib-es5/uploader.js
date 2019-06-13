@@ -12,24 +12,25 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var fs = require('fs');
+var path = require('path');
+var Q = require('q');
+var Writable = require("stream").Writable;
+var urlLib = require('url');
+var defaultsDeep = require('lodash/defaultsDeep');
+
+// eslint-disable-next-line import/order
+
 var _require = require("./config"),
     upload_prefix = _require.upload_prefix;
 
 var isSecure = !(upload_prefix && upload_prefix.slice(0, 5) === 'http:');
 var https = isSecure ? require('https') : require('http');
 
-var fs = require('fs');
-var path = require('path');
-var Q = require('q');
-var Writable = require("stream").Writable;
-var urlLib = require('url');
-
-var defaultsDeep = require('lodash/defaultsDeep');
-
-var UploadStream = require('./upload_stream');
-var utils = require("./utils");
 var Cache = require('./cache');
+var utils = require("./utils");
 var entries = require('./utils/entries');
+var UploadStream = require('./upload_stream');
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,

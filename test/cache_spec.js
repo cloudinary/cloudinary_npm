@@ -1,9 +1,9 @@
 var options;
 const { describe, before, it } = require('mocha');
 const expect = require("expect.js");
+const path = require('path');
 const helper = require("./spechelper");
 const cloudinary = require('../cloudinary').v2;
-const path = require('path');
 
 const FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
 const KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAdapter`);

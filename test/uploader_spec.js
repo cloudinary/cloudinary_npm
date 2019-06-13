@@ -6,7 +6,6 @@ const https = require('https');
 const http = require('http');
 const expect = require("expect.js");
 const sinon = require('sinon');
-const cloudinary = require("../cloudinary");
 const fs = require('fs');
 const Q = require('q');
 const path = require('path');
@@ -14,6 +13,7 @@ const isFunction = require('lodash/isFunction');
 const at = require('lodash/at');
 const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
+const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
 const TEST_TAG = helper.TEST_TAG;

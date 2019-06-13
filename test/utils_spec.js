@@ -3,12 +3,12 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
-const helper = require("./spechelper");
 const Q = require('q');
 const fs = require('fs');
 const os = require('os');
-const cloudinary = require("../cloudinary");
 const defaults = require('lodash/defaults');
+const cloudinary = require("../cloudinary");
+const helper = require("./spechelper");
 
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);

@@ -3,15 +3,15 @@ require('dotenv').load({
   silent: true,
 });
 
-const helper = require("./spechelper");
 const expect = require("expect.js");
-const cloudinary = require("../cloudinary");
 const matchesProperty = require('lodash/matchesProperty');
 const find = require('lodash/find');
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
 const http = require('http');
 const Q = require('q');
+const cloudinary = require("../cloudinary");
+const helper = require("./spechelper");
 
 const { merge } = cloudinary.utils;
 const sharedExamples = helper.sharedExamples;

@@ -1,12 +1,13 @@
 'use strict';
 
+// eslint-disable-next-line import/order
 var config = require("./config");
-var ensureOption = require('./utils/ensureOption').defaults(config());
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
-var utils = require("./utils");
 var querystring = require("querystring");
 var Q = require('q');
 var url = require('url');
+var utils = require("./utils");
+var ensureOption = require('./utils/ensureOption').defaults(config());
 
 var extend = utils.extend,
     includes = utils.includes,

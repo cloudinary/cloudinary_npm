@@ -3,9 +3,9 @@ require('dotenv').load({
 });
 
 const expect = require('expect.js');
+const Q = require('q');
 const cloudinary = require('../cloudinary');
 const helper = require("./spechelper");
-const Q = require('q');
 
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";

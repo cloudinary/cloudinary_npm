@@ -3,9 +3,9 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
-const cloudinary = require("../cloudinary");
 const keys = require('lodash/keys');
 const Q = require('q');
+const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
 const api = cloudinary.v2.api;

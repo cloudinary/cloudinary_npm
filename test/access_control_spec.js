@@ -3,9 +3,9 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
+const isString = require('lodash/isString');
 const cloudinary = require("../cloudinary");
 const helper = require('./spechelper');
-const isString = require('lodash/isString');
 
 const build_upload_params = cloudinary.utils.build_upload_params;
 

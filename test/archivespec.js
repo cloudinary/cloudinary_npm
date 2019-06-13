@@ -2,16 +2,16 @@ require('dotenv').load({
   silent: true,
 });
 
-const helper = require("./spechelper");
 const https = require('https');
 const expect = require("expect.js");
-const cloudinary = require("../cloudinary");
 const last = require('lodash/last');
 const sinon = require("sinon");
 const execSync = require('child_process').execSync;
 const Q = require('q');
 const fs = require('fs');
 const os = require('os');
+const cloudinary = require("../cloudinary");
+const helper = require("./spechelper");
 
 const { utils, api, uploader } = cloudinary.v2;
 const TEST_TAG = helper.TEST_TAG;

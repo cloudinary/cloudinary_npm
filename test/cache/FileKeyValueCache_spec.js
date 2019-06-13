@@ -1,8 +1,7 @@
 const expect = require("expect.js");
-const helper = require("../spechelper");
-
 const fs = require('fs');
 const path = require('path');
+const helper = require("../spechelper");
 
 const FileKeyValueStorage = require("../../" + helper.libPath + "/cache/FileKeyValueStorage");
 
