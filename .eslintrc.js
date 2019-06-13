@@ -37,7 +37,7 @@ module.exports = {
         "tabWidth": 2
       }
     ],
-    "new-cap": "off",
+    // "new-cap": "off",
     "newline-per-chained-call": "off",
     "no-bitwise": "off",
     "no-buffer-constructor": "off",
