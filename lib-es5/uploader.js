@@ -107,7 +107,7 @@ var Chunkable = function (_Writable) {
     var _this = _possibleConstructorReturn(this, (Chunkable.__proto__ || Object.getPrototypeOf(Chunkable)).call(this, options));
 
     _this.chunk_size = options.chunk_size != null ? options.chunk_size : 20000000;
-    _this.buffer = new Buffer(0);
+    _this.buffer = Buffer.alloc(0);
     _this.active = true;
     _this.on('finish', function () {
       if (_this.active) {

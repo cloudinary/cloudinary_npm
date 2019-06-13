@@ -9,7 +9,7 @@ var crypto = require('crypto');
 var config = require('./config');
 
 function digest(message, key) {
-  return crypto.createHmac("sha256", new Buffer(key, "hex")).update(message).digest('hex');
+  return crypto.createHmac("sha256", Buffer.from(key, "hex")).update(message).digest('hex');
 }
 
 /**
