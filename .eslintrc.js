@@ -39,7 +39,7 @@ module.exports = {
     ],
     // "new-cap": "off",
     "newline-per-chained-call": "off",
-    "no-bitwise": "off",
+    // "no-bitwise": "off",
     "no-buffer-constructor": "off",
     "no-cond-assign": "off",
     "no-confusing-arrow": "off",
