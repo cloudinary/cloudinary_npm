@@ -57,7 +57,7 @@ module.exports = {
     // "no-lonely-if": "off",
     // "no-loop-func": "off",
     // "no-mixed-operators": "off",
-    "no-multi-assign": "off",
+    // "no-multi-assign": "off",
     "no-param-reassign": "off",
     "no-plusplus": "off",
     "no-prototype-builtins": "off",

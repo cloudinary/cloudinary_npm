@@ -722,7 +722,6 @@ describe("api", function () {
   describe("update", function () {
     describe("notification url", function () {
       var request, requestSpy, requestStub, writeSpy, xhr;
-      xhr = request = requestStub = requestSpy = writeSpy = void 0;
       before(function () {
         xhr = sinon.useFakeXMLHttpRequest();
         writeSpy = sinon.spy(ClientRequest.prototype, 'write');

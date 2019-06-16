@@ -1,89 +1,39 @@
-var Cache,
-  ClientRequest,
-  FileKeyValueStorage,
-  KeyValueCacheAdapter,
-  Q,
-  api_http,
-  cloneDeep,
-  cloudinary,
-  config,
-  expect,
-  http,
-  https,
-  isEmpty,
-  isFunction,
-  last,
-  libPath,
-  querystring,
-  ref,
-  sharedExamples,
-  sinon,
-  utils;
+const expect = require('expect.js');
+const isFunction = require('lodash/isFunction');
+const cloneDeep = require('lodash/cloneDeep');
+const querystring = require('querystring');
+const sinon = require('sinon');
+const ClientRequest = require('_http_client').ClientRequest;
+const Q = require('q');
+const http = require('http');
+const https = require('https');
 
-expect = require('expect.js');
+const cloudinary = require("../cloudinary");
 
-isFunction = require('lodash/isFunction');
+const { utils, config, Cache } = cloudinary;
+const { isEmpty, last } = utils;
 
-cloneDeep = require('lodash/cloneDeep');
+const libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
+const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
+const KeyValueCacheAdapter = require(`../${libPath}/cache/KeyValueCacheAdapter`);
+exports.libPath = libPath;
 
-libPath = exports.libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
-
-cloudinary = require("../cloudinary");
-
-({ utils, config, Cache } = cloudinary);
-
-({ isEmpty, last } = utils);
-
-FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
-
-KeyValueCacheAdapter = require(`../${libPath}/cache/KeyValueCacheAdapter`);
-
-http = require('http');
-
-https = require('https');
-
-if (config().upload_prefix && config().upload_prefix.slice(0, 5) === 'http:') {
-  api_http = http;
-} else {
-  api_http = https;
-}
-
-querystring = require('querystring');
-
-sinon = require('sinon');
-
-ClientRequest = require('_http_client').ClientRequest;
-
-Q = require('q');
+const api_http = String(config().upload_prefix).startsWith('http:') ? http : https;
 
 exports.TIMEOUT_SHORT = 5000;
-
 exports.TIMEOUT_MEDIUM = 20000;
-
 exports.TIMEOUT_LONG = 50000;
-
 exports.SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
-
 exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
-
 exports.TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDK's tests
-
 exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; // identifies resources created in the current test run
-
 exports.UPLOAD_TAGS = [exports.TEST_TAG, exports.TEST_TAG_PREFIX, exports.SDK_TAG];
-
 exports.IMAGE_FILE = "test/resources/logo.png";
-
 exports.LARGE_RAW_FILE = "test/resources/TheCompleteWorksOfShakespeare.mobi";
-
 exports.LARGE_VIDEO = "test/resources/CloudBookStudy-HD.mp4";
-
 exports.EMPTY_IMAGE = "test/resources/empty.gif";
-
 exports.RAW_FILE = "test/resources/docx.docx";
-
 exports.ICON_FILE = "test/resources/favicon.ico";
-
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
 exports.test_cloudinary_url = function (public_id, options, expected_url, expected_options) {
@@ -143,7 +93,7 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
 
 const allExamples = {};
 
-sharedExamples = function (name, examples) {
+function sharedExamples(name, examples) {
   switch (true) {
     case isFunction(examples):
       return allExamples[name] = examples;
@@ -154,9 +104,10 @@ sharedExamples = function (name, examples) {
         console.log(`Shared example ${name} was not found!`);
       };
   }
-};
+}
 
-exports.sharedExamples = exports.sharedContext = sharedExamples;
+exports.sharedContext = sharedExamples;
+exports.sharedExamples = exports.sharedContext;
 
 exports.itBehavesLike = function (name, ...args) {
   return context(`behaves like ${name}`, function () {
@@ -173,8 +124,8 @@ Create a matcher method for upload parameters
 @private
 @function helper.paramMatcher
 @param {string} name the parameter name
-@param value {Any} the parameter value
-@return {(arg)->Boolean} the matcher function
+@param {*} value the parameter value
+@return {function} the matcher function with the signature (arg)->Boolean
 */
 exports.uploadParamMatcher = function (name, value) {
   return function (arg) {
@@ -190,8 +141,8 @@ exports.uploadParamMatcher = function (name, value) {
   @private
   @function helper.apiParamMatcher
   @param {string} name the parameter name
-  @param value {Any} the parameter value
-  @return {(arg)->Boolean} the matcher function
+  @param {*} value the parameter value
+  @return {function} the matcher function as (arg)->Boolean
 */
 exports.apiParamMatcher = function (name, value) {
   var expected, params;

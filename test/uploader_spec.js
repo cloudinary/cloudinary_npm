@@ -334,37 +334,35 @@ describe("uploader", function () {
     });
   });
   describe("context", function () {
-    var first_id, second_id;
-    second_id = first_id = '';
     this.timeout(helper.TIMEOUT_MEDIUM);
     before(function () {
-      return Q.all([uploadImage(), uploadImage()]).spread(function (result1, result2) {
-        first_id = result1.public_id;
-        second_id = result2.public_id;
+      return Q.all([uploadImage(), uploadImage()]).spread((result1, result2) => {
+        this.first_id = result1.public_id;
+        this.second_id = result2.public_id;
       });
     });
     it("should add context to existing resources", function () {
-      return cloudinary.v2.uploader.add_context('alt=testAlt|custom=testCustom', [first_id, second_id]).then(function () {
-        return cloudinary.v2.uploader.add_context({
+      return cloudinary.v2.uploader
+        .add_context('alt=testAlt|custom=testCustom', [this.first_id, this.second_id])
+        .then(() => cloudinary.v2.uploader.add_context({
           alt2: "testAlt2",
           custom2: "testCustom2",
-        }, [first_id, second_id]);
-      }).then(function () {
-        return cloudinary.v2.api.resource(second_id);
-      }).then(function ({ context }) {
-        expect(context.custom.alt).to.equal('testAlt');
-        expect(context.custom.alt2).to.equal('testAlt2');
-        expect(context.custom.custom).to.equal('testCustom');
-        expect(context.custom.custom2).to.equal('testCustom2');
-        return cloudinary.v2.uploader.remove_all_context([first_id, second_id, 'noSuchId']);
-      }).then(function ({ public_ids }) {
-        expect(public_ids).to.contain(first_id);
-        expect(public_ids).to.contain(second_id);
-        expect(public_ids).to.not.contain('noSuchId');
-        return cloudinary.v2.api.resource(second_id);
-      }).then(function ({ context }) {
-        expect(context).to.be(void 0);
-      });
+        }, [this.first_id, this.second_id]))
+        .then(() => cloudinary.v2.api.resource(this.second_id))
+        .then(({ context }) => {
+          expect(context.custom.alt).to.equal('testAlt');
+          expect(context.custom.alt2).to.equal('testAlt2');
+          expect(context.custom.custom).to.equal('testCustom');
+          expect(context.custom.custom2).to.equal('testCustom2');
+          return cloudinary.v2.uploader.remove_all_context([this.first_id, this.second_id, 'noSuchId']);
+        }).then(({ public_ids }) => {
+          expect(public_ids).to.contain(this.first_id);
+          expect(public_ids).to.contain(this.second_id);
+          expect(public_ids).to.not.contain('noSuchId');
+          return cloudinary.v2.api.resource(this.second_id);
+        }).then(function ({ context }) {
+          expect(context).to.be(void 0);
+        });
     });
     it("should upload with context containing reserved characters", function () {
       var context = {
