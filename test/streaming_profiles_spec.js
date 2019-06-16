@@ -27,13 +27,12 @@ describe('Cloudinary::Api', function () {
     cloudinary.config(true);
     if (cloudinary.config().keep_test_products) {
       return Q.resolve();
-    } else {
-      return Q.allSettled([
-        cloudinary.v2.api.delete_streaming_profile(test_id_1),
-        cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'),
-        cloudinary.v2.api.delete_streaming_profile(test_id_3),
-      ]);
     }
+    return Q.allSettled([
+      cloudinary.v2.api.delete_streaming_profile(test_id_1),
+      cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'),
+      cloudinary.v2.api.delete_streaming_profile(test_id_3),
+    ]);
   });
   describe('create_streaming_profile', function () {
     it('should create a streaming profile with representations', function () {

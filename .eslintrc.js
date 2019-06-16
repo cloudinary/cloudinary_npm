@@ -51,7 +51,7 @@ module.exports = {
     // "no-confusing-arrow": "off",
     "no-console": "off",
     // "no-dupe-keys": "off",
-    "no-else-return": "off",
+    // "no-else-return": "off",
     "no-empty": "off",
     "no-empty-function": "off",
     "no-lonely-if": "off",

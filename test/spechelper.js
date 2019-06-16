@@ -3,7 +3,6 @@ var Cache,
   FileKeyValueStorage,
   KeyValueCacheAdapter,
   Q,
-  allExamples,
   api_http,
   cloneDeep,
   cloudinary,
@@ -142,27 +141,20 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
   return this;
 };
 
-allExamples = null;
+const allExamples = {};
 
-sharedExamples = (function (allExamples, isFunction) {
-  return function (name, examples) {
-    if (allExamples == null) {
-      allExamples = {};
-    }
-    if (isFunction(examples)) {
-      allExamples[name] = examples;
-      return examples;
-    } else {
-      if (allExamples[name] != null) {
-        return allExamples[name];
-      } else {
-        return function () {
-          return console.log(`Shared example ${name} was not found!`);
-        };
-      }
-    }
-  };
-})(allExamples, isFunction);
+sharedExamples = function (name, examples) {
+  switch (true) {
+    case isFunction(examples):
+      return allExamples[name] = examples;
+    case allExamples.hasOwnProperty(name):
+      return allExamples[name];
+    default:
+      return function () {
+        console.log(`Shared example ${name} was not found!`);
+      };
+  }
+};
 
 exports.sharedExamples = exports.sharedContext = sharedExamples;
 
@@ -283,15 +275,14 @@ exports.mockPromise = function (mockBlock) {
     requestSpy = sinon.spy(api_http, 'request');
     mock = { xhr, writeSpy, requestSpy };
     result = mockBlock(xhr, writeSpy, requestSpy);
-    if (isFunction(result != null ? result.then : void 0)) {
+    if (result != null && isFunction(result.then)) {
       return result.then(resolve);
-    } else {
-      return resolve(result);
     }
+    return resolve(result);
   }).finally(function () {
     requestSpy.restore();
     writeSpy.restore();
-    return xhr.restore();
+    xhr.restore();
   }).done();
 };
 

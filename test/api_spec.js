@@ -165,18 +165,17 @@ describe("api", function () {
     this.timeout(helper.TIMEOUT_LONG);
     if (config.keep_test_products) {
       return Promise.resolve();
-    } else {
-      if (!(config.api_key && config.api_secret)) {
-        expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-      }
-      return Q.allSettled([
-        cloudinary.v2.api.delete_resources_by_tag(TEST_TAG),
-        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1),
-        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2),
-        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3),
-        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4),
-      ]);
     }
+    if (!(config.api_key && config.api_secret)) {
+      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
+    }
+    return Q.allSettled([
+      cloudinary.v2.api.delete_resources_by_tag(TEST_TAG),
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1),
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2),
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET3),
+      cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4),
+    ]);
   });
 
   describe("resources", function () {
@@ -929,11 +928,7 @@ describe("api", function () {
     const mapping = `api_test_upload_mapping${Math.floor(Math.random() * 100000)}`;
     deleteMapping = false;
     after(function () {
-      if (deleteMapping) {
-        return cloudinary.v2.api.delete_upload_mapping(mapping);
-      } else {
-        return Promise.resolve();
-      }
+      return deleteMapping ? cloudinary.v2.api.delete_upload_mapping(mapping) : Promise.resolve();
     });
     itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_mappings);
     it('should create mapping', function () {
