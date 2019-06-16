@@ -41,7 +41,7 @@ module.exports = {
     "newline-per-chained-call": "off",
     // "no-bitwise": "off",
     // "no-buffer-constructor": "off",
-    "no-cond-assign": "off",
+    // "no-cond-assign": "off",
     "no-confusing-arrow": "off",
     "no-console": "off",
     "no-dupe-keys": "off",

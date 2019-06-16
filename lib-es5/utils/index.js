@@ -247,14 +247,15 @@ function process_layer(layer) {
       var text = layer.text;
       var style = null;
       var components = [];
-      if (!isEmpty(public_id)) {
+      var noPublicId = isEmpty(public_id);
+      if (!noPublicId) {
         public_id = public_id.replace(new RegExp("/", 'g'), ":");
         if (format != null) {
           public_id = `${public_id}.${format}`;
         }
       }
       if (isEmpty(text) && resource_type !== "text") {
-        if (isEmpty(public_id)) {
+        if (noPublicId) {
           throw "Must supply public_id for resource_type layer_parameter";
         }
         if (resource_type === "subtitles") {
@@ -266,15 +267,15 @@ function process_layer(layer) {
         // type is ignored for text layers
         style = textStyle(layer);
         if (!isEmpty(text)) {
-          if (!(isEmpty(public_id) ^ isEmpty(style))) {
+          var noStyle = isEmpty(style);
+          if (!(noPublicId || noStyle) || noPublicId && noStyle) {
             throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay";
           }
           var re = /\$\([a-zA-Z]\w*\)/g;
           var start = 0;
           var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
           text = "";
-          var res = void 0;
-          while (res = re.exec(textSource)) {
+          for (var res = re.exec(textSource); res; res = re.exec(textSource)) {
             text += smart_escape(textSource.slice(start, res.index));
             text += res[0];
             start = res.index + res[0].length;

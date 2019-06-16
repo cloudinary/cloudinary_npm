@@ -666,7 +666,8 @@ describe("cloudinary", function () {
       var ref;
       process.env.CLOUDINARY_URL = "cloudinary://key:secret@test123?foo[bar]=value";
       cloudinary.config(true);
-      expect((ref = cloudinary.config().foo) != null ? ref.bar : void 0).to.eql('value');
+      const foo = cloudinary.config().foo;
+      expect(foo && foo.bar).to.eql('value');
     });
   });
 });

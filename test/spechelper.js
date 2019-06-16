@@ -63,7 +63,7 @@ exports.TIMEOUT_MEDIUM = 20000;
 
 exports.TIMEOUT_LONG = 50000;
 
-exports.SUFFIX = (ref = process.env.TRAVIS_JOB_ID) != null ? ref : Math.floor(Math.random() * 999999);
+exports.SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
 
 exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
 
