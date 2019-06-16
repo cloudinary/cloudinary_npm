@@ -2,9 +2,9 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -72,11 +72,7 @@ exports.upload = function upload(file, callback) {
 
   return call_api("upload", callback, options, function () {
     var params = build_upload_params(options);
-    if (file != null && isRemoteUrl(file)) {
-      return [params, { file: file }];
-    } else {
-      return [params, {}, file];
-    }
+    return isRemoteUrl(file) ? [params, { file: file }] : [params, {}, file];
   });
 };
 
@@ -84,12 +80,10 @@ exports.upload_large = function upload_large(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   if (path != null && path.match(/^https?:/)) {
+    // upload a remote file
     return exports.upload(path, callback, options);
-  } else {
-    return exports.upload_chunked(path, callback, extend({
-      resource_type: 'raw'
-    }, options));
   }
+  return exports.upload_chunked(path, callback, _extends({ resource_type: 'raw' }, options));
 };
 
 exports.upload_chunked = function upload_chunked(path, callback, options) {
@@ -172,14 +166,11 @@ exports.upload_chunked_stream = function upload_chunked_stream(callback) {
     options.content_range = `bytes ${chunk_start}-${sent - 1}/${is_last ? sent : -1}`;
     params.timestamp = utils.timestamp();
     var finished_part = function finished_part(result) {
-      if (result.error != null || is_last) {
-        if (typeof callback === "function") {
-          callback(result);
-        }
-        return done(false);
-      } else {
-        return done(true);
+      var errorOrLast = result.error != null || is_last;
+      if (errorOrLast && typeof callback === "function") {
+        callback(result);
       }
+      return done(!errorOrLast);
     };
     var stream = call_api("upload", finished_part, options, function () {
       return [params, {}, buffer];
@@ -536,9 +527,8 @@ function call_api(action, callback, options, get_params) {
   var result = post(api_url, post_data, boundary, file, handle_response, options);
   if (isObject(result)) {
     return result;
-  } else {
-    return deferred.promise;
   }
+  return deferred.promise;
 }
 
 function post(url, post_data, boundary, file, callback, options) {
@@ -611,7 +601,8 @@ function post(url, post_data, boundary, file, callback, options) {
   if (options.stream) {
     post_request.write(file_header);
     return upload_stream;
-  } else if (file != null) {
+  }
+  if (file != null) {
     post_request.write(file_header);
     fs.createReadStream(file).on('error', function (error) {
       callback({

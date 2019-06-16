@@ -96,11 +96,7 @@ exports.USER_AGENT = `CloudinaryNodeJS/${exports.VERSION}`;
 exports.userPlatform = "";
 
 exports.getUserAgent = function getUserAgent() {
-  if (isEmpty(utils.userPlatform)) {
-    return `${utils.USER_AGENT}`;
-  } else {
-    return `${utils.userPlatform} ${utils.USER_AGENT}`;
-  }
+  return isEmpty(utils.userPlatform) ? `${utils.USER_AGENT}` : `${utils.userPlatform} ${utils.USER_AGENT}`;
 };
 
 var DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {
@@ -166,6 +162,7 @@ function textStyle(layer) {
   var font_family = layer.font_family;
   var font_size = layer.font_size;
   var keywords = [];
+  var style = "";
   Object.keys(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
     var default_value = LAYER_KEYWORD_PARAMS[attr];
     var attr_value = layer[attr] || default_value;
@@ -190,10 +187,9 @@ function textStyle(layer) {
     }
     keywords.unshift(font_size);
     keywords.unshift(font_family);
-    return compact(keywords).join("_");
-  } else {
-    return null;
+    style = compact(keywords).join("_");
   }
+  return style;
 }
 
 /**
@@ -221,11 +217,7 @@ function normalize_expression(expression) {
  * @return {string} "if_" + ifValue
  */
 function process_if(ifValue) {
-  if (ifValue) {
-    return "if_" + normalize_expression(ifValue);
-  } else {
-    return ifValue;
-  }
+  return ifValue ? "if_" + normalize_expression(ifValue) : ifValue;
 }
 
 /**
@@ -371,61 +363,60 @@ exports.timestamp = function timestamp() {
 exports.option_consume = function option_consume(options, option_name, default_value) {
   var result = options[option_name];
   delete options[option_name];
-  if (result != null) {
-    return result;
-  } else {
-    return default_value;
-  }
+  return result != null ? result : default_value;
 };
 
 exports.build_array = function build_array(arg) {
-  if (arg == null) {
-    return [];
-  } else if (isArray(arg)) {
-    return arg;
-  } else {
-    return [arg];
+  switch (true) {
+    case arg == null:
+      return [];
+    case isArray(arg):
+      return arg;
+    default:
+      return [arg];
   }
 };
 
+/**
+ * Serialize an array of arrays into a string
+ * @param {[]|[[]]} array - An array of arrays.
+ *                          If the first element is not an array the argument is wrapped in an array.
+ * @returns {string} A string representation of the arrays.
+ */
 exports.encode_double_array = function encode_double_array(array) {
   array = utils.build_array(array);
-  if (array.length > 0 && isArray(array[0])) {
-    return array.map(function (e) {
-      return utils.build_array(e).join(",");
-    }).join("|");
-  } else {
-    return array.join(",");
+  if (!isArray(array[0])) {
+    array = [array];
   }
+  return array.map(function (e) {
+    return utils.build_array(e).join(",");
+  }).join("|");
 };
 
 exports.encode_key_value = function encode_key_value(arg) {
-  if (isObject(arg)) {
-    return entries(arg).map(function (_ref) {
-      var _ref2 = _slicedToArray(_ref, 2),
-          k = _ref2[0],
-          v = _ref2[1];
-
-      return `${k}=${v}`;
-    }).join('|');
-  } else {
+  if (!isObject(arg)) {
     return arg;
   }
+  return entries(arg).map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        k = _ref2[0],
+        v = _ref2[1];
+
+    return `${k}=${v}`;
+  }).join('|');
 };
 
 exports.encode_context = function encode_context(arg) {
-  var k, pairs, v;
-  if (isObject(arg)) {
-    return entries(arg).map(function (_ref3) {
-      var _ref4 = _slicedToArray(_ref3, 2),
-          k = _ref4[0],
-          v = _ref4[1];
-
-      return `${k}=${v.replace(/([=|])/g, '\\$&')}`;
-    }).join('|');
-  } else {
+  if (!isObject(arg)) {
     return arg;
   }
+  return entries(arg).map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        k = _ref4[0],
+        v = _ref4[1];
+
+    return `${k}=${v.replace(/([=|])/g, '\\$&')}`;
+  }).join('|');
 };
 
 exports.build_eager = function build_eager(transformations) {
@@ -444,20 +435,21 @@ exports.build_eager = function build_eager(transformations) {
  *         an array of header strings, or a string of headers
  */
 exports.build_custom_headers = function build_custom_headers(headers) {
-  if (headers == null) {
-    return void 0;
-  } else if (isArray(headers)) {
-    return headers.join("\n");
-  } else if (isObject(headers)) {
-    return entries(headers).map(function (_ref5) {
-      var _ref6 = _slicedToArray(_ref5, 2),
-          k = _ref6[0],
-          v = _ref6[1];
+  switch (true) {
+    case headers == null:
+      return void 0;
+    case isArray(headers):
+      return headers.join("\n");
+    case isObject(headers):
+      return entries(headers).map(function (_ref5) {
+        var _ref6 = _slicedToArray(_ref5, 2),
+            k = _ref6[0],
+            v = _ref6[1];
 
-      return `${k}:${v}`;
-    }).join("\n");
-  } else {
-    return headers;
+        return `${k}:${v}`;
+      }).join("\n");
+    default:
+      return headers;
   }
 };
 
@@ -502,15 +494,9 @@ exports.generate_transformation_string = function generate_transformation_string
   color = color && color.replace(/^#/, "rgb:");
   var base_transformations = utils.build_array(utils.option_consume(options, "transformation", []));
   var named_transformation = [];
-  if (base_transformations.length !== 0 && filter(base_transformations, isObject).length > 0) {
-    base_transformations = map(base_transformations, function (base_transformation) {
-      if (isObject(base_transformation)) {
-        return utils.generate_transformation_string(clone(base_transformation));
-      } else {
-        return utils.generate_transformation_string({
-          transformation: base_transformation
-        });
-      }
+  if (base_transformations.some(isObject)) {
+    base_transformations = base_transformations.map(function (tr) {
+      return utils.generate_transformation_string(isObject(tr) ? clone(tr) : { transformation: tr });
     });
   } else {
     named_transformation = base_transformations.join(".");
@@ -1150,11 +1136,8 @@ exports.download_zip_url = function download_zip_url() {
 function join_pair(key, value) {
   if (!value) {
     return void 0;
-  } else if (value === true) {
-    return key;
-  } else {
-    return key + "='" + value + "'";
   }
+  return value === true ? key : key + "='" + value + "'";
 }
 
 /**
@@ -1176,18 +1159,17 @@ exports.cloudinary_js_config = function cloudinary_js_config() {
 };
 
 function v1_result_adapter(callback) {
-  if (callback != null) {
-    return function (result) {
-      if (result.error != null) {
-        return callback(result.error);
-      } else {
-        return callback(void 0, result);
-      }
-    };
-  } else {
+  if (callback == null) {
     return undefined;
   }
+  return function (result) {
+    if (result.error != null) {
+      return callback(result.error);
+    }
+    return callback(void 0, result);
+  };
 }
+
 function v1_adapter(name, num_pass_args, v1) {
   return function () {
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -1238,11 +1220,10 @@ function split_range(range) {
   // :nodoc:
   switch (range.constructor) {
     case String:
-      if (OFFSET_ANY_PATTERN_RE.test(range)) {
-        return range.split("..");
-      } else {
+      if (!OFFSET_ANY_PATTERN_RE.test(range)) {
         return range;
       }
+      return range.split("..");
     case Array:
       return [first(range), last(range)];
     default:

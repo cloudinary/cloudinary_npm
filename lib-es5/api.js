@@ -136,11 +136,10 @@ function call_api(method, uri, params, callback, options) {
 }
 
 function transformationString(transformation) {
-  if (isString(transformation)) {
-    return transformation;
-  } else {
-    return utils.generate_transformation_string(extend({}, transformation));
+  if (!isString(transformation)) {
+    transformation = utils.generate_transformation_string(extend({}, transformation));
   }
+  return transformation;
 }
 
 function deleteResourcesParams(options) {
