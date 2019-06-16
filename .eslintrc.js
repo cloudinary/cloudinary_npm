@@ -15,7 +15,13 @@ module.exports = {
   "rules": {
     "camelcase": "off",
     // "class-methods-use-this": "off",
-    // "comma-dangle": "off",
+    "comma-dangle": ["error", {
+      "functions": "ignore",
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+    }],
     // "consistent-return": "off",
     // "dot-notation": "off",
     "func-names": "off",
