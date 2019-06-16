@@ -238,7 +238,7 @@ describe("api", function () {
         expect(result.resources.map(e => e.public_id))
           .to.contain(PUBLIC_ID).and.contain(PUBLIC_ID_2);
         expect(getAllTags(result)).to.contain(TEST_TAG);
-        expect(result.resources.map(e => e.context ? e.context.custom.key : null))
+        expect(result.resources.map(e => e.context && e.context.custom.key))
           .to.contain("value");
       });
     });

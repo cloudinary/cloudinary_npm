@@ -42,7 +42,7 @@ module.exports = {
     // "no-bitwise": "off",
     // "no-buffer-constructor": "off",
     // "no-cond-assign": "off",
-    "no-confusing-arrow": "off",
+    // "no-confusing-arrow": "off",
     "no-console": "off",
     "no-dupe-keys": "off",
     "no-else-return": "off",
