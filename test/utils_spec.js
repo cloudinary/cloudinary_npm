@@ -1069,9 +1069,9 @@ describe("utils", function () {
 
       // Overlay and underlay have the same code, so we test overlay only
       describe('overlay', function () {
-        var LAYERS_OPTIONS, i, layer, len, name, op, options, result;
+        var layer, len, name, op, options, result;
         // [name, options, result]
-        LAYERS_OPTIONS = [
+        const LAYERS_OPTIONS = [
           ["string",
             "text:test_text:hello",
             "text:test_text:hello"],
@@ -1127,9 +1127,7 @@ describe("utils", function () {
             "subtitles:Arial_40:subtitles.srt",
           ],
         ];
-        for (i = 0, len = LAYERS_OPTIONS.length; i < len; i++) {
-          layer = LAYERS_OPTIONS[i];
-          [name, options, result] = layer;
+        LAYERS_OPTIONS.forEach(function ([name, options, result]) {
           it(`should support ${name}`, function (done) {
             var opt = {};
             opt.overlay = options;
@@ -1140,13 +1138,17 @@ describe("utils", function () {
             op.overlay = options;
             itBehavesLike("a signed url", op, `l_${result}`);
           }
-        }
+        });
         it("should not pass width/height to html for overlay", function () {
-          var opt = {};
-          opt.overlay = "text:test_text";
-          opt.height = 100;
-          opt.width = 100;
-          expect(["sample", opt]).produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample`).and.emptyOptions();
+          let opt = {
+            overlay: "text:test_text",
+            height: 100,
+            width: 100,
+          };
+          expect(["sample", opt])
+            .produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample`)
+            .and
+            .emptyOptions();
         });
       });
     });

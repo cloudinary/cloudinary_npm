@@ -55,7 +55,7 @@ module.exports = {
     // "no-empty": "off",
     // "no-empty-function": "off",
     // "no-lonely-if": "off",
-    "no-loop-func": "off",
+    // "no-loop-func": "off",
     "no-mixed-operators": "off",
     "no-multi-assign": "off",
     "no-param-reassign": "off",
