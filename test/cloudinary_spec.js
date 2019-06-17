@@ -2,7 +2,6 @@ const expect = require("expect.js");
 const cloudinary = require("../cloudinary.js");
 
 describe("cloudinary", function () {
-  var layer, layers;
   beforeEach(function () {
     cloudinary.config({
       cloud_name: "test123",
@@ -381,11 +380,10 @@ describe("cloudinary", function () {
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/e_sepia:10/test");
   });
-  layers = [
+  [
     ["overlay", "l"],
     ["underlay", "u"],
-  ];
-  layers.forEach(([layer, short]) => {
+  ].forEach(([layer, short]) => {
     it(`should support ${layer}`, function () {
       var result;
       let options = {};

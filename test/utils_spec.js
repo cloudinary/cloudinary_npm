@@ -1057,9 +1057,9 @@ describe("utils", function () {
             resource_type: 'raw',
             overwrite: true,
             tags: TEST_TAG,
-          }, function (error, result) {
-            if (error != null) {
-              done(new Error(error.message));
+          }, function (error2, result) {
+            if (error2 != null) {
+              done(new Error(error2.message));
             }
             done();
           });
@@ -1069,7 +1069,6 @@ describe("utils", function () {
 
       // Overlay and underlay have the same code, so we test overlay only
       describe('overlay', function () {
-        var layer, len, name, op, options, result;
         // [name, options, result]
         const LAYERS_OPTIONS = [
           ["string",
@@ -1134,9 +1133,7 @@ describe("utils", function () {
             expect(["sample", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
           });
           if (!isString(options)) {
-            op = {};
-            op.overlay = options;
-            itBehavesLike("a signed url", op, `l_${result}`);
+            itBehavesLike("a signed url", { overlay: options }, `l_${result}`);
           }
         });
         it("should not pass width/height to html for overlay", function () {
@@ -1266,7 +1263,6 @@ describe("utils", function () {
     }, `http://res.cloudinary.com/${cloud_name}/iu/test`, {});
   });
   it("should escape public_ids", function () {
-    var ref, results, source, target;
     const expressions = [
       // [source, target]
       ["a b", "a%20b"],
