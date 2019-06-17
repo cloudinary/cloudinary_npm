@@ -96,7 +96,8 @@ const allExamples = {};
 function sharedExamples(name, examples) {
   switch (true) {
     case isFunction(examples):
-      return allExamples[name] = examples;
+      allExamples[name] = examples;
+      return examples;
     case allExamples.hasOwnProperty(name):
       return allExamples[name];
     default:
@@ -189,12 +190,12 @@ exports.mockTest = function () {
   before(function () {
     mocked.xhr = sinon.useFakeXMLHttpRequest();
     mocked.write = sinon.spy(ClientRequest.prototype, 'write');
-    return mocked.request = sinon.spy(api_http, 'request');
+    mocked.request = sinon.spy(api_http, 'request');
   });
   after(function () {
     mocked.request.restore();
     mocked.write.restore();
-    return mocked.xhr.restore();
+    mocked.xhr.restore();
   });
   return mocked;
 };

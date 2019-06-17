@@ -62,7 +62,7 @@ module.exports = {
     "no-plusplus": "off",
     "no-prototype-builtins": "off",
     // "no-restricted-syntax": "off",
-    "no-return-assign": "off",
+    // "no-return-assign": "off",
     "no-shadow": "off",
     "no-throw-literal": "off",
     "no-unreachable": "off",

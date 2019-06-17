@@ -923,36 +923,41 @@ describe("api", function () {
     }));
   });
   describe('mapping', function () {
-    let deleteMapping = false;
-    const mapping = `api_test_upload_mapping${Math.floor(Math.random() * 100000)}`;
-    deleteMapping = false;
+    before(function () {
+      this.mapping = `api_test_upload_mapping${Math.floor(Math.random() * 100000)}`;
+      this.deleteMapping = false;
+    });
     after(function () {
-      return deleteMapping ? cloudinary.v2.api.delete_upload_mapping(mapping) : Promise.resolve();
+      return this.deleteMapping ? cloudinary.v2.api.delete_upload_mapping(this.mapping) : null;
     });
     itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_mappings);
     it('should create mapping', function () {
       this.timeout(helper.TIMEOUT_LONG);
-      return cloudinary.v2.api.create_upload_mapping(mapping, {
-        template: "http://cloudinary.com",
-        tags: UPLOAD_TAGS,
-      }).then(result => deleteMapping = cloudinary.v2.api.upload_mapping(mapping))
-        .then((result) => {
+      return cloudinary.v2.api
+        .create_upload_mapping(this.mapping, {
+          template: "http://cloudinary.com",
+          tags: UPLOAD_TAGS,
+        }).then(
+          () => cloudinary.v2.api.upload_mapping(this.mapping)
+        ).then((result) => {
+          this.deleteMapping = true;
           expect(result.template).to.eql("http://cloudinary.com");
-          return cloudinary.v2.api.update_upload_mapping(mapping, {
+          return cloudinary.v2.api.update_upload_mapping(this.mapping, {
             template: "http://res.cloudinary.com",
           });
-        }).then(result => cloudinary.v2.api.upload_mapping(mapping))
-        .then((result) => {
+        }).then(
+          result => cloudinary.v2.api.upload_mapping(this.mapping)
+        ).then((result) => {
           expect(result.template).to.eql("http://res.cloudinary.com");
           return cloudinary.v2.api.upload_mappings();
         }).then((result) => {
-          expect(result.mappings.find(({ folder, template }) => folder === mapping && template === "http://res.cloudinary.com")).to.be.ok();
-          return cloudinary.v2.api.delete_upload_mapping(mapping);
+          expect(result.mappings.find(({ folder, template }) => folder === this.mapping && template === "http://res.cloudinary.com")).to.be.ok();
+          return cloudinary.v2.api.delete_upload_mapping(this.mapping);
         }).then((result) => {
-          deleteMapping = false;
+          this.deleteMapping = false;
           return cloudinary.v2.api.upload_mappings();
         }).then(
-          ({ mappings }) => expect(mappings.find(({ folder }) => folder === mapping)).not.to.be.ok(),
+          ({ mappings }) => expect(mappings.find(({ folder }) => folder === this.mapping)).not.to.be.ok(),
         );
     });
   });

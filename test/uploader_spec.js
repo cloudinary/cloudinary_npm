@@ -82,10 +82,10 @@ describe("uploader", function () {
     var writeSpy;
     writeSpy = void 0;
     beforeEach(function () {
-      return writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     });
     afterEach(function () {
-      return writeSpy.restore();
+      writeSpy.restore();
     });
     it("should send s3:// URLs to server", function () {
       cloudinary.v2.uploader.upload("s3://test/1.jpg", {
@@ -145,7 +145,7 @@ describe("uploader", function () {
       end = void 0;
       before(function () {
         xhr = sinon.useFakeXMLHttpRequest();
-        return spy = sinon.spy(ClientRequest.prototype, 'write');
+        spy = sinon.spy(ClientRequest.prototype, 'write');
       });
       after(function () {
         spy.restore();
@@ -835,11 +835,11 @@ describe("uploader", function () {
     xhr = void 0;
     before(function () {
       xhr = sinon.useFakeXMLHttpRequest();
-      return spy = sinon.spy(ClientRequest.prototype, 'write');
+      spy = sinon.spy(ClientRequest.prototype, 'write');
     });
     after(function () {
       spy.restore();
-      return xhr.restore();
+      xhr.restore();
     });
     describe(":invalidate", function () {
       it("should should pass the invalidate value to the server", function () {
