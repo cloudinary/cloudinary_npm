@@ -74,7 +74,9 @@ var utils = module.exports;
 try {
   // eslint-disable-next-line global-require
   utils.VERSION = require('../../package.json').version;
-} catch (error) {}
+} catch (error) {
+  utils.VERSION = '';
+}
 
 exports.generate_auth_token = function generate_auth_token(options) {
   var token_options = Object.assign({}, config().auth_token, options);
@@ -469,14 +471,15 @@ exports.generate_transformation_string = function generate_transformation_string
   var height = options.height;
   var size = utils.option_consume(options, "size");
   if (size) {
-    var _size$split, _size$split2;
+    var _size$split = size.split("x");
 
-    var _ref7 = (_size$split = size.split("x"), _size$split2 = _slicedToArray(_size$split, 2), width = _size$split2[0], height = _size$split2[1], _size$split);
+    var _size$split2 = _slicedToArray(_size$split, 2);
 
-    var _ref8 = _slicedToArray(_ref7, 2);
-
-    options.width = _ref8[0];
-    options.height = _ref8[1];
+    width = _size$split2[0];
+    height = _size$split2[1];
+    var _ref7 = [width, height];
+    options.width = _ref7[0];
+    options.height = _ref7[1];
   }
   var has_layer = options.overlay || options.underlay;
   var crop = utils.option_consume(options, "crop");
@@ -506,10 +509,10 @@ exports.generate_transformation_string = function generate_transformation_string
   if (isArray(effect)) {
     effect = effect.join(":");
   } else if (isObject(effect)) {
-    effect = entries(effect).map(function (_ref9) {
-      var _ref10 = _slicedToArray(_ref9, 2),
-          key = _ref10[0],
-          value = _ref10[1];
+    effect = entries(effect).map(function (_ref8) {
+      var _ref9 = _slicedToArray(_ref8, 2),
+          key = _ref9[0],
+          value = _ref9[1];
 
       return `${key}:${value}`;
     });
@@ -565,10 +568,10 @@ exports.generate_transformation_string = function generate_transformation_string
   };
   var simple_params = [["audio_codec", "ac"], ["audio_frequency", "af"], ["bit_rate", 'br'], ["color_space", "cs"], ["default_image", "d"], ["delay", "dl"], ["density", "dn"], ["duration", "du"], ["end_offset", "eo"], ["fetch_format", "f"], ["gravity", "g"], ["page", "pg"], ["prefix", "p"], ["start_offset", "so"], ["streaming_profile", "sp"], ["video_codec", "vc"], ["video_sampling", "vs"]];
 
-  simple_params.forEach(function (_ref11) {
-    var _ref12 = _slicedToArray(_ref11, 2),
-        name = _ref12[0],
-        short = _ref12[1];
+  simple_params.forEach(function (_ref10) {
+    var _ref11 = _slicedToArray(_ref10, 2),
+        name = _ref11[0],
+        short = _ref11[1];
 
     var value = utils.option_consume(options, name);
     if (value !== undefined) {
@@ -585,37 +588,37 @@ exports.generate_transformation_string = function generate_transformation_string
   });
 
   var variablesParam = utils.option_consume(options, "variables", []);
-  var variables = entries(options).filter(function (_ref13) {
-    var _ref14 = _slicedToArray(_ref13, 2),
-        key = _ref14[0],
-        value = _ref14[1];
+  var variables = entries(options).filter(function (_ref12) {
+    var _ref13 = _slicedToArray(_ref12, 2),
+        key = _ref13[0],
+        value = _ref13[1];
 
     return key.startsWith('$');
-  }).map(function (_ref15) {
-    var _ref16 = _slicedToArray(_ref15, 2),
-        key = _ref16[0],
-        value = _ref16[1];
+  }).map(function (_ref14) {
+    var _ref15 = _slicedToArray(_ref14, 2),
+        key = _ref15[0],
+        value = _ref15[1];
 
     delete options[key];
     return `${key}_${normalize_expression(value)}`;
-  }).sort().concat(variablesParam.map(function (_ref17) {
-    var _ref18 = _slicedToArray(_ref17, 2),
-        name = _ref18[0],
-        value = _ref18[1];
+  }).sort().concat(variablesParam.map(function (_ref16) {
+    var _ref17 = _slicedToArray(_ref16, 2),
+        name = _ref17[0],
+        value = _ref17[1];
 
     return `${name}_${normalize_expression(value)}`;
   })).join(',');
 
-  var transformations = entries(params).filter(function (_ref19) {
-    var _ref20 = _slicedToArray(_ref19, 2),
-        key = _ref20[0],
-        value = _ref20[1];
+  var transformations = entries(params).filter(function (_ref18) {
+    var _ref19 = _slicedToArray(_ref18, 2),
+        key = _ref19[0],
+        value = _ref19[1];
 
     return utils.present(value);
-  }).map(function (_ref21) {
-    var _ref22 = _slicedToArray(_ref21, 2),
-        key = _ref22[0],
-        value = _ref22[1];
+  }).map(function (_ref20) {
+    var _ref21 = _slicedToArray(_ref20, 2),
+        key = _ref21[0],
+        value = _ref21[1];
 
     return key + '_' + value;
   }).sort().join(',');
@@ -628,7 +631,7 @@ exports.generate_transformation_string = function generate_transformation_string
     var responsive_width_transformation = config().responsive_width_transformation || DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION;
     transformations.push(utils.generate_transformation_string(clone(responsive_width_transformation)));
   }
-  if (width != null && width.toString().indexOf("auto") === 0 || responsive_width) {
+  if (String(width).startsWith("auto") || responsive_width) {
     options.responsive = true;
   }
   if (dpr === "auto") {
@@ -805,6 +808,7 @@ exports.url = function url(public_id) {
       for (var i = 0; to_sign !== decodeURIComponent(to_sign) && i < 10; i++) {
         to_sign = decodeURIComponent(to_sign);
       }
+      // eslint-disable-next-line no-empty
     } catch (error) {}
     var shasum = crypto.createHash('sha1');
     shasum.update(utf8_encode(to_sign + api_secret), 'binary');
@@ -972,16 +976,16 @@ exports.signed_preloaded_image = function signed_preloaded_image(result) {
 };
 
 exports.api_sign_request = function api_sign_request(params_to_sign, api_secret) {
-  var to_sign = entries(params_to_sign).filter(function (_ref23) {
-    var _ref24 = _slicedToArray(_ref23, 2),
-        k = _ref24[0],
-        v = _ref24[1];
+  var to_sign = entries(params_to_sign).filter(function (_ref22) {
+    var _ref23 = _slicedToArray(_ref22, 2),
+        k = _ref23[0],
+        v = _ref23[1];
 
     return utils.present(v);
-  }).map(function (_ref25) {
-    var _ref26 = _slicedToArray(_ref25, 2),
-        k = _ref26[0],
-        v = _ref26[1];
+  }).map(function (_ref24) {
+    var _ref25 = _slicedToArray(_ref24, 2),
+        k = _ref25[0],
+        v = _ref25[1];
 
     return `${k}=${utils.build_array(v).join(",")}`;
   }).sort().join("&");
@@ -992,16 +996,16 @@ exports.api_sign_request = function api_sign_request(params_to_sign, api_secret)
 
 exports.clear_blank = function clear_blank(hash) {
   var filtered_hash = {};
-  entries(hash).filter(function (_ref27) {
-    var _ref28 = _slicedToArray(_ref27, 2),
-        k = _ref28[0],
-        v = _ref28[1];
+  entries(hash).filter(function (_ref26) {
+    var _ref27 = _slicedToArray(_ref26, 2),
+        k = _ref27[0],
+        v = _ref27[1];
 
     return utils.present(v);
-  }).forEach(function (_ref29) {
-    var _ref30 = _slicedToArray(_ref29, 2),
-        k = _ref30[0],
-        v = _ref30[1];
+  }).forEach(function (_ref28) {
+    var _ref29 = _slicedToArray(_ref28, 2),
+        k = _ref29[0],
+        v = _ref29[1];
 
     filtered_hash[k] = v;
   });
@@ -1349,10 +1353,10 @@ exports.build_streaming_profiles_param = function build_streaming_profiles_param
  * @return {string} A URI query string.
  */
 function hashToQuery(hash) {
-  return entries(hash).reduce(function (entries, _ref31) {
-    var _ref32 = _slicedToArray(_ref31, 2),
-        key = _ref32[0],
-        value = _ref32[1];
+  return entries(hash).reduce(function (entries, _ref30) {
+    var _ref31 = _slicedToArray(_ref30, 2),
+        key = _ref31[0],
+        value = _ref31[1];
 
     if (isArray(value)) {
       key = key.endsWith('[]') ? key : key + '[]';
@@ -1364,10 +1368,10 @@ function hashToQuery(hash) {
       entries.push([key, value]);
     }
     return entries;
-  }, []).map(function (_ref33) {
-    var _ref34 = _slicedToArray(_ref33, 2),
-        key = _ref34[0],
-        value = _ref34[1];
+  }, []).map(function (_ref32) {
+    var _ref33 = _slicedToArray(_ref32, 2),
+        key = _ref33[0],
+        value = _ref33[1];
 
     return `${querystring.escape(key)}=${querystring.escape(value)}`;
   }).join('&');

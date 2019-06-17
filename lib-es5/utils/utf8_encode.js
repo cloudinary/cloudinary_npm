@@ -47,7 +47,8 @@ module.exports = function utf8_encode(argString) {
         utftext += string.slice(start, end);
       }
       utftext += enc;
-      start = end = n + 1;
+      start = n + 1;
+      end = start;
     }
     n++;
   }

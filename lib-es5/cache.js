@@ -21,22 +21,22 @@ var _require = require('./utils'),
 
 
 var CacheAdapter = function () {
-  function CacheAdapter(storage) {
+  function CacheAdapter() {
     _classCallCheck(this, CacheAdapter);
   }
 
-  /**
-   * Get a value from the cache
-   * @param {string} publicId
-   * @param {string} type
-   * @param {string} resourceType
-   * @param {string} transformation
-   * @return {*} the value associated with the provided arguments
-   */
-
-
   _createClass(CacheAdapter, [{
     key: "get",
+
+    /**
+     * Get a value from the cache
+     * @param {string} publicId
+     * @param {string} type
+     * @param {string} resourceType
+     * @param {string} transformation
+     * @param {string} format
+     * @return {*} the value associated with the provided arguments
+     */
     value: function get(publicId, type, resourceType, transformation, format) {}
 
     /**
@@ -45,6 +45,7 @@ var CacheAdapter = function () {
      * @param {string} type
      * @param {string} resourceType
      * @param {string} transformation
+     * @param {string} format
      * @param {*} value
      */
 
@@ -158,7 +159,7 @@ Object.defineProperty(Cache, "adapter", {
 });
 Object.freeze(Cache);
 
-// Instantiate singleton
+// Instantiate the singleton
 var symbols = Object.getOwnPropertySymbols(global);
 if (symbols.indexOf(CACHE) < 0) {
   global[CACHE] = Cache;

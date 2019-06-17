@@ -61,7 +61,7 @@ module.exports = {
     "no-param-reassign": "off",
     "no-plusplus": "off",
     "no-prototype-builtins": "off",
-    "no-restricted-syntax": "off",
+    // "no-restricted-syntax": "off",
     "no-return-assign": "off",
     "no-shadow": "off",
     "no-throw-literal": "off",

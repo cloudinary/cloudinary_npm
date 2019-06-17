@@ -573,31 +573,9 @@ function post(url, post_data, boundary, file, callback, options) {
     timeout = true;
     return post_request.abort();
   });
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = post_data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var postDatum = _step.value;
-
-      post_request.write(postDatum);
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
-
+  post_data.forEach(function (postDatum) {
+    return post_request.write(postDatum);
+  });
   if (options.stream) {
     post_request.write(file_header);
     return upload_stream;
