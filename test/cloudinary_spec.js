@@ -661,7 +661,6 @@ describe("cloudinary", function () {
       cloudinary.config(true);
     });
     it("should allow nested values in CLOUDINARY_URL", function () {
-      var ref;
       process.env.CLOUDINARY_URL = "cloudinary://key:secret@test123?foo[bar]=value";
       cloudinary.config(true);
       const foo = cloudinary.config().foo;

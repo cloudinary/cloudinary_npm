@@ -66,7 +66,10 @@ module.exports = {
     // "no-shadow": "off",
     "no-throw-literal": "off",
     // "no-unreachable": "off",
-    "no-unused-vars": "off",
+    "no-unused-vars": ["error", {
+      "args": "none",
+      "caughtErrors": "none"
+    }],
     "no-use-before-define": "off",
     "no-useless-concat": "off",
     "no-useless-constructor": "off",

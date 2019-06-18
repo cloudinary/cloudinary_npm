@@ -3,7 +3,6 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
-const Q = require('q');
 const fs = require('fs');
 const os = require('os');
 const defaults = require('lodash/defaults');
@@ -766,11 +765,11 @@ describe("utils", function () {
           "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc="],
       ];
       it(`should support ${param}`, function () {
-        var i, layer, len, name, opt, options, result, results;
+        var i, layer, len, opt, options, result, results;
         results = [];
         for (i = 0, len = layers_options.length; i < len; i++) {
           layer = layers_options[i];
-          [name, options, result] = layer;
+          [options, result] = layer;
           opt = {};
           opt[param] = options;
           results.push(expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/${letter}_${result}/test`).and.emptyOptions());

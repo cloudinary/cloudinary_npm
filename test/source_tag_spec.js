@@ -8,26 +8,12 @@ describe('source helper', function () {
   const public_id = "sample";
   const image_format = "jpg";
   const FULL_PUBLIC_ID = `${public_id}.${image_format}`;
-  var commonTrans = null;
-  var commonTransformationStr = null;
-  var customAttributes = null;
-  var min_width = null;
-  var max_width = null;
-  var breakpoint_list = null;
-  var common_srcset = null;
-  var fill_transformation = null;
-  var fill_transformation_str = null;
+  var min_width;
+  var max_width;
+  var breakpoint_list;
+  var common_srcset;
+  var fill_transformation;
   beforeEach(function () {
-    commonTrans = {
-      effect: 'sepia',
-      cloud_name: 'test123',
-      client_hints: false,
-    };
-    commonTransformationStr = 'e_sepia';
-    customAttributes = {
-      custom_attr1: 'custom_value1',
-      custom_attr2: 'custom_value2',
-    };
     min_width = 100;
     max_width = 399;
     breakpoint_list = [min_width, 200, 300, max_width];
@@ -39,7 +25,6 @@ describe('source helper', function () {
       "height": max_width,
       "crop": "fill",
     };
-    fill_transformation_str = `c_fill,h_${max_width},w_${max_width}`;
     cloudinary.config(true); // Reset
     cloudinary.config({
       cloud_name: "test123",

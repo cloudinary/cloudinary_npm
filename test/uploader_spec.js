@@ -9,7 +9,6 @@ const sinon = require('sinon');
 const fs = require('fs');
 const Q = require('q');
 const path = require('path');
-const isFunction = require('lodash/isFunction');
 const at = require('lodash/at');
 const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
@@ -139,10 +138,9 @@ describe("uploader", function () {
       });
     });
     return context(":invalidate", function () {
-      var end, spy, xhr;
+      var spy, xhr;
       spy = void 0;
       xhr = void 0;
-      end = void 0;
       before(function () {
         xhr = sinon.useFakeXMLHttpRequest();
         spy = sinon.spy(ClientRequest.prototype, 'write');

@@ -13,7 +13,6 @@ exports.Cache = require('./cache');
 var cloudinary = module.exports;
 
 var optionConsume = cloudinary.utils.option_consume;
-var ensureOption = require('./utils/ensureOption').defaults(cloudinary.config());
 
 exports.url = function url(public_id, options) {
   options = _.extend({}, options);
@@ -151,8 +150,9 @@ exports.video = function video(public_id, options) {
   if (!multi_source) {
     source = source + '.' + cloudinary.utils.build_array(source_types)[0];
   }
-  var src = cloudinary.utils.url(source, video_options);
-  if (!multi_source) video_options.src = src;
+  if (!multi_source) {
+    video_options.src = cloudinary.utils.url(source, video_options);
+  }
   if (video_options.hasOwnProperty("html_width")) video_options.width = optionConsume(video_options, 'html_width');
   if (video_options.hasOwnProperty("html_height")) video_options.height = optionConsume(video_options, 'html_height');
   html = html + cloudinary.utils.html_attrs(video_options) + '>';

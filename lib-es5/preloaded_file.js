@@ -34,8 +34,7 @@ var PreloadedFile = function () {
   _createClass(PreloadedFile, [{
     key: "is_valid",
     value: function is_valid() {
-      var expected_signature, public_id;
-      public_id = this.resource_type === "raw" ? this.filename : this.public_id;
+      var expected_signature;
       expected_signature = utils.api_sign_request({
         public_id: this.public_id,
         version: this.version

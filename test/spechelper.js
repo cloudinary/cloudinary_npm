@@ -11,7 +11,7 @@ const https = require('https');
 const cloudinary = require("../cloudinary");
 
 const { utils, config, Cache } = cloudinary;
-const { isEmpty, last } = utils;
+const { isEmpty } = utils;
 
 const libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
 const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
@@ -221,11 +221,10 @@ exports.mockPromise = function (mockBlock) {
   writeSpy = void 0;
   requestSpy = void 0;
   return Q.Promise(function (resolve, reject, notify) {
-    var mock, result;
+    var result;
     xhr = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     requestSpy = sinon.spy(api_http, 'request');
-    mock = { xhr, writeSpy, requestSpy };
     result = mockBlock(xhr, writeSpy, requestSpy);
     if (result != null && isFunction(result.then)) {
       return result.then(resolve);

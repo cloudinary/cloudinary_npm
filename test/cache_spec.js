@@ -20,7 +20,6 @@ const TRANSFORMATION_1 = {
 };
 
 const FORMAT_1 = 'png';
-const TRANSFORAMTION_1_RB = [206, 50];
 
 describe("Cache", function () {
   before(function () {

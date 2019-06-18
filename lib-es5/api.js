@@ -11,12 +11,9 @@ var ensureOption = require('./utils/ensureOption').defaults(config());
 
 var extend = utils.extend,
     includes = utils.includes,
-    isString = utils.isString,
     only = utils.only,
     ensurePresenceOf = utils.ensurePresenceOf;
 
-
-var api = module.exports;
 
 var TRANSFORMATIONS_URI = "transformations";
 
@@ -62,18 +59,17 @@ function call_api(method, uri, params, callback, options) {
       var buffer = "";
       var error = false;
       res.on("data", function (d) {
-        return buffer += d;
+        buffer += d;
+        return buffer;
       });
       res.on("end", function () {
-        var e = void 0,
-            result = void 0;
+        var result = void 0;
         if (error) {
           return;
         }
         try {
           result = JSON.parse(buffer);
-        } catch (error1) {
-          e = error1;
+        } catch (e) {
           result = {
             error: {
               message: "Server return invalid JSON response. Status Code " + res.statusCode
@@ -135,13 +131,6 @@ function call_api(method, uri, params, callback, options) {
   return deferred.promise;
 }
 
-function transformationString(transformation) {
-  if (!isString(transformation)) {
-    transformation = utils.generate_transformation_string(extend({}, transformation));
-  }
-  return transformation;
-}
-
 function deleteResourcesParams(options) {
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -169,8 +158,7 @@ exports.resource_types = function resource_types(callback) {
 exports.resources = function resources(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
@@ -188,8 +176,7 @@ exports.resources = function resources(callback) {
 exports.resources_by_tag = function resources_by_tag(tag, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
@@ -200,7 +187,6 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = void 0,
-      ref = void 0,
       resource_type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
@@ -216,8 +202,7 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
 exports.resources_by_moderation = function resources_by_moderation(kind, status, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "moderations", kind, status];
@@ -228,8 +213,6 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
@@ -244,9 +227,7 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
 exports.resource = function resource(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
@@ -258,9 +239,7 @@ exports.resource = function resource(public_id, callback) {
 exports.restore = function restore(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
@@ -275,8 +254,6 @@ exports.update = function update(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
@@ -293,9 +270,7 @@ exports.update = function update(public_id, callback) {
 exports.delete_resources = function delete_resources(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
@@ -309,9 +284,7 @@ exports.delete_resources = function delete_resources(public_ids, callback) {
 exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
@@ -325,8 +298,7 @@ exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix,
 exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
@@ -336,9 +308,7 @@ exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback
 exports.delete_all_resources = function delete_all_resources(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
 
@@ -381,8 +351,7 @@ exports.delete_derived_by_transformation = function delete_derived_by_transforma
 exports.tags = function tags(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["tags", resource_type];
@@ -396,27 +365,27 @@ exports.transformations = function transformations(callback) {
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.transformation = function transformation(transformation, callback) {
+exports.transformation = function transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = only(options, "next_cursor", "max_results");
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.delete_transformation = function delete_transformation(transformation, callback) {
+exports.delete_transformation = function delete_transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = {};
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   return call_api("delete", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.update_transformation = function update_transformation(transformation, updates, callback) {
+exports.update_transformation = function update_transformation(transformationName, updates, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = only(updates, "allowed_for_strict");
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   if (updates.unsafe_update != null) {
     params.unsafe_update = utils.build_eager(updates.unsafe_update);
   }
@@ -538,7 +507,6 @@ function publishResource(byKey, value, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = void 0,
-      ref = void 0,
       resource_type = void 0,
       uri = void 0;
   params = only(options, "type", "invalidate", "overwrite");
@@ -608,8 +576,6 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0;
   resource_type = options.resource_type || "image";

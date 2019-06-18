@@ -13,29 +13,30 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var fs = require('fs');
-var path = require('path');
+
+var _require = require('path'),
+    extname = _require.extname,
+    basename = _require.basename;
+
 var Q = require('q');
 var Writable = require("stream").Writable;
 var urlLib = require('url');
-var defaultsDeep = require('lodash/defaultsDeep');
 
 // eslint-disable-next-line import/order
 
-var _require = require("./config"),
-    upload_prefix = _require.upload_prefix;
+var _require2 = require("./config"),
+    upload_prefix = _require2.upload_prefix;
 
 var isSecure = !(upload_prefix && upload_prefix.slice(0, 5) === 'http:');
 var https = isSecure ? require('https') : require('http');
 
 var Cache = require('./cache');
 var utils = require("./utils");
-var entries = require('./utils/entries');
 var UploadStream = require('./upload_stream');
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,
     includes = utils.includes,
-    isArray = utils.isArray,
     isObject = utils.isObject,
     isRemoteUrl = utils.isRemoteUrl,
     merge = utils.merge;
@@ -242,14 +243,14 @@ exports.rename = function rename(from_public_id, to_public_id, callback) {
 
 var TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style", "background", "opacity", "text_decoration"];
 
-exports.text = function text(text, callback) {
+exports.text = function text(content, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("text", callback, options, function () {
     var textParams = utils.only(options, TEXT_PARAMS);
     var params = _extends({
       timestamp: utils.timestamp(),
-      text: text
+      text: content
     }, textParams);
 
     return [params];
@@ -410,7 +411,7 @@ function cacheResults(result, _ref) {
       var transformation = _ref2.transformation,
           url = _ref2.url,
           breakpoints = _ref2.breakpoints;
-      return Cache.set(result.public_id, { type, resource_type, raw_transformation: transformation, format: path.extname(breakpoints[0].url).slice(1) }, breakpoints.map(function (i) {
+      return Cache.set(result.public_id, { type, resource_type, raw_transformation: transformation, format: extname(breakpoints[0].url).slice(1) }, breakpoints.map(function (i) {
         return i.width;
       }));
     });
@@ -464,7 +465,8 @@ function call_api(action, callback, options, get_params) {
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
       res.on("data", function (d) {
-        return buffer += d;
+        buffer += d;
+        return buffer;
       });
       res.on("end", function () {
         var result = void 0;
@@ -495,31 +497,16 @@ function call_api(action, callback, options, get_params) {
       callback({ error });
     }
   };
-  var post_data = entries(params).reduce(function (entries, _ref3) {
+  var post_data = utils.hashToParameters(params).filter(function (_ref3) {
     var _ref4 = _slicedToArray(_ref3, 2),
         key = _ref4[0],
         value = _ref4[1];
 
-    if (isArray(value)) {
-      key = key.endsWith('[]') ? key : key + '[]';
-      var items = value.map(function (v) {
-        return [key, v];
-      });
-      entries = entries.concat(items);
-    } else {
-      entries.push([key, value]);
-    }
-    return entries;
-  }, []).filter(function (_ref5) {
+    return value != null;
+  }).map(function (_ref5) {
     var _ref6 = _slicedToArray(_ref5, 2),
         key = _ref6[0],
         value = _ref6[1];
-
-    return value != null;
-  }).map(function (_ref7) {
-    var _ref8 = _slicedToArray(_ref7, 2),
-        key = _ref8[0],
-        value = _ref8[1];
 
     return Buffer.from(encodeFieldPart(boundary, key, value), 'utf8');
   });
@@ -535,7 +522,7 @@ function post(url, post_data, boundary, file, callback, options) {
   var file_header;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
   if (file != null || options.stream) {
-    var filename = options.stream ? "file" : path.basename(file);
+    var filename = options.stream ? "file" : basename(file);
     file_header = Buffer.from(encodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary');
   }
   var post_options = urlLib.parse(url);

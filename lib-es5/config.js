@@ -19,10 +19,18 @@ var entries = require('./utils/entries');
 
 var cloudinary_config = void 0;
 
-function isNestedKey(key) {
-  return key.match(/\w+\[\w+\]/);
-}
-
+/**
+ * Sets a value in an object using a nested key
+ * @param {object} params The object to assign the value in.
+ * @param {string} key The key of the value. A period is used to denote inner keys.
+ * @param {*} value The value to set.
+ * @returns {object} The params argument.
+ * @example
+ *     let o = {foo: {bar: 1}};
+ *     putNestedValue(o, 'foo.bar', 2); // {foo: {bar: 2}}
+ *     putNestedValue(o, 'foo.inner.key', 'this creates an inner object');
+ *     // {{foo: {bar: 2}, inner: {key: 'this creates an inner object'}}}
+ */
 function putNestedValue(params, key, value) {
   var chain = key.split(/[\[\]]+/).filter(function (i) {
     return i.length;
@@ -38,7 +46,8 @@ function putNestedValue(params, key, value) {
     }
     outer = inner;
   }
-  return outer[lastKey] = value;
+  outer[lastKey] = value;
+  return params;
 }
 
 module.exports = function (new_config, new_value) {

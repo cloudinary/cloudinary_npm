@@ -1,10 +1,7 @@
 'use strict';
 
-var ensurePresenceOf = require("./ensurePresenceOf");
-
 var utils = require('./index');
 var generateBreakpoints = require('./generateBreakpoints');
-var config = require('../config');
 var Cache = require('../cache');
 
 var isEmpty = utils.isEmpty;

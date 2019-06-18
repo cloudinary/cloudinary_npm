@@ -2,8 +2,6 @@ require('dotenv').load({
   silent: true,
 });
 
-const fs = require('fs');
-const Q = require('q');
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary");
 

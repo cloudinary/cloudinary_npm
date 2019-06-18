@@ -4,8 +4,6 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
-const matchesProperty = require('lodash/matchesProperty');
-const find = require('lodash/find');
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
 const http = require('http');
@@ -258,7 +256,6 @@ describe("api", function () {
         context: true,
         tags: true,
       }).then((result) => {
-        let resource = findByAttr(result.resources, "public_id", PUBLIC_ID);
         expect(result.resources.map(e => e.public_id).sort()).to.eql([PUBLIC_ID, PUBLIC_ID_2]);
         expect(getAllTags(result)).to.contain(TEST_TAG);
         expect(result.resources.map(e => e.context.custom.key)).to.contain("value");
@@ -360,10 +357,10 @@ describe("api", function () {
             eager: [EXPLICIT_TRANSFORMATION,
               EXPLICIT_TRANSFORMATION2],
           }),
-      ]).then(results => cloudinary.v2.api.delete_derived_by_transformation(
+      ]).then(() => cloudinary.v2.api.delete_derived_by_transformation(
         [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2],
       )).then(
-        result => cloudinary.v2.api.resource(PUBLIC_ID_1),
+        () => cloudinary.v2.api.resource(PUBLIC_ID_1),
       ).then((result) => {
         expect(result.derived.length).to.eql(0);
         return cloudinary.v2.api.resource(PUBLIC_ID_2);
@@ -380,14 +377,14 @@ describe("api", function () {
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         public_id: PUBLIC_ID_3,
         tags: UPLOAD_TAGS,
-      }).then(function (r) {
-        return cloudinary.v2.api.resource(PUBLIC_ID_3);
-      }).then(function (resource) {
+      }).then(
+        () => cloudinary.v2.api.resource(PUBLIC_ID_3)
+      ).then(function (resource) {
         expect(resource).not.to.eql(void 0);
         return cloudinary.v2.api.delete_resources(["apit_test", PUBLIC_ID_2, PUBLIC_ID_3]);
-      }).then(function (result) {
-        return cloudinary.v2.api.resource(PUBLIC_ID_3);
-      }).then(() => {
+      }).then(
+        () => cloudinary.v2.api.resource(PUBLIC_ID_3)
+      ).then(() => {
         expect().fail();
       }).catch(function ({ error }) {
         expect(error).to.be.an(Object);
@@ -402,7 +399,7 @@ describe("api", function () {
           public_id: "api_test_by_prefix",
           tags: UPLOAD_TAGS,
         }).then(
-          r => cloudinary.v2.api.resource("api_test_by_prefix"),
+          () => cloudinary.v2.api.resource("api_test_by_prefix"),
         ).then(function (resource) {
           expect(resource).not.to.eql(void 0);
           return cloudinary.v2.api.delete_resources_by_prefix("api_test_by");
@@ -425,12 +422,12 @@ describe("api", function () {
           public_id: PUBLIC_ID_4,
           tags: UPLOAD_TAGS.concat([deleteTestTag]),
         }).then(
-          result => cloudinary.v2.api.resource(PUBLIC_ID_4),
+          () => cloudinary.v2.api.resource(PUBLIC_ID_4),
         ).then(function (resource) {
           expect(resource).to.be.ok();
           return cloudinary.v2.api.delete_resources_by_tag(deleteTestTag);
         }).then(
-          result => cloudinary.v2.api.resource(PUBLIC_ID_4),
+          () => cloudinary.v2.api.resource(PUBLIC_ID_4),
         ).then(
           () => expect().fail(),
         ).catch(({ error }) => {
@@ -571,13 +568,13 @@ describe("api", function () {
         return cloudinary.v2.api.create_transformation(transformationName, {
           crop: "scale",
           width: 102,
-        }).then(result => cloudinary.v2.api.update_transformation(transformationName, {
+        }).then(() => cloudinary.v2.api.update_transformation(transformationName, {
           unsafe_update: {
             crop: "scale",
             width: 103,
           },
         })).then(
-          result => cloudinary.v2.api.transformation(transformationName),
+          () => cloudinary.v2.api.transformation(transformationName),
         ).then((transformation) => {
           expect(transformation).not.to.eql(void 0);
           expect(transformation.info).to.eql([
@@ -605,7 +602,7 @@ describe("api", function () {
       }).then(
         () => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME),
       ).then(
-        transformation => expect().fail(),
+        () => expect().fail()
       ).catch(({ error }) => expect(error.http_code).to.eql(404));
     });
   });
@@ -721,7 +718,7 @@ describe("api", function () {
   });
   describe("update", function () {
     describe("notification url", function () {
-      var request, requestSpy, requestStub, writeSpy, xhr;
+      var writeSpy, xhr;
       before(function () {
         xhr = sinon.useFakeXMLHttpRequest();
         writeSpy = sinon.spy(ClientRequest.prototype, 'write');

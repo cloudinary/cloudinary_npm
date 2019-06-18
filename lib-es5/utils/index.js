@@ -16,15 +16,11 @@ var urlParse = require("url").parse;
 
 // Functions used internally
 var compact = require("lodash/compact");
-var defaults = require("lodash/defaults");
-var find = require("lodash/find");
 var first = require("lodash/first");
-var identity = require("lodash/identity");
 var isFunction = require("lodash/isFunction");
 var isPlainObject = require("lodash/isPlainObject");
 var last = require("lodash/last");
 var map = require("lodash/map");
-var sortBy = require("lodash/sortBy");
 var take = require("lodash/take");
 var at = require("lodash/at");
 
@@ -39,8 +35,6 @@ var isNumber = require("lodash/isNumber");
 var isObject = require("lodash/isObject");
 var isString = require("lodash/isString");
 var isUndefined = require("lodash/isUndefined");
-var keys = require("lodash/keys");
-var merge = require("lodash/merge");
 
 var config = require("../config");
 var generate_token = require("../auth_token");
@@ -64,8 +58,9 @@ module.exports = {
   isRemoteUrl,
   isString,
   isUndefined,
-  keys,
-  merge,
+  keys: function keys(source) {
+    return Object.keys(source);
+  },
   ensurePresenceOf
 };
 exports = module.exports;
@@ -78,10 +73,10 @@ try {
   utils.VERSION = '';
 }
 
-exports.generate_auth_token = function generate_auth_token(options) {
+function generate_auth_token(options) {
   var token_options = Object.assign({}, config().auth_token, options);
   return generate_token(token_options);
-};
+}
 
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net";
 
@@ -97,9 +92,9 @@ exports.USER_AGENT = `CloudinaryNodeJS/${exports.VERSION}`;
 // This is intended for platform information and not individual applications!
 exports.userPlatform = "";
 
-exports.getUserAgent = function getUserAgent() {
+function getUserAgent() {
   return isEmpty(utils.userPlatform) ? `${utils.USER_AGENT}` : `${utils.userPlatform} ${utils.USER_AGENT}`;
-};
+}
 
 var DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {
   width: "auto",
@@ -296,15 +291,14 @@ function process_layer(layer) {
   return result;
 }
 
-function base64EncodeURL(url) {
-  var ignore;
+function base64EncodeURL(sourceUrl) {
   try {
-    url = decodeURI(url);
+    sourceUrl = decodeURI(sourceUrl);
   } catch (error) {
-    ignore = error;
+    // ignore errors
   }
-  url = encodeURI(url);
-  return base64Encode(url);
+  sourceUrl = encodeURI(sourceUrl);
+  return base64Encode(sourceUrl);
 }
 
 function base64Encode(input) {
@@ -314,7 +308,7 @@ function base64Encode(input) {
   return input.toString('base64');
 }
 
-exports.build_upload_params = function build_upload_params(options) {
+function build_upload_params(options) {
   var params = {
     access_mode: options.access_mode,
     allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
@@ -349,11 +343,7 @@ exports.build_upload_params = function build_upload_params(options) {
     use_filename: utils.as_safe_bool(options.use_filename)
   };
   return utils.updateable_resource_params(options, params);
-};
-
-exports.timestamp = function timestamp() {
-  return Math.floor(new Date().getTime() / 1000);
-};
+}
 
 /**
  * Deletes `option_name` from `options` and return the value if present.
@@ -362,13 +352,14 @@ exports.timestamp = function timestamp() {
  * @param {String} option_name the name (key) of the desired value
  * @param {*} [default_value] the value to return is option_name is missing
  */
-exports.option_consume = function option_consume(options, option_name, default_value) {
+
+function option_consume(options, option_name, default_value) {
   var result = options[option_name];
   delete options[option_name];
   return result != null ? result : default_value;
-};
+}
 
-exports.build_array = function build_array(arg) {
+function build_array(arg) {
   switch (true) {
     case arg == null:
       return [];
@@ -377,7 +368,7 @@ exports.build_array = function build_array(arg) {
     default:
       return [arg];
   }
-};
+}
 
 /**
  * Serialize an array of arrays into a string
@@ -385,7 +376,8 @@ exports.build_array = function build_array(arg) {
  *                          If the first element is not an array the argument is wrapped in an array.
  * @returns {string} A string representation of the arrays.
  */
-exports.encode_double_array = function encode_double_array(array) {
+
+function encode_double_array(array) {
   array = utils.build_array(array);
   if (!isArray(array[0])) {
     array = [array];
@@ -393,9 +385,8 @@ exports.encode_double_array = function encode_double_array(array) {
   return array.map(function (e) {
     return utils.build_array(e).join(",");
   }).join("|");
-};
-
-exports.encode_key_value = function encode_key_value(arg) {
+}
+function encode_key_value(arg) {
   if (!isObject(arg)) {
     return arg;
   }
@@ -406,9 +397,9 @@ exports.encode_key_value = function encode_key_value(arg) {
 
     return `${k}=${v}`;
   }).join('|');
-};
+}
 
-exports.encode_context = function encode_context(arg) {
+function encode_context(arg) {
   if (!isObject(arg)) {
     return arg;
   }
@@ -419,16 +410,15 @@ exports.encode_context = function encode_context(arg) {
 
     return `${k}=${v.replace(/([=|])/g, '\\$&')}`;
   }).join('|');
-};
+}
 
-exports.build_eager = function build_eager(transformations) {
+function build_eager(transformations) {
   return utils.build_array(transformations).map(function (transformation) {
     var transformationString = utils.generate_transformation_string(clone(transformation));
     var format = transformation.format;
     return format == null ? transformationString : `${transformationString}/${format}`;
   }).join('|');
-};
-
+}
 /**
  * Build the custom headers for the request
  * @private
@@ -436,7 +426,7 @@ exports.build_eager = function build_eager(transformations) {
  * @return {Array<string>|object|string} An object of name and value,
  *         an array of header strings, or a string of headers
  */
-exports.build_custom_headers = function build_custom_headers(headers) {
+function build_custom_headers(headers) {
   switch (true) {
     case headers == null:
       return void 0;
@@ -453,11 +443,10 @@ exports.build_custom_headers = function build_custom_headers(headers) {
     default:
       return headers;
   }
-};
-
+}
 var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom'];
 
-exports.generate_transformation_string = function generate_transformation_string(options) {
+function generate_transformation_string(options) {
   if (utils.isString(options)) {
     return options;
   }
@@ -638,9 +627,9 @@ exports.generate_transformation_string = function generate_transformation_string
     options.hidpi = true;
   }
   return filter(transformations, utils.present).join("/");
-};
+}
 
-exports.updateable_resource_params = function updateable_resource_params(options) {
+function updateable_resource_params(options) {
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (options.access_control != null) {
@@ -686,7 +675,7 @@ exports.updateable_resource_params = function updateable_resource_params(options
     params.tags = utils.build_array(options.tags).join(",");
   }
   return params;
-};
+}
 
 /**
  * A list of keys used by the url() function.
@@ -699,25 +688,28 @@ var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cnam
  * @param {object} options The source object
  * @return {Object} An object containing only URL parameters
  */
-exports.extractUrlParams = function extractUrlParams(options) {
+
+function extractUrlParams(options) {
   return utils.only.apply(utils, [options].concat(URL_KEYS));
-};
+}
 
 /**
  * Create a new object with only transformation parameters
  * @param {object} options The source object
  * @return {Object} An object containing only transformation parameters
  */
-exports.extractTransformationParams = function extractTransformationParams(options) {
+
+function extractTransformationParams(options) {
   return utils.only.apply(utils, [options].concat(TRANSFORMATION_PARAMS));
-};
+}
 
 /**
  * Handle the format parameter for fetch urls
  * @private
  * @param options url and transformation options. This argument may be changed by the function!
  */
-exports.patchFetchFormat = function patchFetchFormat() {
+
+function patchFetchFormat() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   if (options.type === "fetch") {
@@ -725,9 +717,9 @@ exports.patchFetchFormat = function patchFetchFormat() {
       options.fetch_format = utils.option_consume(options, "format");
     }
   }
-};
+}
 
-exports.url = function url(public_id) {
+function url(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var signature = void 0,
@@ -825,14 +817,14 @@ exports.url = function url(public_id) {
     resultUrl += `?${token}`;
   }
   return resultUrl;
-};
+}
 
-exports.video_url = function video_url(public_id, options) {
+function video_url(public_id, options) {
   options = extend({
     resource_type: 'video'
   }, options);
   return utils.url(public_id, options);
-};
+}
 
 function finalize_source(source, format, url_suffix) {
   var source_to_sign;
@@ -856,10 +848,11 @@ function finalize_source(source, format, url_suffix) {
   }
   return [source, source_to_sign];
 }
-exports.video_thumbnail_url = function video_thumbnail_url(public_id, options) {
+
+function video_thumbnail_url(public_id, options) {
   options = extend({}, exports.DEFAULT_POSTER_OPTIONS, options);
   return utils.url(public_id, options);
-};
+}
 
 function finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten) {
   if (type == null) {
@@ -957,7 +950,8 @@ function smart_escape(string) {
     }).join("");
   });
 }
-exports.api_url = function api_url() {
+
+function api_url() {
   var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'upload';
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -965,17 +959,17 @@ exports.api_url = function api_url() {
   var cloud_name = ensureOption(options, "cloud_name");
   var resource_type = options.resource_type || "image";
   return [cloudinary, "v1_1", cloud_name, resource_type, action].join("/");
-};
+}
 
-exports.random_public_id = function random_public_id() {
+function random_public_id() {
   return crypto.randomBytes(12).toString('base64').replace(/[^a-z0-9]/g, "");
-};
+}
 
-exports.signed_preloaded_image = function signed_preloaded_image(result) {
+function signed_preloaded_image(result) {
   return `${result.resource_type}/upload/v${result.version}/${filter([result.public_id, result.format], utils.present).join(".")}#${result.signature}`;
-};
+}
 
-exports.api_sign_request = function api_sign_request(params_to_sign, api_secret) {
+function api_sign_request(params_to_sign, api_secret) {
   var to_sign = entries(params_to_sign).filter(function (_ref22) {
     var _ref23 = _slicedToArray(_ref22, 2),
         k = _ref23[0],
@@ -992,9 +986,9 @@ exports.api_sign_request = function api_sign_request(params_to_sign, api_secret)
   var shasum = crypto.createHash('sha1');
   shasum.update(utf8_encode(to_sign + api_secret), 'binary');
   return shasum.digest('hex');
-};
+}
 
-exports.clear_blank = function clear_blank(hash) {
+function clear_blank(hash) {
   var filtered_hash = {};
   entries(hash).filter(function (_ref26) {
     var _ref27 = _slicedToArray(_ref26, 2),
@@ -1010,13 +1004,13 @@ exports.clear_blank = function clear_blank(hash) {
     filtered_hash[k] = v;
   });
   return filtered_hash;
-};
+}
 
-exports.merge = function merge(hash1, hash2) {
+function merge(hash1, hash2) {
   return _extends({}, hash1, hash2);
-};
+}
 
-exports.sign_request = function sign_request(params) {
+function sign_request(params) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var apiKey = ensureOption(options, 'api_key');
@@ -1025,9 +1019,9 @@ exports.sign_request = function sign_request(params) {
   params.signature = exports.api_sign_request(params, apiSecret);
   params.api_key = apiKey;
   return params;
-};
+}
 
-exports.webhook_signature = function webhook_signature(data, timestamp) {
+function webhook_signature(data, timestamp) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   ensurePresenceOf({ data, timestamp });
@@ -1036,9 +1030,9 @@ exports.webhook_signature = function webhook_signature(data, timestamp) {
   var shasum = crypto.createHash('sha1');
   shasum.update(data + timestamp + api_secret, 'binary');
   return shasum.digest('hex');
-};
+}
 
-exports.process_request_params = function process_request_params(params, options) {
+function process_request_params(params, options) {
   if (options.unsigned != null && options.unsigned) {
     params = exports.clear_blank(params);
     delete params.timestamp;
@@ -1046,9 +1040,9 @@ exports.process_request_params = function process_request_params(params, options
     params = exports.sign_request(params, options);
   }
   return params;
-};
+}
 
-exports.private_download_url = function private_download_url(public_id, format) {
+function private_download_url(public_id, format) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = exports.sign_request({
@@ -1060,13 +1054,14 @@ exports.private_download_url = function private_download_url(public_id, format) 
     expires_at: options.expires_at
   }, options);
   return exports.api_url("download", options) + "?" + querystring.stringify(params);
-};
+}
 
 /**
  * Utility method that uses the deprecated ZIP download API.
  * @deprecated Replaced by {download_zip_url} that uses the more advanced and robust archive generation and download API
  */
-exports.zip_download_url = function zip_download_url(tag) {
+
+function zip_download_url(tag) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var params = exports.sign_request({
@@ -1075,7 +1070,7 @@ exports.zip_download_url = function zip_download_url(tag) {
     transformation: utils.generate_transformation_string(options)
   }, options);
   return exports.api_url("download_tag.zip", options) + "?" + hashToQuery(params);
-};
+}
 
 /**
  * Returns a URL that when invokes creates an archive and returns it.
@@ -1109,26 +1104,27 @@ exports.zip_download_url = function zip_download_url(tag) {
  * @param {string} [options.keep_derived=false] keep the derived images used for generating the archive
  * @return {String} archive url
  */
-exports.download_archive_url = function download_archive_url() {
+function download_archive_url() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   var cloudinary_params = exports.sign_request(exports.archive_params(merge(options, {
     mode: "download"
   })), options);
   return exports.api_url("generate_archive", options) + "?" + hashToQuery(cloudinary_params);
-};
+}
 
 /**
  * Returns a URL that when invokes creates an zip archive and returns it.
  * @see download_archive_url
  */
-exports.download_zip_url = function download_zip_url() {
+
+function download_zip_url() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   return exports.download_archive_url(merge(options, {
     target_format: "zip"
   }));
-};
+}
 
 /**
  * Render the key/value pair as an HTML tag attribute
@@ -1149,18 +1145,19 @@ function join_pair(key, value) {
  * @param attrs
  * @return {*}
  */
-exports.html_attrs = function html_attrs(attrs) {
+
+function html_attrs(attrs) {
   return filter(map(attrs, function (value, key) {
     return join_pair(key, value);
   })).sort().join(" ");
-};
+}
 
 var CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain'];
 
-exports.cloudinary_js_config = function cloudinary_js_config() {
+function cloudinary_js_config() {
   var params = utils.only.apply(utils, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
   return `<script type='text/javascript'>\n$.cloudinary.config(${JSON.stringify(params)});\n</script>`;
-};
+}
 
 function v1_result_adapter(callback) {
   if (callback == null) {
@@ -1192,15 +1189,16 @@ function v1_adapter(name, num_pass_args, v1) {
     return v1[name].apply(this, args);
   };
 }
-exports.v1_adapters = function v1_adapters(exports, v1, mapping) {
+
+function v1_adapters(exports, v1, mapping) {
   return Object.keys(mapping).map(function (name) {
     var num_pass_args = mapping[name];
     exports[name] = v1_adapter(name, num_pass_args, v1);
     return exports[name];
   });
-};
+}
 
-exports.as_safe_bool = function as_safe_bool(value) {
+function as_safe_bool(value) {
   if (value == null) {
     return void 0;
   }
@@ -1211,7 +1209,7 @@ exports.as_safe_bool = function as_safe_bool(value) {
     value = 0;
   }
   return value;
-};
+}
 
 var NUMBER_PATTERN = "([0-9]*)\\.([0-9]+)|([0-9]+)";
 
@@ -1281,7 +1279,8 @@ function process_video_params(param) {
  * @param {object} options
  * @return {object} Archive API parameters
  */
-exports.archive_params = function archive_params() {
+
+function archive_params() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   return {
@@ -1305,15 +1304,15 @@ exports.archive_params = function archive_params() {
     type: options.type,
     use_original_filename: exports.as_safe_bool(options.use_original_filename)
   };
-};
+}
 
-exports.build_explicit_api_params = function build_explicit_api_params(public_id) {
+function build_explicit_api_params(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   return [exports.build_upload_params(extend({}, { public_id }, options))];
-};
+}
 
-exports.generate_responsive_breakpoints_string = function generate_responsive_breakpoints_string(breakpoints) {
+function generate_responsive_breakpoints_string(breakpoints) {
   if (breakpoints == null) {
     return null;
   }
@@ -1330,9 +1329,9 @@ exports.generate_responsive_breakpoints_string = function generate_responsive_br
     }
   }
   return JSON.stringify(breakpoints);
-};
+}
 
-exports.build_streaming_profiles_param = function build_streaming_profiles_param() {
+function build_streaming_profiles_param() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   var params = utils.only(options, "display_name", "representations");
@@ -1344,16 +1343,10 @@ exports.build_streaming_profiles_param = function build_streaming_profiles_param
     }));
   }
   return params;
-};
+}
 
-/**
- * Convert a hash of values to a URI query string.
- * Array values are spread as individual parameters.
- * @param {object} hash Key-value parameters
- * @return {string} A URI query string.
- */
-function hashToQuery(hash) {
-  return entries(hash).reduce(function (entries, _ref30) {
+function hashToParameters(hash) {
+  return entries(hash).reduce(function (parameters, _ref30) {
     var _ref31 = _slicedToArray(_ref30, 2),
         key = _ref31[0],
         value = _ref31[1];
@@ -1363,12 +1356,22 @@ function hashToQuery(hash) {
       var items = value.map(function (v) {
         return [key, v];
       });
-      entries = entries.concat(items);
+      parameters = parameters.concat(items);
     } else {
-      entries.push([key, value]);
+      parameters.push([key, value]);
     }
-    return entries;
-  }, []).map(function (_ref32) {
+    return parameters;
+  }, []);
+}
+
+/**
+ * Convert a hash of values to a URI query string.
+ * Array values are spread as individual parameters.
+ * @param {object} hash Key-value parameters
+ * @return {string} A URI query string.
+ */
+function hashToQuery(hash) {
+  return hashToParameters(hash).map(function (_ref32) {
     var _ref33 = _slicedToArray(_ref32, 2),
         key = _ref33[0],
         value = _ref33[1];
@@ -1384,9 +1387,10 @@ function hashToQuery(hash) {
  * @param {string|number} value The value to check.
  * @return {boolean} True if the value is defined and not empty.
  */
-exports.present = function present(value) {
+
+function present(value) {
   return value != null && ("" + value).length > 0;
-};
+}
 
 /**
  * Returns a new object with key values from source based on the keys.
@@ -1396,7 +1400,8 @@ exports.present = function present(value) {
  * @param {...string} keys One or more keys to copy from source.
  * @return {object} A new object with the required keys and values.
  */
-exports.only = function only(source) {
+
+function only(source) {
   var result = {};
   if (source) {
     for (var _len2 = arguments.length, keys = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -1411,7 +1416,7 @@ exports.only = function only(source) {
     }
   }
   return result;
-};
+}
 
 /**
  * Returns a JSON array as String.
@@ -1421,7 +1426,8 @@ exports.only = function only(source) {
  * @param {function(*):*} [modifier] called with the array before the array is stringified
  * @return {String|null} a JSON array string or `null` if data is `null`
  */
-exports.jsonArrayParam = function jsonArrayParam(data, modifier) {
+
+function jsonArrayParam(data, modifier) {
   if (!data) {
     return null;
   }
@@ -1435,10 +1441,56 @@ exports.jsonArrayParam = function jsonArrayParam(data, modifier) {
     data = modifier(data);
   }
   return JSON.stringify(data);
-};
+}
 
 /**
  * Empty function - do nothing
  *
  */
 exports.NOP = function () {};
+exports.generate_auth_token = generate_auth_token;
+exports.getUserAgent = getUserAgent;
+exports.build_upload_params = build_upload_params;
+exports.timestamp = function () {
+  return Math.floor(new Date().getTime() / 1000);
+};
+exports.option_consume = option_consume;
+exports.build_array = build_array;
+exports.encode_double_array = encode_double_array;
+exports.encode_key_value = encode_key_value;
+exports.encode_context = encode_context;
+exports.build_eager = build_eager;
+exports.build_custom_headers = build_custom_headers;
+exports.generate_transformation_string = generate_transformation_string;
+exports.updateable_resource_params = updateable_resource_params;
+exports.extractUrlParams = extractUrlParams;
+exports.extractTransformationParams = extractTransformationParams;
+exports.patchFetchFormat = patchFetchFormat;
+exports.url = url;
+exports.video_url = video_url;
+exports.video_thumbnail_url = video_thumbnail_url;
+exports.api_url = api_url;
+exports.random_public_id = random_public_id;
+exports.signed_preloaded_image = signed_preloaded_image;
+exports.api_sign_request = api_sign_request;
+exports.clear_blank = clear_blank;
+exports.merge = merge;
+exports.sign_request = sign_request;
+exports.webhook_signature = webhook_signature;
+exports.process_request_params = process_request_params;
+exports.private_download_url = private_download_url;
+exports.zip_download_url = zip_download_url;
+exports.download_archive_url = download_archive_url;
+exports.download_zip_url = download_zip_url;
+exports.html_attrs = html_attrs;
+exports.cloudinary_js_config = cloudinary_js_config;
+exports.v1_adapters = v1_adapters;
+exports.as_safe_bool = as_safe_bool;
+exports.archive_params = archive_params;
+exports.build_explicit_api_params = build_explicit_api_params;
+exports.generate_responsive_breakpoints_string = generate_responsive_breakpoints_string;
+exports.build_streaming_profiles_param = build_streaming_profiles_param;
+exports.hashToParameters = hashToParameters;
+exports.present = present;
+exports.only = only;
+exports.jsonArrayParam = jsonArrayParam;
