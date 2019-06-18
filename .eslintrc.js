@@ -65,7 +65,7 @@ module.exports = {
     // "no-return-assign": "off",
     // "no-shadow": "off",
     "no-throw-literal": "off",
-    "no-unreachable": "off",
+    // "no-unreachable": "off",
     "no-unused-vars": "off",
     "no-use-before-define": "off",
     "no-useless-concat": "off",
