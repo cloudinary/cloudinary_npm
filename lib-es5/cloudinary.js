@@ -150,8 +150,9 @@ exports.video = function video(public_id, options) {
   if (!multi_source) {
     source = source + '.' + cloudinary.utils.build_array(source_types)[0];
   }
+  var src = cloudinary.utils.url(source, video_options); // calculate src and reduce video_options
   if (!multi_source) {
-    video_options.src = cloudinary.utils.url(source, video_options);
+    video_options.src = src;
   }
   if (video_options.hasOwnProperty("html_width")) video_options.width = optionConsume(video_options, 'html_width');
   if (video_options.hasOwnProperty("html_height")) video_options.height = optionConsume(video_options, 'html_height');
@@ -159,10 +160,10 @@ exports.video = function video(public_id, options) {
   if (multi_source) {
     html += source_types.map(function (source_type) {
       var transformation = source_transformation[source_type] || {};
-      var src = cloudinary.utils.url(source + "." + source_type, _.extend({ resource_type: 'video' }, _.cloneDeep(options), _.cloneDeep(transformation)));
+      var sourceSrc = cloudinary.utils.url(source + "." + source_type, _.extend({ resource_type: 'video' }, _.cloneDeep(options), _.cloneDeep(transformation)));
       var video_type = source_type === 'ogv' ? 'ogg' : source_type;
       var type = "video/" + video_type;
-      return `<source ${cloudinary.utils.html_attrs({ src, type })}>`;
+      return `<source ${cloudinary.utils.html_attrs({ src: sourceSrc, type })}>`;
     }).join('');
   }
 
