@@ -683,10 +683,7 @@ describe("utils", function () {
       expect(Object.keys(options).length).to.eql(2);
     });
     describe("overlay and underlay", function () {
-      var layers_options, letter, param;
-      param = 'overlay';
-      letter = 'l';
-      layers_options = [
+      var layers_options = [
         // [name,                    options,                                          result]
         ["string",
           "text:hello",
@@ -708,7 +705,7 @@ describe("utils", function () {
           "logo",
         ],
         [
-          "public_id",
+          "UTF-8 public_id",
           {
             "public_id": "abcαβγאבג.jpg",
           },
@@ -764,25 +761,29 @@ describe("utils", function () {
           "fetch:http://cloudinary.com/images/old_logo.png",
           "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc="],
       ];
-      it(`should support ${param}`, function () {
-        var i, layer, len, opt, options, result, results;
-        results = [];
-        for (i = 0, len = layers_options.length; i < len; i++) {
-          layer = layers_options[i];
-          [options, result] = layer;
-          opt = {};
-          opt[param] = options;
-          results.push(expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/${letter}_${result}/test`).and.emptyOptions());
-        }
-        return results;
-      });
-      it(`should not pass width/height to html for ${param}`, function () {
-        var opt = {
-          'height': 100,
-          'width': 100,
-        };
-        opt[param] = "text:hello";
-        expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,${letter}_text:hello,w_100/test`).and.emptyOptions();
+      [
+        {
+          param: 'overlay',
+          letter: 'l',
+        },
+        {
+          param: 'underlay',
+          letter: 'u',
+        },
+      ].forEach(function ({ param, letter }) {
+        layers_options.forEach(function ([name, layer, result]) {
+          it(`should support ${name} ${param}`, function () {
+            expect(["test", { [param]: layer }]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/${letter}_${result}/test`).and.emptyOptions();
+          });
+        });
+        it(`should not pass width/height to html for ${param}`, function () {
+          var opt = {
+            'height': 100,
+            'width': 100,
+          };
+          opt[param] = "text:hello";
+          expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,${letter}_text:hello,w_100/test`).and.emptyOptions();
+        });
       });
     });
     describe("streaming_profile", function () {
