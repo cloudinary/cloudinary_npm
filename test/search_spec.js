@@ -1,11 +1,12 @@
 require('dotenv').load({
-  silent: true
+  silent: true,
 });
 
 const expect = require('expect.js');
+const Q = require('q');
 const cloudinary = require('../cloudinary');
 const helper = require("./spechelper");
-const Q = require('q');
+
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
@@ -28,13 +29,13 @@ describe("search_api", function () {
         'max_results',
         'next_cursor',
         'aggregate',
-        'with_field'
+        'with_field',
       ].forEach(method => expect(instance).to.eql(instance[method]('emptyarg')));
     });
     it('should add expression to query', function () {
       var query = cloudinary.v2.search.expression('format:jpg').to_query();
       expect(query).to.eql({
-        expression: 'format:jpg'
+        expression: 'format:jpg',
       });
     });
     it('should add sort_by to query', function () {
@@ -42,36 +43,36 @@ describe("search_api", function () {
       expect(query).to.eql({
         sort_by: [
           {
-            created_at: 'asc'
+            created_at: 'asc',
           },
           {
-            updated_at: 'desc'
-          }
-        ]
+            updated_at: 'desc',
+          },
+        ],
       });
     });
     it('should add max_results to query', function () {
       var query = cloudinary.v2.search.max_results('format:jpg').to_query();
       expect(query).to.eql({
-        max_results: 'format:jpg'
+        max_results: 'format:jpg',
       });
     });
     it('should add next_cursor to query', function () {
       var query = cloudinary.v2.search.next_cursor('format:jpg').to_query();
       expect(query).to.eql({
-        next_cursor: 'format:jpg'
+        next_cursor: 'format:jpg',
       });
     });
     it('should add aggregate arguments as array to query', function () {
       var query = cloudinary.v2.search.aggregate('format').aggregate('size_category').to_query();
       expect(query).to.eql({
-        aggregate: ['format', 'size_category']
+        aggregate: ['format', 'size_category'],
       });
     });
     it('should add with_field to query', function () {
       var query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
       expect(query).to.eql({
-        with_field: ['context', 'tags']
+        with_field: ['context', 'tags'],
       });
     });
   });
@@ -90,22 +91,22 @@ describe("search_api", function () {
             public_id: PUBLIC_ID_1,
             tags: [...helper.UPLOAD_TAGS,
               SEARCH_TAG],
-            context: "stage=in_review"
+            context: "stage=in_review",
           }),
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_2,
             tags: [...helper.UPLOAD_TAGS,
               SEARCH_TAG],
-            context: "stage=new"
+            context: "stage=new",
           }),
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_3,
             tags: [...helper.UPLOAD_TAGS,
               SEARCH_TAG],
-            context: "stage=validated"
-          })
+            context: "stage=validated",
+          }),
       ]).delay(3000); // wait for the server to update
     });
     after(function () {
@@ -121,35 +122,35 @@ describe("search_api", function () {
       return cloudinary.v2.search.expression(`tags:${SEARCH_TAG}`)
         .execute()
         .then(function (results) {
-          expect(results['resources'].length).to.eql(3);
+          expect(results.resources.length).to.eql(3);
         });
     });
     it(`should return resource ${PUBLIC_ID_1}`, function () {
       return cloudinary.v2.search.expression(`public_id:${PUBLIC_ID_1}`)
         .execute()
         .then(function (results) {
-          expect(results['resources'].length).to.eql(1);
+          expect(results.resources.length).to.eql(1);
         });
     });
     it('should paginate resources limited by tag and orderd by ascing public_id', function () {
       return cloudinary.v2.search.max_results(1).expression(`tags:${SEARCH_TAG}`)
         .sort_by('public_id', 'asc')
         .execute().then(function (results) {
-          expect(results['resources'].length).to.eql(1);
-          expect(results['resources'][0]['public_id']).to.eql(PUBLIC_ID_1);
-          expect(results['total_count']).to.eql(3);
+          expect(results.resources.length).to.eql(1);
+          expect(results.resources[0].public_id).to.eql(PUBLIC_ID_1);
+          expect(results.total_count).to.eql(3);
           return cloudinary.v2.search.max_results(1).expression(`tags:${SEARCH_TAG}`)
             .sort_by('public_id', 'asc')
-            .next_cursor(results['next_cursor']).execute();
+            .next_cursor(results.next_cursor).execute();
         }).then(function (results) {
-          expect(results['resources'].length).to.eql(1);
-          expect(results['resources'][0]['public_id']).to.eql(PUBLIC_ID_2);
-          expect(results['total_count']).to.eql(3);
-          return cloudinary.v2.search.max_results(1).expression(`tags:${SEARCH_TAG}`).sort_by('public_id', 'asc').next_cursor(results['next_cursor']).execute();
+          expect(results.resources.length).to.eql(1);
+          expect(results.resources[0].public_id).to.eql(PUBLIC_ID_2);
+          expect(results.total_count).to.eql(3);
+          return cloudinary.v2.search.max_results(1).expression(`tags:${SEARCH_TAG}`).sort_by('public_id', 'asc').next_cursor(results.next_cursor).execute();
         }).then(function (results) {
-          expect(results['resources'].length).to.eql(1);
-          expect(results['resources'][0]['public_id']).to.eql(PUBLIC_ID_3);
-          expect(results['total_count']).to.eql(3);
+          expect(results.resources.length).to.eql(1);
+          expect(results.resources[0].public_id).to.eql(PUBLIC_ID_3);
+          expect(results.total_count).to.eql(3);
           expect(results).not.to.have.key('next_cursor');
         });
     });
@@ -157,9 +158,9 @@ describe("search_api", function () {
       return cloudinary.v2.search.expression(`tags:${SEARCH_TAG}`).with_field('context')
         .execute()
         .then(function (results) {
-          expect(results['resources'].length).to.eql(3);
-          results['resources'].forEach(function (res) {
-            expect(Object.keys(res['context'])).to.eql(['stage']);
+          expect(results.resources.length).to.eql(3);
+          results.resources.forEach(function (res) {
+            expect(Object.keys(res.context)).to.eql(['stage']);
           });
         });
     });
@@ -170,11 +171,11 @@ describe("search_api", function () {
         .with_field('image_metadata')
         .execute()
         .then(function (results) {
-          expect(results['resources'].length).to.eql(3);
-          results['resources'].forEach(function (res) {
-            expect(Object.keys(res['context'])).to.eql(['stage']);
+          expect(results.resources.length).to.eql(3);
+          results.resources.forEach(function (res) {
+            expect(Object.keys(res.context)).to.eql(['stage']);
             expect(res.image_metadata).to.be.ok();
-            expect(res['tags'].length).to.eql(4)
+            expect(res.tags.length).to.eql(4);
           });
         });
     });

@@ -24,6 +24,9 @@
     "babel-register": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "dotenv": "4.x",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
     "expect.js": "0.3.x",
     "jsdoc": "^3.5.5",
     "jsdom": "^9.12.0",
@@ -35,6 +38,7 @@
   },
   "scripts": {
     "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
+    "lint": "eslint .",
     "compile": "node_modules/.bin/babel lib --out-dir lib-es5 --delete-dir-on-start --verbose",
     "test-es6": "which node && node node_modules/.bin/mocha --ui bdd -R spec --recursive test/",
     "test-es5": "node node_modules/.bin/mocha -R spec --recursive --require 'babel-register' --require 'babel-polyfill' test/",
