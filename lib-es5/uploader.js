@@ -42,7 +42,7 @@ exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, 
 
   return exports.upload_stream(callback, utils.merge(options, {
     unsigned: true,
-    upload_preset: upload_preset
+    upload_preset
   }));
 };
 
@@ -59,7 +59,7 @@ exports.unsigned_upload = function unsigned_upload(file, upload_preset, callback
 
   return exports.upload(file, callback, utils.merge(options, {
     unsigned: true,
-    upload_preset: upload_preset
+    upload_preset
   }));
 };
 
@@ -159,7 +159,7 @@ exports.upload_chunked_stream = function upload_chunked_stream(callback) {
   var params = build_upload_params(options);
   var chunk_size = options.chunk_size != null ? options.chunk_size : options.part_size;
   var chunker = new Chunkable({
-    chunk_size: chunk_size
+    chunk_size
   });
   var sent = 0;
   chunker.on('ready', function (buffer, is_last, done) {
@@ -224,7 +224,7 @@ exports.destroy = function destroy(public_id, callback) {
       timestamp: utils.timestamp(),
       type: options.type,
       invalidate: options.invalidate,
-      public_id: public_id
+      public_id
     }];
   });
 };
@@ -236,8 +236,8 @@ exports.rename = function rename(from_public_id, to_public_id, callback) {
     return [{
       timestamp: utils.timestamp(),
       type: options.type,
-      from_public_id: from_public_id,
-      to_public_id: to_public_id,
+      from_public_id,
+      to_public_id,
       overwrite: options.overwrite,
       invalidate: options.invalidate,
       to_type: options.to_type
@@ -254,7 +254,7 @@ exports.text = function text(text, callback) {
     var textParams = utils.only(options, TEXT_PARAMS);
     var params = _extends({
       timestamp: utils.timestamp(),
-      text: text
+      text
     }, textParams);
 
     return [params];
@@ -270,8 +270,8 @@ exports.generate_sprite = function generate_sprite(tag, callback) {
     }));
     return [{
       timestamp: utils.timestamp(),
-      tag: tag,
-      transformation: transformation,
+      tag,
+      transformation,
       async: options.async,
       notification_url: options.notification_url
     }];
@@ -285,8 +285,8 @@ exports.multi = function multi(tag, callback) {
     var transformation = utils.generate_transformation_string(extend({}, options));
     return [{
       timestamp: utils.timestamp(),
-      tag: tag,
-      transformation: transformation,
+      tag,
+      transformation,
       format: options.format,
       async: options.async,
       notification_url: options.notification_url
@@ -301,8 +301,8 @@ exports.explode = function explode(public_id, callback) {
     var transformation = utils.generate_transformation_string(extend({}, options));
     return [{
       timestamp: utils.timestamp(),
-      public_id: public_id,
-      transformation: transformation,
+      public_id,
+      transformation,
       format: options.format,
       type: options.type,
       notification_url: options.notification_url
@@ -354,7 +354,7 @@ function call_tags_api(tag, command) {
     var params = {
       timestamp: utils.timestamp(),
       public_ids: utils.build_array(public_ids),
-      command: command,
+      command,
       type: options.type
     };
     if (tag != null) {
@@ -389,7 +389,7 @@ function call_context_api(context, command) {
     var params = {
       timestamp: utils.timestamp(),
       public_ids: utils.build_array(public_ids),
-      command: command,
+      command,
       type: options.type
     };
     if (context != null) {
@@ -557,7 +557,7 @@ function post(url, post_data, boundary, file, callback, options) {
   }
   post_options = extend(post_options, {
     method: 'POST',
-    headers: headers
+    headers
   });
   if (options.agent != null) {
     post_options.agent = options.agent;
@@ -611,7 +611,7 @@ function post(url, post_data, boundary, file, callback, options) {
     post_request.write(file_header);
     fs.createReadStream(file).on('error', function (error) {
       callback({
-        error: error
+        error
       });
       return post_request.abort();
     }).pipe(upload_stream);
@@ -686,6 +686,6 @@ exports.unsigned_image_upload_tag = function unsigned_image_upload_tag(field, up
 
   return exports.image_upload_tag(field, utils.merge(options, {
     unsigned: true,
-    upload_preset: upload_preset
+    upload_preset
   }));
 };

@@ -45,7 +45,7 @@ function call_api(method, uri, params, callback, options) {
   }
   var request_options = require('url').parse(api_url);
   request_options = extend(request_options, {
-    method: method,
+    method,
     headers: {
       'Content-Type': content_type,
       'User-Agent': utils.getUserAgent()
@@ -263,7 +263,7 @@ exports.restore = function restore(public_ids, callback) {
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type, "restore"];
   return call_api("post", uri, {
-    public_ids: public_ids
+    public_ids
   }, callback, options);
 };
 
@@ -314,7 +314,7 @@ exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix,
   type = (ref1 = options["type"]) != null ? ref1 : "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
-    prefix: prefix
+    prefix
   }), callback, options);
 };
 
@@ -542,7 +542,7 @@ function publishResource(byKey, value, callback) {
   resource_type = (ref = options.resource_type) != null ? ref : "image";
   uri = ["resources", resource_type, "publish_resources"];
   options = extend({
-    resource_type: resource_type
+    resource_type
   }, options);
   return call_api("post", uri, params, callback, options);
 }
@@ -611,7 +611,7 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
   resource_type = (ref = options.resource_type) != null ? ref : "image";
   type = (ref1 = options.type) != null ? ref1 : "upload";
   params = {
-    access_mode: access_mode
+    access_mode
   };
   params[by_key] = value;
   return call_api("post", "resources/" + resource_type + "/" + type + "/update_access_mode", params, callback, options);

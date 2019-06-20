@@ -7,7 +7,7 @@ var multipartMiddleware = multipart();
 
 function index(req, res) {
   Photo.all().then(function (photos) {
-    res.render('photos/index', { photos: photos });
+    res.render('photos/index', { photos });
   });
 }
 
@@ -19,7 +19,7 @@ function add_through_server(req, res) {
   })
     .finally(function () {
       res.render('photos/add', {
-        photo: photo
+        photo
       });
     });
 }
@@ -52,7 +52,7 @@ function create_through_server(req, res) {
       console.log('** photo saved');
     })
     .finally(function () {
-      res.render('photos/create_through_server', { photo: photo, upload: photo.image });
+      res.render('photos/create_through_server', { photo, upload: photo.image });
     });
 }
 
@@ -66,8 +66,8 @@ function add_direct(req, res) {
   })
     .finally(function () {
       res.render('photos/add_direct', {
-        photo: photo,
-        cloudinary_cors: cloudinary_cors
+        photo,
+        cloudinary_cors
       });
     });
 }
@@ -110,9 +110,9 @@ function add_direct_unsigned(req, res) {
     .finally(function (preset) {
       res.render('photos/add_direct_unsigned',
         {
-          photo: photo,
-          cloudinary_cors: cloudinary_cors,
-          preset_name: preset_name
+          photo,
+          cloudinary_cors,
+          preset_name
         });
     });
 }
@@ -146,7 +146,7 @@ function create_direct(req, res) {
       console.log('** error while uploading file');
       console.dir(err);
     }).finally(function () {
-      res.render('photos/create_direct', { photo: photo, upload: photo.image });
+      res.render('photos/create_direct', { photo, upload: photo.image });
     });
 }
 

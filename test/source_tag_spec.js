@@ -52,7 +52,7 @@ describe('source helper', function () {
     var expectedMedia, expectedTag, media, tag;
     media = { min_width, max_width };
     tag = cloudinary.source(FULL_PUBLIC_ID, {
-      media: media
+      media
     });
     expectedMedia = `(min-width: ${min_width}px) and (max-width: ${max_width}px)`;
     expectedTag = `<source media='${expectedMedia}' srcset='${UPLOAD_PATH}/sample.jpg'>`;

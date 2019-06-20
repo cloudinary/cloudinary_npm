@@ -560,7 +560,7 @@ exports.generate_transformation_string = function generate_transformation_string
     dpr: normalize_expression(dpr),
     e: normalize_expression(effect),
     fl: flags,
-    fps: fps,
+    fps,
     h: normalize_expression(height),
     ki: normalize_expression(utils.option_consume(options, "keyframe_interval")),
     l: overlay,
@@ -1075,8 +1075,8 @@ exports.private_download_url = function private_download_url(public_id, format) 
 
   var params = exports.sign_request({
     timestamp: exports.timestamp(),
-    public_id: public_id,
-    format: format,
+    public_id,
+    format,
     type: options.type,
     attachment: options.attachment,
     expires_at: options.expires_at
@@ -1093,7 +1093,7 @@ exports.zip_download_url = function zip_download_url(tag) {
 
   var params = exports.sign_request({
     timestamp: exports.timestamp(),
-    tag: tag,
+    tag,
     transformation: utils.generate_transformation_string(options)
   }, options);
   return exports.api_url("download_tag.zip", options) + "?" + hashToQuery(params);

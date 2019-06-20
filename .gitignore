@@ -1,5 +1,6 @@
 node_modules/
 bower_components/
+test_cache/
 .idea
 .DS_Store
 .env
