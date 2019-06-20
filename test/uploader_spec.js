@@ -599,8 +599,21 @@ describe("uploader", function () {
         });
       });
     });
-    it("should support uploading a small raw file", function (done) {
-      fs.stat(RAW_FILE, function (err, stat) {
+    it("should use file name", function(done) {
+      fs.stat(LARGE_RAW_FILE, function(err, stat) {
+        return cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
+          use_filename: true
+        }, function(error, result) {
+          if (error != null) {
+            done(new Error(error.message));
+          }
+          expect(result.public_id).to.eql(LARGE_RAW_FILE.split(/(\\|\/)/g).pop());
+          done();
+        });
+      });
+    });
+    it("should support uploading a small raw file", function(done) {
+      fs.stat(RAW_FILE, function(err, stat) {
         cloudinary.v2.uploader.upload_large(RAW_FILE, {
           tags: UPLOAD_TAGS,
         }, function (error, result) {
