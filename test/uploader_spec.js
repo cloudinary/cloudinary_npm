@@ -615,6 +615,19 @@ describe("uploader", function() {
         });
       });
     });
+    it("should add original filename", function(done) {
+      fs.stat(RAW_FILE, function(err, stat) {
+        cloudinary.v2.uploader.upload_large(RAW_FILE, {
+          filename: 'my_file_name'
+        }, function(error, result) {
+          if (error != null) {
+            done(new Error(error.message));
+          }
+          expect(result.original_filename).to.eql('my_file_name');
+          done();
+        });
+      });
+    });
     it("should support uploading a small image file", function(done) {
       fs.stat(IMAGE_FILE, function(err, stat) {
         return cloudinary.v2.uploader.upload_chunked(IMAGE_FILE, {
