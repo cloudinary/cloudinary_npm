@@ -718,7 +718,7 @@ describe("api", function () {
   });
   describe("update", function () {
     describe("notification url", function () {
-      var writeSpy, xhr;
+      var writeSpy; var xhr;
       before(function () {
         xhr = sinon.useFakeXMLHttpRequest();
         writeSpy = sinon.spy(ClientRequest.prototype, 'write');
@@ -796,7 +796,7 @@ describe("api", function () {
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     describe("access_control", function () {
-      var acl, acl_string, options;
+      var acl; var acl_string; var options;
       acl = {
         access_type: 'anonymous',
         start: new Date(Date.UTC(2019, 1, 22, 16, 20, 57)),
@@ -821,7 +821,7 @@ describe("api", function () {
   it("should support listing by moderation kind and value", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
     return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
-      var status, status2;
+      var status; var status2;
       status = stat;
       status2 = status;
       request.resetHistory();
@@ -869,10 +869,10 @@ describe("api", function () {
     ]).then(function (results) {
       return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
     }).then(function (results) {
-      var folder, root, root_folders, sub_1;
+      var folder; var root; var root_folders; var sub_1;
       root = results[0];
       root_folders = (() => {
-        var j, len, ref, results1;
+        var j; var len; var ref; var results1;
         ref = root.folders;
         results1 = [];
         for (j = 0, len = ref.length; j < len; j++) {
@@ -959,7 +959,7 @@ describe("api", function () {
     });
   });
   describe("publish", function () {
-    var i, idsToDelete, publishTestId, publishTestTag;
+    var i; var idsToDelete; var publishTestId; var publishTestTag;
     this.timeout(helper.TIMEOUT_LONG);
     i = 0;
     publishTestId = "";
@@ -1025,7 +1025,7 @@ describe("api", function () {
     });
   });
   describe("access_mode", function () {
-    var access_mode_tag, i, publicId;
+    var access_mode_tag; var i; var publicId;
     i = 0;
     this.timeout(helper.TIMEOUT_LONG);
     publicId = "";

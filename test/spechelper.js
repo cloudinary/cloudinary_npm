@@ -45,7 +45,7 @@ exports.test_cloudinary_url = function (public_id, options, expected_url, expect
 };
 
 expect.Assertion.prototype.produceUrl = function (url) {
-  var actual, actualOptions, options, public_id;
+  var actual; var actualOptions; var options; var public_id;
   [public_id, options] = this.obj;
   actualOptions = cloneDeep(options);
   actual = utils.url(public_id, actualOptions);
@@ -58,7 +58,7 @@ expect.Assertion.prototype.produceUrl = function (url) {
 };
 
 expect.Assertion.prototype.emptyOptions = function () {
-  var actual, options, public_id;
+  var actual; var options; var public_id;
   [public_id, options] = this.obj;
   actual = cloneDeep(options);
   utils.url(public_id, actual);
@@ -71,7 +71,7 @@ expect.Assertion.prototype.emptyOptions = function () {
 };
 
 expect.Assertion.prototype.beServedByCloudinary = function (done) {
-  var actual, actualOptions, callHttp, options, public_id;
+  var actual; var actualOptions; var callHttp; var options; var public_id;
   [public_id, options] = this.obj;
   actualOptions = cloneDeep(options);
   actual = utils.url(public_id, actualOptions);
@@ -146,7 +146,7 @@ exports.uploadParamMatcher = function (name, value) {
   @return {function} the matcher function as (arg)->Boolean
 */
 exports.apiParamMatcher = function (name, value) {
-  var expected, params;
+  var expected; var params;
   params = {};
   params[name] = value;
   expected = querystring.stringify(params);
@@ -216,7 +216,7 @@ Can be called inside `it` functions
 @return {Promise}
 */
 exports.mockPromise = function (mockBlock) {
-  var requestSpy, writeSpy, xhr;
+  var requestSpy; var writeSpy; var xhr;
   xhr = void 0;
   writeSpy = void 0;
   requestSpy = void 0;

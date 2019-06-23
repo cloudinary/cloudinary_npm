@@ -35,7 +35,7 @@ describe('source helper', function () {
     expect(cloudinary.source("sample.jpg")).to.eql(`<source srcset='${UPLOAD_PATH}/sample.jpg'>`);
   });
   it("should generate source tag with media query", function () {
-    var expectedMedia, expectedTag, media, tag;
+    var expectedMedia; var expectedTag; var media; var tag;
     media = { min_width, max_width };
     tag = cloudinary.source(FULL_PUBLIC_ID, {
       media,
@@ -51,7 +51,7 @@ describe('source helper', function () {
     expect(tag).to.eql("<source srcset='" + "http://res.cloudinary.com/test123/image/upload/c_scale,w_100/sample.jpg 100w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_200/sample.jpg 200w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_300/sample.jpg 300w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_399/sample.jpg 399w" + "'>");
   });
   it("should generate picture tag", function () {
-    var exp_tag, tag;
+    var exp_tag; var tag;
     tag = cloudinary.picture(FULL_PUBLIC_ID, extend({
       sources: [
         {

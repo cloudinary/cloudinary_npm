@@ -138,7 +138,7 @@ describe("uploader", function () {
       });
     });
     return context(":invalidate", function () {
-      var spy, xhr;
+      var spy; var xhr;
       spy = void 0;
       xhr = void 0;
       before(function () {
@@ -250,7 +250,7 @@ describe("uploader", function () {
     });
   });
   it("should successfully upload stream", function (done) {
-    var file_reader, stream;
+    var file_reader; var stream;
     stream = cloudinary.v2.uploader.upload_stream({
       tags: UPLOAD_TAGS,
     }, function (error, result) {
@@ -440,7 +440,7 @@ describe("uploader", function () {
     });
   });
   it("should allow sending face coordinates", function () {
-    var coordinates, custom_coordinates, different_coordinates, out_coordinates;
+    var coordinates; var custom_coordinates; var different_coordinates; var out_coordinates;
     this.timeout(helper.TIMEOUT_LONG);
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]];
     out_coordinates = [
@@ -628,7 +628,7 @@ describe("uploader", function () {
       });
     });
     it("should support uploading large video files", function () {
-      var stat, writeSpy;
+      var stat; var writeSpy;
       this.timeout(helper.TIMEOUT_LONG * 10);
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       stat = fs.statSync(LARGE_VIDEO);
@@ -717,7 +717,7 @@ describe("uploader", function () {
     });
   });
   it("should successfully upload with pipes", function (done) {
-    var file_reader, upload;
+    var file_reader; var upload;
     this.timeout(helper.TIMEOUT_LONG);
     upload = cloudinary.v2.uploader.upload_stream({
       tags: UPLOAD_TAGS,
@@ -742,7 +742,7 @@ describe("uploader", function () {
     }, function (error, result) {}).to.throwError();
   });
   it("should successfully override https agent", function () {
-    var file_reader, upload;
+    var file_reader; var upload;
     upload = cloudinary.v2.uploader.upload_stream({
       agent: new https.Agent(),
       tags: UPLOAD_TAGS,
@@ -799,7 +799,7 @@ describe("uploader", function () {
           expect(at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10");
           expect(at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/);
           result.responsive_breakpoints.forEach(function (bp) {
-            var cached, format;
+            var cached; var format;
             format = path.extname(bp.breakpoints[0].url).slice(1);
             cached = cloudinary.Cache.get(result.public_id, {
               raw_transformation: bp.transformation,
@@ -828,7 +828,7 @@ describe("uploader", function () {
     });
   });
   describe("explicit", function () {
-    var spy, xhr;
+    var spy; var xhr;
     spy = void 0;
     xhr = void 0;
     before(function () {
@@ -866,7 +866,7 @@ describe("uploader", function () {
     });
   });
   it("should create an image upload tag with required properties", function () {
-    var fakeDiv, input_element, tag;
+    var fakeDiv; var input_element; var tag;
     this.timeout(helper.TIMEOUT_LONG);
     tag = cloudinary.v2.uploader.image_upload_tag("image_id", {
       chunk_size: "1234",
@@ -886,7 +886,7 @@ describe("uploader", function () {
     expect(input_element.getAttribute("type")).to.be('file');
   });
   describe("access_control", function () {
-    var acl, acl_string, options, requestSpy, writeSpy;
+    var acl; var acl_string; var options; var requestSpy; var writeSpy;
     writeSpy = void 0;
     requestSpy = void 0;
     options = void 0;

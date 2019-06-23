@@ -11,7 +11,7 @@ const srcRegExp = function (name, path) {
 };
 
 describe('image helper', function () {
-  var commonTrans, commonTransformationStr, customAttributes;
+  var commonTrans; var commonTransformationStr; var customAttributes;
   commonTrans = {
     effect: 'sepia',
     cloud_name: 'test123',
@@ -85,7 +85,7 @@ describe('image helper', function () {
     });
   });
   it("Should consume custom attributes as is from options", function () {
-    var options, tag;
+    var options; var tag;
     options = extend({}, commonTrans, customAttributes);
     tag = cloudinary.image('sample.jpg', options);
     Object.entries(customAttributes).forEach(function ([key, value]) {
@@ -93,7 +93,7 @@ describe('image helper', function () {
     });
   });
   it("Attributes from 'attributes' dict should override existing attributes", function () {
-    var options, tag;
+    var options; var tag;
     options = extend({}, commonTrans, {
       alt: "original alt",
       attributes: {
@@ -179,7 +179,7 @@ describe('image helper', function () {
       setupCache();
     });
     it("Should create srcset attribute with provided breakpoints", function () {
-      var expected, tagWithBreakpoints;
+      var expected; var tagWithBreakpoints;
       tagWithBreakpoints = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           breakpoints,
@@ -200,7 +200,7 @@ describe('image helper', function () {
       expect(tag).to.eql(expected);
     });
     it("should support a single srcset image", function () {
-      var expected, tag;
+      var expected; var tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           min_width: breakpoints[0],
@@ -218,7 +218,7 @@ describe('image helper', function () {
       expect(tag).to.eql(expected);
     });
     it("Should support custom transformation for srcset items", function () {
-      var expected, tag;
+      var expected; var tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           breakpoints,
@@ -233,7 +233,7 @@ describe('image helper', function () {
       expect(tag).to.eql(expected);
     });
     it("Should populate sizes attribute", function () {
-      var expected, expectedSizesAttr, tag;
+      var expected; var expectedSizesAttr; var tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           breakpoints,
@@ -247,7 +247,7 @@ describe('image helper', function () {
       expect(tag).to.eql(expected);
     });
     it("Should support srcset string value", function () {
-      var expected, rawSrcSet, tag;
+      var expected; var rawSrcSet; var tag;
       rawSrcSet = "some srcset data as is";
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: rawSrcSet,
@@ -258,7 +258,7 @@ describe('image helper', function () {
       expect(tag).to.eql(expected);
     });
     it("Should remove width and height attributes in case srcset is specified, but passed to transformation", function () {
-      var expected, tag;
+      var expected; var tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         width: 500,
         height: 500,
@@ -269,7 +269,7 @@ describe('image helper', function () {
       expect(tag).to.eql(expected);
     });
     it("should use cached breakpoints", function () {
-      var srcset, tag;
+      var srcset; var tag;
       Cache.set('sample.jpg', {}, BREAKPOINTS);
       tag = cloudinary.image('sample.jpg', {
         srcset: {

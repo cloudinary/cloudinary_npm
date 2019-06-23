@@ -11,7 +11,7 @@ const helper = require("./spechelper");
 const api = cloudinary.v2.api;
 
 describe('Cloudinary::Api', function () {
-  var PREDEFINED_PROFILES, prefix, test_id_1, test_id_2, test_id_3;
+  var PREDEFINED_PROFILES; var prefix; var test_id_1; var test_id_2; var test_id_3;
   PREDEFINED_PROFILES = ["4k", "full_hd", "hd", "sd", "full_hd_wifi", "full_hd_lean", "hd_lean"];
   prefix = helper.TEST_TAG;
   test_id_1 = `${prefix}_1`;

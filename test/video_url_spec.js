@@ -15,7 +15,7 @@ function test_cloudinary_url(public_id, options, expected_url, expected_options)
 }
 
 describe("Cloudinary::Utils for video", function () {
-  var root_path, upload_path;
+  var root_path; var upload_path;
   beforeEach(function () {
     cloudinary.config({
       cloud_name: "test123",
@@ -144,7 +144,7 @@ describe("Cloudinary::Utils for video", function () {
       ].forEach(function ([name, url_param, range]) {
         describe(`when provided with ${name} ${range}`, function () {
           it(`should produce a range transformation in the format of ${url_param}`, function () {
-            var matched, options, transformation, url;
+            var matched; var options; var transformation; var url;
             options = {
               resource_type: 'video',
               offset: range,
@@ -207,7 +207,7 @@ describe("Cloudinary::Utils for video", function () {
     });
   });
   describe('cloudinary.video_thumbnail_url', function () {
-    var options, path, source;
+    var options; var path; var source;
     source = "movie_id";
     options = {
       cloud_name: "test123",

@@ -50,7 +50,7 @@ describe("utils", function () {
     root_path = `http://res.cloudinary.com/${cloud_name}`;
   });
   sharedExamples("a signed url", function (specific_options = {}, specific_transformation = "") {
-    var authenticated_image, authenticated_path, expected_transformation, options;
+    var authenticated_image; var authenticated_path; var expected_transformation; var options;
     this.timeout(helper.TIMEOUT_LONG);
     expected_transformation = ((specific_transformation.blank != null) || specific_transformation.match(/\/$/)) ? specific_transformation : `${specific_transformation}/`;
     authenticated_path = '';
@@ -983,7 +983,7 @@ describe("utils", function () {
     });
     describe('User Define Variables', function () {
       it("array should define a set of variables", function () {
-        var options, t;
+        var options; var t;
         options = {
           if: "face_count > 2",
           variables: [["$z", 5], ["$foo", "$z * 2"]],
@@ -994,7 +994,7 @@ describe("utils", function () {
         expect(t).to.eql("if_fc_gt_2,$z_5,$foo_$z_mul_2,c_scale,w_$foo_mul_200");
       });
       it("'$key' should define a variable", function () {
-        var options, t;
+        var options; var t;
         options = {
           transformation: [
             {
@@ -1033,11 +1033,11 @@ describe("utils", function () {
       });
     });
     describe("text", function () {
-      var text_encoded, text_layer;
+      var text_encoded; var text_layer;
       text_layer = "Hello World, /Nice to meet you?";
       text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
       before(function (done) {
-        var fileName, srt;
+        var fileName; var srt;
         cloudinary.v2.uploader.text(text_layer, {
           public_id: "test_text",
           overwrite: true,
@@ -1221,7 +1221,7 @@ describe("utils", function () {
     })[0].phash).to.eql('1');
   });
   it("build_upload_params canonize booleans", function () {
-    var actual, expected, options, params;
+    var actual; var expected; var options; var params;
     options = {
       backup: true,
       use_filename: false,
@@ -1369,7 +1369,7 @@ describe("utils", function () {
     });
   });
   it("should call validate_webhook_signature", function () {
-    var data, orig, sig, timestamp;
+    var data; var orig; var sig; var timestamp;
     this.timeout(1000);
     data = '{"public_id":"117e5550-7bfa-11e4-80d7-f962166bd3be","version":1417727468}';
     timestamp = 1417727468;
