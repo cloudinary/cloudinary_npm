@@ -82,7 +82,7 @@ module.exports = {
         "consistent": true
       }
     ],
-    "object-shorthand": "off",
+    //"object-shorthand": "off",
     "one-var": "off",
     "one-var-declaration-per-line": "off",
     "operator-assignment": "off",

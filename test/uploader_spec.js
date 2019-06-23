@@ -370,7 +370,7 @@ describe("uploader", function () {
         key4: 'val\=ue',
       };
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        context: context,
+        context,
       }).then(function (result) {
         return cloudinary.v2.api.resource(result.public_id, {
           context: true,
@@ -466,7 +466,7 @@ describe("uploader", function () {
       return cloudinary.v2.uploader.explicit(result.public_id, {
         faces: true,
         face_coordinates: different_coordinates,
-        custom_coordinates: custom_coordinates,
+        custom_coordinates,
         type: "upload",
       });
     }).then(function (result) {

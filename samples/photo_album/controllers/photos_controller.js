@@ -1,13 +1,15 @@
 var cloudinary = require('cloudinary').v2;
-var schema = require('../config/schema');
 var crypto = require('crypto');
+
 var Photo = schema.models.Photo;
 var multipart = require('connect-multiparty');
+var schema = require('../config/schema');
+
 var multipartMiddleware = multipart();
 
 function index(req, res) {
   Photo.all().then(function (photos) {
-    res.render('photos/index', { photos: photos });
+    res.render('photos/index', { photos });
   });
 }
 
@@ -19,7 +21,7 @@ function add_through_server(req, res) {
   })
     .finally(function () {
       res.render('photos/add', {
-        photo: photo
+        photo,
       });
     });
 }
@@ -48,11 +50,12 @@ function create_through_server(req, res) {
       // Save photo with image metadata
       return photo.save();
     })
+    // eslint-disable-next-line no-shadow
     .then(function (photo) {
       console.log('** photo saved');
     })
     .finally(function () {
-      res.render('photos/create_through_server', { photo: photo, upload: photo.image });
+      res.render('photos/create_through_server', { photo, upload: photo.image });
     });
 }
 
@@ -66,8 +69,8 @@ function add_direct(req, res) {
   })
     .finally(function () {
       res.render('photos/add_direct', {
-        photo: photo,
-        cloudinary_cors: cloudinary_cors
+        photo,
+        cloudinary_cors,
       });
     });
 }
@@ -91,6 +94,7 @@ function add_direct_unsigned(req, res) {
     .then(function () {
       return cloudinary.api.upload_preset(preset_name);
     })
+    // eslint-disable-next-line consistent-return
     .then(function (preset) {
       if (!preset.settings.return_delete_token) {
         return cloudinary.api.update_upload_preset(preset_name, { return_delete_token: true });
@@ -104,15 +108,15 @@ function add_direct_unsigned(req, res) {
         unsigned: true,
         name: preset_name,
         folder: "preset_folder",
-        return_delete_token: true
+        return_delete_token: true,
       });
     })
     .finally(function (preset) {
       res.render('photos/add_direct_unsigned',
         {
-          photo: photo,
-          cloudinary_cors: cloudinary_cors,
-          preset_name: preset_name
+          photo,
+          cloudinary_cors,
+          preset_name,
         });
     });
 }
@@ -138,6 +142,7 @@ function create_direct(req, res) {
     photo.image = image.toJSON();
     console.dir(photo.image);
   }
+  // eslint-disable-next-line no-shadow
   photo.save().then(function (photo) {
     console.log('** photo saved');
   })
@@ -146,7 +151,7 @@ function create_direct(req, res) {
       console.log('** error while uploading file');
       console.dir(err);
     }).finally(function () {
-      res.render('photos/create_direct', { photo: photo, upload: photo.image });
+      res.render('photos/create_direct', { photo, upload: photo.image });
     });
 }
 

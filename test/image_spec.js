@@ -182,7 +182,7 @@ describe('image helper', function () {
       var expected, tagWithBreakpoints;
       tagWithBreakpoints = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
-          breakpoints: breakpoints,
+          breakpoints,
         },
       }));
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', breakpoints);
@@ -221,7 +221,7 @@ describe('image helper', function () {
       var expected, tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
-          breakpoints: breakpoints,
+          breakpoints,
           transformation: {
             crop: "crop",
             width: 10,
@@ -236,7 +236,7 @@ describe('image helper', function () {
       var expected, expectedSizesAttr, tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
-          breakpoints: breakpoints,
+          breakpoints,
           sizes: true,
         },
       }));
@@ -349,7 +349,7 @@ describe('image helper', function () {
         it("Should throw an exception when " + subject, function () {
           expect(function () {
             cloudinary.image('sample.jpg', extend({
-              srcset: srcset,
+              srcset,
             }, commonTrans));
           }).to.throwException();
         });

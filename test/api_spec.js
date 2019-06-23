@@ -284,7 +284,7 @@ describe("api", function () {
       helper.mockPromise((xhr, writeSpy, requestSpy) => {
         cloudinary.v2.api.resources({
           type: "upload",
-          start_at: start_at,
+          start_at,
           direction: "asc",
         });
         sinon.assert.calledWith(requestSpy, sinon.match({
@@ -613,7 +613,7 @@ describe("api", function () {
       const PRESET_NAMES = [API_TEST_UPLOAD_PRESET3, API_TEST_UPLOAD_PRESET2, API_TEST_UPLOAD_PRESET1];
       return Q.all(
         PRESET_NAMES.map(name => cloudinary.v2.api.create_upload_preset({
-          name: name,
+          name,
           folder: "folder",
         })),
       ).then(
