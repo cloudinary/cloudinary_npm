@@ -4,7 +4,7 @@ const cloudinary = require('../cloudinary');
 const extend = cloudinary.utils.extend;
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 
-describe('source helper', function () {
+describe('source helper', () => {
   const public_id = "sample";
   const image_format = "jpg";
   const FULL_PUBLIC_ID = `${public_id}.${image_format}`;
@@ -13,7 +13,7 @@ describe('source helper', function () {
   var breakpoint_list;
   var common_srcset;
   var fill_transformation;
-  beforeEach(function () {
+  beforeEach(() => {
     min_width = 100;
     max_width = 399;
     breakpoint_list = [min_width, 200, 300, max_width];
@@ -31,10 +31,10 @@ describe('source helper', function () {
       api_secret: "1234",
     });
   });
-  it("should generate a source tag", function () {
+  it("should generate a source tag", () => {
     expect(cloudinary.source("sample.jpg")).to.eql(`<source srcset='${UPLOAD_PATH}/sample.jpg'>`);
   });
-  it("should generate source tag with media query", function () {
+  it("should generate source tag with media query", () => {
     var expectedMedia; var expectedTag; var media; var tag;
     media = { min_width, max_width };
     tag = cloudinary.source(FULL_PUBLIC_ID, {
@@ -44,13 +44,13 @@ describe('source helper', function () {
     expectedTag = `<source media='${expectedMedia}' srcset='${UPLOAD_PATH}/sample.jpg'>`;
     expect(tag).to.eql(expectedTag);
   });
-  it("should generate source tag with responsive srcset", function () {
+  it("should generate source tag with responsive srcset", () => {
     var tag = cloudinary.source(FULL_PUBLIC_ID, {
       srcset: common_srcset,
     });
     expect(tag).to.eql("<source srcset='" + "http://res.cloudinary.com/test123/image/upload/c_scale,w_100/sample.jpg 100w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_200/sample.jpg 200w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_300/sample.jpg 300w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_399/sample.jpg 399w" + "'>");
   });
-  it("should generate picture tag", function () {
+  it("should generate picture tag", () => {
     var exp_tag; var tag;
     tag = cloudinary.picture(FULL_PUBLIC_ID, extend({
       sources: [

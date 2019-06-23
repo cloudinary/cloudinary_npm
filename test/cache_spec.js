@@ -21,20 +21,20 @@ const TRANSFORMATION_1 = {
 
 const FORMAT_1 = 'png';
 
-describe("Cache", function () {
-  before(function () {
+describe("Cache", () => {
+  before(() => {
     Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
   });
-  it("should be initialized", function () {
+  it("should be initialized", () => {
     expect(Cache).to.be.ok();
   });
-  it("should set and get a value", function () {
+  it("should set and get a value", () => {
     Cache.set(PUBLIC_ID, {}, BREAKPOINTS);
     expect(Cache.get(PUBLIC_ID, {})).to.eql(BREAKPOINTS);
   });
   describe("Upload integration", function () {
     this.timeout(helper.TIMEOUT_LONG);
-    before(function () {
+    before(() => {
       options = {
         tags: UPLOAD_TAGS,
         responsive_breakpoints: [
@@ -54,7 +54,7 @@ describe("Cache", function () {
         ],
       };
     });
-    after(function () {
+    after(() => {
       let config = cloudinary.config(true);
       if (!(config.api_key && config.api_secret)) {
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
@@ -63,25 +63,23 @@ describe("Cache", function () {
         cloudinary.api.delete_resources_by_tag(helper.TEST_TAG);
       }
     });
-    it("should save responsive breakpoints to cache after upload", function () {
-      return cloudinary.uploader.upload(IMAGE_FILE, options)
-        .then(function (results) {
-          let public_id = results.public_id;
-          let type = results.type;
-          let resource_type = results.resource_type;
-          results.responsive_breakpoints.forEach(function (bp) {
-            let cachedBp = Cache.get(results.public_id, {
-              public_id,
-              type,
-              resource_type,
-              raw_transformation: bp.transformation,
-              format: path.extname(bp.breakpoints[0].url).slice(1),
-            });
-            expect(cachedBp).to.eql(bp.breakpoints.map(i => i.width));
+    it("should save responsive breakpoints to cache after upload", () => cloudinary.uploader.upload(IMAGE_FILE, options)
+      .then((results) => {
+        let public_id = results.public_id;
+        let type = results.type;
+        let resource_type = results.resource_type;
+        results.responsive_breakpoints.forEach((bp) => {
+          let cachedBp = Cache.get(results.public_id, {
+            public_id,
+            type,
+            resource_type,
+            raw_transformation: bp.transformation,
+            format: path.extname(bp.breakpoints[0].url).slice(1),
           });
+          expect(cachedBp).to.eql(bp.breakpoints.map(i => i.width));
         });
-    });
+      }));
   });
-  it("should create srcset from cache", function () {
+  it("should create srcset from cache", () => {
   });
 });

@@ -46,53 +46,49 @@ const EXPLICIT_TRANSFORMATION2 = {
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
 
-sharedExamples("a list with a cursor", function (testFunc, ...args) {
-  specify(":max_results", function () {
-    return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
-      testFunc(...args, {
-        max_results: 10,
-      });
-      if (writeSpy.called) {
-        sinon.assert.calledWith(writeSpy, sinon.match(/max_results=10/));
-      } else {
-        sinon.assert.calledWith(requestSpy, sinon.match({
-          query: sinon.match(/max_results=10/),
-        }));
-      }
+sharedExamples("a list with a cursor", (testFunc, ...args) => {
+  specify(":max_results", () => helper.mockPromise((xhr, writeSpy, requestSpy) => {
+    testFunc(...args, {
+      max_results: 10,
     });
-  });
-  specify(":next_cursor", function () {
-    return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
-      testFunc(...args, {
-        next_cursor: 23452342,
-      });
-      if (writeSpy.called) {
-        sinon.assert.calledWith(writeSpy, sinon.match(/next_cursor=23452342/));
-      } else {
-        sinon.assert.calledWith(requestSpy, sinon.match({
-          query: sinon.match(/next_cursor=23452342/),
-        }));
-      }
+    if (writeSpy.called) {
+      sinon.assert.calledWith(writeSpy, sinon.match(/max_results=10/));
+    } else {
+      sinon.assert.calledWith(requestSpy, sinon.match({
+        query: sinon.match(/max_results=10/),
+      }));
+    }
+  }));
+  specify(":next_cursor", () => helper.mockPromise((xhr, writeSpy, requestSpy) => {
+    testFunc(...args, {
+      next_cursor: 23452342,
     });
-  });
+    if (writeSpy.called) {
+      sinon.assert.calledWith(writeSpy, sinon.match(/next_cursor=23452342/));
+    } else {
+      sinon.assert.calledWith(requestSpy, sinon.match({
+        query: sinon.match(/next_cursor=23452342/),
+      }));
+    }
+  }));
 });
 
-sharedExamples("accepts next_cursor", function (testFunc, ...args) {
+sharedExamples("accepts next_cursor", (testFunc, ...args) => {
   var requestSpy;
   var writeSpy;
   var xhr;
 
-  before(function () {
+  before(() => {
     xhr = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     requestSpy = sinon.spy(http, 'request');
   });
-  after(function () {
+  after(() => {
     writeSpy.restore();
     requestSpy.restore();
     xhr.restore();
   });
-  specify(":next_cursor", function () {
+  specify(":next_cursor", () => {
     testFunc(...args, {
       next_cursor: 23452342,
     });
@@ -117,9 +113,9 @@ function findByAttr(elements, attr, value) {
 }
 
 
-describe("api", function () {
+describe("api", () => {
   var contextKey = `test-key${helper.SUFFIX}`;
-  before("Verify Configuration", function () {
+  before("Verify Configuration", () => {
     let config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
@@ -156,7 +152,7 @@ describe("api", function () {
           context: `${contextKey}=alt-test`,
           eager: [EXPLICIT_TRANSFORMATION],
         }),
-    ]).finally(function () {});
+    ]).finally(() => {});
   });
   after(function () {
     var config = cloudinary.config();
@@ -176,11 +172,11 @@ describe("api", function () {
     ]);
   });
 
-  describe("resources", function () {
+  describe("resources", () => {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources);
     it("should allow listing resource_types", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.resource_types().then(function (result) {
+      return cloudinary.v2.api.resource_types().then((result) => {
         expect(result.resource_types).to.contain("image");
       });
     });
@@ -190,10 +186,10 @@ describe("api", function () {
       publicId = '';
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         tags: UPLOAD_TAGS,
-      }).then(function (result) {
+      }).then((result) => {
         publicId = result.public_id;
         return cloudinary.v2.api.resources();
-      }).then(function (result) {
+      }).then((result) => {
         let resource = findByAttr(result.resources, "public_id", publicId);
         expect(resource).not.to.eql(void 0);
         expect(resource.type).to.eql("upload");
@@ -218,7 +214,7 @@ describe("api", function () {
         type: "upload",
         prefix: PUBLIC_ID_PREFIX,
         max_results: 500,
-      }).then(function (result) {
+      }).then((result) => {
         let public_ids = result.resources.map(resource => resource.public_id);
         expect(public_ids).to.contain(PUBLIC_ID);
         expect(public_ids).to.contain(PUBLIC_ID_2);
@@ -246,7 +242,7 @@ describe("api", function () {
     });
     it("should allow listing resources by context key and value", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.resources_by_context(contextKey, "test").then(function (result) {
+      return cloudinary.v2.api.resources_by_context(contextKey, "test").then((result) => {
         expect(result.resources).to.have.length(1);
       });
     });
@@ -279,7 +275,7 @@ describe("api", function () {
         resultDesc.resources.map(r => r.public_id),
       ]).then(([asc, desc]) => expect(asc.reverse()).to.eql(desc));
     });
-    it("should allow listing resources by start_at", function () {
+    it("should allow listing resources by start_at", () => {
       let start_at = new Date().toString();
       helper.mockPromise((xhr, writeSpy, requestSpy) => {
         cloudinary.v2.api.resources({
@@ -307,7 +303,7 @@ describe("api", function () {
         });
     });
   });
-  describe("delete", function () {
+  describe("delete", () => {
     it("should allow deleting derived resource", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
@@ -368,7 +364,7 @@ describe("api", function () {
         expect(result.derived.find(d => d.transformation === EXPLICIT_TRANSFORMATION_NAME2))
           .to.not.be.empty();
         return cloudinary.v2.api.resource(PUBLIC_ID_3);
-      }).then(function (result) {
+      }).then((result) => {
         expect(result.derived.length).to.eql(0);
       });
     });
@@ -379,19 +375,19 @@ describe("api", function () {
         tags: UPLOAD_TAGS,
       }).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_3)
-      ).then(function (resource) {
+      ).then((resource) => {
         expect(resource).not.to.eql(void 0);
         return cloudinary.v2.api.delete_resources(["apit_test", PUBLIC_ID_2, PUBLIC_ID_3]);
       }).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_3)
       ).then(() => {
         expect().fail();
-      }).catch(function ({ error }) {
+      }).catch(({ error }) => {
         expect(error).to.be.an(Object);
         expect(error.http_code).to.eql(404);
       });
     });
-    describe("delete_resources_by_prefix", function () {
+    describe("delete_resources_by_prefix", () => {
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
       return it("should allow deleting resources by prefix", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
@@ -400,20 +396,20 @@ describe("api", function () {
           tags: UPLOAD_TAGS,
         }).then(
           () => cloudinary.v2.api.resource("api_test_by_prefix"),
-        ).then(function (resource) {
+        ).then((resource) => {
           expect(resource).not.to.eql(void 0);
           return cloudinary.v2.api.delete_resources_by_prefix("api_test_by");
         }).then(
           () => cloudinary.v2.api.resource("api_test_by_prefix"),
         ).then(
           () => expect().fail(),
-        ).catch(function ({ error }) {
+        ).catch(({ error }) => {
           expect(error).to.be.an(Object);
           expect(error.http_code).to.eql(404);
         });
       });
     });
-    describe("delete_resources_by_tag", function () {
+    describe("delete_resources_by_tag", () => {
       let deleteTestTag = TEST_TAG + "_delete";
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
       it("should allow deleting resources by tags", function () {
@@ -423,7 +419,7 @@ describe("api", function () {
           tags: UPLOAD_TAGS.concat([deleteTestTag]),
         }).then(
           () => cloudinary.v2.api.resource(PUBLIC_ID_4),
-        ).then(function (resource) {
+        ).then((resource) => {
           expect(resource).to.be.ok();
           return cloudinary.v2.api.delete_resources_by_tag(deleteTestTag);
         }).then(
@@ -437,7 +433,7 @@ describe("api", function () {
       });
     });
   });
-  describe("tags", function () {
+  describe("tags", () => {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.tags);
     it("should allow listing tags", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -459,23 +455,21 @@ describe("api", function () {
       }).then(result => expect(result.tags).to.be.empty());
     });
   });
-  describe("transformations", function () {
+  describe("transformations", () => {
     var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
     transformationName = "api_test_transformation3" + SUFFIX;
-    after(function () {
-      return Q.allSettled(
-        [
-          cloudinary.v2.api.delete_transformation(transformationName),
-          cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION),
-          cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION2),
-        ],
-      ).finally(function () {});
-    });
+    after(() => Q.allSettled(
+      [
+        cloudinary.v2.api.delete_transformation(transformationName),
+        cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION),
+        cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION2),
+      ],
+    ).finally(() => {}));
     it("should allow listing transformations", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.transformations().then(function (result) {
+      return cloudinary.v2.api.transformations().then((result) => {
         expect(result).to.have.key("transformations");
         expect(result.transformations).not.to.be.empty();
         expect(result.transformations[0]).to.have.key('used');
@@ -483,14 +477,14 @@ describe("api", function () {
     });
     it("should allow getting transformation metadata", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then(function (transformation) {
+      return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then((transformation) => {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
     it("should allow getting transformation metadata by info", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION).then(function (transformation) {
+      return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION).then((transformation) => {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
@@ -501,18 +495,18 @@ describe("api", function () {
         allowed_for_strict: true,
       }).then(
         () => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME),
-      ).then(function (transformation) {
+      ).then((transformation) => {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.allowed_for_strict).to.be.ok();
         return cloudinary.v2.api.update_transformation(EXPLICIT_TRANSFORMATION_NAME, {
           allowed_for_strict: false,
         });
-      }).then(() => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)).then(function (transformation) {
+      }).then(() => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)).then((transformation) => {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.allowed_for_strict).not.to.be.ok();
       });
     });
-    describe("Named Transformations", function () {
+    describe("Named Transformations", () => {
       it("should allow creating named transformation", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
         return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION, {
@@ -520,7 +514,7 @@ describe("api", function () {
           width: 102,
         }).then(
           () => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION),
-        ).then(function (transformation) {
+        ).then((transformation) => {
           expect(transformation).not.to.eql(void 0);
           expect(transformation.allowed_for_strict).to.be.ok();
           expect(transformation.info).to.eql([
@@ -540,7 +534,7 @@ describe("api", function () {
           format: '',
         }).then(
           () => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION2),
-        ).then(function (transformation) {
+        ).then((transformation) => {
           expect(transformation).not.to.eql(void 0);
           expect(transformation.allowed_for_strict).to.be.ok();
           expect(transformation.info).to.eql([
@@ -553,16 +547,14 @@ describe("api", function () {
           expect(transformation.used).not.to.be.ok();
         });
       });
-      it("should allow listing of named transformations", function () {
-        return helper.mockPromise(function (xhr, write, request) {
-          cloudinary.v2.api.transformations({
-            named: true,
-          });
-          return sinon.assert.calledWith(request, sinon.match({
-            query: sinon.match('named=true'),
-          }, "named=true"));
+      it("should allow listing of named transformations", () => helper.mockPromise((xhr, write, request) => {
+        cloudinary.v2.api.transformations({
+          named: true,
         });
-      });
+        return sinon.assert.calledWith(request, sinon.match({
+          query: sinon.match('named=true'),
+        }, "named=true"));
+      }));
       it("should allow unsafe update of named transformation", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
         return cloudinary.v2.api.create_transformation(transformationName, {
@@ -596,7 +588,7 @@ describe("api", function () {
     });
     it("should allow deleting implicit transformation", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then(function (transformation) {
+      return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then((transformation) => {
         expect(transformation).to.be.an(Object);
         return cloudinary.v2.api.delete_transformation(EXPLICIT_TRANSFORMATION_NAME);
       }).then(
@@ -606,7 +598,7 @@ describe("api", function () {
       ).catch(({ error }) => expect(error.http_code).to.eql(404));
     });
   });
-  describe("upload_preset", function () {
+  describe("upload_preset", () => {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_presets);
     it("should allow creating and listing upload_presets", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -699,45 +691,41 @@ describe("api", function () {
     return cloudinary.v2.api.usage()
       .then(usage => expect(usage.last_update).not.to.eql(null));
   });
-  describe("delete_all_resources", function () {
+  describe("delete_all_resources", () => {
     itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
-    describe("keep_original: yes", function () {
-      it("should allow deleting all derived resources", function () {
-        return helper.mockPromise(function (xhr, write, request) {
-          let options = {
-            keep_original: true,
-          };
-          cloudinary.v2.api.delete_all_resources(options);
-          sinon.assert.calledWith(request, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
-          sinon.assert.calledWith(request, sinon.match(arg => arg.method === "DELETE", "DELETE"));
-          sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
-          sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
-        });
-      });
+    describe("keep_original: yes", () => {
+      it("should allow deleting all derived resources", () => helper.mockPromise((xhr, write, request) => {
+        let options = {
+          keep_original: true,
+        };
+        cloudinary.v2.api.delete_all_resources(options);
+        sinon.assert.calledWith(request, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
+        sinon.assert.calledWith(request, sinon.match(arg => arg.method === "DELETE", "DELETE"));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
+      }));
     });
   });
-  describe("update", function () {
-    describe("notification url", function () {
+  describe("update", () => {
+    describe("notification url", () => {
       var writeSpy; var xhr;
-      before(function () {
+      before(() => {
         xhr = sinon.useFakeXMLHttpRequest();
         writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       });
-      after(function () {
+      after(() => {
         writeSpy.restore();
         xhr.restore();
       });
-      it("should support changing moderation status with notification-url", function () {
-        return cloudinary.v2.api.update("sample", {
-          moderation_status: "approved",
-          notification_url: "http://example.com",
-        }).then(function () {
-          if (writeSpy.called) {
-            sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
-            sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
-          }
-        });
-      });
+      it("should support changing moderation status with notification-url", () => cloudinary.v2.api.update("sample", {
+        moderation_status: "approved",
+        notification_url: "http://example.com",
+      }).then(() => {
+        if (writeSpy.called) {
+          sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
+          sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
+        }
+      }));
     });
     it("should support setting manual moderation status", function () {
       this.timeout(helper.TIMEOUT_LONG);
@@ -767,13 +755,11 @@ describe("api", function () {
     });
     it("should support requesting categorization", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return uploadImage().then(function (upload_result) {
-        return cloudinary.v2.api.update(upload_result.public_id, {
-          categorization: "illegal",
-        });
-      }).then(() => {
+      return uploadImage().then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
+        categorization: "illegal",
+      })).then(() => {
         expect().fail();
-      }).catch(function ({ error }) {
+      }).catch(({ error }) => {
         expect(error.message).to.contain("Illegal value");
       });
     });
@@ -795,7 +781,7 @@ describe("api", function () {
           () => expect().fail(),
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
-    describe("access_control", function () {
+    describe("access_control", () => {
       var acl; var acl_string; var options;
       acl = {
         access_type: 'anonymous',
@@ -807,18 +793,16 @@ describe("api", function () {
         public_id: helper.TEST_TAG,
         tags: [...helper.UPLOAD_TAGS, 'access_control_test'],
       };
-      it("should allow the user to define ACL in the update parameters2", function () {
-        return helper.mockPromise((xhr, writeSpy, requestSpy) => {
-          options.access_control = [acl];
-          cloudinary.v2.api.update("id", options);
-          return sinon.assert.calledWith(
-            writeSpy, sinon.match(arg => helper.apiParamMatcher('access_control', `[${acl_string}]`)(arg)),
-          );
-        });
-      });
+      it("should allow the user to define ACL in the update parameters2", () => helper.mockPromise((xhr, writeSpy, requestSpy) => {
+        options.access_control = [acl];
+        cloudinary.v2.api.update("id", options);
+        return sinon.assert.calledWith(
+          writeSpy, sinon.match(arg => helper.apiParamMatcher('access_control', `[${acl_string}]`)(arg)),
+        );
+      }));
     });
   });
-  it("should support listing by moderation kind and value", function () {
+  it("should support listing by moderation kind and value", () => {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
     return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
       var status; var status2;
@@ -866,9 +850,7 @@ describe("api", function () {
           public_id: 'test_folder1/test_subfolder2/item',
           tags: UPLOAD_TAGS,
         }),
-    ]).then(function (results) {
-      return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
-    }).then(function (results) {
+    ]).then(results => Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')])).then((results) => {
       var folder; var root; var root_folders; var sub_1;
       root = results[0];
       root_folders = (() => {
@@ -919,7 +901,7 @@ describe("api", function () {
       expect(resource.bytes).to.eql(3381);
     }));
   });
-  describe('mapping', function () {
+  describe('mapping', () => {
     before(function () {
       this.mapping = `api_test_upload_mapping${Math.floor(Math.random() * 100000)}`;
       this.deleteMapping = false;
@@ -965,7 +947,7 @@ describe("api", function () {
     publishTestId = "";
     publishTestTag = "";
     idsToDelete = [];
-    beforeEach(function () {
+    beforeEach(() => {
       publishTestTag = TEST_TAG + i++;
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         type: "authenticated",
@@ -975,17 +957,12 @@ describe("api", function () {
         idsToDelete.push(publishTestId);
       });
     });
-    after(function () {
-      // cleanup any resource that were not published
-      return cloudinary.v2.api.delete_resources(idsToDelete, {
-        type: "authenticated",
-      });
-    });
+    after(() => cloudinary.v2.api.delete_resources(idsToDelete, { type: "authenticated" }));
     it("should publish by public id", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "authenticated",
-      }).then(function (result) {
+      }).then((result) => {
         let published = result.published;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
@@ -1017,7 +994,7 @@ describe("api", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "private",
-      }).then(function (result) {
+      }).then((result) => {
         let published = result.published;
         expect(published).not.to.be(null);
         expect(published.length).to.be(0);
@@ -1030,7 +1007,7 @@ describe("api", function () {
     this.timeout(helper.TIMEOUT_LONG);
     publicId = "";
     access_mode_tag = '';
-    beforeEach(function () {
+    beforeEach(() => {
       access_mode_tag = TEST_TAG + "access_mode" + i++;
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         access_mode: "authenticated",

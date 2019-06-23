@@ -10,20 +10,20 @@ const helper = require("./spechelper");
 
 const api = cloudinary.v2.api;
 
-describe('Cloudinary::Api', function () {
+describe('Cloudinary::Api', () => {
   var PREDEFINED_PROFILES; var prefix; var test_id_1; var test_id_2; var test_id_3;
   PREDEFINED_PROFILES = ["4k", "full_hd", "hd", "sd", "full_hd_wifi", "full_hd_lean", "hd_lean"];
   prefix = helper.TEST_TAG;
   test_id_1 = `${prefix}_1`;
   test_id_2 = `${prefix}_2`;
   test_id_3 = `${prefix}_3`;
-  before("Verify configuration", function () {
+  before("Verify configuration", () => {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
-  after(function () {
+  after(() => {
     cloudinary.config(true);
     if (cloudinary.config().keep_test_products) {
       return Q.resolve();
@@ -34,51 +34,45 @@ describe('Cloudinary::Api', function () {
       cloudinary.v2.api.delete_streaming_profile(test_id_3),
     ]);
   });
-  describe('create_streaming_profile', function () {
-    it('should create a streaming profile with representations', function () {
-      return api.create_streaming_profile(test_id_1, {
-        representations: [
-          {
-            transformation: {
+  describe('create_streaming_profile', () => {
+    it('should create a streaming profile with representations', () => api.create_streaming_profile(test_id_1, {
+      representations: [
+        {
+          transformation: {
+            crop: 'scale',
+            width: '1200',
+            height: '1200',
+            bit_rate: '5m',
+          },
+        },
+      ],
+    }).then((result) => {
+      expect(result).not.to.be(void 0);
+    }));
+    it('should create a streaming profile with an array of transformation', () => api.create_streaming_profile(test_id_1 + 'a', {
+      representations: [
+        {
+          transformation: [
+            {
               crop: 'scale',
               width: '1200',
               height: '1200',
               bit_rate: '5m',
             },
-          },
-        ],
-      }).then(function (result) {
-        expect(result).not.to.be(void 0);
-      });
-    });
-    it('should create a streaming profile with an array of transformation', function () {
-      return api.create_streaming_profile(test_id_1 + 'a', {
-        representations: [
-          {
-            transformation: [
-              {
-                crop: 'scale',
-                width: '1200',
-                height: '1200',
-                bit_rate: '5m',
-              },
-            ],
-          },
-        ],
-      }).then(function (result) {
-        expect(result).not.to.be(void 0);
-      });
-    });
+          ],
+        },
+      ],
+    }).then((result) => {
+      expect(result).not.to.be(void 0);
+    }));
   });
-  describe('list_streaming_profile', function () {
-    it('should list streaming profile', function () {
-      return api.list_streaming_profiles().then(function (result) {
-        expect(result).to.have.key('data');
-        PREDEFINED_PROFILES.forEach(profile => expect(result.data.some(p => p.name === profile)).to.be.ok());
-      });
-    });
+  describe('list_streaming_profile', () => {
+    it('should list streaming profile', () => api.list_streaming_profiles().then((result) => {
+      expect(result).to.have.key('data');
+      PREDEFINED_PROFILES.forEach(profile => expect(result.data.some(p => p.name === profile)).to.be.ok());
+    }));
   });
-  describe('delete_streaming_profile', function () {
+  describe('delete_streaming_profile', () => {
     it('should delete a streaming profile', function () {
       this.timeout(5000);
       return api.create_streaming_profile(test_id_2, {
@@ -92,29 +86,27 @@ describe('Cloudinary::Api', function () {
             },
           },
         ],
-      }).then(function (result) {
+      }).then((result) => {
         expect(result).not.to.be(void 0);
         return api.delete_streaming_profile(test_id_2);
-      }).then(function (result) {
+      }).then((result) => {
         expect(result).to.have.key('message');
         expect(result.message).to.eql('deleted');
         return api.list_streaming_profiles();
-      }).then(function (result) {
+      }).then((result) => {
         expect(result.data.map(p => p.name)).not.to.contain(test_id_2);
       });
     });
   });
-  describe('get_streaming_profile', function () {
-    it('should get a specific streaming profile', function () {
-      return api.get_streaming_profile(PREDEFINED_PROFILES[1])
-        .then(function (result) {
-          expect(keys(result.data)).to.contain('name');
-          expect(keys(result.data)).to.contain('display_name');
-          expect(keys(result.data)).to.contain('representations');
-        });
-    });
+  describe('get_streaming_profile', () => {
+    it('should get a specific streaming profile', () => api.get_streaming_profile(PREDEFINED_PROFILES[1])
+      .then((result) => {
+        expect(keys(result.data)).to.contain('name');
+        expect(keys(result.data)).to.contain('display_name');
+        expect(keys(result.data)).to.contain('representations');
+      }));
   });
-  describe('update_streaming_profile', function () {
+  describe('update_streaming_profile', () => {
     it('should create a streaming profile with representations', function () {
       this.timeout(helper.TIMEOUT_LONG);
       return api.create_streaming_profile(test_id_3, {
@@ -128,7 +120,7 @@ describe('Cloudinary::Api', function () {
             },
           },
         ],
-      }).then(function (result) {
+      }).then((result) => {
         expect(result).to.be.ok();
         return api.update_streaming_profile(test_id_3, {
           representations: [
@@ -142,10 +134,10 @@ describe('Cloudinary::Api', function () {
             },
           ],
         });
-      }).then(function (result) {
+      }).then((result) => {
         expect(result).to.be.ok();
         return api.get_streaming_profile(test_id_3);
-      }).then(function (result) {
+      }).then((result) => {
         result = result.data;
         expect(result.representations.length).to.eql(1);
         // Notice transformation is always returned as an array; numeric values represented as numbers, not strings

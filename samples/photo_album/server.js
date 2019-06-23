@@ -45,7 +45,7 @@ wirePostRequest(app);
 
 // eslint-disable-next-line no-shadow
 function wirePreRequest(app) {
-  app.use(function (req, res, next) {
+  app.use((req, res, next) => {
     console.log(req.method + " " + req.url);
     res.locals.req = req;
     res.locals.res = res;
@@ -63,7 +63,7 @@ function wirePreRequest(app) {
 // eslint-disable-next-line no-shadow
 function wirePostRequest(app) {
   // eslint-disable-next-line consistent-return
-  app.use(function (err, req, res, next) {
+  app.use((err, req, res, next) => {
     // eslint-disable-next-line no-bitwise
     if (err.message && (~err.message.indexOf('not found') || (~err.message.indexOf('Cast to ObjectId failed')))) {
       return next();
@@ -80,7 +80,7 @@ function wirePostRequest(app) {
 }
 
 // Assume 404 since no middleware responded
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   console.log('error (404)');
   res.status(404).render('errors/404', {
     url: req.url,
@@ -88,6 +88,6 @@ app.use(function (req, res, next) {
   });
 });
 
-var server = app.listen(process.env.PORT || 9000, function () {
+var server = app.listen(process.env.PORT || 9000, () => {
   console.log('Listening on port %d', server.address().port);
 });

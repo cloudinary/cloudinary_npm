@@ -49,11 +49,7 @@ expect.Assertion.prototype.produceUrl = function (url) {
   [public_id, options] = this.obj;
   actualOptions = cloneDeep(options);
   actual = utils.url(public_id, actualOptions);
-  this.assert(actual.match(url), function () {
-    return `expected '${public_id}' and ${JSON.stringify(options)} to produce '${url}' but got '${actual}'`;
-  }, function () {
-    return `expected '${public_id}' and ${JSON.stringify(options)} not to produce '${url}' but got '${actual}'`;
-  });
+  this.assert(actual.match(url), () => `expected '${public_id}' and ${JSON.stringify(options)} to produce '${url}' but got '${actual}'`, () => `expected '${public_id}' and ${JSON.stringify(options)} not to produce '${url}' but got '${actual}'`);
   return this;
 };
 
@@ -62,11 +58,7 @@ expect.Assertion.prototype.emptyOptions = function () {
   [public_id, options] = this.obj;
   actual = cloneDeep(options);
   utils.url(public_id, actual);
-  this.assert(isEmpty(actual), function () {
-    return `expected '${public_id}' and ${JSON.stringify(options)} to produce empty options but got ${JSON.stringify(actual)}`;
-  }, function () {
-    return `expected '${public_id}' and ${JSON.stringify(options)} not to produce empty options`;
-  });
+  this.assert(isEmpty(actual), () => `expected '${public_id}' and ${JSON.stringify(options)} to produce empty options but got ${JSON.stringify(actual)}`, () => `expected '${public_id}' and ${JSON.stringify(options)} not to produce empty options`);
   return this;
 };
 
@@ -81,11 +73,7 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
     callHttp = http;
   }
   callHttp.get(actual, (res) => {
-    this.assert(res.statusCode === 200, function () {
-      return `Expected to get ${actual} but server responded with "${res.statusCode}: ${res.headers['x-cld-error']}"`;
-    }, function () {
-      return `Expeted not to get ${actual}.`;
-    });
+    this.assert(res.statusCode === 200, () => `Expected to get ${actual} but server responded with "${res.statusCode}: ${res.headers['x-cld-error']}"`, () => `Expeted not to get ${actual}.`);
     return done();
   });
   return this;
@@ -187,12 +175,12 @@ describe("some topic", function() {
 exports.mockTest = function () {
   var mocked;
   mocked = {};
-  before(function () {
+  before(() => {
     mocked.xhr = sinon.useFakeXMLHttpRequest();
     mocked.write = sinon.spy(ClientRequest.prototype, 'write');
     mocked.request = sinon.spy(api_http, 'request');
   });
-  after(function () {
+  after(() => {
     mocked.request.restore();
     mocked.write.restore();
     mocked.xhr.restore();
@@ -220,7 +208,7 @@ exports.mockPromise = function (mockBlock) {
   xhr = void 0;
   writeSpy = void 0;
   requestSpy = void 0;
-  return Q.Promise(function (resolve, reject, notify) {
+  return Q.Promise((resolve, reject, notify) => {
     var result;
     xhr = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');
@@ -230,7 +218,7 @@ exports.mockPromise = function (mockBlock) {
       return result.then(resolve);
     }
     return resolve(result);
-  }).finally(function () {
+  }).finally(() => {
     requestSpy.restore();
     writeSpy.restore();
     xhr.restore();

@@ -23,8 +23,8 @@ const PUBLIC_ID1 = ARCHIVE_TAG + "_1";
 const PUBLIC_ID2 = ARCHIVE_TAG + "_2";
 const PUBLIC_ID_RAW = ARCHIVE_TAG + "_3";
 
-sharedExamples('archive', function () {
-  before("Verify Configuration", function () {
+sharedExamples('archive', () => {
+  before("Verify Configuration", () => {
     var config;
     config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -58,16 +58,16 @@ sharedExamples('archive', function () {
         }),
     ]);
   });
-  after(function () {
+  after(() => {
     if (!cloudinary.config().keep_test_products) {
       api.delete_resources_by_tag(ARCHIVE_TAG);
     }
   });
 });
 
-describe("archive", function () {
+describe("archive", () => {
   includeContext('archive');
-  describe("utils", function () {
+  describe("utils", () => {
     describe('.generate_zip_download_url', function () {
       this.timeout(helper.TIMEOUT_LONG);
       this.archive_result = void 0;
@@ -79,7 +79,7 @@ describe("archive", function () {
           expires_at: Date.now() / 1000 + 60, // expiration after 60 seconds
         });
       });
-      describe('public_ids', function () {
+      describe('public_ids', () => {
         it('should generate a valid url', function () {
           expect(this.archive_result).not.to.be.empty();
         });
@@ -87,7 +87,7 @@ describe("archive", function () {
           var filename;
           filename = `${os.tmpdir()}/deleteme-${Math.floor(Math.random() * 100000)}.zip`;
           expect(this.archive_result).to.contain("expires_at");
-          https.get(this.archive_result, function (res) {
+          https.get(this.archive_result, (res) => {
             var file;
             file = fs.createWriteStream(filename);
             if (res.statusCode === 200) {
@@ -95,8 +95,8 @@ describe("archive", function () {
             } else {
               done(new Error(`${res.statusCode}: ${res.headers['x-cld-error']}`));
             }
-            res.on('end', function () {
-              file.on('close', function () {
+            res.on('end', () => {
+              file.on('close', () => {
                 let list = execSync(`unzip -l -qq ${filename}`);
                 list = list.toString().split('\n').slice(0, -1);
                 list = list.map(line => last(line.split(/[ ]+/)));
@@ -112,33 +112,31 @@ describe("archive", function () {
     });
   });
 
-  describe("uploader", function () {
+  describe("uploader", () => {
     describe('.create_archive', function () {
       var archive_result;
       this.timeout(helper.TIMEOUT_LONG);
-      before(function () {
-        return uploader.create_archive({
-          target_public_id: 'gem_archive_test',
-          public_ids: [PUBLIC_ID2, PUBLIC_ID1],
-          target_tags: [TEST_TAG, ARCHIVE_TAG],
-          mode: 'create',
-          skip_transformation_name: true,
-        }).then((result) => {
-          archive_result = result;
-        });
-      });
-      it('should a Hash', function () {
+      before(() => uploader.create_archive({
+        target_public_id: 'gem_archive_test',
+        public_ids: [PUBLIC_ID2, PUBLIC_ID1],
+        target_tags: [TEST_TAG, ARCHIVE_TAG],
+        mode: 'create',
+        skip_transformation_name: true,
+      }).then((result) => {
+        archive_result = result;
+      }));
+      it('should a Hash', () => {
         expect(archive_result).to.be.an(Object);
       });
       const EXPECTED_KEYS = ["resource_type", "type", "public_id", "version", "url", "secure_url", "created_at", "tags", "signature", "bytes", "etag", "resource_count", "file_count"];
-      it(`should include keys: ${EXPECTED_KEYS.join(', ')}`, function () {
+      it(`should include keys: ${EXPECTED_KEYS.join(', ')}`, () => {
         expect(archive_result).to.have.keys(EXPECTED_KEYS);
       });
     });
     describe('.create_zip', function () {
       this.timeout(helper.TIMEOUT_LONG);
-      it('should call create_archive with "zip" format and ignore missing resources', function () {
-        helper.mockPromise(function (xhr, write) {
+      it('should call create_archive with "zip" format and ignore missing resources', () => {
+        helper.mockPromise((xhr, write) => {
           uploader.create_zip({
             tags: TEST_TAG,
             public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],

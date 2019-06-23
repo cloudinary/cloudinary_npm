@@ -8,7 +8,7 @@ var schema = require('../config/schema');
 var multipartMiddleware = multipart();
 
 function index(req, res) {
-  Photo.all().then(function (photos) {
+  Photo.all().then((photos) => {
     res.render('photos/index', { photos });
   });
 }
@@ -16,10 +16,10 @@ function index(req, res) {
 function add_through_server(req, res) {
   // Create a new photo model and set it's default title
   var photo = new Photo();
-  Photo.count().then(function (amount) {
+  Photo.count().then((amount) => {
     photo.title = "My Photo #" + (amount + 1);
   })
-    .finally(function () {
+    .finally(() => {
       res.render('photos/add', {
         photo,
       });
@@ -43,7 +43,7 @@ function create_through_server(req, res) {
   var imageFile = req.files.image.path;
   // Upload file to Cloudinary
   cloudinary.uploader.upload(imageFile, { tags: 'express_sample' })
-    .then(function (image) {
+    .then((image) => {
       console.log('** file uploaded to Cloudinary service');
       console.dir(image);
       photo.image = image;
@@ -51,10 +51,10 @@ function create_through_server(req, res) {
       return photo.save();
     })
     // eslint-disable-next-line no-shadow
-    .then(function (photo) {
+    .then((photo) => {
       console.log('** photo saved');
     })
-    .finally(function () {
+    .finally(() => {
       res.render('photos/create_through_server', { photo, upload: photo.image });
     });
 }
@@ -64,10 +64,10 @@ function add_direct(req, res) {
   var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
   // Create a new photo model and set it's default title
   var photo = new Photo();
-  Photo.count().then(function (amount) {
+  Photo.count().then((amount) => {
     photo.title = "My Photo #" + (amount + 1) + " (direct)";
   })
-    .finally(function () {
+    .finally(() => {
       res.render('photos/add_direct', {
         photo,
         cloudinary_cors,
@@ -88,30 +88,28 @@ function add_direct_unsigned(req, res) {
 
   // Create a new photo model and set it's default title
   var photo = new Photo();
-  Photo.count().then(function (amount) {
+  Photo.count().then((amount) => {
     photo.title = "My Photo #" + (amount + 1) + " (direct unsigned)";
   })
-    .then(function () {
-      return cloudinary.api.upload_preset(preset_name);
-    })
+    .then(() => cloudinary.api.upload_preset(preset_name))
     // eslint-disable-next-line consistent-return
-    .then(function (preset) {
+    .then((preset) => {
       if (!preset.settings.return_delete_token) {
         return cloudinary.api.update_upload_preset(preset_name, { return_delete_token: true });
       }
     })
-    .catch(function (err) {
+    .catch(err =>
       // Creating an upload preset is done here only for demo purposes.
       // Usually it is created outside the upload flow via api or
       // online console (https://cloudinary.com/console/settings/upload)
-      return cloudinary.api.create_upload_preset({
+      // eslint-disable-next-line implicit-arrow-linebreak
+      cloudinary.api.create_upload_preset({
         unsigned: true,
         name: preset_name,
         folder: "preset_folder",
         return_delete_token: true,
-      });
-    })
-    .finally(function (preset) {
+      }))
+    .finally((preset) => {
       res.render('photos/add_direct_unsigned',
         {
           photo,
@@ -143,14 +141,14 @@ function create_direct(req, res) {
     console.dir(photo.image);
   }
   // eslint-disable-next-line no-shadow
-  photo.save().then(function (photo) {
+  photo.save().then((photo) => {
     console.log('** photo saved');
   })
-    .catch(function (err) {
+    .catch((err) => {
       result.error = err;
       console.log('** error while uploading file');
       console.dir(err);
-    }).finally(function () {
+    }).finally(() => {
       res.render('photos/create_direct', { photo, upload: photo.image });
     });
 }
