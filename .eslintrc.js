@@ -92,7 +92,7 @@ module.exports = {
     //"prefer-template": "off",
     //"quote-props": "off",
     "quotes": "off",
-    "radix": "off",
+    //"radix": "off",
     "vars-on-top": "off",
     "wrap-iife": "off"
   }
