@@ -528,7 +528,7 @@ describe("cloudinary", () => {
     ];
     tests.forEach(([source, target]) => {
       const result = cloudinary.utils.url(source);
-      expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target);
+      expect(result).to.eql(`http://res.cloudinary.com/test123/image/upload/${target}`);
     });
   });
   it("should correctly sign a url", () => {

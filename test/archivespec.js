@@ -18,10 +18,10 @@ const { TEST_TAG } = helper;
 const { IMAGE_URL } = helper;
 const { sharedExamples } = helper;
 const { includeContext } = helper;
-const ARCHIVE_TAG = TEST_TAG + "_archive";
-const PUBLIC_ID1 = ARCHIVE_TAG + "_1";
-const PUBLIC_ID2 = ARCHIVE_TAG + "_2";
-const PUBLIC_ID_RAW = ARCHIVE_TAG + "_3";
+const ARCHIVE_TAG = `${TEST_TAG}_archive`;
+const PUBLIC_ID1 = `${ARCHIVE_TAG}_1`;
+const PUBLIC_ID2 = `${ARCHIVE_TAG}_2`;
+const PUBLIC_ID_RAW = `${ARCHIVE_TAG}_3`;
 
 sharedExamples('archive', () => {
   before("Verify Configuration", () => {
@@ -101,8 +101,8 @@ describe("archive", () => {
                 list = list.toString().split('\n').slice(0, -1);
                 list = list.map(line => last(line.split(/[ ]+/)));
                 expect(list.length).to.eql(2);
-                expect(list).to.contain(PUBLIC_ID1 + ".jpg");
-                expect(list).to.contain(PUBLIC_ID2 + ".jpg");
+                expect(list).to.contain(`${PUBLIC_ID1}.jpg`);
+                expect(list).to.contain(`${PUBLIC_ID2}.jpg`);
                 done();
               });
             });

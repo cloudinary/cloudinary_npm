@@ -347,7 +347,7 @@ describe('image helper', () => {
           "invalid max_images",
         ],
       ].forEach(([srcset, subject]) => {
-        it("Should throw an exception when " + subject, () => {
+        it(`Should throw an exception when ${subject}`, () => {
           expect(() => {
             cloudinary.image('sample.jpg', extend({
               srcset,
@@ -380,7 +380,7 @@ function getExpectedSrcsetTag(publicId, commonTrans, customTrans, breakpoints, a
   let tag = `<img src='${UPLOAD_PATH}/${commonTrans}/${publicId}'`;
   const attrs = Object.entries(attributes).map(([key, value]) => `${key}='${value}'`).join(' ');
   if (attrs) {
-    tag += ' ' + attrs;
+    tag += ` ${attrs}`;
   }
   tag += "/>";
   return tag;

@@ -89,7 +89,7 @@ module.exports = {
     //"prefer-arrow-callback": "off",
     //"prefer-const": "off",
     //"prefer-destructuring": "off",
-    "prefer-template": "off",
+    //"prefer-template": "off",
     "quote-props": "off",
     "quotes": "off",
     "radix": "off",

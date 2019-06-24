@@ -21,18 +21,18 @@ const { uploadImage } = helper;
 const { SUFFIX } = helper;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
-const PUBLIC_ID_1 = PUBLIC_ID + "_1";
-const PUBLIC_ID_2 = PUBLIC_ID + "_2";
-const PUBLIC_ID_3 = PUBLIC_ID + "_3";
-const PUBLIC_ID_4 = PUBLIC_ID + "_4";
-const PUBLIC_ID_5 = PUBLIC_ID + "_5";
-const PUBLIC_ID_6 = PUBLIC_ID + "_6";
-const NAMED_TRANSFORMATION = "npm_api_test_transformation_" + SUFFIX;
-const NAMED_TRANSFORMATION2 = "npm_api_test_transformation_2_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET2 = "npm_api_test_upload_preset_2_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET3 = "npm_api_test_upload_preset_3_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET4 = "npm_api_test_upload_preset_4_" + SUFFIX;
+const PUBLIC_ID_1 = `${PUBLIC_ID}_1`;
+const PUBLIC_ID_2 = `${PUBLIC_ID}_2`;
+const PUBLIC_ID_3 = `${PUBLIC_ID}_3`;
+const PUBLIC_ID_4 = `${PUBLIC_ID}_4`;
+const PUBLIC_ID_5 = `${PUBLIC_ID}_5`;
+const PUBLIC_ID_6 = `${PUBLIC_ID}_6`;
+const NAMED_TRANSFORMATION = `npm_api_test_transformation_${SUFFIX}`;
+const NAMED_TRANSFORMATION2 = `npm_api_test_transformation_2_${SUFFIX}`;
+const API_TEST_UPLOAD_PRESET1 = `npm_api_test_upload_preset_1_${SUFFIX}`;
+const API_TEST_UPLOAD_PRESET2 = `npm_api_test_upload_preset_2_${SUFFIX}`;
+const API_TEST_UPLOAD_PRESET3 = `npm_api_test_upload_preset_3_${SUFFIX}`;
+const API_TEST_UPLOAD_PRESET4 = `npm_api_test_upload_preset_4_${SUFFIX}`;
 const EXPLICIT_TRANSFORMATION_NAME = `c_scale,l_text:Arial_60:${TEST_TAG},w_100`;
 const EXPLICIT_TRANSFORMATION_NAME2 = `c_scale,l_text:Arial_60:${TEST_TAG},w_200`;
 const EXPLICIT_TRANSFORMATION = {
@@ -410,7 +410,7 @@ describe("api", () => {
       });
     });
     describe("delete_resources_by_tag", () => {
-      const deleteTestTag = TEST_TAG + "_delete";
+      const deleteTestTag = `${TEST_TAG}_delete`;
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
       it("should allow deleting resources by tags", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
@@ -459,7 +459,7 @@ describe("api", () => {
     var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
-    transformationName = "api_test_transformation3" + SUFFIX;
+    transformationName = `api_test_transformation3${SUFFIX}`;
     after(() => Q.allSettled(
       [
         cloudinary.v2.api.delete_transformation(transformationName),
@@ -877,7 +877,7 @@ describe("api", () => {
   describe('.restore', function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
 
-    const publicId = "api_test_restore" + SUFFIX;
+    const publicId = `api_test_restore${SUFFIX}`;
     before(() => cloudinary.v2.uploader.upload(IMAGE_FILE, {
       public_id: publicId,
       backup: true,
@@ -1008,7 +1008,7 @@ describe("api", () => {
     publicId = "";
     access_mode_tag = '';
     beforeEach(() => {
-      access_mode_tag = TEST_TAG + "access_mode" + i++;
+      access_mode_tag = `${TEST_TAG}access_mode${i++}`;
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         access_mode: "authenticated",
         tags: UPLOAD_TAGS.concat([access_mode_tag]),

@@ -26,7 +26,7 @@ exports.TIMEOUT_LONG = 50000;
 exports.SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
 exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
 exports.TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDK's tests
-exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; // identifies resources created in the current test run
+exports.TEST_TAG = `${exports.TEST_TAG_PREFIX}_${exports.SUFFIX}`; // identifies resources created in the current test run
 exports.UPLOAD_TAGS = [exports.TEST_TAG, exports.TEST_TAG_PREFIX, exports.SDK_TAG];
 exports.IMAGE_FILE = "test/resources/logo.png";
 exports.LARGE_RAW_FILE = "test/resources/TheCompleteWorksOfShakespeare.mobi";
@@ -119,7 +119,7 @@ Create a matcher method for upload parameters
 exports.uploadParamMatcher = function (name, value) {
   return function (arg) {
     var return_part;
-    return_part = 'Content-Disposition: form-data; name="' + name + '"\r\n\r\n';
+    return_part = `Content-Disposition: form-data; name="${name}"\r\n\r\n`;
     return_part += String(value);
     return arg.indexOf(return_part) + 1;
   };
@@ -150,7 +150,7 @@ exports.apiParamMatcher = function (name, value) {
   @return a new escaped string
 */
 exports.escapeRegexp = function (s) {
-  return s.replace(/[{\[\].*+()}]/g, c => '\\' + c);
+  return s.replace(/[{\[\].*+()}]/g, c => `\\${c}`);
 };
 
 /**

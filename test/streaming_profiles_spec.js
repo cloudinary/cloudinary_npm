@@ -30,7 +30,7 @@ describe('Cloudinary::Api', () => {
     }
     return Q.allSettled([
       cloudinary.v2.api.delete_streaming_profile(test_id_1),
-      cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'),
+      cloudinary.v2.api.delete_streaming_profile(`${test_id_1}a`),
       cloudinary.v2.api.delete_streaming_profile(test_id_3),
     ]);
   });
@@ -49,7 +49,7 @@ describe('Cloudinary::Api', () => {
     }).then((result) => {
       expect(result).not.to.be(void 0);
     }));
-    it('should create a streaming profile with an array of transformation', () => api.create_streaming_profile(test_id_1 + 'a', {
+    it('should create a streaming profile with an array of transformation', () => api.create_streaming_profile(`${test_id_1}a`, {
       representations: [
         {
           transformation: [

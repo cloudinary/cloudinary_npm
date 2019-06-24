@@ -17,7 +17,7 @@ function add_through_server(req, res) {
   // Create a new photo model and set it's default title
   var photo = new Photo();
   Photo.count().then((amount) => {
-    photo.title = "My Photo #" + (amount + 1);
+    photo.title = `My Photo #${amount + 1}`;
   })
     .finally(() => {
       res.render('photos/add', {
@@ -61,11 +61,11 @@ function create_through_server(req, res) {
 
 function add_direct(req, res) {
   // Configuring cloudinary_cors direct upload to support old IE versions
-  var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
+  var cloudinary_cors = `http://${req.headers.host}/cloudinary_cors.html`;
   // Create a new photo model and set it's default title
   var photo = new Photo();
   Photo.count().then((amount) => {
-    photo.title = "My Photo #" + (amount + 1) + " (direct)";
+    photo.title = `My Photo #${amount + 1} (direct)`;
   })
     .finally(() => {
       res.render('photos/add_direct', {
@@ -77,19 +77,19 @@ function add_direct(req, res) {
 
 function add_direct_unsigned(req, res) {
   // Configuring cloudinary_cors direct upload to support old IE versions
-  var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
+  var cloudinary_cors = `http://${req.headers.host}/cloudinary_cors.html`;
 
   // Set a unique unsigned upload preset name (for demo purposes only).
   // In 'real life' scenario the preset name will be meaningful and will be set
   // via online console or API not related to the actual upload
   var sha1 = crypto.createHash('sha1');
   sha1.update(cloudinary.config('api_key') + cloudinary.config('api_secret'));
-  var preset_name = "sample_" + sha1.digest('hex');
+  var preset_name = `sample_${sha1.digest('hex')}`;
 
   // Create a new photo model and set it's default title
   var photo = new Photo();
   Photo.count().then((amount) => {
-    photo.title = "My Photo #" + (amount + 1) + " (direct unsigned)";
+    photo.title = `My Photo #${amount + 1} (direct unsigned)`;
   })
     .then(() => cloudinary.api.upload_preset(preset_name))
     // eslint-disable-next-line consistent-return

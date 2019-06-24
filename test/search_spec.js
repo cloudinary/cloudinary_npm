@@ -10,10 +10,10 @@ const helper = require("./spechelper");
 const { SUFFIX } = helper;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
-const PUBLIC_ID_1 = PUBLIC_ID + "_1";
-const PUBLIC_ID_2 = PUBLIC_ID + "_2";
-const PUBLIC_ID_3 = PUBLIC_ID + "_3";
-const SEARCH_TAG = 'npm_advanced_search_' + SUFFIX;
+const PUBLIC_ID_1 = `${PUBLIC_ID}_1`;
+const PUBLIC_ID_2 = `${PUBLIC_ID}_2`;
+const PUBLIC_ID_3 = `${PUBLIC_ID}_3`;
+const SEARCH_TAG = `npm_advanced_search_${SUFFIX}`;
 
 describe("search_api", () => {
   describe("unit", () => {

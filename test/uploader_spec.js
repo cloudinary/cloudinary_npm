@@ -106,7 +106,7 @@ describe("uploader", function () {
 
   describe("rename", function () {
     this.timeout(helper.TIMEOUT_LONG);
-    it("should successfully rename a file", () => uploadImage().then(result => cloudinary.v2.uploader.rename(result.public_id, result.public_id + "2").then(() => result.public_id)).then(public_id => cloudinary.v2.api.resource(public_id + "2")));
+    it("should successfully rename a file", () => uploadImage().then(result => cloudinary.v2.uploader.rename(result.public_id, `${result.public_id}2`).then(() => result.public_id)).then(public_id => cloudinary.v2.api.resource(`${public_id}2`)));
     it("should not rename to an existing public_id", () => Promise.all([uploadImage(), uploadImage()]).then(results => cloudinary.v2.uploader.rename(results[0].public_id, results[1].public_id)).then(() => {
       expect().fail();
     }).catch((error) => {

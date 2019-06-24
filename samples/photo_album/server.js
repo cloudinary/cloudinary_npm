@@ -46,7 +46,7 @@ wirePostRequest(app);
 // eslint-disable-next-line no-shadow
 function wirePreRequest(app) {
   app.use((req, res, next) => {
-    console.log(req.method + " " + req.url);
+    console.log(`${req.method} ${req.url}`);
     res.locals.req = req;
     res.locals.res = res;
 
@@ -68,7 +68,7 @@ function wirePostRequest(app) {
     if (err.message && (~err.message.indexOf('not found') || (~err.message.indexOf('Cast to ObjectId failed')))) {
       return next();
     }
-    console.log('error (500) ' + err.message);
+    console.log(`error (500) ${err.message}`);
     console.log(err.stack);
     // eslint-disable-next-line no-bitwise
     if (~err.message.indexOf('CLOUDINARY_URL')) {
