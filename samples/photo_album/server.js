@@ -33,16 +33,6 @@ app.use('/node_modules', express.static(path.join(__dirname, '/node_modules')));
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 
-// Wire request 'pre' actions
-wirePreRequest(app);
-// Wire request controllers
-var photosController = require('./controllers/photos_controller');
-
-photosController.wire(app);
-
-// Wire request 'post' actions
-wirePostRequest(app);
-
 // eslint-disable-next-line no-shadow
 function wirePreRequest(app) {
   app.use((req, res, next) => {
@@ -78,6 +68,17 @@ function wirePostRequest(app) {
     }
   });
 }
+
+// Wire request 'pre' actions
+wirePreRequest(app);
+// Wire request controllers
+var photosController = require('./controllers/photos_controller');
+
+photosController.wire(app);
+
+// Wire request 'post' actions
+wirePostRequest(app);
+
 
 // Assume 404 since no middleware responded
 app.use((req, res, next) => {

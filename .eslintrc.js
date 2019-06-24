@@ -70,7 +70,7 @@ module.exports = {
       "args": "none",
       "caughtErrors": "none"
     }],
-    "no-use-before-define": "off",
+    //"no-use-before-define": "off",
     "no-useless-concat": "off",
     "no-useless-constructor": "off",
     "no-useless-escape": "off",
@@ -94,6 +94,6 @@ module.exports = {
     "quotes": "off",
     //"radix": "off",
     "vars-on-top": "off",
-    "wrap-iife": "off"
+    //"wrap-iife": "off"
   }
 }

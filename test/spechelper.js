@@ -13,6 +13,7 @@ const cloudinary = require("../cloudinary");
 const { utils, config, Cache } = cloudinary;
 const { isEmpty } = utils;
 
+const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 const libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
 const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
 const KeyValueCacheAdapter = require(`../${libPath}/cache/KeyValueCacheAdapter`);
@@ -230,6 +231,24 @@ exports.setupCache = function () {
     Cache.setAdapter(new KeyValueCacheAdapter(new FileKeyValueStorage()));
   }
 };
+
+function getExpectedSrcsetTag(publicId, commonTrans, customTrans, breakpoints, attributes = {}) {
+  if (!customTrans) {
+    customTrans = commonTrans;
+  }
+  if (!isEmpty(breakpoints)) {
+    attributes.srcset = breakpoints.map(width => `${UPLOAD_PATH}/${customTrans}/c_scale,w_${width}/${publicId} ${width}w`).join(', ');
+  }
+  let tag = `<img src='${UPLOAD_PATH}/${commonTrans}/${publicId}'`;
+  const attrs = Object.entries(attributes).map(([key, value]) => `${key}='${value}'`).join(' ');
+  if (attrs) {
+    tag += ` ${attrs}`;
+  }
+  tag += "/>";
+  return tag;
+}
+
+exports.getExpectedSrcsetTag = getExpectedSrcsetTag;
 
 /**
   Upload an image to be tested on.

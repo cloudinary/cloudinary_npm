@@ -1018,23 +1018,23 @@ describe("api", () => {
       });
     });
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
+      var [resource] = result.updated;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
-      var [resource] = result.updated;
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));
     it("should update access mode by prefix", () => cloudinary.v2.api.update_resources_access_mode_by_prefix("public", publicId.slice(0, -2)).then((result) => {
+      var [resource] = result.updated;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
-      var [resource] = result.updated;
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));
     it("should update access mode by tag", () => cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag).then((result) => {
+      var [resource] = result.updated;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
-      var [resource] = result.updated;
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));

@@ -1,8 +1,8 @@
 const expect = require('expect.js');
 const cloudinary = require('../cloudinary');
-const { setupCache, sharedExamples, includeContext } = require("./spechelper");
+const { setupCache, sharedExamples, includeContext, getExpectedSrcsetTag } = require("./spechelper");
 
-const { extend, isEmpty } = cloudinary.utils;
+const { extend } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 const { Cache } = cloudinary;
@@ -368,20 +368,3 @@ describe('image helper', () => {
     });
   });
 });
-
-
-function getExpectedSrcsetTag(publicId, commonTrans, customTrans, breakpoints, attributes = {}) {
-  if (!customTrans) {
-    customTrans = commonTrans;
-  }
-  if (!isEmpty(breakpoints)) {
-    attributes.srcset = breakpoints.map(width => `${UPLOAD_PATH}/${customTrans}/c_scale,w_${width}/${publicId} ${width}w`).join(', ');
-  }
-  let tag = `<img src='${UPLOAD_PATH}/${commonTrans}/${publicId}'`;
-  const attrs = Object.entries(attributes).map(([key, value]) => `${key}='${value}'`).join(' ');
-  if (attrs) {
-    tag += ` ${attrs}`;
-  }
-  tag += "/>";
-  return tag;
-}

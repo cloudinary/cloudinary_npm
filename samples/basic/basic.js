@@ -1,11 +1,10 @@
 var dotenv = require('dotenv');
+var cloudinary = require('cloudinary').v2;
+
+var uploads = {};
 
 dotenv.load();
 
-var cloudinary = require('cloudinary').v2;
-
-
-var uploads = {};
 
 // set your env variable CLOUDINARY_URL or set the following configuration
 /* cloudinary.config({
@@ -15,6 +14,48 @@ var uploads = {};
 }); */
 
 console.log("** ** ** ** ** ** ** ** ** Uploads ** ** ** ** ** ** ** ** ** **");
+
+// Eager Transformations:
+// Applied as soon as the file is uploaded, instead of lazily applying them when accessed by your site's visitors.
+var eager_options = {
+  width: 200, height: 150, crop: 'scale', format: 'jpg',
+};
+
+function performTransformations() {
+  console.log();
+  console.log();
+  console.log();
+  console.log(">> >> >> >> >> >> >> >> >> >>  Transformations << << << << << << << << << <<");
+  console.log();
+  console.log("> Fit into 200x150");
+  console.log(`> ${cloudinary.url(uploads.pizza2.public_id, { width: 200, height: 150, crop: "fit", format: "jpg" })}`);
+
+  console.log();
+  console.log("> Eager transformation of scaling to 200x150");
+  console.log(`> ${cloudinary.url(uploads.lake.public_id, eager_options)}`);
+
+  console.log();
+  console.log("> Face detection based 200x150 thumbnail");
+  console.log(`> ${cloudinary.url(uploads.couple.public_id, { width: 200, height: 150, crop: "thumb", gravity: "faces", format: "jpg" })}`);
+
+  console.log();
+  console.log("> Fill 200x150, round corners, apply the sepia effect");
+  console.log(`> ${cloudinary.url(uploads.couple2.public_id, { width: 200, height: 150, crop: "fill", gravity: "face", radius: 10, effect: "sepia", format: "jpg" })}`);
+
+  console.log();
+  console.log("> That's it. You can now open the URLs above in a browser");
+  console.log("> and check out the generated images.");
+}
+
+function waitForAllUploads(id, err, image) {
+  uploads[id] = image;
+  var ids = Object.keys(uploads);
+  if (ids.length === 6) {
+    console.log();
+    console.log(`**  uploaded all files (${ids.join(',')}) to cloudinary`);
+    performTransformations();
+  }
+}
 
 // File upload
 cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample' }, (err, image) => {
@@ -29,7 +70,7 @@ cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample' }, (err, image) =
 
 
 // Stream upload
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars,vars-on-top
 var upload_stream = cloudinary.uploader.upload_stream({ tags: 'basic_sample' }, (err, image) => {
   console.log();
   console.log("** Stream Upload");
@@ -67,12 +108,6 @@ cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample', public_id: 'my_f
   waitForAllUploads("pizza2", err, image);
 });
 
-
-// Eager Transformations:
-// Applied as soon as the file is uploaded, instead of lazily applying them when accessed by your site's visitors.
-var eager_options = {
-  width: 200, height: 150, crop: 'scale', format: 'jpg',
-};
 cloudinary.uploader.upload("lake.jpg", { tags: "basic_sample", public_id: "blue_lake", eager: eager_options }, (err, image) => {
   // "eager" parameter accepts a hash (or just a single item). You can pass
   // named transformations or transformation parameters as we do here.
@@ -110,40 +145,3 @@ cloudinary.uploader.upload('http://res.cloudinary.com/demo/image/upload/couple.j
     console.log(`* ${image.url}`);
     waitForAllUploads("couple2", err, image);
   });
-
-
-function waitForAllUploads(id, err, image) {
-  uploads[id] = image;
-  var ids = Object.keys(uploads);
-  if (ids.length === 6) {
-    console.log();
-    console.log(`**  uploaded all files (${ids.join(',')}) to cloudinary`);
-    performTransformations();
-  }
-}
-
-function performTransformations() {
-  console.log();
-  console.log();
-  console.log();
-  console.log(">> >> >> >> >> >> >> >> >> >>  Transformations << << << << << << << << << <<");
-  console.log();
-  console.log("> Fit into 200x150");
-  console.log(`> ${cloudinary.url(uploads.pizza2.public_id, { width: 200, height: 150, crop: "fit", format: "jpg" })}`);
-
-  console.log();
-  console.log("> Eager transformation of scaling to 200x150");
-  console.log(`> ${cloudinary.url(uploads.lake.public_id, eager_options)}`);
-
-  console.log();
-  console.log("> Face detection based 200x150 thumbnail");
-  console.log(`> ${cloudinary.url(uploads.couple.public_id, { width: 200, height: 150, crop: "thumb", gravity: "faces", format: "jpg" })}`);
-
-  console.log();
-  console.log("> Fill 200x150, round corners, apply the sepia effect");
-  console.log(`> ${cloudinary.url(uploads.couple2.public_id, { width: 200, height: 150, crop: "fill", gravity: "face", radius: 10, effect: "sepia", format: "jpg" })}`);
-
-  console.log();
-  console.log("> That's it. You can now open the URLs above in a browser");
-  console.log("> and check out the generated images.");
-}

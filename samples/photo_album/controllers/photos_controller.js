@@ -1,9 +1,9 @@
 var cloudinary = require('cloudinary').v2;
 var crypto = require('crypto');
-
-var { Photo } = schema.models;
 var multipart = require('connect-multiparty');
 var schema = require('../config/schema');
+
+var { Photo } = schema.models;
 
 var multipartMiddleware = multipart();
 
