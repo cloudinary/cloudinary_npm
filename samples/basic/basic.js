@@ -101,7 +101,7 @@ cloudinary.uploader.upload('http://res.cloudinary.com/demo/image/upload/couple.j
 // Here, the transformation is applied to the uploaded image BEFORE storing it on the cloud.
 // The original uploaded image is discarded.
 cloudinary.uploader.upload('http://res.cloudinary.com/demo/image/upload/couple.jpg',
-  { "tags": "basic_sample", "width": 500, "height": 500, "crop": "fit", "effect": "saturation:-70" },
+  { tags: "basic_sample", width: 500, height: 500, crop: "fit", effect: "saturation:-70" },
   (err, image) => {
     console.log();
     console.log("** Remote Url");

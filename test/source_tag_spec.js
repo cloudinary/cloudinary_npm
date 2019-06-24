@@ -18,12 +18,12 @@ describe('source helper', () => {
     max_width = 399;
     breakpoint_list = [min_width, 200, 300, max_width];
     common_srcset = {
-      "breakpoints": breakpoint_list,
+      breakpoints: breakpoint_list,
     };
     fill_transformation = {
-      "width": max_width,
-      "height": max_width,
-      "crop": "fill",
+      width: max_width,
+      height: max_width,
+      crop: "fill",
     };
     cloudinary.config(true); // Reset
     cloudinary.config({
@@ -55,28 +55,28 @@ describe('source helper', () => {
     tag = cloudinary.picture(FULL_PUBLIC_ID, extend({
       sources: [
         {
-          "max_width": min_width,
-          "transformation": {
-            "effect": "sepia",
-            "angle": 17,
-            "width": min_width,
+          max_width: min_width,
+          transformation: {
+            effect: "sepia",
+            angle: 17,
+            width: min_width,
           },
         },
         {
-          "min_width": min_width,
-          "max_width": max_width,
-          "transformation": {
-            "effect": "colorize",
-            "angle": 18,
-            "width": max_width,
+          min_width,
+          max_width,
+          transformation: {
+            effect: "colorize",
+            angle: 18,
+            width: max_width,
           },
         },
         {
-          "min_width": max_width,
-          "transformation": {
-            "effect": "blur",
-            "angle": 19,
-            "width": max_width,
+          min_width: max_width,
+          transformation: {
+            effect: "blur",
+            angle: 19,
+            width: max_width,
           },
         },
       ],

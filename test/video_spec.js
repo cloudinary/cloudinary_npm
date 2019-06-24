@@ -84,14 +84,14 @@ describe("video tag helper", () => {
       width: 100,
       crop: "scale",
       transformation: {
-        'quality': 50,
+        quality: 50,
       },
       source_transformation: {
-        'ogv': {
-          'quality': 70,
+        ogv: {
+          quality: 70,
         },
-        'mp4': {
-          'quality': 30,
+        mp4: {
+          quality: 30,
         },
       },
     })).to.eql(`<video poster='${expected_url}.jpg' width='100'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_mp4_url}.mp4' type='video/mp4'>` + `<source src='${expected_ogv_url}.ogv' type='video/ogg'>` + "</video>");
@@ -99,14 +99,14 @@ describe("video tag helper", () => {
       width: 100,
       crop: "scale",
       transformation: {
-        'quality': 50,
+        quality: 50,
       },
       source_transformation: {
-        'ogv': {
-          'quality': 70,
+        ogv: {
+          quality: 70,
         },
-        'mp4': {
-          'quality': 30,
+        mp4: {
+          quality: 30,
         },
       },
       source_types: ['webm', 'mp4'],
@@ -123,16 +123,16 @@ describe("video tag helper", () => {
     expected_poster_url = `${VIDEO_UPLOAD_PATH}g_north/movie.jpg`;
     expect(cloudinary.video("movie", {
       poster: {
-        'gravity': 'north',
+        gravity: 'north',
       },
       source_types: "mp4",
     })).to.eql(`<video poster='${expected_poster_url}' src='${expected_url}.mp4'></video>`);
     expected_poster_url = `${DEFAULT_UPLOAD_PATH}g_north/my_poster.jpg`;
     expect(cloudinary.video("movie", {
       poster: {
-        'gravity': 'north',
-        'public_id': 'my_poster',
-        'format': 'jpg',
+        gravity: 'north',
+        public_id: 'my_poster',
+        format: 'jpg',
       },
       source_types: "mp4",
     })).to.eql(`<video poster='${expected_poster_url}' src='${expected_url}.mp4'></video>`);

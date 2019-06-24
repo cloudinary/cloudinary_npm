@@ -90,7 +90,7 @@ module.exports = {
     //"prefer-const": "off",
     //"prefer-destructuring": "off",
     //"prefer-template": "off",
-    "quote-props": "off",
+    //"quote-props": "off",
     "quotes": "off",
     "radix": "off",
     "vars-on-top": "off",

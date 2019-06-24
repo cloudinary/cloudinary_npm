@@ -668,10 +668,10 @@ describe("utils", () => {
     });
     it("should support aspect ratio", () => {
       test_cloudinary_url("test", {
-        "aspect_ratio": "1.0",
+        aspect_ratio: "1.0",
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/ar_1.0/test`, {});
       test_cloudinary_url("test", {
-        "aspect_ratio": "3:2",
+        aspect_ratio: "3:2",
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/ar_3:2/test`, {});
     });
     it("build_upload_params should not destroy options", () => {
@@ -691,54 +691,54 @@ describe("utils", () => {
         [
           "string",
           {
-            "font_family": "arial",
-            "font_size": 30,
-            "text": "abc,αβγ/אבג",
+            font_family: "arial",
+            font_size: 30,
+            text: "abc,αβγ/אבג",
           },
           "text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92",
         ],
         [
           "public_id",
           {
-            "public_id": "logo",
+            public_id: "logo",
           },
           "logo",
         ],
         [
           "UTF-8 public_id",
           {
-            "public_id": "abcαβγאבג.jpg",
+            public_id: "abcαβγאבג.jpg",
           },
           "abcαβγאבג.jpg",
         ],
         [
           "public_id with folder",
           {
-            "public_id": "folder/logo",
+            public_id: "folder/logo",
           },
           "folder:logo",
         ],
         [
           "private",
           {
-            "public_id": "logo",
-            "type": "private",
+            public_id: "logo",
+            type: "private",
           },
           "private:logo",
         ],
         [
           "format",
           {
-            "public_id": "logo",
-            "format": "png",
+            public_id: "logo",
+            format: "png",
           },
           "logo.png",
         ],
         [
           "video",
           {
-            "resource_type": "video",
-            "public_id": "cat",
+            resource_type: "video",
+            public_id: "cat",
           },
           "video:cat",
         ],
@@ -778,8 +778,8 @@ describe("utils", () => {
         });
         it(`should not pass width/height to html for ${param}`, () => {
           var opt = {
-            'height': 100,
-            'width': 100,
+            height: 100,
+            width: 100,
           };
           opt[param] = "text:hello";
           expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,${letter}_text:hello,w_100/test`).and.emptyOptions();
@@ -975,8 +975,8 @@ describe("utils", () => {
         it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", () => {
           var allOperators = 'if_' + 'w_eq_0_and' + '_h_ne_0_or' + '_ar_lt_0_and' + '_pc_gt_0_and' + '_fc_lte_0_and' + '_w_gte_0' + ',e_grayscale';
           expect(utils.url("sample", {
-            "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
-            "effect": "grayscale",
+            if: "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
+            effect: "grayscale",
           })).to.match(new RegExp(allOperators));
         });
       });
