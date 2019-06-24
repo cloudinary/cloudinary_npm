@@ -1137,7 +1137,7 @@ describe("utils", () => {
           }
         });
         it("should not pass width/height to html for overlay", () => {
-          let opt = {
+          const opt = {
             overlay: "text:test_text",
             height: 100,
             width: 100,

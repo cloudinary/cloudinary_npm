@@ -55,7 +55,7 @@ describe("Cache", () => {
       };
     });
     after(() => {
-      let config = cloudinary.config(true);
+      const config = cloudinary.config(true);
       if (!(config.api_key && config.api_secret)) {
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
       }
@@ -65,11 +65,11 @@ describe("Cache", () => {
     });
     it("should save responsive breakpoints to cache after upload", () => cloudinary.uploader.upload(IMAGE_FILE, options)
       .then((results) => {
-        let public_id = results.public_id;
-        let type = results.type;
-        let resource_type = results.resource_type;
+        const public_id = results.public_id;
+        const type = results.type;
+        const resource_type = results.resource_type;
         results.responsive_breakpoints.forEach((bp) => {
-          let cachedBp = Cache.get(results.public_id, {
+          const cachedBp = Cache.get(results.public_id, {
             public_id,
             type,
             resource_type,

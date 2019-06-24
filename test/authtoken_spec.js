@@ -28,7 +28,7 @@ describe("authToken", () => {
     cloudinary.config(true);
   });
   it("should generate with start and window", () => {
-    let token = utils.generate_auth_token({
+    const token = utils.generate_auth_token({
       start_time: 1111111111,
       acl: "/image/*",
       duration: 300,
@@ -42,7 +42,7 @@ describe("authToken", () => {
       });
     });
     it("should add token if authToken is globally set and signed = true", () => {
-      let url = cloudinary.url("sample.jpg", {
+      const url = cloudinary.url("sample.jpg", {
         sign_url: true,
         resource_type: "image",
         type: "authenticated",
@@ -51,7 +51,7 @@ describe("authToken", () => {
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=8db0d753ee7bbb9e2eaf8698ca3797436ba4c20e31f44527e43b6a6e995cfdb3");
     });
     it("should add token for 'public' resource", () => {
-      let url = cloudinary.url("sample.jpg", {
+      const url = cloudinary.url("sample.jpg", {
         sign_url: true,
         resource_type: "image",
         type: "public",
@@ -60,14 +60,14 @@ describe("authToken", () => {
       expect(url).to.eql("http://test123-res.cloudinary.com/image/public/v1486020273/sample.jpg?__cld_token__=st=11111111~exp=11111411~hmac=c2b77d9f81be6d89b5d0ebc67b671557e88a40bcf03dd4a6997ff4b994ceb80e");
     });
     it("should not add token if signed is false", () => {
-      let url = cloudinary.url("sample.jpg", {
+      const url = cloudinary.url("sample.jpg", {
         type: "authenticated",
         version: "1486020273",
       });
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/v1486020273/sample.jpg");
     });
     it("should not add token if authToken is globally set but null auth token is explicitly set and signed = true", () => {
-      let url = cloudinary.url("sample.jpg", {
+      const url = cloudinary.url("sample.jpg", {
         auth_token: false,
         sign_url: true,
         type: "authenticated",
@@ -76,7 +76,7 @@ describe("authToken", () => {
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/s--v2fTPYTu--/v1486020273/sample.jpg");
     });
     it("explicit authToken should override global setting", () => {
-      let url = cloudinary.url("sample.jpg", {
+      const url = cloudinary.url("sample.jpg", {
         sign_url: true,
         auth_token: {
           key: ALT_KEY,
@@ -92,11 +92,11 @@ describe("authToken", () => {
       expect(url).to.eql("http://test123-res.cloudinary.com/image/authenticated/c_scale,w_300/sample.jpg?__cld_token__=st=222222222~exp=222222322~hmac=7d276841d70c4ecbd0708275cd6a82e1f08e47838fbb0bceb2538e06ddfa3029");
     });
     it("should compute expiration as start time + duration", () => {
-      let token = {
+      const token = {
         start_time: 11111111,
         duration: 300,
       };
-      let url = cloudinary.url("sample.jpg", {
+      const url = cloudinary.url("sample.jpg", {
         sign_url: true,
         auth_token: token,
         resource_type: "image",
@@ -108,19 +108,19 @@ describe("authToken", () => {
   });
   describe("authentication token", () => {
     it("should generate token string", () => {
-      let user = "foobar"; // we can't rely on the default "now" value in tests
-      let tokenOptions = {
+      const user = "foobar"; // we can't rely on the default "now" value in tests
+      const tokenOptions = {
         key: KEY,
         duration: 300,
         acl: `/*/t_${user}`,
       };
       tokenOptions.start_time = 222222222; // we can't rely on the default "now" value in tests
-      let cookieToken = utils.generate_auth_token(tokenOptions);
+      const cookieToken = utils.generate_auth_token(tokenOptions);
       expect(cookieToken).to.eql("__cld_token__=st=222222222~exp=222222522~acl=%2f*%2ft_foobar~hmac=8e39600cc18cec339b21fe2b05fcb64b98de373355f8ce732c35710d8b10259f");
     });
   });
   it("should add token to an image tag url", () => {
-    let tag = cloudinary.image("sample.jpg", {
+    const tag = cloudinary.image("sample.jpg", {
       sign_url: true,
       type: "authenticated",
       version: "1486020273",

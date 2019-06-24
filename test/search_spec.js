@@ -22,7 +22,7 @@ describe("search_api", () => {
       expect(query_hash).to.eql({});
     });
     it('should always return same object in fluent interface', () => {
-      let instance = cloudinary.v2.search.instance();
+      const instance = cloudinary.v2.search.instance();
       [
         'expression',
         'sort_by',
@@ -109,7 +109,7 @@ describe("search_api", () => {
     ]).delay(3000));// wait for the server to update
     after(() => {
       if (!cloudinary.config().keep_test_products) {
-        let config = cloudinary.config();
+        const config = cloudinary.config();
         if (!(config.api_key && config.api_secret)) {
           expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
         }

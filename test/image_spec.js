@@ -356,13 +356,13 @@ describe('image helper', () => {
       });
     });
     it("Should throw InvalidArgumentException on invalid values", () => {
-      let tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
+      const tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         width: 500,
         height: 500,
       }, {
         srcset: { breakpoints },
       }));
-      let expected = getExpectedSrcsetTag('sample.jpg', 'e_sepia,h_500,w_500', '', breakpoints);
+      const expected = getExpectedSrcsetTag('sample.jpg', 'e_sepia,h_500,w_500', '', breakpoints);
       expect(tag).to.eql(expected);
     });
   });
@@ -377,7 +377,7 @@ function getExpectedSrcsetTag(publicId, commonTrans, customTrans, breakpoints, a
     attributes.srcset = breakpoints.map(width => `${UPLOAD_PATH}/${customTrans}/c_scale,w_${width}/${publicId} ${width}w`).join(', ');
   }
   let tag = `<img src='${UPLOAD_PATH}/${commonTrans}/${publicId}'`;
-  let attrs = Object.entries(attributes).map(([key, value]) => `${key}='${value}'`).join(' ');
+  const attrs = Object.entries(attributes).map(([key, value]) => `${key}='${value}'`).join(' ');
   if (attrs) {
     tag += ' ' + attrs;
   }

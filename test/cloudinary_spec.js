@@ -386,7 +386,7 @@ describe("cloudinary", () => {
   ].forEach(([layer, short]) => {
     it(`should support ${layer}`, () => {
       var result;
-      let options = {};
+      const options = {};
       options[layer] = "text:hello";
       result = cloudinary.utils.url("test", options);
       expect(options).to.eql({});
@@ -527,7 +527,7 @@ describe("cloudinary", () => {
       ["a??b", "a%3F%3Fb"],
     ];
     tests.forEach(([source, target]) => {
-      let result = cloudinary.utils.url(source);
+      const result = cloudinary.utils.url(source);
       expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/" + target);
     });
   });

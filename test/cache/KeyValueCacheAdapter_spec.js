@@ -31,7 +31,7 @@ describe("KeyValueCacheAdapter", () => {
   });
   it("should set and get values", () => {
     cache.set(...parameters, value);
-    let actualValue = cache.get(...parameters);
+    const actualValue = cache.get(...parameters);
 
     expect(actualValue).to.eql(value);
   });
@@ -47,8 +47,8 @@ describe("KeyValueCacheAdapter", () => {
     cache.set(...parameters, value);
     cache.set(...parameters2, value2);
     cache.flushAll();
-    let deletedValue = cache.get(...parameters);
-    let deletedValue2 = cache.get(...parameters2);
+    const deletedValue = cache.get(...parameters);
+    const deletedValue2 = cache.get(...parameters2);
     expect(deletedValue).to.be(null);
     expect(deletedValue2).to.be(null);
   });

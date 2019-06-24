@@ -15,7 +15,7 @@ describe("FileKeyValueStorage", () => {
   var basefolder;
 
   function getTestValue(key) {
-    let storedValue = fs.readFileSync(storage.getFilename(key));
+    const storedValue = fs.readFileSync(storage.getFilename(key));
     return JSON.parse(storedValue);
   }
 
@@ -33,12 +33,12 @@ describe("FileKeyValueStorage", () => {
 
   it("should set a value in a file", () => {
     storage.set(KEY, VALUE);
-    let actual = getTestValue(KEY);
+    const actual = getTestValue(KEY);
     expect(actual).to.eql(VALUE);
   });
   it("should get a value from a file", () => {
     storage.set(KEY, VALUE);
-    let actual = storage.get(KEY);
+    const actual = storage.get(KEY);
     expect(actual).to.eql(VALUE);
   });
   it("should remove all files", () => {

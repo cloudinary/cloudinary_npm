@@ -116,7 +116,7 @@ function findByAttr(elements, attr, value) {
 describe("api", () => {
   var contextKey = `test-key${helper.SUFFIX}`;
   before("Verify Configuration", () => {
-    let config = cloudinary.config(true);
+    const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
@@ -190,7 +190,7 @@ describe("api", () => {
         publicId = result.public_id;
         return cloudinary.v2.api.resources();
       }).then((result) => {
-        let resource = findByAttr(result.resources, "public_id", publicId);
+        const resource = findByAttr(result.resources, "public_id", publicId);
         expect(resource).not.to.eql(void 0);
         expect(resource.type).to.eql("upload");
       });
@@ -203,7 +203,7 @@ describe("api", () => {
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result]),
       ).then(([public_id, result]) => {
-        let resource = findByAttr(result.resources, "public_id", public_id);
+        const resource = findByAttr(result.resources, "public_id", public_id);
         expect(resource).to.be.an(Object);
         expect(resource.type).to.eql("upload");
       });
@@ -215,7 +215,7 @@ describe("api", () => {
         prefix: PUBLIC_ID_PREFIX,
         max_results: 500,
       }).then((result) => {
-        let public_ids = result.resources.map(resource => resource.public_id);
+        const public_ids = result.resources.map(resource => resource.public_id);
         expect(public_ids).to.contain(PUBLIC_ID);
         expect(public_ids).to.contain(PUBLIC_ID_2);
       });
@@ -276,7 +276,7 @@ describe("api", () => {
       ]).then(([asc, desc]) => expect(asc.reverse()).to.eql(desc));
     });
     it("should allow listing resources by start_at", () => {
-      let start_at = new Date().toString();
+      const start_at = new Date().toString();
       helper.mockPromise((xhr, writeSpy, requestSpy) => {
         cloudinary.v2.api.resources({
           type: "upload",
@@ -321,7 +321,7 @@ describe("api", () => {
         expect(resource).not.to.eql(void 0);
         expect(resource.bytes).to.eql(3381);
         expect(resource.derived).to.have.length(1);
-        let derived_resource_id = resource.derived[0].id;
+        const derived_resource_id = resource.derived[0].id;
         // ignore results and pass-through the public_id
         return cloudinary.v2.api.delete_derived_resources(derived_resource_id)
           .then(() => public_id);
@@ -410,7 +410,7 @@ describe("api", () => {
       });
     });
     describe("delete_resources_by_tag", () => {
-      let deleteTestTag = TEST_TAG + "_delete";
+      const deleteTestTag = TEST_TAG + "_delete";
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
       it("should allow deleting resources by tags", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
@@ -695,7 +695,7 @@ describe("api", () => {
     itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
     describe("keep_original: yes", () => {
       it("should allow deleting all derived resources", () => helper.mockPromise((xhr, write, request) => {
-        let options = {
+        const options = {
           keep_original: true,
         };
         cloudinary.v2.api.delete_all_resources(options);
@@ -892,7 +892,7 @@ describe("api", () => {
       expect(resource.placeholder).to.eql(true);
     }));
     it('should restore a deleted resource', () => cloudinary.v2.api.restore(publicId).then((response) => {
-      let info = response[publicId];
+      const info = response[publicId];
       expect(info).not.to.be(null);
       expect(info.bytes).to.eql(3381);
       return cloudinary.v2.api.resource(publicId);
@@ -963,7 +963,7 @@ describe("api", () => {
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "authenticated",
       }).then((result) => {
-        let published = result.published;
+        const published = result.published;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
         expect(published[0].public_id).to.eql(publishTestId);
@@ -973,7 +973,7 @@ describe("api", () => {
     it("should publish by prefix", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_prefix(publishTestId.slice(0, -1)).then((result) => {
-        let published = result.published;
+        const published = result.published;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
         expect(published[0].public_id).to.eql(publishTestId);
@@ -983,7 +983,7 @@ describe("api", () => {
     it("should publish by tag", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_tag(publishTestTag).then((result) => {
-        let published = result.published;
+        const published = result.published;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
         expect(published[0].public_id).to.eql(publishTestId);
@@ -995,7 +995,7 @@ describe("api", () => {
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "private",
       }).then((result) => {
-        let published = result.published;
+        const published = result.published;
         expect(published).not.to.be(null);
         expect(published.length).to.be(0);
       });

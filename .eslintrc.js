@@ -87,7 +87,7 @@ module.exports = {
     //"one-var-declaration-per-line": "off",
     //"operator-assignment": "off",
     //"prefer-arrow-callback": "off",
-    "prefer-const": "off",
+    //"prefer-const": "off",
     "prefer-destructuring": "off",
     "prefer-template": "off",
     "quote-props": "off",

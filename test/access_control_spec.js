@@ -22,14 +22,14 @@ const ACL_STRING = '{"access_type":"anonymous","start":"2019-02-22 16:20:57 +020
 
 describe("Access Control", () => {
   before("Verify Configuration", () => {
-    let config = cloudinary.config(true);
+    const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
   describe("build_upload_params", () => {
     it("should accept a Hash value", () => {
-      let params = build_upload_params({
+      const params = build_upload_params({
         access_control: ACL,
       });
       expect(params).to.have.key('access_control');
@@ -37,20 +37,20 @@ describe("Access Control", () => {
       expect(params.access_control).to.match(/^\[.+\]$/);
     });
     it("should accept an array of Hash values", () => {
-      let params = build_upload_params({
+      const params = build_upload_params({
         access_control: [ACL, ACL_2],
       });
       expect(params).to.have.key('access_control');
       expect(isString(params.access_control)).to.be.ok();
       expect(params.access_control).to.match(/^\[.+\]$/);
-      let j = JSON.parse(params.access_control);
+      const j = JSON.parse(params.access_control);
       expect(j.length).to.be(2);
       expect(j[0].access_type).to.equal(ACL.access_type);
       expect(Date.parse(j[0].start)).to.equal(Date.parse(ACL.start));
       expect(Date.parse(j[0].end)).to.equal(Date.parse(ACL.end));
     });
     it("should accept a JSON string", () => {
-      let params = build_upload_params({
+      const params = build_upload_params({
         access_control: ACL_STRING,
       });
       expect(params).to.have.key('access_control');
