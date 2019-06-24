@@ -663,7 +663,7 @@ describe("cloudinary", () => {
     it("should allow nested values in CLOUDINARY_URL", () => {
       process.env.CLOUDINARY_URL = "cloudinary://key:secret@test123?foo[bar]=value";
       cloudinary.config(true);
-      const foo = cloudinary.config().foo;
+      const { foo } = cloudinary.config();
       expect(foo && foo.bar).to.eql('value');
     });
   });

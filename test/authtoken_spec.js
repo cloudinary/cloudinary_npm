@@ -5,7 +5,7 @@ require('dotenv').load({
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary.js");
 
-const utils = cloudinary.utils;
+const { utils } = cloudinary;
 const KEY = "00112233FF99";
 const ALT_KEY = "CCBB2233FF00";
 

@@ -8,7 +8,7 @@ const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
-const api = cloudinary.v2.api;
+const { api } = cloudinary.v2;
 
 describe('Cloudinary::Api', () => {
   var PREDEFINED_PROFILES; var prefix; var test_id_1; var test_id_2; var test_id_3;

@@ -5,7 +5,7 @@ const { setupCache, sharedExamples, includeContext } = require("./spechelper");
 const { extend, isEmpty } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
-const Cache = cloudinary.Cache;
+const { Cache } = cloudinary;
 const srcRegExp = function (name, path) {
   return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "\/"));
 };
@@ -276,6 +276,7 @@ describe('image helper', () => {
           useCache: true,
         },
       });
+      // eslint-disable-next-line prefer-destructuring
       srcset = tag.match(/srcset=['"]([^"']+)['"]/)[1];
       expect(srcset).to.be.ok();
       srcset = srcset.split(/, /);

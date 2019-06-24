@@ -5,20 +5,20 @@ require('dotenv').load({
 
 const expect = require("expect.js");
 const sinon = require('sinon');
-const ClientRequest = require('_http_client').ClientRequest;
+const { ClientRequest } = require('_http_client');
 const http = require('http');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
 const { merge } = cloudinary.utils;
-const sharedExamples = helper.sharedExamples;
-const itBehavesLike = helper.itBehavesLike;
-const TEST_TAG = helper.TEST_TAG;
-const IMAGE_FILE = helper.IMAGE_FILE;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
-const uploadImage = helper.uploadImage;
-const SUFFIX = helper.SUFFIX;
+const { sharedExamples } = helper;
+const { itBehavesLike } = helper;
+const { TEST_TAG } = helper;
+const { IMAGE_FILE } = helper;
+const { UPLOAD_TAGS } = helper;
+const { uploadImage } = helper;
+const { SUFFIX } = helper;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
 const PUBLIC_ID_1 = PUBLIC_ID + "_1";
@@ -666,6 +666,7 @@ describe("api", () => {
       return cloudinary.v2.api.create_upload_preset({
         folder: "folder",
       }).then((preset) => {
+        // eslint-disable-next-line prefer-destructuring
         name = preset.name;
         return cloudinary.v2.api.upload_preset(name);
       }).then(preset => cloudinary.v2.api.update_upload_preset(name, merge(preset.settings, {
@@ -851,8 +852,8 @@ describe("api", () => {
           tags: UPLOAD_TAGS,
         }),
     ]).then(results => Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')])).then((results) => {
-      var folder; var root; var root_folders; var sub_1;
-      root = results[0];
+      var folder; var root_folders;
+      var [root, sub_1] = results;
       root_folders = (() => {
         var j; var len; var ref; var results1;
         ref = root.folders;
@@ -863,7 +864,6 @@ describe("api", () => {
         }
         return results1;
       })();
-      sub_1 = results[1];
       expect(root_folders).to.contain('test_folder1');
       expect(root_folders).to.contain('test_folder2');
       expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
@@ -963,7 +963,7 @@ describe("api", () => {
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "authenticated",
       }).then((result) => {
-        const published = result.published;
+        const { published } = result;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
         expect(published[0].public_id).to.eql(publishTestId);
@@ -973,7 +973,7 @@ describe("api", () => {
     it("should publish by prefix", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_prefix(publishTestId.slice(0, -1)).then((result) => {
-        const published = result.published;
+        const { published } = result;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
         expect(published[0].public_id).to.eql(publishTestId);
@@ -983,7 +983,7 @@ describe("api", () => {
     it("should publish by tag", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return cloudinary.v2.api.publish_by_tag(publishTestTag).then((result) => {
-        const published = result.published;
+        const { published } = result;
         expect(published).not.to.be(null);
         expect(published.length).to.be(1);
         expect(published[0].public_id).to.eql(publishTestId);
@@ -995,7 +995,7 @@ describe("api", () => {
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "private",
       }).then((result) => {
-        const published = result.published;
+        const { published } = result;
         expect(published).not.to.be(null);
         expect(published.length).to.be(0);
       });
@@ -1018,26 +1018,23 @@ describe("api", () => {
       });
     });
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
-      var resource;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
-      resource = result.updated[0];
+      var [resource] = result.updated;
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));
     it("should update access mode by prefix", () => cloudinary.v2.api.update_resources_access_mode_by_prefix("public", publicId.slice(0, -2)).then((result) => {
-      var resource;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
-      resource = result.updated[0];
+      var [resource] = result.updated;
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));
     it("should update access mode by tag", () => cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag).then((result) => {
-      var resource;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
-      resource = result.updated[0];
+      var [resource] = result.updated;
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));

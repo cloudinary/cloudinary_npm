@@ -11,18 +11,18 @@ const Q = require('q');
 const path = require('path');
 const at = require('lodash/at');
 const uniq = require('lodash/uniq');
-const ClientRequest = require('_http_client').ClientRequest;
+const { ClientRequest } = require('_http_client');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
-const TEST_TAG = helper.TEST_TAG;
-const IMAGE_FILE = helper.IMAGE_FILE;
-const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
-const LARGE_VIDEO = helper.LARGE_VIDEO;
-const EMPTY_IMAGE = helper.EMPTY_IMAGE;
-const RAW_FILE = helper.RAW_FILE;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
-const uploadImage = helper.uploadImage;
+const { TEST_TAG } = helper;
+const { IMAGE_FILE } = helper;
+const { LARGE_RAW_FILE } = helper;
+const { LARGE_VIDEO } = helper;
+const { EMPTY_IMAGE } = helper;
+const { RAW_FILE } = helper;
+const { UPLOAD_TAGS } = helper;
+const { uploadImage } = helper;
 
 require('jsdom-global')();
 
@@ -142,6 +142,7 @@ describe("uploader", function () {
     it("should delete a resource", () => {
       var public_id;
       return uploadImage().then((result) => {
+        // eslint-disable-next-line prefer-destructuring
         public_id = result.public_id;
         return cloudinary.v2.uploader.destroy(public_id);
       }).then((result) => {
@@ -257,7 +258,7 @@ describe("uploader", function () {
     it("should replace existing tag", () => cloudinary.v2.uploader.upload(IMAGE_FILE, {
       tags: ["tag1", "tag2", TEST_TAG],
     }).then((result) => {
-      var public_id = result.public_id;
+      var { public_id } = result;
       return cloudinary.v2.uploader.replace_tag("tag3Å", public_id).then(() => public_id);
     }).then(public_id => // TODO this also tests non ascii characters
       // eslint-disable-next-line implicit-arrow-linebreak

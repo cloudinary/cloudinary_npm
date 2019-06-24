@@ -8,9 +8,9 @@ const cloudinary = require('../cloudinary').v2;
 const FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
 const KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAdapter`);
 
-const Cache = cloudinary.Cache;
-const IMAGE_FILE = helper.IMAGE_FILE;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
+const { Cache } = cloudinary;
+const { IMAGE_FILE } = helper;
+const { UPLOAD_TAGS } = helper;
 const PUBLIC_ID = "dummy";
 const BREAKPOINTS = [5, 3, 7, 5];
 
@@ -65,9 +65,9 @@ describe("Cache", () => {
     });
     it("should save responsive breakpoints to cache after upload", () => cloudinary.uploader.upload(IMAGE_FILE, options)
       .then((results) => {
-        const public_id = results.public_id;
-        const type = results.type;
-        const resource_type = results.resource_type;
+        const { public_id } = results;
+        const { type } = results;
+        const { resource_type } = results;
         results.responsive_breakpoints.forEach((bp) => {
           const cachedBp = Cache.get(results.public_id, {
             public_id,

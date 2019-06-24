@@ -7,7 +7,7 @@ const Q = require('q');
 const cloudinary = require('../cloudinary');
 const helper = require("./spechelper");
 
-const SUFFIX = helper.SUFFIX;
+const { SUFFIX } = helper;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
 const PUBLIC_ID_1 = PUBLIC_ID + "_1";

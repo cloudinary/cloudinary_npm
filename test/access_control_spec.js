@@ -6,7 +6,7 @@ const expect = require("expect.js");
 const isString = require('lodash/isString');
 const cloudinary = require("../cloudinary");
 
-const build_upload_params = cloudinary.utils.build_upload_params;
+const { build_upload_params } = cloudinary.utils;
 
 const ACL = {
   access_type: 'anonymous',
