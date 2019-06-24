@@ -151,7 +151,7 @@ describe("Cloudinary::Utils for video", () => {
             };
             url = utils.url("video_id", options);
             expect(options).to.eql({});
-            matched = /([^\/]*)\/video_id$/.exec(url);
+            matched = /([^/]*)\/video_id$/.exec(url);
             transformation = matched ? matched[1] : '';
             // we can't rely on the order of the parameters so we sort them before comparing
             expect(transformation.split(',').sort().reverse().join(',')).to.eql(url_param);

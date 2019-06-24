@@ -7,7 +7,7 @@ const BREAKPOINTS = [5, 3, 7, 5];
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 const { Cache } = cloudinary;
 const srcRegExp = function (name, path) {
-  return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "\/"));
+  return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "/"));
 };
 
 describe('image helper', () => {

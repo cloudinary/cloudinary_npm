@@ -300,9 +300,9 @@ describe("uploader", function () {
     it("should upload with context containing reserved characters", () => {
       var context = {
         key1: 'value1',
-        key2: 'valu\e2',
+        key2: 'value2',
         key3: 'val=u|e3',
-        key4: 'val\=ue',
+        key4: 'val=ue',
       };
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
         context,

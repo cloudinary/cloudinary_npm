@@ -72,8 +72,8 @@ module.exports = {
     }],
     //"no-use-before-define": "off",
     //"no-useless-concat": "off",
-    "no-useless-constructor": "off",
-    "no-useless-escape": "off",
+    //"no-useless-constructor": "off",
+    //"no-useless-escape": "off",
     "no-var": "off",
     "no-void": "off",
     "object-curly-newline": [
