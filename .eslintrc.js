@@ -71,7 +71,7 @@ module.exports = {
       "caughtErrors": "none"
     }],
     //"no-use-before-define": "off",
-    "no-useless-concat": "off",
+    //"no-useless-concat": "off",
     "no-useless-constructor": "off",
     "no-useless-escape": "off",
     "no-var": "off",

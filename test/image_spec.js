@@ -240,7 +240,7 @@ describe('image helper', () => {
           sizes: true,
         },
       }));
-      expectedSizesAttr = '(max-width: 100px) 100px, (max-width: 200px) 200px, ' + '(max-width: 300px) 300px, (max-width: 399px) 399px';
+      expectedSizesAttr = '(max-width: 100px) 100px, (max-width: 200px) 200px, (max-width: 300px) 300px, (max-width: 399px) 399px';
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', breakpoints, {
         sizes: expectedSizesAttr,
       });

@@ -973,7 +973,7 @@ describe("utils", () => {
       });
       describe('chaining conditions', () => {
         it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", () => {
-          var allOperators = 'if_' + 'w_eq_0_and' + '_h_ne_0_or' + '_ar_lt_0_and' + '_pc_gt_0_and' + '_fc_lte_0_and' + '_w_gte_0' + ',e_grayscale';
+          var allOperators = 'if_w_eq_0_and_h_ne_0_or_ar_lt_0_and_pc_gt_0_and_fc_lte_0_and_w_gte_0,e_grayscale';
           expect(utils.url("sample", {
             if: "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
             effect: "grayscale",

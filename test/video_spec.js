@@ -17,7 +17,7 @@ describe("video tag helper", () => {
   });
   it("should generate video tag", () => {
     var expected_url = `${VIDEO_UPLOAD_PATH}movie`;
-    expect(cloudinary.video("movie")).to.eql(`<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
+    expect(cloudinary.video("movie")).to.eql(`<video poster='${expected_url}.jpg'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_url}.mp4' type='video/mp4'><source src='${expected_url}.ogv' type='video/ogg'></video>`);
   });
   it("should generate video tag with html5 attributes", () => {
     var expected_url = `${VIDEO_UPLOAD_PATH}movie`;
@@ -28,7 +28,7 @@ describe("video tag helper", () => {
       muted: "true",
       preload: true,
       style: "border: 1px",
-    })).to.eql(`<video autoplay='1' controls loop muted='true' poster='${expected_url}.jpg' preload style='border: 1px'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
+    })).to.eql(`<video autoplay='1' controls loop muted='true' poster='${expected_url}.jpg' preload style='border: 1px'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_url}.mp4' type='video/mp4'><source src='${expected_url}.ogv' type='video/ogg'></video>`);
   });
   it("should generate video tag with various attributes", () => {
     var expected_url; var options;
@@ -46,16 +46,16 @@ describe("video tag helper", () => {
     expected_url = `${VIDEO_UPLOAD_PATH}ac_acc,ki_2.0,so_3,vc_h264/movie`;
     expect(cloudinary.video("movie", options)).to.eql(`<video height='100' poster='${expected_url}.jpg' src='${expected_url}.mp4' width='200'></video>`);
     delete options.source_types;
-    expect(cloudinary.video("movie", options)).to.eql(`<video height='100' poster='${expected_url}.jpg' width='200'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
+    expect(cloudinary.video("movie", options)).to.eql(`<video height='100' poster='${expected_url}.jpg' width='200'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_url}.mp4' type='video/mp4'><source src='${expected_url}.ogv' type='video/ogg'></video>`);
     delete options.html_height;
     delete options.html_width;
     options.width = 250;
     options.crop = 'scale';
     expected_url = `${VIDEO_UPLOAD_PATH}ac_acc,c_scale,ki_2.0,so_3,vc_h264,w_250/movie`;
-    expect(cloudinary.video("movie", options)).to.eql(`<video poster='${expected_url}.jpg' width='250'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
+    expect(cloudinary.video("movie", options)).to.eql(`<video poster='${expected_url}.jpg' width='250'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_url}.mp4' type='video/mp4'><source src='${expected_url}.ogv' type='video/ogg'></video>`);
     expected_url = `${VIDEO_UPLOAD_PATH}ac_acc,c_fit,ki_2.0,so_3,vc_h264,w_250/movie`;
     options.crop = 'fit';
-    expect(cloudinary.video("movie", options)).to.eql(`<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
+    expect(cloudinary.video("movie", options)).to.eql(`<video poster='${expected_url}.jpg'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_url}.mp4' type='video/mp4'><source src='${expected_url}.ogv' type='video/ogg'></video>`);
   });
   it("should generate video tag with fallback", () => {
     var expected_url; var fallback;
@@ -63,7 +63,7 @@ describe("video tag helper", () => {
     fallback = "<span id='spanid'>Cannot display video</span>";
     expect(cloudinary.video("movie", {
       fallback_content: fallback,
-    }), `${`<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>`}${fallback}</video>`);
+    }), `${`<video poster='${expected_url}.jpg'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_url}.mp4' type='video/mp4'><source src='${expected_url}.ogv' type='video/ogg'>`}${fallback}</video>`);
     expect(cloudinary.video("movie", {
       fallback_content: fallback,
       source_types: "mp4",
@@ -73,7 +73,7 @@ describe("video tag helper", () => {
     var expected_url = `${VIDEO_UPLOAD_PATH}movie`;
     expect(cloudinary.video("movie", {
       source_types: ['ogv', 'mp4'],
-    })).to.eql(`<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + "</video>");
+    })).to.eql(`<video poster='${expected_url}.jpg'><source src='${expected_url}.ogv' type='video/ogg'><source src='${expected_url}.mp4' type='video/mp4'></video>`);
   });
   it("should generate video tag with source transformation", () => {
     var expected_mp4_url; var expected_ogv_url; var expected_url;
@@ -94,7 +94,7 @@ describe("video tag helper", () => {
           quality: 30,
         },
       },
-    })).to.eql(`<video poster='${expected_url}.jpg' width='100'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_mp4_url}.mp4' type='video/mp4'>` + `<source src='${expected_ogv_url}.ogv' type='video/ogg'>` + "</video>");
+    })).to.eql(`<video poster='${expected_url}.jpg' width='100'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_mp4_url}.mp4' type='video/mp4'><source src='${expected_ogv_url}.ogv' type='video/ogg'></video>`);
     expect(cloudinary.video("movie", {
       width: 100,
       crop: "scale",
@@ -110,7 +110,7 @@ describe("video tag helper", () => {
         },
       },
       source_types: ['webm', 'mp4'],
-    })).to.eql(`<video poster='${expected_url}.jpg' width='100'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_mp4_url}.mp4' type='video/mp4'>` + "</video>");
+    })).to.eql(`<video poster='${expected_url}.jpg' width='100'><source src='${expected_url}.webm' type='video/webm'><source src='${expected_mp4_url}.mp4' type='video/mp4'></video>`);
   });
   it("should generate video tag with configurable poster", () => {
     var expected_poster_url; var expected_url;
