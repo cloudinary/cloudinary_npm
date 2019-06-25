@@ -9,13 +9,12 @@ const { utils } = cloudinary;
 
 
 function test_cloudinary_url(public_id, options, expected_url, expected_options) {
-  var result = utils.url(public_id, options);
+  const result = utils.url(public_id, options);
   expect(options).to.eql(expected_options);
   expect(result).to.eql(expected_url);
 }
 
 describe("Cloudinary::Utils for video", () => {
-  var root_path; var upload_path;
   beforeEach(() => {
     cloudinary.config({
       cloud_name: "test123",
@@ -28,8 +27,8 @@ describe("Cloudinary::Utils for video", () => {
       api_secret: "b",
     });
   });
-  root_path = "http://res.cloudinary.com/test123";
-  upload_path = `${root_path}/video/upload`;
+  const root_path = "http://res.cloudinary.com/test123";
+  const upload_path = `${root_path}/video/upload`;
   describe("utils.url", () => {
     describe(":video_codec", () => {
       it('Should support a string "auto"', () => {
@@ -112,21 +111,21 @@ describe("Cloudinary::Utils for video", () => {
     ].forEach(([short, long]) => {
       describe(`:${long}`, () => {
         it("should support decimal seconds ", () => {
-          var op = {
+          const op = {
             resource_type: 'video',
             [long]: 2.63,
           };
           test_cloudinary_url("video_id", op, `${upload_path}/${short}_2.63/video_id`, {});
         });
         it('should support percents of the video length as "<number>p"', () => {
-          var op = {
+          const op = {
             resource_type: 'video',
             [long]: '35p',
           };
           test_cloudinary_url("video_id", op, `${upload_path}/${short}_35p/video_id`, {});
         });
         it('should support percents of the video length as "<number>%"', () => {
-          var op = {
+          const op = {
             resource_type: 'video',
             [long]: '35%',
           };
@@ -144,22 +143,21 @@ describe("Cloudinary::Utils for video", () => {
       ].forEach(([name, url_param, range]) => {
         describe(`when provided with ${name} ${range}`, () => {
           it(`should produce a range transformation in the format of ${url_param}`, () => {
-            var matched; var options; var transformation; var url;
-            options = {
+            const options = {
               resource_type: 'video',
               offset: range,
             };
-            url = utils.url("video_id", options);
+            const url = utils.url("video_id", options);
             expect(options).to.eql({});
-            matched = /([^/]*)\/video_id$/.exec(url);
-            transformation = matched ? matched[1] : '';
+            const matched = /([^/]*)\/video_id$/.exec(url);
+            const transformation = matched ? matched[1] : '';
             // we can't rely on the order of the parameters so we sort them before comparing
             expect(transformation.split(',').sort().reverse().join(',')).to.eql(url_param);
           });
         });
       });
       it('should support start_offset `auto`', () => {
-        var op = {
+        const op = {
           resource_type: 'video',
           start_offset: 'auto',
         };
@@ -172,14 +170,14 @@ describe("Cloudinary::Utils for video", () => {
         ['underlay', 'u'],
       ].forEach(([param, letter]) => {
         it(`should support ${param}`, () => {
-          var op = {
+          const op = {
             resource_type: 'video',
             [param]: "text:hello",
           };
           test_cloudinary_url("test", op, `${upload_path}/${letter}_text:hello/test`, {});
         });
         it(`should not pass width/height to html for ${param}`, () => {
-          var op = {
+          const op = {
             resource_type: 'video',
             height: 100,
             width: 100,
@@ -207,12 +205,11 @@ describe("Cloudinary::Utils for video", () => {
     });
   });
   describe('cloudinary.video_thumbnail_url', () => {
-    var options; var path; var source;
-    source = "movie_id";
-    options = {
+    const source = "movie_id";
+    const options = {
       cloud_name: "test123",
     };
-    path = utils.video_thumbnail_url(source, options);
+    const path = utils.video_thumbnail_url(source, options);
     it("should generate a cloudinary URI to the video thumbnail", () => {
       expect(path).to.eql(`${upload_path}/movie_id.jpg`);
     });

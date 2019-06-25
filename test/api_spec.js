@@ -74,9 +74,9 @@ sharedExamples("a list with a cursor", (testFunc, ...args) => {
 });
 
 sharedExamples("accepts next_cursor", (testFunc, ...args) => {
-  var requestSpy;
-  var writeSpy;
-  var xhr;
+  let requestSpy;
+  let writeSpy;
+  let xhr;
 
   before(() => {
     xhr = sinon.useFakeXMLHttpRequest();
@@ -114,7 +114,7 @@ function findByAttr(elements, attr, value) {
 
 
 describe("api", () => {
-  var contextKey = `test-key${helper.SUFFIX}`;
+  const contextKey = `test-key${helper.SUFFIX}`;
   before("Verify Configuration", () => {
     const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -155,7 +155,7 @@ describe("api", () => {
     ]).finally(() => {});
   });
   after(function () {
-    var config = cloudinary.config();
+    const config = cloudinary.config();
     this.timeout(helper.TIMEOUT_LONG);
     if (config.keep_test_products) {
       return Promise.resolve();
@@ -181,7 +181,7 @@ describe("api", () => {
       });
     });
     it("should allow listing resources", function () {
-      var publicId;
+      let publicId;
       this.timeout(helper.TIMEOUT_MEDIUM);
       publicId = '';
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
@@ -456,10 +456,9 @@ describe("api", () => {
     });
   });
   describe("transformations", () => {
-    var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
-    transformationName = `api_test_transformation3${SUFFIX}`;
+    const transformationName = `api_test_transformation3${SUFFIX}`;
     after(() => Q.allSettled(
       [
         cloudinary.v2.api.delete_transformation(transformationName),
@@ -661,7 +660,7 @@ describe("api", () => {
       ).catch(({ error }) => expect(error.message).to.contain("Can't find"));
     });
     it("should allow updating upload_presets", function () {
-      var name = '';
+      let name = '';
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.create_upload_preset({
         folder: "folder",
@@ -709,7 +708,7 @@ describe("api", () => {
   });
   describe("update", () => {
     describe("notification url", () => {
-      var writeSpy; var xhr;
+      let writeSpy; let xhr;
       before(() => {
         xhr = sinon.useFakeXMLHttpRequest();
         writeSpy = sinon.spy(ClientRequest.prototype, 'write');
@@ -783,14 +782,13 @@ describe("api", () => {
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     describe("access_control", () => {
-      var acl; var acl_string; var options;
-      acl = {
+      const acl = {
         access_type: 'anonymous',
         start: new Date(Date.UTC(2019, 1, 22, 16, 20, 57)),
         end: '2019-03-22 00:00 +0200',
       };
-      acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
-      options = {
+      const acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
+      const options = {
         public_id: helper.TEST_TAG,
         tags: [...helper.UPLOAD_TAGS, 'access_control_test'],
       };
@@ -806,9 +804,8 @@ describe("api", () => {
   it("should support listing by moderation kind and value", () => {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
     return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
-      var status; var status2;
-      status = stat;
-      status2 = status;
+      const status = stat;
+      const status2 = status;
       request.resetHistory();
       cloudinary.v2.api.resources_by_moderation("manual", status2, {
         moderations: true,
@@ -852,12 +849,12 @@ describe("api", () => {
           tags: UPLOAD_TAGS,
         }),
     ]).then(results => Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')])).then((results) => {
-      var folder; var root_folders;
-      var [root, sub_1] = results;
-      root_folders = (() => {
-        var j; var len; var ref; var results1;
-        ref = root.folders;
-        results1 = [];
+      let folder;
+      const [root, sub_1] = results;
+      const root_folders = (() => {
+        let j; let len;
+        const ref = root.folders;
+        const results1 = [];
         for (j = 0, len = ref.length; j < len; j++) {
           folder = ref[j];
           results1.push(folder.name);
@@ -941,12 +938,12 @@ describe("api", () => {
     });
   });
   describe("publish", function () {
-    var i; var idsToDelete; var publishTestId; var publishTestTag;
+    let i; let publishTestId; let publishTestTag;
     this.timeout(helper.TIMEOUT_LONG);
     i = 0;
     publishTestId = "";
     publishTestTag = "";
-    idsToDelete = [];
+    const idsToDelete = [];
     beforeEach(() => {
       publishTestTag = TEST_TAG + i++;
       return cloudinary.v2.uploader.upload(IMAGE_FILE, {
@@ -1002,7 +999,7 @@ describe("api", () => {
     });
   });
   describe("access_mode", function () {
-    var access_mode_tag; var i; var publicId;
+    let access_mode_tag; let i; let publicId;
     i = 0;
     this.timeout(helper.TIMEOUT_LONG);
     publicId = "";
@@ -1018,21 +1015,21 @@ describe("api", () => {
       });
     });
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
-      var [resource] = result.updated;
+      const [resource] = result.updated;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));
     it("should update access mode by prefix", () => cloudinary.v2.api.update_resources_access_mode_by_prefix("public", publicId.slice(0, -2)).then((result) => {
-      var [resource] = result.updated;
+      const [resource] = result.updated;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
       expect(resource.public_id).to.be(publicId);
       expect(resource.access_mode).to.be('public');
     }));
     it("should update access mode by tag", () => cloudinary.v2.api.update_resources_access_mode_by_tag("public", access_mode_tag).then((result) => {
-      var [resource] = result.updated;
+      const [resource] = result.updated;
       expect(result.updated).to.be.an('array');
       expect(result.updated.length).to.be(1);
       expect(resource.public_id).to.be(publicId);

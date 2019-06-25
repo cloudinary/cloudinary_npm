@@ -1,4 +1,4 @@
-var options;
+let options;
 const { describe, before, it } = require('mocha');
 const expect = require("expect.js");
 const path = require('path');

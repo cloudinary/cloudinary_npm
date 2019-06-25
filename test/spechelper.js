@@ -38,36 +38,33 @@ exports.ICON_FILE = "test/resources/favicon.ico";
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
 exports.test_cloudinary_url = function (public_id, options, expected_url, expected_options) {
-  var url;
-  url = utils.url(public_id, options);
+  const url = utils.url(public_id, options);
   expect(url).to.eql(expected_url);
   expect(options).to.eql(expected_options);
   return url;
 };
 
 expect.Assertion.prototype.produceUrl = function (url) {
-  var actual; var actualOptions; var options; var public_id;
-  [public_id, options] = this.obj;
-  actualOptions = cloneDeep(options);
-  actual = utils.url(public_id, actualOptions);
+  const [public_id, options] = this.obj;
+  const actualOptions = cloneDeep(options);
+  const actual = utils.url(public_id, actualOptions);
   this.assert(actual.match(url), () => `expected '${public_id}' and ${JSON.stringify(options)} to produce '${url}' but got '${actual}'`, () => `expected '${public_id}' and ${JSON.stringify(options)} not to produce '${url}' but got '${actual}'`);
   return this;
 };
 
 expect.Assertion.prototype.emptyOptions = function () {
-  var actual; var options; var public_id;
-  [public_id, options] = this.obj;
-  actual = cloneDeep(options);
+  const [public_id, options] = this.obj;
+  const actual = cloneDeep(options);
   utils.url(public_id, actual);
   this.assert(isEmpty(actual), () => `expected '${public_id}' and ${JSON.stringify(options)} to produce empty options but got ${JSON.stringify(actual)}`, () => `expected '${public_id}' and ${JSON.stringify(options)} not to produce empty options`);
   return this;
 };
 
 expect.Assertion.prototype.beServedByCloudinary = function (done) {
-  var actual; var actualOptions; var callHttp; var options; var public_id;
-  [public_id, options] = this.obj;
-  actualOptions = cloneDeep(options);
-  actual = utils.url(public_id, actualOptions);
+  let callHttp;
+  const [public_id, options] = this.obj;
+  const actualOptions = cloneDeep(options);
+  const actual = utils.url(public_id, actualOptions);
   if (actual.startsWith("https")) {
     callHttp = https;
   } else {
@@ -119,7 +116,7 @@ Create a matcher method for upload parameters
 */
 exports.uploadParamMatcher = function (name, value) {
   return function (arg) {
-    var return_part;
+    let return_part;
     return_part = `Content-Disposition: form-data; name="${name}"\r\n\r\n`;
     return_part += String(value);
     return arg.indexOf(return_part) + 1;
@@ -135,10 +132,9 @@ exports.uploadParamMatcher = function (name, value) {
   @return {function} the matcher function as (arg)->Boolean
 */
 exports.apiParamMatcher = function (name, value) {
-  var expected; var params;
-  params = {};
+  const params = {};
   params[name] = value;
-  expected = querystring.stringify(params);
+  const expected = querystring.stringify(params);
   return function (arg) {
     return new RegExp(expected).test(arg);
   };
@@ -174,8 +170,7 @@ describe("some topic", function() {
 @return {object} the mocked objects: `xhr`, `write`, `request`
 */
 exports.mockTest = function () {
-  var mocked;
-  mocked = {};
+  const mocked = {};
   before(() => {
     mocked.xhr = sinon.useFakeXMLHttpRequest();
     mocked.write = sinon.spy(ClientRequest.prototype, 'write');
@@ -205,16 +200,15 @@ Can be called inside `it` functions
 @return {Promise}
 */
 exports.mockPromise = function (mockBlock) {
-  var requestSpy; var writeSpy; var xhr;
+  let requestSpy; let writeSpy; let xhr;
   xhr = void 0;
   writeSpy = void 0;
   requestSpy = void 0;
   return Q.Promise((resolve, reject, notify) => {
-    var result;
     xhr = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     requestSpy = sinon.spy(api_http, 'request');
-    result = mockBlock(xhr, writeSpy, requestSpy);
+    const result = mockBlock(xhr, writeSpy, requestSpy);
     if (result != null && isFunction(result.then)) {
       return result.then(resolve);
     }

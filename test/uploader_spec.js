@@ -28,14 +28,14 @@ require('jsdom-global')();
 
 describe("uploader", function () {
   before("Verify Configuration", () => {
-    var config = cloudinary.config(true);
+    const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
   this.timeout(helper.TIMEOUT_LONG);
   after(() => {
-    var config = cloudinary.config(true);
+    const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
@@ -53,10 +53,9 @@ describe("uploader", function () {
   it("should successfully upload file", function () {
     this.timeout(helper.TIMEOUT_LONG);
     return uploadImage().then((result) => {
-      var expected_signature;
       expect(result.width).to.eql(241);
       expect(result.height).to.eql(51);
-      expected_signature = cloudinary.utils.api_sign_request({
+      const expected_signature = cloudinary.utils.api_sign_request({
         public_id: result.public_id,
         version: result.version,
       }, cloudinary.config().api_secret);
@@ -66,17 +65,16 @@ describe("uploader", function () {
   it("should successfully upload url", () => cloudinary.v2.uploader.upload("http://cloudinary.com/images/old_logo.png", {
     tags: UPLOAD_TAGS,
   }).then((result) => {
-    var expected_signature;
     expect(result.width).to.eql(241);
     expect(result.height).to.eql(51);
-    expected_signature = cloudinary.utils.api_sign_request({
+    const expected_signature = cloudinary.utils.api_sign_request({
       public_id: result.public_id,
       version: result.version,
     }, cloudinary.config().api_secret);
     expect(result.signature).to.eql(expected_signature);
   }));
   describe("remote urls ", () => {
-    var writeSpy;
+    let writeSpy;
     writeSpy = void 0;
     beforeEach(() => {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
@@ -118,7 +116,7 @@ describe("uploader", function () {
       expect(format).to.eql("png");
     }));
     return context(":invalidate", () => {
-      var spy; var xhr;
+      let spy; let xhr;
       spy = void 0;
       xhr = void 0;
       before(() => {
@@ -140,7 +138,7 @@ describe("uploader", function () {
   describe("destroy", function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
     it("should delete a resource", () => {
-      var public_id;
+      let public_id;
       return uploadImage().then((result) => {
         // eslint-disable-next-line prefer-destructuring
         public_id = result.public_id;
@@ -179,7 +177,7 @@ describe("uploader", function () {
       },
     ],
   }).then((result) => {
-    var url = cloudinary.utils.url("sample", {
+    const url = cloudinary.utils.url("sample", {
       type: "upload",
       crop: "scale",
       width: "2.0",
@@ -219,21 +217,19 @@ describe("uploader", function () {
     expect(result.height).to.within(5, 15);
   }));
   it("should successfully upload stream", (done) => {
-    var file_reader; var stream;
-    stream = cloudinary.v2.uploader.upload_stream({
+    const stream = cloudinary.v2.uploader.upload_stream({
       tags: UPLOAD_TAGS,
     }, (error, result) => {
-      var expected_signature;
       expect(result.width).to.eql(241);
       expect(result.height).to.eql(51);
-      expected_signature = cloudinary.utils.api_sign_request({
+      const expected_signature = cloudinary.utils.api_sign_request({
         public_id: result.public_id,
         version: result.version,
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
       done();
     });
-    file_reader = fs.createReadStream(IMAGE_FILE, {
+    const file_reader = fs.createReadStream(IMAGE_FILE, {
       encoding: 'binary',
     });
     file_reader.on('data', (chunk) => {
@@ -258,7 +254,7 @@ describe("uploader", function () {
     it("should replace existing tag", () => cloudinary.v2.uploader.upload(IMAGE_FILE, {
       tags: ["tag1", "tag2", TEST_TAG],
     }).then((result) => {
-      var { public_id } = result;
+      const { public_id } = result;
       return cloudinary.v2.uploader.replace_tag("tag3Å", public_id).then(() => public_id);
     }).then(public_id => // TODO this also tests non ascii characters
       // eslint-disable-next-line implicit-arrow-linebreak
@@ -298,7 +294,7 @@ describe("uploader", function () {
         });
     });
     it("should upload with context containing reserved characters", () => {
-      var context = {
+      const context = {
         key1: 'value1',
         key2: 'value2',
         key3: 'val=u|e3',
@@ -365,10 +361,9 @@ describe("uploader", function () {
     }));
   });
   it("should allow sending face coordinates", function () {
-    var coordinates; var custom_coordinates; var different_coordinates; var out_coordinates;
     this.timeout(helper.TIMEOUT_LONG);
-    coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]];
-    out_coordinates = [
+    const coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]];
+    const out_coordinates = [
       [120,
         30,
         109,
@@ -380,8 +375,8 @@ describe("uploader", function () {
         51, // coordinates are limited to the image dimensions
       ],
     ];
-    different_coordinates = [[122, 32, 111, 152]];
-    custom_coordinates = [1, 2, 3, 4];
+    const different_coordinates = [[122, 32, 111, 152]];
+    const custom_coordinates = [1, 2, 3, 4];
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       face_coordinates: coordinates,
       faces: true,
@@ -535,10 +530,9 @@ describe("uploader", function () {
       }));
     });
     it("should support uploading large video files", function () {
-      var stat; var writeSpy;
       this.timeout(helper.TIMEOUT_LONG * 10);
-      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-      stat = fs.statSync(LARGE_VIDEO);
+      const writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+      const stat = fs.statSync(LARGE_VIDEO);
       expect(stat).to.be.ok();
       return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
@@ -546,10 +540,9 @@ describe("uploader", function () {
         timeout: helper.TIMEOUT_LONG * 10,
         tags: UPLOAD_TAGS,
       }).then((result) => {
-        var timestamps;
         expect(result.bytes).to.eql(stat.size);
         expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571");
-        timestamps = writeSpy.args.map(a => a[0].toString()).filter(p => p.match(/timestamp/)).map(p => p.match(/"timestamp"\s+(\d+)/)[1]);
+        const timestamps = writeSpy.args.map(a => a[0].toString()).filter(p => p.match(/timestamp/)).map(p => p.match(/"timestamp"\s+(\d+)/)[1]);
         expect(timestamps.length).to.be.greaterThan(1);
         expect(uniq(timestamps)).to.eql(uniq(timestamps)); // uniq b/c last timestamp may be duplicated
       }).finally(() => {
@@ -557,14 +550,14 @@ describe("uploader", function () {
       });
     });
     it("should update timestamp for each chunk", () => {
-      var writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+      const writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
         timeout: helper.TIMEOUT_LONG * 10,
         tags: UPLOAD_TAGS,
       }).then(() => {
-        var timestamps = writeSpy.args.map(a => a[0].toString()).filter(p => p.match(/timestamp/)).map(p => p.match(/"timestamp"\s+(\d+)/)[1]);
+        const timestamps = writeSpy.args.map(a => a[0].toString()).filter(p => p.match(/timestamp/)).map(p => p.match(/"timestamp"\s+(\d+)/)[1]);
         expect(timestamps.length).to.be.greaterThan(1);
         expect(uniq(timestamps)).to.eql(uniq(timestamps));
       }).finally(() => {
@@ -608,22 +601,20 @@ describe("uploader", function () {
     expect(error.message.toLowerCase()).to.contain("empty");
   }));
   it("should successfully upload with pipes", function (done) {
-    var file_reader; var upload;
     this.timeout(helper.TIMEOUT_LONG);
-    upload = cloudinary.v2.uploader.upload_stream({
+    const upload = cloudinary.v2.uploader.upload_stream({
       tags: UPLOAD_TAGS,
     }, (error, result) => {
-      var expected_signature;
       expect(result.width).to.eql(241);
       expect(result.height).to.eql(51);
-      expected_signature = cloudinary.utils.api_sign_request({
+      const expected_signature = cloudinary.utils.api_sign_request({
         public_id: result.public_id,
         version: result.version,
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
       done();
     });
-    file_reader = fs.createReadStream(IMAGE_FILE);
+    const file_reader = fs.createReadStream(IMAGE_FILE);
     file_reader.pipe(upload);
   });
   it("should fail with http.Agent (non secure)", function () {
@@ -633,21 +624,19 @@ describe("uploader", function () {
     }, (error, result) => {}).to.throwError();
   });
   it("should successfully override https agent", () => {
-    var file_reader; var upload;
-    upload = cloudinary.v2.uploader.upload_stream({
+    const upload = cloudinary.v2.uploader.upload_stream({
       agent: new https.Agent(),
       tags: UPLOAD_TAGS,
     }, (error, result) => {
-      var expected_signature;
       expect(result.width).to.eql(241);
       expect(result.height).to.eql(51);
-      expected_signature = cloudinary.utils.api_sign_request({
+      const expected_signature = cloudinary.utils.api_sign_request({
         public_id: result.public_id,
         version: result.version,
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
     });
-    file_reader = fs.createReadStream(IMAGE_FILE);
+    const file_reader = fs.createReadStream(IMAGE_FILE);
     file_reader.pipe(upload);
   });
   context(":responsive_breakpoints", () => {
@@ -689,9 +678,8 @@ describe("uploader", function () {
         expect(at(result, "responsive_breakpoints[1].transformation")[0]).to.eql("a_10");
         expect(at(result, "responsive_breakpoints[1].breakpoints[0].url")[0]).to.match(/\.gif$/);
         result.responsive_breakpoints.forEach((bp) => {
-          var cached; var format;
-          format = path.extname(bp.breakpoints[0].url).slice(1);
-          cached = cloudinary.Cache.get(result.public_id, {
+          const format = path.extname(bp.breakpoints[0].url).slice(1);
+          const cached = cloudinary.Cache.get(result.public_id, {
             raw_transformation: bp.transformation,
             format,
           });
@@ -705,7 +693,7 @@ describe("uploader", function () {
     });
   });
   describe("async upload", () => {
-    var mocked = helper.mockTest();
+    const mocked = helper.mockTest();
     it("should pass `async` value to the server", () => {
       cloudinary.v2.uploader.upload(IMAGE_FILE, {
         async: true,
@@ -717,7 +705,7 @@ describe("uploader", function () {
     });
   });
   describe("explicit", () => {
-    var spy; var xhr;
+    let spy; let xhr;
     spy = void 0;
     xhr = void 0;
     before(() => {
@@ -755,16 +743,15 @@ describe("uploader", function () {
     });
   });
   it("should create an image upload tag with required properties", function () {
-    var fakeDiv; var input_element; var tag;
     this.timeout(helper.TIMEOUT_LONG);
-    tag = cloudinary.v2.uploader.image_upload_tag("image_id", {
+    const tag = cloudinary.v2.uploader.image_upload_tag("image_id", {
       chunk_size: "1234",
     });
     expect(tag).to.match(/^<input/);
     // Create an HTMLElement from the returned string to validate attributes
-    fakeDiv = document.createElement('div');
+    const fakeDiv = document.createElement('div');
     fakeDiv.innerHTML = tag;
-    input_element = fakeDiv.firstChild;
+    const input_element = fakeDiv.firstChild;
     expect(input_element.tagName.toLowerCase()).to.be('input');
     expect(input_element.getAttribute("data-url")).to.be.ok();
     expect(input_element.getAttribute("data-form-data")).to.be.ok();
@@ -775,7 +762,7 @@ describe("uploader", function () {
     expect(input_element.getAttribute("type")).to.be('file');
   });
   describe("access_control", () => {
-    var acl; var acl_string; var options; var requestSpy; var writeSpy;
+    let options; let requestSpy; let writeSpy;
     writeSpy = void 0;
     requestSpy = void 0;
     options = void 0;
@@ -791,19 +778,18 @@ describe("uploader", function () {
       requestSpy.restore();
       writeSpy.restore();
     });
-    acl = {
+    const acl = {
       access_type: 'anonymous',
       start: new Date(Date.UTC(2019, 1, 22, 16, 20, 57)),
       end: '2019-03-22 00:00 +0200',
     };
-    acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
+    const acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
     it("should allow the user to define ACL in the upload parameters", () => {
       options.access_control = [acl];
       return uploadImage(options).then((resource) => {
-        var response_acl;
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('access_control', `[${acl_string}]`)));
         expect(resource).to.have.key('access_control');
-        response_acl = resource.access_control;
+        const response_acl = resource.access_control;
         expect(response_acl.length).to.be(1);
         expect(response_acl[0].access_type).to.be("anonymous");
         expect(Date.parse(response_acl[0].start)).to.be(Date.parse(acl.start));

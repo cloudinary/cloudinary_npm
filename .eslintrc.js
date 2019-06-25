@@ -74,7 +74,7 @@ module.exports = {
     //"no-useless-concat": "off",
     //"no-useless-constructor": "off",
     //"no-useless-escape": "off",
-    "no-var": "off",
+    //"no-var": "off",
     "no-void": "off",
     "object-curly-newline": [
       "error",

@@ -11,8 +11,8 @@ const KEY2 = "test_key_2";
 const VALUE2 = "test_value_2";
 
 describe("FileKeyValueStorage", () => {
-  var storage;
-  var basefolder;
+  let storage;
+  let basefolder;
 
   function getTestValue(key) {
     const storedValue = fs.readFileSync(storage.getFilename(key));

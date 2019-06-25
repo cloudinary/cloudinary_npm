@@ -5,11 +5,11 @@ const DummyCacheStorage = require('./DummyCacheStorage');
 
 const KeyValueCacheAdapter = require(`../../${helper.libPath}/cache/KeyValueCacheAdapter`);
 
-var cache;
-var parameters = ["public_id", "upload", "image", "w_100", "jpg"];
-var value = [100, 200, 300, 399];
-var parameters2 = ["public_id2", "fetch", "image", "w_200", "png"];
-var value2 = [101, 201, 301, 398];
+let cache;
+const parameters = ["public_id", "upload", "image", "w_100", "jpg"];
+const value = [100, 200, 300, 399];
+const parameters2 = ["public_id2", "fetch", "image", "w_200", "png"];
+const value2 = [101, 201, 301, 398];
 
 describe("KeyValueCacheAdapter", () => {
   before(() => {

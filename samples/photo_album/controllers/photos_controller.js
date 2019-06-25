@@ -1,11 +1,11 @@
-var cloudinary = require('cloudinary').v2;
-var crypto = require('crypto');
-var multipart = require('connect-multiparty');
-var schema = require('../config/schema');
+const cloudinary = require('cloudinary').v2;
+const crypto = require('crypto');
+const multipart = require('connect-multiparty');
+const schema = require('../config/schema');
 
-var { Photo } = schema.models;
+const { Photo } = schema.models;
 
-var multipartMiddleware = multipart();
+const multipartMiddleware = multipart();
 
 function index(req, res) {
   Photo.all().then((photos) => {
@@ -15,7 +15,7 @@ function index(req, res) {
 
 function add_through_server(req, res) {
   // Create a new photo model and set it's default title
-  var photo = new Photo();
+  const photo = new Photo();
   Photo.count().then((amount) => {
     photo.title = `My Photo #${amount + 1}`;
   })
@@ -38,9 +38,9 @@ function create_through_server(req, res) {
     return;
   }
 
-  var photo = new Photo(req.body);
+  const photo = new Photo(req.body);
   // Get temp file path
-  var imageFile = req.files.image.path;
+  const imageFile = req.files.image.path;
   // Upload file to Cloudinary
   cloudinary.uploader.upload(imageFile, { tags: 'express_sample' })
     .then((image) => {
@@ -61,9 +61,9 @@ function create_through_server(req, res) {
 
 function add_direct(req, res) {
   // Configuring cloudinary_cors direct upload to support old IE versions
-  var cloudinary_cors = `http://${req.headers.host}/cloudinary_cors.html`;
+  const cloudinary_cors = `http://${req.headers.host}/cloudinary_cors.html`;
   // Create a new photo model and set it's default title
-  var photo = new Photo();
+  const photo = new Photo();
   Photo.count().then((amount) => {
     photo.title = `My Photo #${amount + 1} (direct)`;
   })
@@ -77,17 +77,17 @@ function add_direct(req, res) {
 
 function add_direct_unsigned(req, res) {
   // Configuring cloudinary_cors direct upload to support old IE versions
-  var cloudinary_cors = `http://${req.headers.host}/cloudinary_cors.html`;
+  const cloudinary_cors = `http://${req.headers.host}/cloudinary_cors.html`;
 
   // Set a unique unsigned upload preset name (for demo purposes only).
   // In 'real life' scenario the preset name will be meaningful and will be set
   // via online console or API not related to the actual upload
-  var sha1 = crypto.createHash('sha1');
+  const sha1 = crypto.createHash('sha1');
   sha1.update(cloudinary.config('api_key') + cloudinary.config('api_secret'));
-  var preset_name = `sample_${sha1.digest('hex')}`;
+  const preset_name = `sample_${sha1.digest('hex')}`;
 
   // Create a new photo model and set it's default title
-  var photo = new Photo();
+  const photo = new Photo();
   Photo.count().then((amount) => {
     photo.title = `My Photo #${amount + 1} (direct unsigned)`;
   })
@@ -122,8 +122,8 @@ function add_direct_unsigned(req, res) {
 function create_direct(req, res) {
   // In direct mode, the image is uploaded to Cloudinary by the browser,
   // and upload metadata is available in JavaScript (see add_direct.ejs).
-  var result = {};
-  var photo = new Photo(req.body);
+  const result = {};
+  const photo = new Photo(req.body);
   result.photo = photo;
   // image was not uploaded, returning to edit form
   if (!req.body.image_id) {
@@ -134,7 +134,7 @@ function create_direct(req, res) {
     }
     return;
   }
-  var image = new cloudinary.PreloadedFile(req.body.image_id);
+  const image = new cloudinary.PreloadedFile(req.body.image_id);
   // check that image resolved from image_id is valid
   if (image.is_valid()) {
     photo.image = image.toJSON();

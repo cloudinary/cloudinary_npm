@@ -25,8 +25,7 @@ const PUBLIC_ID_RAW = `${ARCHIVE_TAG}_3`;
 
 sharedExamples('archive', () => {
   before("Verify Configuration", () => {
-    var config;
-    config = cloudinary.config(true);
+    const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
@@ -84,12 +83,10 @@ describe("archive", () => {
           expect(this.archive_result).not.to.be.empty();
         });
         it('should include two files', function (done) {
-          var filename;
-          filename = `${os.tmpdir()}/deleteme-${Math.floor(Math.random() * 100000)}.zip`;
+          const filename = `${os.tmpdir()}/deleteme-${Math.floor(Math.random() * 100000)}.zip`;
           expect(this.archive_result).to.contain("expires_at");
           https.get(this.archive_result, (res) => {
-            var file;
-            file = fs.createWriteStream(filename);
+            const file = fs.createWriteStream(filename);
             if (res.statusCode === 200) {
               res.pipe(file);
             } else {
@@ -114,7 +111,7 @@ describe("archive", () => {
 
   describe("uploader", () => {
     describe('.create_archive', function () {
-      var archive_result;
+      let archive_result;
       this.timeout(helper.TIMEOUT_LONG);
       before(() => uploader.create_archive({
         target_public_id: 'gem_archive_test',

@@ -10,7 +10,7 @@ const KEY = "00112233FF99";
 const ALT_KEY = "CCBB2233FF00";
 
 describe("authToken", () => {
-  var urlBackup = null;
+  let urlBackup = null;
   before(() => {
     urlBackup = process.env.CLOUDINARY_URL;
   });

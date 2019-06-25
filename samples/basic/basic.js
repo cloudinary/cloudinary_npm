@@ -1,7 +1,7 @@
-var dotenv = require('dotenv');
-var cloudinary = require('cloudinary').v2;
+const dotenv = require('dotenv');
+const cloudinary = require('cloudinary').v2;
 
-var uploads = {};
+const uploads = {};
 
 dotenv.load();
 
@@ -17,7 +17,7 @@ console.log("** ** ** ** ** ** ** ** ** Uploads ** ** ** ** ** ** ** ** ** **");
 
 // Eager Transformations:
 // Applied as soon as the file is uploaded, instead of lazily applying them when accessed by your site's visitors.
-var eager_options = {
+const eager_options = {
   width: 200, height: 150, crop: 'scale', format: 'jpg',
 };
 
@@ -49,7 +49,7 @@ function performTransformations() {
 
 function waitForAllUploads(id, err, image) {
   uploads[id] = image;
-  var ids = Object.keys(uploads);
+  const ids = Object.keys(uploads);
   if (ids.length === 6) {
     console.log();
     console.log(`**  uploaded all files (${ids.join(',')}) to cloudinary`);
@@ -71,7 +71,7 @@ cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample' }, (err, image) =
 
 // Stream upload
 // eslint-disable-next-line no-unused-vars,vars-on-top
-var upload_stream = cloudinary.uploader.upload_stream({ tags: 'basic_sample' }, (err, image) => {
+const upload_stream = cloudinary.uploader.upload_stream({ tags: 'basic_sample' }, (err, image) => {
   console.log();
   console.log("** Stream Upload");
   if (err) { console.warn(err); }

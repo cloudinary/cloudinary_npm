@@ -19,13 +19,13 @@ const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
 const { TEST_TAG } = helper;
 
 // Defined globals
-var cloud_name = '';
+let cloud_name = '';
 
-var root_path = '';
+let root_path = '';
 
 describe("utils", () => {
   before("Verify Configuration", () => {
-    var config = cloudinary.config(true);
+    const config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
@@ -50,9 +50,9 @@ describe("utils", () => {
     root_path = `http://res.cloudinary.com/${cloud_name}`;
   });
   sharedExamples("a signed url", function (specific_options = {}, specific_transformation = "") {
-    var authenticated_image; var authenticated_path; var expected_transformation; var options;
+    let authenticated_image; let authenticated_path; let options;
     this.timeout(helper.TIMEOUT_LONG);
-    expected_transformation = ((specific_transformation.blank != null) || specific_transformation.match(/\/$/)) ? specific_transformation : `${specific_transformation}/`;
+    const expected_transformation = ((specific_transformation.blank != null) || specific_transformation.match(/\/$/)) ? specific_transformation : `${specific_transformation}/`;
     authenticated_path = '';
     authenticated_image = {};
     options = {};
@@ -216,7 +216,7 @@ describe("utils", () => {
       }, `http://${cloud_name}-res.cloudinary.com/images/test/hello.jpg`, {});
     });
     it("should not sign the url_suffix", () => {
-      var expected_signature = utils.url("test", {
+      let expected_signature = utils.url("test", {
         format: "jpg",
         sign_url: true,
       }).match(/s--[0-9A-Za-z_-]{8}--/).toString();
@@ -240,7 +240,7 @@ describe("utils", () => {
       }, `http://${cloud_name}-res.cloudinary.com/images/${expected_signature}/a_0/test/hello.jpg`, {});
     });
     it("should sign the decoded form of a url", () => {
-      var expected_signature = utils.url("%25a%20(b)", {
+      const expected_signature = utils.url("%25a%20(b)", {
         format: "jpg",
         sign_url: true,
       }).match(/s--[0-9A-Za-z_-]{8}--/).toString();
@@ -550,7 +550,7 @@ describe("utils", () => {
         });
       });
       it("should support array of transformations", () => {
-        var result = utils.generate_transformation_string([
+        const result = utils.generate_transformation_string([
           {
             x: 100,
             y: 100,
@@ -675,7 +675,7 @@ describe("utils", () => {
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/ar_3:2/test`, {});
     });
     it("build_upload_params should not destroy options", () => {
-      var options = {
+      const options = {
         width: 100,
         crop: "scale",
       };
@@ -683,7 +683,7 @@ describe("utils", () => {
       expect(Object.keys(options).length).to.eql(2);
     });
     describe("overlay and underlay", () => {
-      var layers_options = [
+      const layers_options = [
         // [name,                    options,                                          result]
         ["string",
           "text:hello",
@@ -777,7 +777,7 @@ describe("utils", () => {
           });
         });
         it(`should not pass width/height to html for ${param}`, () => {
-          var opt = {
+          const opt = {
             height: 100,
             width: 100,
           };
@@ -813,7 +813,7 @@ describe("utils", () => {
       });
     });
     describe('Conditional Transformation', () => {
-      var configBck = null;
+      let configBck = null;
       before(() => {
         configBck = cloudinary.config();
         cloudinary.config({
@@ -828,7 +828,7 @@ describe("utils", () => {
       });
       describe('with literal condition string', () => {
         it("should include the if parameter as the first component in the transformation string", () => {
-          var url = utils.url("sample", {
+          let url = utils.url("sample", {
             if: "w_lt_200",
             crop: "fill",
             height: 120,
@@ -844,7 +844,7 @@ describe("utils", () => {
           expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
         });
         it("should allow multiple conditions when chaining transformations ", () => {
-          var url = utils.url("sample", {
+          const url = utils.url("sample", {
             transformation: [
               {
                 if: "w_lt_200",
@@ -867,7 +867,7 @@ describe("utils", () => {
         });
         describe("including spaces and operators", () => {
           it("should translate operators", () => {
-            var url = utils.url("sample", {
+            const url = utils.url("sample", {
               if: "w < 200",
               crop: "fill",
               height: 120,
@@ -879,7 +879,7 @@ describe("utils", () => {
       });
       describe('with tags', () => {
         it("should allow multiple tags condition", () => {
-          var url = utils.url("sample", {
+          const url = utils.url("sample", {
             transformation: [
               {
                 if: "!tag1:tag2:tag3!_in_tags",
@@ -903,7 +903,7 @@ describe("utils", () => {
       });
       describe('if end', () => {
         it("should include the if_end as the last parameter in its component", () => {
-          var url = utils.url("sample", {
+          const url = utils.url("sample", {
             transformation: [
               {
                 if: "w_lt_200",
@@ -929,7 +929,7 @@ describe("utils", () => {
           expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200/c_fill,e_sharpen,h_120,w_80/e_brightness:50/co_red,e_shadow/if_end/sample");
         });
         it("should support if_else with transformation parameters", () => {
-          var url = utils.url("sample", {
+          const url = utils.url("sample", {
             transformation: [
               {
                 if: "w_lt_200",
@@ -948,7 +948,7 @@ describe("utils", () => {
           expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_else,c_fill,h_90,w_100/sample");
         });
         it("if_else should be without any transformation parameters", () => {
-          var url = utils.url("sample", {
+          const url = utils.url("sample", {
             transformation: [
               {
                 if: "aspect_ratio_lt_0.7",
@@ -973,7 +973,7 @@ describe("utils", () => {
       });
       describe('chaining conditions', () => {
         it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", () => {
-          var allOperators = 'if_w_eq_0_and_h_ne_0_or_ar_lt_0_and_pc_gt_0_and_fc_lte_0_and_w_gte_0,e_grayscale';
+          const allOperators = 'if_w_eq_0_and_h_ne_0_or_ar_lt_0_and_pc_gt_0_and_fc_lte_0_and_w_gte_0,e_grayscale';
           expect(utils.url("sample", {
             if: "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
             effect: "grayscale",
@@ -983,19 +983,17 @@ describe("utils", () => {
     });
     describe('User Define Variables', () => {
       it("array should define a set of variables", () => {
-        var options; var t;
-        options = {
+        const options = {
           if: "face_count > 2",
           variables: [["$z", 5], ["$foo", "$z * 2"]],
           crop: "scale",
           width: "$foo * 200",
         };
-        t = cloudinary.utils.generate_transformation_string(options);
+        const t = cloudinary.utils.generate_transformation_string(options);
         expect(t).to.eql("if_fc_gt_2,$z_5,$foo_$z_mul_2,c_scale,w_$foo_mul_200");
       });
       it("'$key' should define a variable", () => {
-        var options; var t;
-        options = {
+        const options = {
           transformation: [
             {
               $foo: 10,
@@ -1012,7 +1010,7 @@ describe("utils", () => {
             },
           ],
         };
-        t = cloudinary.utils.generate_transformation_string(options);
+        const t = cloudinary.utils.generate_transformation_string(options);
         expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
       });
       it("should support text values", () => {
@@ -1033,11 +1031,9 @@ describe("utils", () => {
       });
     });
     describe("text", () => {
-      var text_encoded; var text_layer;
-      text_layer = "Hello World, /Nice to meet you?";
-      text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
+      const text_layer = "Hello World, /Nice to meet you?";
+      const text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
       before((done) => {
-        var fileName; var srt;
         cloudinary.v2.uploader.text(text_layer, {
           public_id: "test_text",
           overwrite: true,
@@ -1045,8 +1041,8 @@ describe("utils", () => {
           font_size: "18",
           tags: TEST_TAG,
         });
-        fileName = `${os.tmpdir()}/test_subtitles.srt`;
-        srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
+        const fileName = `${os.tmpdir()}/test_subtitles.srt`;
+        const srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
         fs.writeFile(fileName, srt, (error) => {
           if (error != null) {
             done(new Error(error.message));
@@ -1128,7 +1124,7 @@ describe("utils", () => {
         ];
         LAYERS_OPTIONS.forEach(([name, options, result]) => {
           it(`should support ${name}`, (done) => {
-            var opt = {};
+            const opt = {};
             opt.overlay = options;
             expect(["sample", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
           });
@@ -1196,7 +1192,7 @@ describe("utils", () => {
       });
     });
     it("build_explicit_api_params should support multiple eager transformations with a pipe", () => {
-      var options = {
+      const options = {
         eager: [scaled(), sepia()],
       };
       expect(utils.build_explicit_api_params('some_id', options)[0].eager).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
@@ -1208,7 +1204,7 @@ describe("utils", () => {
       })[0].moderation).to.eql('manual');
     });
     it("archive_params should support multiple eager transformations with a pipe", () => {
-      var options = {
+      const options = {
         transformations: [scaled(), sepia()],
       };
       expect(utils.archive_params(options).transformations).to.eql("c_scale,h_200,w_100|c_lfill,e_sepia,w_400");
@@ -1221,8 +1217,7 @@ describe("utils", () => {
     })[0].phash).to.eql('1');
   });
   it("build_upload_params canonize booleans", () => {
-    var actual; var expected; var options; var params;
-    options = {
+    const options = {
       backup: true,
       use_filename: false,
       colors: "true",
@@ -1231,9 +1226,9 @@ describe("utils", () => {
       invalidate: 1,
       eager_async: "1",
     };
-    params = utils.build_upload_params(options);
-    expected = only(params, ...Object.keys(options));
-    actual = {
+    const params = utils.build_upload_params(options);
+    const expected = only(params, ...Object.keys(options));
+    const actual = {
       backup: 1,
       use_filename: 0,
       colors: 1,
@@ -1278,7 +1273,7 @@ describe("utils", () => {
     });
   });
   context("sign URLs", () => {
-    var configBck = void 0;
+    let configBck = void 0;
     before(() => {
       configBck = cloudinary.config();
       cloudinary.config({
@@ -1328,7 +1323,7 @@ describe("utils", () => {
       }, "http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png", {});
     });
     it("should correctly sign_request", () => {
-      var params = utils.sign_request({
+      const params = utils.sign_request({
         public_id: "folder/file",
         version: "1234",
       });
@@ -1369,16 +1364,15 @@ describe("utils", () => {
     });
   });
   it("should call validate_webhook_signature", function () {
-    var data; var orig; var sig; var timestamp;
     this.timeout(1000);
-    data = '{"public_id":"117e5550-7bfa-11e4-80d7-f962166bd3be","version":1417727468}';
-    timestamp = 1417727468;
-    orig = cloudinary.config();
+    const data = '{"public_id":"117e5550-7bfa-11e4-80d7-f962166bd3be","version":1417727468}';
+    const timestamp = 1417727468;
+    const orig = cloudinary.config();
     cloudinary.config({
       api_key: 'key',
       api_secret: 'shhh',
     });
-    sig = cloudinary.utils.webhook_signature(data, timestamp);
+    const sig = cloudinary.utils.webhook_signature(data, timestamp);
     expect(sig).to.eql('bac927006d3ce039ef7632e2c03189348d02924a');
     cloudinary.config(orig);
   });
@@ -1398,20 +1392,20 @@ describe("utils", () => {
   });
   describe('srcsetUrl', () => {
     it('should generate url', () => {
-      var url = srcsetUrl('sample.jpg', 101, {
+      const url = srcsetUrl('sample.jpg', 101, {
         width: 200,
         crop: 'scale',
       });
       expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,w_200/c_scale,w_101/sample.jpg`);
     });
     it("should generate url without a transformation", () => {
-      var url = srcsetUrl('sample.jpg', 101, {});
+      const url = srcsetUrl('sample.jpg', 101, {});
       expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,w_101/sample.jpg`);
     });
   });
   describe('generateSrcsetAttribute', () => {
     it("should generate a url for each breakpoint", () => {
-      var srcset = generateSrcsetAttribute('sample', [1, 2, 3]);
+      const srcset = generateSrcsetAttribute('sample', [1, 2, 3]);
       expect(srcset.split(', ').length).to.eql(3);
     });
   });

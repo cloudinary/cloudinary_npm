@@ -1,8 +1,8 @@
 // Load environment variables
-var dotenv = require('dotenv');
+const dotenv = require('dotenv');
 
 dotenv.load();
-var cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary').v2;
 
 if (typeof (process.env.CLOUDINARY_URL) === 'undefined') {
   console.warn('!! cloudinary config is undefined !!');
@@ -12,14 +12,14 @@ if (typeof (process.env.CLOUDINARY_URL) === 'undefined') {
   console.log(cloudinary.config());
 }
 console.log('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
-var path = require('path');
+const path = require('path');
 // Start express server
-var express = require('express');
-var engine = require('ejs-locals');
+const express = require('express');
+const engine = require('ejs-locals');
 
-var app = express();
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
+const app = express();
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -72,7 +72,7 @@ function wirePostRequest(app) {
 // Wire request 'pre' actions
 wirePreRequest(app);
 // Wire request controllers
-var photosController = require('./controllers/photos_controller');
+const photosController = require('./controllers/photos_controller');
 
 photosController.wire(app);
 
@@ -89,6 +89,6 @@ app.use((req, res, next) => {
   });
 });
 
-var server = app.listen(process.env.PORT || 9000, () => {
+const server = app.listen(process.env.PORT || 9000, () => {
   console.log('Listening on port %d', server.address().port);
 });

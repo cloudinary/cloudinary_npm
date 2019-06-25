@@ -18,7 +18,7 @@ const SEARCH_TAG = `npm_advanced_search_${SUFFIX}`;
 describe("search_api", () => {
   describe("unit", () => {
     it('should create empty json', () => {
-      var query_hash = cloudinary.v2.search.instance().to_query();
+      const query_hash = cloudinary.v2.search.instance().to_query();
       expect(query_hash).to.eql({});
     });
     it('should always return same object in fluent interface', () => {
@@ -33,13 +33,13 @@ describe("search_api", () => {
       ].forEach(method => expect(instance).to.eql(instance[method]('emptyarg')));
     });
     it('should add expression to query', () => {
-      var query = cloudinary.v2.search.expression('format:jpg').to_query();
+      const query = cloudinary.v2.search.expression('format:jpg').to_query();
       expect(query).to.eql({
         expression: 'format:jpg',
       });
     });
     it('should add sort_by to query', () => {
-      var query = cloudinary.v2.search.sort_by('created_at', 'asc').sort_by('updated_at', 'desc').to_query();
+      const query = cloudinary.v2.search.sort_by('created_at', 'asc').sort_by('updated_at', 'desc').to_query();
       expect(query).to.eql({
         sort_by: [
           {
@@ -52,25 +52,25 @@ describe("search_api", () => {
       });
     });
     it('should add max_results to query', () => {
-      var query = cloudinary.v2.search.max_results('format:jpg').to_query();
+      const query = cloudinary.v2.search.max_results('format:jpg').to_query();
       expect(query).to.eql({
         max_results: 'format:jpg',
       });
     });
     it('should add next_cursor to query', () => {
-      var query = cloudinary.v2.search.next_cursor('format:jpg').to_query();
+      const query = cloudinary.v2.search.next_cursor('format:jpg').to_query();
       expect(query).to.eql({
         next_cursor: 'format:jpg',
       });
     });
     it('should add aggregate arguments as array to query', () => {
-      var query = cloudinary.v2.search.aggregate('format').aggregate('size_category').to_query();
+      const query = cloudinary.v2.search.aggregate('format').aggregate('size_category').to_query();
       expect(query).to.eql({
         aggregate: ['format', 'size_category'],
       });
     });
     it('should add with_field to query', () => {
-      var query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
+      const query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
       expect(query).to.eql({
         with_field: ['context', 'tags'],
       });
@@ -79,7 +79,7 @@ describe("search_api", () => {
   describe("integration", function () {
     this.timeout(helper.TIMEOUT_LONG);
     before("Verify Configuration", () => {
-      var config = cloudinary.config(true);
+      const config = cloudinary.config(true);
       if (!(config.api_key && config.api_secret)) {
         expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
       }
