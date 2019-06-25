@@ -1108,6 +1108,21 @@ describe("utils", function () {
             `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2:${text_encoded}`,
           ],
           [
+            "text with text font_antialiasing and font_hinting",
+            {
+              text: text_layer,
+              font_family: "Arial",
+              font_size: "18",
+              font_weight: "bold",
+              font_style: "italic",
+              letter_spacing: 4,
+              line_spacing: 2,
+              font_antialiasing: "best",
+              font_hinting: "medium",
+            },
+            `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2_antialiasing_best_hinting_medium:${text_encoded}`,
+          ],
+          [
             "subtitles",
             {
               resource_type: "subtitles",
