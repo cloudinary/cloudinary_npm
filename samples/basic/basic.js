@@ -1,9 +1,6 @@
-var dotenv = require('dotenv');
-dotenv.load();
-
+require('dotenv').load();
 var fs = require('fs');
 var cloudinary = require('cloudinary').v2;
-
 
 var uploads = {};
 
@@ -38,7 +35,7 @@ var upload_stream = cloudinary.uploader.upload_stream({ tags: 'basic_sample' }, 
   console.log("* " + image.url);
   waitForAllUploads("pizza3", err, image);
 });
-var file_reader = fs.createReadStream('pizza.jpg').pipe(upload_stream);
+fs.createReadStream('pizza.jpg').pipe(upload_stream);
 
 
 // File upload (example for promise api)
@@ -72,7 +69,7 @@ cloudinary.uploader.upload('pizza.jpg', { tags: 'basic_sample', public_id: 'my_f
 // Eager Transformations:
 // Applied as soon as the file is uploaded, instead of lazily applying them when accessed by your site's visitors.
 var eager_options = {
-  width: 200, height: 150, crop: 'scale', format: 'jpg'
+  width: 200, height: 150, crop: 'scale', format: 'jpg',
 };
 cloudinary.uploader.upload("lake.jpg", { tags: "basic_sample", public_id: "blue_lake", eager: eager_options }, function (err, image) {
   // "eager" parameter accepts a hash (or just a single item). You can pass
