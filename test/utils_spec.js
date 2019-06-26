@@ -843,6 +843,22 @@ describe("utils", function () {
           });
           expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
         });
+        describe('conditional duration video', function () {
+          it("should include conditional transformation", function () {
+            var url = utils.url("test", {
+              resource_type: 'video',
+              if: "du_gt_30",
+              width: 100,
+            });
+            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_du_gt_30,w_100/test");
+            url = utils.url("test", {
+              resource_type: 'video',
+              if: "idu_gt_500",
+              width: 100,
+            });
+            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_500,w_100/test");
+          });
+        });
         it("should allow multiple conditions when chaining transformations ", function () {
           var url = utils.url("sample", {
             transformation: [
