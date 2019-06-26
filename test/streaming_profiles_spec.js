@@ -46,7 +46,7 @@ describe('Cloudinary::Api', () => {
         },
       ],
     }).then((result) => {
-      expect(result).not.to.be(void 0);
+      expect(result).not.to.be(undefined);
     }));
     it('should create a streaming profile with an array of transformation', () => api.create_streaming_profile(`${test_id_1}a`, {
       representations: [
@@ -62,7 +62,7 @@ describe('Cloudinary::Api', () => {
         },
       ],
     }).then((result) => {
-      expect(result).not.to.be(void 0);
+      expect(result).not.to.be(undefined);
     }));
   });
   describe('list_streaming_profile', () => {
@@ -86,7 +86,7 @@ describe('Cloudinary::Api', () => {
           },
         ],
       }).then((result) => {
-        expect(result).not.to.be(void 0);
+        expect(result).not.to.be(undefined);
         return api.delete_streaming_profile(test_id_2);
       }).then((result) => {
         expect(result).to.have.key('message');

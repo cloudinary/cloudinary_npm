@@ -383,7 +383,7 @@ describe("cloudinary", () => {
       hello: null,
       goodbye: 12,
       world: "problem",
-      undef: void 0,
+      undef: undefined,
     }, "1234")).to.eql("f05cfe85cee78e7e997b3c7da47ba212dcbf1ea5");
   });
   it("should correctly build signed preloaded image", () => {
@@ -546,7 +546,7 @@ describe("cloudinary", () => {
     let params = cloudinary.utils.process_request_params({
       public_id: "folder/file",
       version: "1234",
-      colors: void 0,
+      colors: undefined,
     }, {
       api_key: '1234',
       api_secret: 'b',

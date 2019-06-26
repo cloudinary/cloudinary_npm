@@ -191,7 +191,7 @@ describe("api", () => {
         return cloudinary.v2.api.resources();
       }).then((result) => {
         const resource = findByAttr(result.resources, "public_id", publicId);
-        expect(resource).not.to.eql(void 0);
+        expect(resource).not.to.eql(undefined);
         expect(resource.type).to.eql("upload");
       });
     });
@@ -296,7 +296,7 @@ describe("api", () => {
       }).then(({ public_id }) => cloudinary.v2.api.resource(public_id)
         .then(resource => [public_id, resource]))
         .then(([public_id, resource]) => {
-          expect(resource).not.to.eql(void 0);
+          expect(resource).not.to.eql(undefined);
           expect(resource.public_id).to.eql(public_id);
           expect(resource.bytes).to.eql(3381);
           expect(resource.derived).to.have.length(1);
@@ -318,7 +318,7 @@ describe("api", () => {
         ({ public_id }) => cloudinary.v2.api.resource(public_id)
           .then(resource => [public_id, resource]),
       ).then(([public_id, resource]) => {
-        expect(resource).not.to.eql(void 0);
+        expect(resource).not.to.eql(undefined);
         expect(resource.bytes).to.eql(3381);
         expect(resource.derived).to.have.length(1);
         const derived_resource_id = resource.derived[0].id;
@@ -327,7 +327,7 @@ describe("api", () => {
           .then(() => public_id);
       }).then(public_id => cloudinary.v2.api.resource(public_id))
         .then((resource) => {
-          expect(resource).not.to.eql(void 0);
+          expect(resource).not.to.eql(undefined);
           expect(resource.derived).to.have.length(0);
         });
     });
@@ -376,7 +376,7 @@ describe("api", () => {
       }).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_3)
       ).then((resource) => {
-        expect(resource).not.to.eql(void 0);
+        expect(resource).not.to.eql(undefined);
         return cloudinary.v2.api.delete_resources(["apit_test", PUBLIC_ID_2, PUBLIC_ID_3]);
       }).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_3)
@@ -397,7 +397,7 @@ describe("api", () => {
         }).then(
           () => cloudinary.v2.api.resource("api_test_by_prefix"),
         ).then((resource) => {
-          expect(resource).not.to.eql(void 0);
+          expect(resource).not.to.eql(undefined);
           return cloudinary.v2.api.delete_resources_by_prefix("api_test_by");
         }).then(
           () => cloudinary.v2.api.resource("api_test_by_prefix"),
@@ -477,14 +477,14 @@ describe("api", () => {
     it("should allow getting transformation metadata", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then((transformation) => {
-        expect(transformation).not.to.eql(void 0);
+        expect(transformation).not.to.eql(undefined);
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
     it("should allow getting transformation metadata by info", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION).then((transformation) => {
-        expect(transformation).not.to.eql(void 0);
+        expect(transformation).not.to.eql(undefined);
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
@@ -495,13 +495,13 @@ describe("api", () => {
       }).then(
         () => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME),
       ).then((transformation) => {
-        expect(transformation).not.to.eql(void 0);
+        expect(transformation).not.to.eql(undefined);
         expect(transformation.allowed_for_strict).to.be.ok();
         return cloudinary.v2.api.update_transformation(EXPLICIT_TRANSFORMATION_NAME, {
           allowed_for_strict: false,
         });
       }).then(() => cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME)).then((transformation) => {
-        expect(transformation).not.to.eql(void 0);
+        expect(transformation).not.to.eql(undefined);
         expect(transformation.allowed_for_strict).not.to.be.ok();
       });
     });
@@ -514,7 +514,7 @@ describe("api", () => {
         }).then(
           () => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION),
         ).then((transformation) => {
-          expect(transformation).not.to.eql(void 0);
+          expect(transformation).not.to.eql(undefined);
           expect(transformation.allowed_for_strict).to.be.ok();
           expect(transformation.info).to.eql([
             {
@@ -534,7 +534,7 @@ describe("api", () => {
         }).then(
           () => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION2),
         ).then((transformation) => {
-          expect(transformation).not.to.eql(void 0);
+          expect(transformation).not.to.eql(undefined);
           expect(transformation.allowed_for_strict).to.be.ok();
           expect(transformation.info).to.eql([
             {
@@ -567,7 +567,7 @@ describe("api", () => {
         })).then(
           () => cloudinary.v2.api.transformation(transformationName),
         ).then((transformation) => {
-          expect(transformation).not.to.eql(void 0);
+          expect(transformation).not.to.eql(undefined);
           expect(transformation.info).to.eql([
             {
               crop: "scale",
@@ -811,10 +811,10 @@ describe("api", () => {
         moderations: true,
       });
       sinon.assert.calledWith(request, sinon.match(
-        arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : void 0), `/resources/image/moderations/manual/${status}`,
+        arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : undefined), `/resources/image/moderations/manual/${status}`,
       ));
       sinon.assert.calledWith(request, sinon.match(
-        arg => (arg != null ? arg.query : void 0) === "moderations=true", "moderations=true",
+        arg => (arg != null ? arg.query : undefined) === "moderations=true", "moderations=true",
       ));
     }));
   });

@@ -1240,8 +1240,8 @@ describe("utils", () => {
     expect(expected).to.eql(actual);
     expect(utils.build_upload_params({
       backup: null,
-    }).backup).to.eql(void 0);
-    expect(utils.build_upload_params({}).backup).to.eql(void 0);
+    }).backup).to.eql(undefined);
+    expect(utils.build_upload_params({}).backup).to.eql(undefined);
   });
   it("should add version if public_id contains /", () => {
     test_cloudinary_url("folder/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
@@ -1273,7 +1273,7 @@ describe("utils", () => {
     });
   });
   context("sign URLs", () => {
-    let configBck = void 0;
+    let configBck;
     before(() => {
       configBck = cloudinary.config();
       cloudinary.config({

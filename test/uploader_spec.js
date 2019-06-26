@@ -40,11 +40,11 @@ describe("uploader", function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
     return Q.allSettled([
-      !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) : void 0,
+      !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) : undefined,
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG,
         {
           resource_type: "video",
-        }) : void 0,
+        }) : undefined,
     ]);
   });
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe("uploader", function () {
   }));
   describe("remote urls ", () => {
     let writeSpy;
-    writeSpy = void 0;
+    writeSpy = undefined;
     beforeEach(() => {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     });
@@ -117,8 +117,8 @@ describe("uploader", function () {
     }));
     return context(":invalidate", () => {
       let spy; let xhr;
-      spy = void 0;
-      xhr = void 0;
+      spy = undefined;
+      xhr = undefined;
       before(() => {
         xhr = sinon.useFakeXMLHttpRequest();
         spy = sinon.spy(ClientRequest.prototype, 'write');
@@ -290,7 +290,7 @@ describe("uploader", function () {
           expect(public_ids).to.not.contain('noSuchId');
           return cloudinary.v2.api.resource(this.second_id);
         }).then(({ context }) => {
-          expect(context).to.be(void 0);
+          expect(context).to.be(undefined);
         });
     });
     it("should upload with context containing reserved characters", () => {
@@ -390,7 +390,7 @@ describe("uploader", function () {
         type: "upload",
       });
     }).then((result) => {
-      expect(result.faces).not.to.be(void 0);
+      expect(result.faces).not.to.be(undefined);
       return cloudinary.v2.api.resource(result.public_id, {
         faces: true,
         coordinates: true,
@@ -458,7 +458,7 @@ describe("uploader", function () {
   }).then(() => {
     expect().fail();
   }).catch((error) => {
-    expect(error).not.to.be(void 0);
+    expect(error).not.to.be(undefined);
     expect(error.message).to.contain("Detection is invalid");
   }));
   it("should support requesting background_removal", () => cloudinary.v2.uploader.upload(IMAGE_FILE, {
@@ -706,8 +706,8 @@ describe("uploader", function () {
   });
   describe("explicit", () => {
     let spy; let xhr;
-    spy = void 0;
-    xhr = void 0;
+    spy = undefined;
+    xhr = undefined;
     before(() => {
       xhr = sinon.useFakeXMLHttpRequest();
       spy = sinon.spy(ClientRequest.prototype, 'write');
@@ -763,9 +763,9 @@ describe("uploader", function () {
   });
   describe("access_control", () => {
     let options; let requestSpy; let writeSpy;
-    writeSpy = void 0;
-    requestSpy = void 0;
-    options = void 0;
+    writeSpy = undefined;
+    requestSpy = undefined;
+    options = undefined;
     beforeEach(() => {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       requestSpy = sinon.spy(http, 'request');

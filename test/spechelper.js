@@ -201,9 +201,9 @@ Can be called inside `it` functions
 */
 exports.mockPromise = function (mockBlock) {
   let requestSpy; let writeSpy; let xhr;
-  xhr = void 0;
-  writeSpy = void 0;
-  requestSpy = void 0;
+  xhr = undefined;
+  writeSpy = undefined;
+  requestSpy = undefined;
   return Q.Promise((resolve, reject, notify) => {
     xhr = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');

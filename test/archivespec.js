@@ -69,7 +69,7 @@ describe("archive", () => {
   describe("utils", () => {
     describe('.generate_zip_download_url', function () {
       this.timeout(helper.TIMEOUT_LONG);
-      this.archive_result = void 0;
+      this.archive_result = undefined;
       before(function () {
         this.archive_result = utils.download_zip_url({
           target_public_id: 'gem_archive_test',
