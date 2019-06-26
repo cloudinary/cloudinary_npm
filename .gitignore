@@ -6,3 +6,4 @@ bower_components/
 bin
 *.map
 !lib
+test_cache/
