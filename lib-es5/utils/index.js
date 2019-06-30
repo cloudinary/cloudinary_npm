@@ -175,6 +175,14 @@ function textStyle(layer) {
   if (line_spacing) {
     keywords.push(`line_spacing_${line_spacing}`);
   }
+  var font_antialiasing = layer.font_antialiasing;
+  if (font_antialiasing) {
+    keywords.push(`antialiasing_${font_antialiasing}`);
+  }
+  var font_hinting = layer.font_hinting;
+  if (font_antialiasing) {
+    keywords.push(`hinting_${font_hinting}`);
+  }
   if (font_size || font_family || !isEmpty(keywords)) {
     if (!font_family) {
       throw "Must supply font_family for text in overlay/underlay";
