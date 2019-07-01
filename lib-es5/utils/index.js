@@ -784,17 +784,14 @@ function url(public_id) {
   public_id = _finalize_source2[0];
   source_to_sign = _finalize_source2[1];
 
-  if (source_to_sign.indexOf("/") > 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)) {
-    if (version == null) {
-      version = 1;
-    }
-  }
-  if (version != null) {
-    version = `v${version}`;
-  }
   if (exclude_version) {
     version = '';
+  } else if (source_to_sign.indexOf("/") > 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//) && version == null) {
+    version = `v1`;
+  } else if (version != null) {
+    version = `v${version}`;
   }
+
   transformation = transformation.replace(/([^:])\/\//g, '$1/');
   if (sign_url && isEmpty(auth_token)) {
     var to_sign = [transformation, source_to_sign].filter(function (part) {
