@@ -608,23 +608,13 @@ describe("api", function () {
   });
   describe("upload_preset", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_presets);
-    it("should allow creating and listing upload_presets", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      const PRESET_NAMES = [API_TEST_UPLOAD_PRESET3, API_TEST_UPLOAD_PRESET2, API_TEST_UPLOAD_PRESET1];
-      return Q.all(
-        PRESET_NAMES.map(name => cloudinary.v2.api.create_upload_preset({
-          name: name,
-          folder: "folder",
-        })),
-      ).then(
-        () => cloudinary.v2.api.upload_presets(),
-      ).then(
-        ({ presets }) => presets.map(p => p.name),
-      ).then(
-        presetList => PRESET_NAMES.forEach(p => expect(presetList).to.contain(p)),
-      ).finally(() => Q.allSettled(
-        PRESET_NAMES.map(name => cloudinary.v2.api.delete_upload_preset(name)),
-      ));
+    it("should allow listing upload_presets", function () {
+      return helper.mockPromise(function (xhr, write, request) {
+        cloudinary.v2.api.upload_presets();
+        return sinon.assert.calledWith(request, sinon.match({
+          pathname: sinon.match(/.*\/upload_presets$/),
+        }, "upload_presets"));
+      });
     });
     it("should allow getting a single upload_preset", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
