@@ -83,8 +83,14 @@ exports.upload_large = function upload_large(path, callback) {
   if (path != null && path.match(/^https?:/)) {
     // upload a remote file
     return exports.upload(path, callback, options);
+  } else {
+    if (path != null) {
+      options.filename = path.split(/(\\|\/)/g).pop().replace(/\.[^/.]+$/, "");
+    }
+    return exports.upload_chunked(path, callback, extend({
+      resource_type: 'raw'
+    }, options));
   }
-  return exports.upload_chunked(path, callback, _extends({ resource_type: 'raw' }, options));
 };
 
 exports.upload_chunked = function upload_chunked(path, callback, options) {
@@ -522,7 +528,7 @@ function post(url, post_data, boundary, file, callback, options) {
   var file_header;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
   if (file != null || options.stream) {
-    var filename = options.stream ? "file" : basename(file);
+    var filename = options.stream ? options.filename ? options.filename : "file" : path.basename(file);
     file_header = Buffer.from(encodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary');
   }
   var post_options = urlLib.parse(url);

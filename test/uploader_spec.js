@@ -607,7 +607,7 @@ describe("uploader", function () {
           if (error != null) {
             done(new Error(error.message));
           }
-          expect(result.public_id).to.eql(LARGE_RAW_FILE.split(/(\\|\/)/g).pop());
+          expect(result.public_id).to.match(/TheCompleteWorksOfShakespeare_[a-zA-Z0-9]{6}/);
           done();
         });
       });
