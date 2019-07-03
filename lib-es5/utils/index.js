@@ -180,7 +180,7 @@ function textStyle(layer) {
     keywords.push(`antialiasing_${font_antialiasing}`);
   }
   var font_hinting = layer.font_hinting;
-  if (font_antialiasing) {
+  if (font_hinting) {
     keywords.push(`hinting_${font_hinting}`);
   }
   if (font_size || font_family || !isEmpty(keywords)) {
