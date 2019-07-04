@@ -12,7 +12,8 @@
   "main": "cloudinary.js",
   "dependencies": {
     "lodash": "^4.17.11",
-    "q": "^1.5.1"
+    "q": "^1.5.1",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -42,10 +43,13 @@
     "compile": "node_modules/.bin/babel lib --out-dir lib-es5 --delete-dir-on-start --verbose",
     "test-es6": "which node && node node_modules/.bin/mocha --ui bdd -R spec --recursive test/",
     "test-es5": "node node_modules/.bin/mocha -R spec --recursive --require 'babel-register' --require 'babel-polyfill' test/",
-    "docs": "npm run compile && node_modules/.bin/jsdoc -d docs -r -p lib/*"
+    "docs": "npm run compile && node_modules/.bin/jsdoc -d docs -r -p lib/*",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "optionalDependencies": {},
   "engines": {
     "node": ">=0.6"
-  }
+  },
+  "snyk": true
 }
