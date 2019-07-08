@@ -617,70 +617,41 @@ describe("api", function () {
       });
     });
     it("should allow getting a single upload_preset", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.create_upload_preset({
-        unsigned: true,
-        folder: "folder",
-        transformation: EXPLICIT_TRANSFORMATION,
-        tags: ["a", "b", "c"],
-        context: {
-          a: "b",
-          c: "d",
-        },
-      }).then(
-        newPreset => cloudinary.v2.api.upload_preset(newPreset.name)
-          .then(preset => [newPreset.name, preset]),
-      ).then(([name, preset]) => {
-        expect(preset.name).to.eql(name);
-        expect(preset.unsigned).to.eql(true);
-        expect(preset.settings.folder).to.eql("folder");
-        expect(preset.settings.transformation).to.eql([EXPLICIT_TRANSFORMATION]);
-        expect(preset.settings.context).to.eql({
-          a: "b",
-          c: "d",
-        });
-        expect(preset.settings.tags).to.eql(["a", "b", "c"]);
-        return cloudinary.v2.api.delete_upload_preset(name);
+      return helper.mockPromise(function (xhr, write, request) {
+        cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET1);
+        var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET1+"$";
+        return sinon.assert.calledWith(request, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match("GET")
+        }));
       });
     });
     it("should allow deleting upload_presets", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.create_upload_preset({
-        name: API_TEST_UPLOAD_PRESET4,
-        folder: "folder",
-      }).then(
-        () => cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4),
-      ).then(
-        () => cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET4),
-      ).then(
-        () => cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET4),
-      ).then(
-        () => expect().fail(),
-      ).catch(({ error }) => expect(error.message).to.contain("Can't find"));
+      return helper.mockPromise(function (xhr, write, request) {
+        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2);
+        var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET2+"$";
+        return sinon.assert.calledWith(request, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match("DELETE")
+        }))
+      });
     });
     it("should allow updating upload_presets", function () {
-      var name = '';
-      this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.api.create_upload_preset({
-        folder: "folder",
-      }).then((preset) => {
-        name = preset.name;
-        return cloudinary.v2.api.upload_preset(name);
-      }).then(preset => cloudinary.v2.api.update_upload_preset(name, merge(preset.settings, {
-        colors: true,
-        unsigned: true,
-        disallow_public_id: true,
-      }))).then(
-        () => cloudinary.v2.api.upload_preset(name),
-      ).then((preset) => {
-        expect(preset.name).to.eql(name);
-        expect(preset.unsigned).to.eql(true);
-        expect(preset.settings).to.eql({
-          folder: "folder",
-          colors: true,
-          disallow_public_id: true,
-        });
-        return cloudinary.v2.api.delete_upload_preset(name);
+      return helper.mockPromise(function (xhr, write, request) {
+        cloudinary.v2.api.update_upload_preset(API_TEST_UPLOAD_PRESET3,
+          {
+            colors: true,
+            unsigned: true,
+            disallow_public_id: true,
+          });
+        var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET3+"$";
+        sinon.assert.calledWith(request, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match("PUT")
+        }));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1 , "colors=1")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true , "unsigned=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true , "disallow_public_id=true")));
       });
     });
   });
