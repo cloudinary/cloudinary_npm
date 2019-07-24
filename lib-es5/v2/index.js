@@ -1,9 +1,15 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var v1 = require('../cloudinary.js');
-var clone = require('lodash/clone');
-var v2 = clone(v1);
-v2.api = require('./api');
-v2.uploader = require('./uploader');
-v2.search = require('./search');
+var api = require('./api');
+var uploader = require('./uploader');
+var search = require('./search');
+
+var v2 = _extends({}, v1, {
+  api,
+  uploader,
+  search
+});
 module.exports = v2;

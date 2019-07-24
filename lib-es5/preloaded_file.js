@@ -26,7 +26,7 @@ var PreloadedFile = function () {
     this.version = matches[3];
     this.filename = matches[4];
     this.signature = matches[5];
-    public_id_and_format = this.split_format(this.filename);
+    public_id_and_format = PreloadedFile.split_format(this.filename);
     this.public_id = public_id_and_format[0];
     this.format = public_id_and_format[1];
   }
@@ -34,25 +34,12 @@ var PreloadedFile = function () {
   _createClass(PreloadedFile, [{
     key: "is_valid",
     value: function is_valid() {
-      var expected_signature, public_id;
-      public_id = this.resource_type === "raw" ? this.filename : this.public_id;
+      var expected_signature;
       expected_signature = utils.api_sign_request({
         public_id: this.public_id,
         version: this.version
       }, config().api_secret);
       return this.signature === expected_signature;
-    }
-  }, {
-    key: "split_format",
-    value: function split_format(identifier) {
-      var format, last_dot, public_id;
-      last_dot = identifier.lastIndexOf(".");
-      if (last_dot === -1) {
-        return [identifier, null];
-      }
-      public_id = identifier.substr(0, last_dot);
-      format = identifier.substr(last_dot + 1);
-      return [public_id, format];
     }
   }, {
     key: "identifier",
@@ -77,6 +64,18 @@ var PreloadedFile = function () {
         }
       });
       return result;
+    }
+  }], [{
+    key: "split_format",
+    value: function split_format(identifier) {
+      var format, last_dot, public_id;
+      last_dot = identifier.lastIndexOf(".");
+      if (last_dot === -1) {
+        return [identifier, null];
+      }
+      public_id = identifier.substr(0, last_dot);
+      format = identifier.substr(last_dot + 1);
+      return [public_id, format];
     }
   }]);
 

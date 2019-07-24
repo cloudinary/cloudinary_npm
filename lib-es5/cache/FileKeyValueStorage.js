@@ -54,31 +54,12 @@ var FileKeyValueStorage = function () {
   }, {
     key: 'clear',
     value: function clear() {
+      var _this2 = this;
+
       var files = fs.readdirSync(this.baseFolder);
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var file = _step.value;
-
-          fs.unlinkSync(path.join(this.baseFolder, file));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      files.forEach(function (file) {
+        return fs.unlinkSync(path.join(_this2.baseFolder, file));
+      });
     }
   }, {
     key: 'deleteBaseFolder',
