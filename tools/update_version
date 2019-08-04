@@ -202,26 +202,31 @@ function publish
     # TODO support mono-repo, which may have multiple package.json files
     pushd $(git rev-parse --show-toplevel)
     local version=${NEW_VERSION:-$(current_version)}
-    ${CMD_PREFIX} git add package.json CHANGELOG.md           &&
-    ${CMD_PREFIX} git commit -m "${QUOTE}Version ${version}${QUOTE}"    &&
-    [[ -z "${CMD_PREFIX}" ]] && {
-        sed -e "1,/^${version//./\\.}/d" \
-            -e "/^=/d" \
-            -e "/^$/d" \
-            -e "/^[0-9]/,\$d" \
-            CHANGELOG.md \
-        |  git tag -a "${version}" --file=-
-    }
-    # print the command instead of executing it
-    [[ -n "${CMD_PREFIX}" ]] &&
-        echo sed -e "'1,/^${version//./\\.}/d'" \
-             -e "'/^=/d'" \
-             -e "'/^$/d'" \
-             -e "'/^[0-9]/,\$d'" \
-             CHANGELOG.md \
-        \| git tag -a "'${version}'" --file=-
-
+    if [[ -z $(git status --short) ]]; then
+        ${CMD_PREFIX} git add package.json CHANGELOG.md           &&
+        ${CMD_PREFIX} git commit -m "${QUOTE}Version ${version}${QUOTE}"    &&
+        [[ -z "${CMD_PREFIX}" ]] && {
+            sed -e "1,/^${version//./\\.}/d" \
+                -e "/^=/d" \
+                -e "/^$/d" \
+                -e "/^[0-9]/,\$d" \
+                CHANGELOG.md \
+            |  git tag -a "${version}" --file=-
+        }
+        # print the command instead of executing it
+        [[ -n "${CMD_PREFIX}" ]] &&
+            echo sed -e "'1,/^${version//./\\.}/d'" \
+                 -e "'/^=/d'" \
+                 -e "'/^$/d'" \
+                 -e "'/^[0-9]/,\$d'" \
+                 CHANGELOG.md \
+            \| git tag -a "'${version}'" --file=-
+    fi
     [[ $? == 0 ]] && ${CMD_PREFIX} git push && ${CMD_PREFIX} git push --tags
+
+    [[ $? == 0 ]] && ${CMD_PREFIX} npm publish
+
+    [[ -z "${CMD_PREFIX}" ]] && echo "Remember to create a new release in github: ${$(git remote get-url origin)%.git}/releases"
 
     popd
 }
