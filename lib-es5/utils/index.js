@@ -170,8 +170,11 @@ function textStyle(layer) {
     if (attr === "letter_spacing" || attr === "line_spacing") {
       keywords.push(`${attr}_${layer[attr]}`);
     }
-    if (attr === "font_antialiasing" || attr === "font_hinting") {
+    if (attr === "font_hinting") {
       keywords.push(`${attr.split("_").pop()}_${layer[attr]}`);
+    }
+    if (attr === "font_antialiasing") {
+      keywords.push(`antialias_${layer[attr]}`);
     }
   });
 

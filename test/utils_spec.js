@@ -1119,7 +1119,7 @@ describe("utils", function () {
               line_spacing: 2,
               font_antialiasing: "best",
             },
-            `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2_antialiasing_best:${text_encoded}`,
+            `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2_antialias_best:${text_encoded}`,
           ],
           [
             "text with text font_hinting",
