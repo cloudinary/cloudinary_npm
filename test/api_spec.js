@@ -728,10 +728,13 @@ describe("api", function () {
         xhr.restore();
       });
       it("should support changing moderation status with notification-url", function () {
-        return cloudinary.v2.api.update("sample", {
+        this.timeout(helper.TIMEOUT_LONG);
+        return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+          moderation: "manual",
+        }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           moderation_status: "approved",
           notification_url: "http://example.com",
-        }).then(function () {
+        })).then(function () {
           if (writeSpy.called) {
             sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
             sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
