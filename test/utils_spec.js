@@ -1257,13 +1257,13 @@ describe("utils", function () {
   it("should not add version if public_id contains version already", function () {
     test_cloudinary_url("v1234/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
   });
-  it("should not add version if exclude_version:true", function () {
+  it("should not add version if force_version:false", function () {
     test_cloudinary_url("test",
-      { exclude_version: true, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
+      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
-  it("should add version when exclude_version:false", function () {
+  it("should add version when force_version:true", function () {
     test_cloudinary_url("test",
-      { exclude_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
+      { force_version: true, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
   });
   it("should not add version when null", function () {
     test_cloudinary_url("test",
