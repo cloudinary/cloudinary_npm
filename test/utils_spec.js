@@ -1257,10 +1257,6 @@ describe("utils", function () {
   it("should not add version if public_id contains version already", function () {
     test_cloudinary_url("v1234/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
   });
-  it("should not add version if force_version:false", function () {
-    test_cloudinary_url("test",
-      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
-  });
   it("should add version when force_version:true", function () {
     test_cloudinary_url("test",
       { force_version: true, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
@@ -1268,6 +1264,26 @@ describe("utils", function () {
   it("should not add version when null", function () {
     test_cloudinary_url("test",
       { version: null }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
+  });
+  it("Should not set default version v1 to resources stored in folders if force_version is set to false", function () {
+    test_cloudinary_url("folder/test", {},
+      `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
+    test_cloudinary_url("folder/test",
+      { force_version: false }, `http://res.cloudinary.com/${cloud_name}/image/upload/folder/test`, {});
+  });
+  it("should not add version if force_version:false", function () {
+    test_cloudinary_url("test",
+      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
+  });
+  it("Should use force_version from config", function () {
+    cloudinary.config({ force_version: false });
+    test_cloudinary_url("test",
+      {}, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
+  });
+  it("Should override config with options", function () {
+    cloudinary.config({ force_version: true });
+    test_cloudinary_url("folder/test",
+      {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
   });
   it("should allow to shorted image/upload urls", function () {
     test_cloudinary_url("test", {
