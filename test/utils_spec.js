@@ -847,28 +847,16 @@ describe("utils", function () {
           it("should include conditional transformation", function () {
             var url = utils.url("test", {
               resource_type: 'video',
-              if: "du_gt_30",
+              if: "duration > 30",
               width: 100,
             });
             expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_du_gt_30,w_100/test");
-            url = utils.url("test", {
-              resource_type: 'video',
-              if: "idu_gt_500",
-              width: 100,
-            });
-            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_500,w_100/test");
             url = utils.url("test", {
               resource_type: 'video',
               if: "initialDuration > 30",
               width: 100,
             });
             expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_30,w_100/test");
-            url = utils.url("test", {
-              resource_type: 'video',
-              if: "duration > 30",
-              width: 100,
-            });
-            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_du_gt_30,w_100/test");
             url = utils.url("test", {
               resource_type: 'video',
               if: "initial_duration > 30",
