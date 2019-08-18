@@ -785,10 +785,10 @@ function url(public_id) {
   source_to_sign = _finalize_source2[1];
 
 
-  if (!version && force_version && source_to_sign.indexOf("/") >= 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)) {
-    version = `1`;
+  if (version == null && force_version && source_to_sign.indexOf("/") >= 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)) {
+    version = 1;
   }
-  if (version) {
+  if (version != null) {
     version = `v${version}`;
   } else {
     version = null;

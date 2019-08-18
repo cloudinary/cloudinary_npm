@@ -1275,9 +1275,9 @@ describe("utils", function () {
       {}, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
   });
   it("should override config with options", function () {
-    cloudinary.config({ force_version: true });
+    cloudinary.config({ force_version: false });
     test_cloudinary_url("folder/test",
-      {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
+      { force_version: true }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
   });
   it("should allow to shorted image/upload urls", function () {
     test_cloudinary_url("test", {
