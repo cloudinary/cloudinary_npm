@@ -1257,6 +1257,28 @@ describe("utils", function () {
   it("should not add version if public_id contains version already", function () {
     test_cloudinary_url("v1234/test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
   });
+  it("should not set default version v1 to resources stored in folders if force_version is set to false", function () {
+    test_cloudinary_url("folder/test", {},
+      `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
+    test_cloudinary_url("folder/test",
+      { force_version: false }, `http://res.cloudinary.com/${cloud_name}/image/upload/folder/test`, {});
+  });
+  it("explicitly set version is always passed", function () {
+    test_cloudinary_url("test",
+      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
+    test_cloudinary_url("folder/test",
+      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/folder/test`, {});
+  });
+  it("should use force_version from config", function () {
+    cloudinary.config({ force_version: false });
+    test_cloudinary_url("folder/test",
+      {}, `http://res.cloudinary.com/${cloud_name}/image/upload/folder/test`, {});
+  });
+  it("should override config with options", function () {
+    cloudinary.config({ force_version: false });
+    test_cloudinary_url("folder/test",
+      { force_version: true }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
+  });
   it("should allow to shorted image/upload urls", function () {
     test_cloudinary_url("test", {
       shorten: true,

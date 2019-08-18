@@ -729,6 +729,10 @@ function url(public_id) {
   var transformation = utils.generate_transformation_string(options);
   var resource_type = utils.option_consume(options, "resource_type", "image");
   var version = utils.option_consume(options, "version");
+  var force_version = utils.option_consume(options, "force_version", config().force_version);
+  if (force_version == null) {
+    force_version = true;
+  }
   var format = utils.option_consume(options, "format");
   var cloud_name = utils.option_consume(options, "cloud_name", config().cloud_name);
   if (!cloud_name) {
@@ -783,14 +787,16 @@ function url(public_id) {
   public_id = _finalize_source2[0];
   source_to_sign = _finalize_source2[1];
 
-  if (source_to_sign.indexOf("/") > 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)) {
-    if (version == null) {
-      version = 1;
-    }
+
+  if (version == null && force_version && source_to_sign.indexOf("/") >= 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)) {
+    version = 1;
   }
   if (version != null) {
     version = `v${version}`;
+  } else {
+    version = null;
   }
+
   transformation = transformation.replace(/([^:])\/\//g, '$1/');
   if (sign_url && isEmpty(auth_token)) {
     var to_sign = [transformation, source_to_sign].filter(function (part) {
