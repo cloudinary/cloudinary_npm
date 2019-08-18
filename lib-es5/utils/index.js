@@ -786,11 +786,12 @@ function url(public_id) {
 
 
   if (!version && force_version && source_to_sign.indexOf("/") >= 0 && !source_to_sign.match(/^v[0-9]+/) && !source_to_sign.match(/^https?:\//)) {
-    version = `v1`;
-  } else if (version) {
+    version = `1`;
+  }
+  if (version) {
     version = `v${version}`;
   } else {
-    version = '';
+    version = null;
   }
 
   transformation = transformation.replace(/([^:])\/\//g, '$1/');
