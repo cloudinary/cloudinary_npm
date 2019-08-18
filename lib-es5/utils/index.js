@@ -729,7 +729,10 @@ function url(public_id) {
   var transformation = utils.generate_transformation_string(options);
   var resource_type = utils.option_consume(options, "resource_type", "image");
   var version = utils.option_consume(options, "version");
-  var force_version = utils.option_consume(options, "force_version", config().force_version || true);
+  var force_version = utils.option_consume(options, "force_version", config().force_version);
+  if (force_version == null) {
+    force_version = true;
+  }
   var format = utils.option_consume(options, "format");
   var cloud_name = utils.option_consume(options, "cloud_name", config().cloud_name);
   if (!cloud_name) {
