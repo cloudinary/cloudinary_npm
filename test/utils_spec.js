@@ -692,7 +692,7 @@ describe("utils", function () {
           "string",
           {
             "font_family": "arial",
-            "font_size": 30,
+            "font_size": "30",
             "text": "abc,αβγ/אבג",
           },
           "text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92",
@@ -1128,6 +1128,34 @@ describe("utils", function () {
               line_spacing: 2,
             },
             `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2:${text_encoded}`,
+          ],
+          [
+            "text with text font_antialiasing",
+            {
+              text: text_layer,
+              font_family: "Arial",
+              font_size: "18",
+              font_weight: "bold",
+              font_style: "italic",
+              letter_spacing: 4,
+              line_spacing: 2,
+              font_antialiasing: "best",
+            },
+            `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2_antialias_best:${text_encoded}`,
+          ],
+          [
+            "text with text font_hinting",
+            {
+              text: text_layer,
+              font_family: "Arial",
+              font_size: "18",
+              font_weight: "bold",
+              font_style: "italic",
+              letter_spacing: 4,
+              line_spacing: 2,
+              font_hinting: "medium",
+            },
+            `text:Arial_18_bold_italic_letter_spacing_4_line_spacing_2_hinting_medium:${text_encoded}`,
           ],
           [
             "subtitles",

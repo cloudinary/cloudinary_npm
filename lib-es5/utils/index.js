@@ -159,8 +159,6 @@ var LAYER_KEYWORD_PARAMS = {
 };
 
 function textStyle(layer) {
-  var font_family = layer.font_family;
-  var font_size = layer.font_size;
   var keywords = [];
   var style = "";
   Object.keys(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
@@ -170,23 +168,24 @@ function textStyle(layer) {
       keywords.push(attr_value);
     }
   });
-  var letter_spacing = layer.letter_spacing;
-  if (letter_spacing) {
-    keywords.push(`letter_spacing_${letter_spacing}`);
-  }
-  var line_spacing = layer.line_spacing;
-  if (line_spacing) {
-    keywords.push(`line_spacing_${line_spacing}`);
-  }
-  if (font_size || font_family || !isEmpty(keywords)) {
-    if (!font_family) {
-      throw "Must supply font_family for text in overlay/underlay";
+
+  Object.keys(layer).forEach(function (attr) {
+    if (attr === "letter_spacing" || attr === "line_spacing") {
+      keywords.push(`${attr}_${layer[attr]}`);
     }
-    if (!font_size) {
-      throw "Must supply font_size for text in overlay/underlay";
+    if (attr === "font_hinting") {
+      keywords.push(`${attr.split("_").pop()}_${layer[attr]}`);
     }
-    keywords.unshift(font_size);
-    keywords.unshift(font_family);
+    if (attr === "font_antialiasing") {
+      keywords.push(`antialias_${layer[attr]}`);
+    }
+  });
+
+  if (layer.hasOwnProperty("font_size" || "font_family") || !isEmpty(keywords)) {
+    if (!layer.font_size) throw `Must supply font_size for text in overlay/underlay`;
+    if (!layer.font_family) throw `Must supply font_family for text in overlay/underlay`;
+    keywords.unshift(layer.font_size);
+    keywords.unshift(layer.font_family);
     style = compact(keywords).join("_");
   }
   return style;
