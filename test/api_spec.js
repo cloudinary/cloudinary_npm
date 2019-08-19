@@ -306,6 +306,17 @@ describe("api", function () {
           expect(resource.derived).to.have.length(1);
         });
     });
+    describe("derived pagination", function(){
+      it("should send the derived_next_cursor to the server", function() {
+        return helper.mockPromise((xhr, writeSpy, requestSpy) => {
+          cloudinary.v2.api.resource(PUBLIC_ID, {derived_next_cursor: 'aaa'});
+          return sinon.assert.calledWith(
+            requestSpy, sinon.match(sinon.match({
+              query: sinon.match('derived_next_cursor=aaa')
+            }, 'derived_next_cursor=aaa')));
+        });
+      });
+    });
   });
   describe("delete", function () {
     it("should allow deleting derived resource", function () {
