@@ -856,6 +856,31 @@ describe("api", function () {
       expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
     }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
   });
+  describe("delete folders", function() {
+    this.timeout(helper.TIMEOUT_MEDIUM);
+    const folderPath= "test_folder/delete_folder/"+TEST_TAG;
+    before(function(){
+      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        folder: folderPath,
+        tags: UPLOAD_TAGS
+      }).delay(2 * 1000).then(function() {
+        return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
+          .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
+            expect(folder).not.to.be(null);
+            expect(folder["total_count"]).to.eql(0);
+            expect(folder["folders"]).to.be.empty;
+        }));
+      });
+    });
+    it('should delete an empty folder', function () {
+      this.timeout(helper.TIMEOUT_MEDIUM);
+      return cloudinary.v2.api.delete_folder(
+        folderPath
+      ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
+      ).then(()=> expect().fail()
+      ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
+    });
+  });
   describe('.restore', function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
 
