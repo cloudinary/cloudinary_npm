@@ -354,7 +354,7 @@ function build_upload_params(options) {
     quality_analysis: utils.as_safe_bool(options.quality_analysis),
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints),
     return_delete_token: utils.as_safe_bool(options.return_delete_token),
-    timestamp: exports.timestamp(),
+    timestamp: options.timestamp ? options.timestamp : exports.timestamp(),
     transformation: utils.generate_transformation_string(clone(options)),
     type: options.type,
     unique_filename: utils.as_safe_bool(options.unique_filename),
@@ -1063,6 +1063,8 @@ function process_request_params(params, options) {
   if (options.unsigned != null && options.unsigned) {
     params = exports.clear_blank(params);
     delete params.timestamp;
+  } else if (options.signature ) {
+    params = exports.clear_blank(options);
   } else {
     params = exports.sign_request(params, options);
   }
@@ -1073,7 +1075,7 @@ function private_download_url(public_id, format) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = exports.sign_request({
-    timestamp: exports.timestamp(),
+    timestamp: options.timestamp ? options.timestamp : exports.timestamp(),
     public_id: public_id,
     format: format,
     type: options.type,
@@ -1092,7 +1094,7 @@ function zip_download_url(tag) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var params = exports.sign_request({
-    timestamp: exports.timestamp(),
+    timestamp: options.timestamp ? options.timestamp : exports.timestamp(),
     tag: tag,
     transformation: utils.generate_transformation_string(options)
   }, options);
