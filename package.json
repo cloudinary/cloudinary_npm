@@ -35,7 +35,18 @@
     "nyc": "^13.0.1",
     "sinon": "^6.1.4",
     "webpack-cli": "^3.2.1"
-  },
+  },"files": [
+  "lib/**/*",
+  "lib-es5/**/*",
+  "node_modules",
+  "cloudinary.js",
+  ".baelrc",
+  ".npmignore",
+  "babel.config.js",
+  "package.json",
+  "types/*"
+],
+  "types": "./types/cloudinary.d.ts",
   "scripts": {
     "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
     "lint": "eslint .",
