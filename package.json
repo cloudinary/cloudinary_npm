@@ -39,8 +39,6 @@
   "lib/**/*",
   "lib-es5/**/*",
   "cloudinary.js",
-  ".baelrc",
-  ".npmignore",
   "babel.config.js",
   "package.json",
   "types/*"
