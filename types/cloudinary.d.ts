@@ -53,35 +53,65 @@ declare module 'cloudinary' {
 
         function create_streaming_profile(name: string, callback?: ErrorCallBack, options?: {display_name?: string, representations: Array<{transformation?: VideoOptions}>}): Promise<any>;
 
+        function create_streaming_profile(name: string, options?: {display_name?: string, representations: Array<{transformation?: VideoOptions}>}): Promise<any>;
+
         function create_transformation(name: string, definition: Transformation, callback?: ErrorCallBack, options?: CommonTransformationOptions): Promise<any>;
+
+        function create_transformation(name: string, definition: Transformation, options?: CommonTransformationOptions): Promise<any>;
 
         function update_transformation(transformation_name: Transformation, updates?: UtilsOptions, callback?: ErrorCallBack): Promise<any>;
 
         function create_upload_mapping(folder: string, callback?: ErrorCallBack, options?: {template: string}): Promise<any>;
 
+        function create_upload_mapping(folder: string, options?: {template: string}): Promise<any>;
+
         function create_upload_preset(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function create_upload_preset(options?: ApiOptions): Promise<any>;
 
         function delete_all_resources(callback?: ErrorCallBack, value?: {public_ids?: string[] , prefix?: string , all?: boolean, type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
 
+        function delete_all_resources(value?: {public_ids?: string[] , prefix?: string , all?: boolean, type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
+
         function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: ApiOptions): Promise<any>;
 
         function delete_derived_resources(derived_resource_ids: string[], callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function delete_derived_resources(derived_resource_ids: string[], options?: ApiOptions): Promise<any>;
+
         function delete_resources(public_ids: string[], callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function delete_resources(public_ids: string[], options?: ApiOptions): Promise<any>;
+
         function delete_resources_by_prefix(prefix: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function delete_resources_by_prefix(prefix: string, options?: ApiOptions): Promise<any>;
+
+        function delete_resources_by_tag(tag: string, options?: ApiOptions): Promise<any>;
 
         function delete_resources_by_tag(tag: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
         function delete_streaming_profile(name: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function delete_streaming_profile(name: string, options?: ApiOptions): Promise<any>;
+
         function delete_transformation(transformation: Transformation, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function delete_transformation(transformation: Transformation, options?: ApiOptions): Promise<any>;
 
         function delete_upload_mapping(folder: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function delete_upload_mapping(folder: string, options?: ApiOptions): Promise<any>;
+
         function delete_upload_preset(name: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function delete_upload_preset(name: string, options?: ApiOptions): Promise<any>;
+
         function get_streaming_profile(name: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function get_streaming_profile(name: string, options?: ApiOptions): Promise<any>;
 
         function list_streaming_profiles(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
@@ -89,96 +119,187 @@ declare module 'cloudinary' {
 
         function publish_by_ids(public_ids: string[], callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function publish_by_ids(public_ids: string[], options?: ApiOptions): Promise<any>;
+
         function publish_by_prefix(prefix: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function publish_by_prefix(prefix: string, options?: ApiOptions): Promise<any>;
 
         function publish_by_tag(tag: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function publish_by_tag(tag: string, options?: ApiOptions): Promise<any>;
+
         function resource(public_id: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function resource(public_id: string, options?: AdminApiOptions): Promise<any>;
 
         function resource_types(callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function resource_types(options?: AdminApiOptions): Promise<any>;
+
         function resources(callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
-        function resources_by_context(key: string, value: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+        function resources(options?: AdminApiOptions): Promise<any>;
+
+        function resources_by_context(key: string, value?: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function resources_by_context(key: string, value?: string, options?: AdminApiOptions): Promise<any>;
+
+        function resources_by_context(key: string, options?: AdminApiOptions): Promise<any>;
+
+        function resources_by_context(key: string, callback?: ErrorCallBack): Promise<any>;
 
         function resources_by_ids(public_ids: string[], callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function resources_by_ids(public_ids: string[], options?: AdminApiOptions): Promise<any>;
+
         function resources_by_moderation(kind: ModerationKind, status: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function resources_by_moderation(kind: ModerationKind, status: string, options?: AdminApiOptions): Promise<any>;
 
         function resources_by_tag(tag: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function resources_by_tag(tag: string, options?: AdminApiOptions): Promise<any>;
+
         function restore(public_ids: string[], callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function restore(public_ids: string[], options?: AdminApiOptions): Promise<any>;
 
         function root_folders(callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function root_folders(options?: AdminApiOptions): Promise<any>;
+
         function search(params: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function search(params: string, options?: AdminApiOptions): Promise<any>;
 
         function sub_folders(path?: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function sub_folders(path?: string, options?: AdminApiOptions): Promise<any>;
+
         function tags(callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function tags(options?: AdminApiOptions): Promise<any>;
 
         function transformation(transformation: Transformation, callback?: ErrorCallBack, options?: {max_resluts?: number , next_cursor?: string}): Promise<any>;
 
+        function transformation(transformation: Transformation, options?: {max_resluts?: number , next_cursor?: string}): Promise<any>;
+
         function transformations(callback?: ErrorCallBack, options?:{max_results?: number, next_cursor?: string, named?: boolean}): Promise<any>;
+
+        function transformations(options?:{max_results?: number, next_cursor?: string, named?: boolean}): Promise<any>;
 
         function update(public_id: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function update(public_id: string, options?: AdminApiOptions): Promise<any>;
+
         function update_resources_access_mode_by_ids(access_mode: AccessMode, ids: string[], callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function update_resources_access_mode_by_ids(access_mode: AccessMode, ids: string[], options?: AdminApiOptions): Promise<any>;
 
         function update_resources_access_mode_by_prefix(access_mode: AccessMode, prefix: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
+        function update_resources_access_mode_by_prefix(access_mode: AccessMode, prefix: string, options?: AdminApiOptions): Promise<any>;
+
         function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
+
+        function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, options?: AdminApiOptions): Promise<any>;
 
         function update_streaming_profile(name: string, callback?: ErrorCallBack, options?: {display_name?: string, representations: Array<{transformation?: VideoOptions}>}): Promise<any>;
 
+        function update_streaming_profile(name: string, options?: {display_name?: string, representations: Array<{transformation?: VideoOptions}>}): Promise<any>;
+
         function update_upload_mapping(name?: string, callback?: ErrorCallBack, options?: {template: string}): Promise<any>;
+
+        function update_upload_mapping(name?: string, options?: {template: string}): Promise<any>;
 
         function update_upload_preset(name?: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function update_upload_preset(name?: string, options?: ApiOptions): Promise<any>;
+
         function upload_mapping(name?: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function upload_mapping(name?: string, options?: ApiOptions): Promise<any>
 
         function upload_mappings(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function upload_mappings(options?: ApiOptions): Promise<any>;
+
         function upload_preset(name?: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+
+        function upload_preset(name?: string, options?: ApiOptions): Promise<any>;
 
         function upload_presets(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function upload_presets(options?: ApiOptions): Promise<any>;
+
         function usage(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
 
+        function usage(options?: ApiOptions): Promise<any>;
     }
 
     export namespace uploader {
         function add_context(context: string, public_ids: string[], callback?: ErrorCallBack, options?: {type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
 
-        function add_tag(tag?: string, public_ids?: string[], callback?: ErrorCallBack, options?: {type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
+        function add_context(context: string, public_ids: string[], options?: {type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
+
+        function add_tag(tag: string, public_ids: string[], callback?: ErrorCallBack, options?: {type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
+
+        function add_tag(tag: string, public_ids: string[], options?: {type?: DeliveryType, resource_type?: ResourceType}): Promise<any>;
 
         function create_archive(callback?: ErrorCallBack, options?: UploadApiOptions, target_format?: TargetFormat): Promise<any>;
 
+        function create_archive(options?: UploadApiOptions, target_format?: TargetFormat): Promise<any>;
+
         function create_zip(callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
 
+        function create_zip(options?: UploadApiOptions): Promise<any>;
+
         function destroy(public_id: string, callback?: ErrorCallBack, options?: {resource_type?: ResourceType, type?: DeliveryType, invalidate?: boolean}): Promise<any>;
+
+        function destroy(public_id: string, options?: {resource_type?: ResourceType, type?: DeliveryType, invalidate?: boolean}): Promise<any>;
 
         function direct_upload(callback_url?: string, options?: UploadApiOptions): Promise<any>;
 
         function explicit(public_id: string, callback?: ErrorCallBack, options?:{type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{transformation?: ImageOptions | VideoOptions}>}): Promise<any>;
 
-        function explode(public_id: string, callback?: ErrorCallBack, options?: {type?: DeliveryType, format?:ImageFileExtension | VideoFileExtension, notification_url?: string}): Promise<any>;
+        function explicit(public_id: string, options?:{type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{transformation?: ImageOptions | VideoOptions}>}): Promise<any>;
+
+        function explode(public_id: string, callback?: ErrorCallBack, options?: {page?: 'all', type?: DeliveryType, format?: ImageFileExtension | VideoFileExtension, notification_url?: string}): Promise<any>;
+
+        function explode(public_id: string, options?: {type?: DeliveryType, format?:ImageFileExtension | VideoFileExtension, notification_url?: string}): Promise<any>;
 
         function generate_sprite(tag: string, callback?: ErrorCallBack, options?: {transformation?: Transformation, format?:ImageFileExtension | VideoFileExtension, async?: boolean, notification_url?: string}): Promise<any>;
+
+        function generate_sprite(tag: string, options?: {transformation?: Transformation, format?:ImageFileExtension | VideoFileExtension, async?: boolean, notification_url?: string}): Promise<any>;
 
         function image_upload_tag(field?: string, options?: UploadApiOptions): Promise<any>;
 
         function multi(tag: string, callback?: ErrorCallBack, options?: {transformation?: Transformation, async?: boolean, format?:ImageFileExtension | VideoFileExtension, notification_url?: string}): Promise<any>;
 
+        function multi(tag: string, options?: {transformation?: Transformation, async?: boolean, format?:ImageFileExtension | VideoFileExtension, notification_url?: string}): Promise<any>;
+
         function remove_all_context(public_ids: string[], callback?: ErrorCallBack, options?: {context?: string, resource_type?:ResourceType, type?: DeliveryType}): Promise<any>;
+
+        function remove_all_context(public_ids: string[], options?: {context?: string, resource_type?:ResourceType, type?: DeliveryType}): Promise<any>;
 
         function remove_all_tags(public_ids: string[], callback?: ErrorCallBack, options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType}): Promise<any>;
 
+        function remove_all_tags(public_ids: string[], options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType}): Promise<any>;
+
         function remove_tag(tag: string, public_ids: string[], callback?: ErrorCallBack, options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType}): Promise<any>;
+
+        function remove_tag(tag: string, public_ids: string[], options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType}): Promise<any>;
 
         function rename(from_public_id: string, to_public_id: string, callback?: ErrorCallBack, options?: {resource_type?: ResourceType, type?: DeliveryType, to_type?: DeliveryType, overwrite?: boolean, invalidate?: boolean}): Promise<any>;
 
+        function rename(from_public_id: string, to_public_id: string, options?: {resource_type?: ResourceType, type?: DeliveryType, to_type?: DeliveryType, overwrite?: boolean, invalidate?: boolean}): Promise<any>;
+
+        function replace_tag(tag: string, public_ids: string[], options?: {resource_type?:ResourceType, type?: DeliveryType}): Promise<any>;
+
         function replace_tag(tag: string, public_ids: string[], callback?: ErrorCallBack, options?: {resource_type?:ResourceType, type?: DeliveryType}): Promise<any>;
+
+        function text(text: string, options?: {public_id?: string, font_family?: string, font_size?: number, font_color?: string, font_weight?: string, font_style?: string, background?: string, opacity?: number, text_decoration?: string}): Promise<any>;
 
         function text(text: string, callback?: ErrorCallBack, options?: {public_id?: string, font_family?: string, font_size?: number, font_color?: string, font_weight?: string, font_style?: string, background?: string, opacity?: number, text_decoration?: string}): Promise<any>;
 
@@ -186,24 +307,41 @@ declare module 'cloudinary' {
 
         function unsigned_upload(file: string, upload_preset: string, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
 
+        function unsigned_upload(file: string, upload_preset: string, options?: UploadApiOptions): Promise<any>;
+
         function unsigned_upload_stream(upload_preset: string, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+
+        function unsigned_upload_stream(upload_preset: string, options?: UploadApiOptions): Promise<any>;
 
         function upload(file: string, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
 
+        function upload(file: string, options?: UploadApiOptions): Promise<any>;
+
         function upload_chunked(path: string, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+
+        function upload_chunked(path: string, options?: UploadApiOptions): Promise<any>;
 
         function upload_chunked_stream(callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
 
+        function upload_chunked_stream(options?: UploadApiOptions): Promise<any>;
+
         function upload_large(path: string, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+
+        function upload_large(path: string, options?: UploadApiOptions): Promise<any>;
 
         function upload_large_stream(_unused_?: any, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
 
+        function upload_large_stream(_unused_?: any, options?: UploadApiOptions): Promise<any>;
+
         function upload_stream(callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+
+        function upload_stream(options?: UploadApiOptions): Promise<any>;
 
         function upload_tag_params(callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
 
-        function upload_url(options?: UploadApiOptions): Promise<any>;
+        function upload_tag_params(options?: UploadApiOptions): Promise<any>;
 
+        function upload_url(options?: UploadApiOptions): Promise<any>;
     }
 
     export namespace utils {
@@ -223,8 +361,6 @@ declare module 'cloudinary' {
         function webhook_signature(data?: string, timestamp?: number, options?: any): string;
 
         function zip_download_url(tag?: string, options?: ApiOptions): string;
-
-
     }
 
     export namespace v2 {
@@ -256,14 +392,14 @@ declare module 'cloudinary' {
 
             static next_cursor(args?: string): search;
 
-           static sort_by(key: string, value: 'asc' | 'desc'): search;
+            static sort_by(key: string, value: 'asc' | 'desc'): search;
 
             static with_field(args?: string): search;
         }
 
         function cloudinary_js_config(): any;
 
-        function config(new_config: any, new_value: any): any;
+        function config(new_config?: any, new_value?: any): any;
 
         function image(source: string, options?: ImageOptions): string;
 
@@ -287,145 +423,251 @@ declare module 'cloudinary' {
 
             function delete_all_resources(value?: {public_ids?: string[] , prefix?: string , all?: boolean, type?: DeliveryType, resource_type?: ResourceType}, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_derived_by_transformation(public_ids?: string[], transformations?: Transformation, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_derived_resources(public_ids: string[], options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, callback?: ErrorCallBack): Promise<any>;
 
+            function delete_derived_resources(public_ids: string[], options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_resources(value: string[], options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_resources(public_ids: string[],  callback?: ErrorCallBack): Promise<any>;
+
+            function delete_resources(value: string[], options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function delete_resources(value: string[], callback?: ErrorCallBack): Promise<any>;
 
             function delete_resources_by_prefix(prefix: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
+            function delete_resources_by_prefix(prefix: string, callback?: ErrorCallBack): Promise<any>;
+
             function delete_resources_by_tag(tag: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_streaming_profile(name: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack ): Promise<any>;
+            function delete_resources_by_tag(tag: string, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_transformation(transformation: Transformation, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack ): Promise<any>;
+            function delete_streaming_profile(name: string, options?: ApiOptions, callback?: ErrorCallBack ): Promise<any>;
 
-            function delete_upload_mapping(folder: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack ): Promise<any>;
+            function delete_streaming_profile(name: string, callback?: ErrorCallBack ): Promise<any>;
 
-            function delete_upload_preset(name: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack ): Promise<any>;
+            function delete_transformation(transformation: Transformation, options?: ApiOptions, callback?: ErrorCallBack ): Promise<any>;
 
-            function get_streaming_profile(name: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack ): Promise<any>;
+            function delete_transformation(transformation: Transformation, callback?: ErrorCallBack ): Promise<any>;
 
-            function list_streaming_profiles(options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function delete_upload_mapping(folder: string, options?: ApiOptions, callback?: ErrorCallBack ): Promise<any>;
 
-            function ping(options: ApiOptions | ErrorCallBack, callback: ErrorCallBack): Promise<any>;
+            function delete_upload_mapping(folder: string, callback?: ErrorCallBack ): Promise<any>;
+
+            function delete_upload_preset(name: string, options?: ApiOptions, callback?: ErrorCallBack ): Promise<any>;
+
+            function delete_upload_preset(name: string, callback?: ErrorCallBack ): Promise<any>;
+
+            function get_streaming_profile(name: string | ErrorCallBack, options?: ApiOptions, callback?: ErrorCallBack ): Promise<any>;
+
+            function get_streaming_profile(name: string | ErrorCallBack, callback?: ErrorCallBack ): Promise<any>;
+
+            function list_streaming_profiles(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function list_streaming_profiles(callback?: ErrorCallBack): Promise<any>;
+
+            function ping(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function ping(callback?: ErrorCallBack): Promise<any>;
 
             function publish_by_ids(public_ids: string[], options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
+            function publish_by_ids(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
+
             function publish_by_prefix(prefix: string[] | string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function publish_by_prefix(prefix: string[] | string, callback?: ErrorCallBack): Promise<any>;
 
             function publish_by_tag(tag: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
+            function publish_by_tag(tag: string, callback?: ErrorCallBack): Promise<any>;
+
             function resource(public_id: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function resource(public_id: string, callback?: ErrorCallBack): Promise<any>;
 
             function resource_types(options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function resources(options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function resources_by_context(key: string, value?: string | ErrorCallBack, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function resources_by_context(key: string, value?: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function resources_by_ids(public_ids: string[], options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function resources_by_context(key: string, value?: string, options?: AdminApiOptions): Promise<any>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function resources_by_context(key: string, options?: AdminApiOptions): Promise<any>;
 
-            function resources_by_tag(tag: string, options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function resources_by_context(key: string, callback?: ErrorCallBack): Promise<any>;
 
-            function restore(public_ids: string[], options?: {resource_type: ResourceType, type: DeliveryType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function resources_by_ids(public_ids: string[], options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function resources_by_ids(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
+
+            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ErrorCallBack): Promise<any>;
+
+            function resources_by_tag(tag: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function resources_by_tag(tag: string, callback?: ErrorCallBack): Promise<any>;
+
+            function restore(public_ids: string[], options?: {resource_type: ResourceType, type: DeliveryType}, callback?: ErrorCallBack): Promise<any>;
+
+            function restore(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
             function root_folders(callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
             function search(params: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function sub_folders(root_folder: string, options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function search(params: string, callback?: ErrorCallBack): Promise<any>;
+
+            function sub_folders(root_folder: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function sub_folders(root_folder: string, callback?: ErrorCallBack): Promise<any>;
 
             function tags(callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
-            function transformation(transformation: Transformation, options?: {max_results?: number, next_cursor?: string} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function transformation(transformation: Transformation, options?: {max_results?: number, next_cursor?: string}, callback?: ErrorCallBack): Promise<any>;
+
+            function transformation(transformation: Transformation, callback?: ErrorCallBack): Promise<any>;
 
             function transformations(options?:{max_results?: number, next_cursor?: string, named?: boolean}, callback?: ErrorCallBack): Promise<any>;
 
-            function update(public_id: string, options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function transformations(callback?: ErrorCallBack): Promise<any>;
 
-            function update_resources_access_mode_by_ids(access_mode: AccessMode, ids: string[], options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function update(public_id: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function update_resources_access_mode_by_prefix(access_mode: AccessMode, prefix: string, options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function update(public_id: string, callback?: ErrorCallBack): Promise<any>;
 
-            function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, options?: AdminApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function update_resources_access_mode_by_ids(access_mode: AccessMode, ids: string[], options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function update_resources_access_mode_by_ids(access_mode: AccessMode, ids: string[], callback?: ErrorCallBack): Promise<any>;
+
+            function update_resources_access_mode_by_prefix(access_mode: AccessMode, prefix: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function update_resources_access_mode_by_prefix(access_mode: AccessMode, prefix: string, callback?: ErrorCallBack): Promise<any>;
+
+            function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, callback?: ErrorCallBack): Promise<any>;
 
             function update_streaming_profile(name: string, options: {display_name?: string, representations: Array<{transformation?: VideoOptions}>} , callback?: ErrorCallBack): Promise<any>;
 
-            function update_transformation(transformation_name: Transformation, options?: {allowed_for_strict?: boolean, unsafe_update?: string}, callback?: ErrorCallBack): Promise<any>;
+            function update_transformation(transformation_name: Transformation, updates?: UtilsOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function update_transformation(transformation_name: Transformation, callback?: ErrorCallBack): Promise<any>;
 
             function update_upload_mapping(name: string, options: {template: string}, callback?: ErrorCallBack): Promise<any>;
 
-            function update_upload_preset(name?: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function update_upload_preset(name?: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_mapping(name?: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function update_upload_preset(name?: string, callback?: ErrorCallBack): Promise<any>;
+
+            function upload_mapping(name?: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function upload_mapping(name?: string, callback?: ErrorCallBack): Promise<any>;
 
             function upload_mappings(options?: AdminApiOptions | ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_preset(name?: string, options?: ApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function upload_mappings(callback?: ErrorCallBack): Promise<any>;
+
+            function upload_preset(name?: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function upload_preset(name?: string, callback?: ErrorCallBack): Promise<any>;
 
             function upload_presets(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function usage(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
-
         }
 
         namespace uploader {
-            function add_context(context: string, public_ids: string[], options?: {type?: DeliveryType, resource_type?: ResourceType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function add_context(context: string, public_ids: string[], options?: {type?: DeliveryType, resource_type?: ResourceType}, callback?: ErrorCallBack): Promise<any>;
 
-            function add_tag(tag: string, public_ids: string[], options?: {type?: DeliveryType, resource_type?: ResourceType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function add_context(context: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
+
+            function add_tag(tag: string, public_ids: string[], options?: {type?: DeliveryType, resource_type?: ResourceType}, callback?: ErrorCallBack): Promise<any>;
+
+            function add_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
             function create_archive(options?: UploadApiOptions, target_format?: TargetFormat, callback?: ErrorCallBack, ): Promise<any>;
 
             function create_zip(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function destroy(public_id:string, options?: {resource_types?: ResourceType, type?: DeliveryType, invalidate?: boolean} | ErrorCallBack, callback?: ErrorCallBack, ): Promise<any>;
+            function destroy(public_id:string, options?: {resource_types?: ResourceType, type?: DeliveryType, invalidate?: boolean}, callback?: ErrorCallBack, ): Promise<any>;
+
+            function destroy(public_id:string, callback?: ErrorCallBack, ): Promise<any>;
 
             function direct_upload(callback_url: string, options?: UploadApiOptions): Promise<any>;
 
-            function explicit(public_id: string, options?:{type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{transformation?: ImageOptions | VideoOptions}>} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function explicit(public_id: string, options?:{type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{transformation?: ImageOptions | VideoOptions}>}, callback?: ErrorCallBack): Promise<any>;
 
-            function explode( public_id: string, options?:{page?: 'all', type?: DeliveryType, format?: ImageFileExtension | VideoFileExtension, notification_url?: string} | ErrorCallBack, callback?: ErrorCallBack) : Promise<any>
+            function explicit(public_id: string, callback?: ErrorCallBack): Promise<any>;
 
-            function generate_sprite(tag: string, options?: {transformation?: Transformation, format?: ImageFileExtension | VideoFileExtension, notification_url?: string, async?: boolean } | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function explode( public_id: string, options?:{page?: 'all', type?: DeliveryType, format?: ImageFileExtension | VideoFileExtension, notification_url?: string}, callback?: ErrorCallBack) : Promise<any>
+
+            function explode( public_id: string, callback?: ErrorCallBack) : Promise<any>
+
+            function generate_sprite(tag: string, options?: {transformation?: Transformation, format?: ImageFileExtension | VideoFileExtension, notification_url?: string, async?: boolean }, callback?: ErrorCallBack): Promise<any>;
+
+            function generate_sprite(tag: string, callback?: ErrorCallBack): Promise<any>;
 
             function image_upload_tag(field?: string, options?: any): Promise<any>;
 
-            function multi(tag: string, options?: {transformation?: Transformation, async?: boolean, format?:ImageFileExtension | VideoFileExtension, notification_url?: string} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function multi(tag: string, options?: {transformation?: Transformation, async?: boolean, format?:ImageFileExtension | VideoFileExtension, notification_url?: string}, callback?: ErrorCallBack): Promise<any>;
 
-            function remove_all_context(public_ids: string[], options?: {context?: string, resource_type?:ResourceType, type?: DeliveryType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function multi(tag: string, callback?: ErrorCallBack): Promise<any>;
 
-            function remove_all_tags(public_ids: string[], options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function remove_all_context(public_ids: string[], options?: {context?: string, resource_type?:ResourceType, type?: DeliveryType}, callback?: ErrorCallBack): Promise<any>;
 
-            function remove_tag(tag: string, public_ids: string[], options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function remove_all_context(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function rename(from_public_id: string, to_public_id: string, options?: {resource_type?: ResourceType, type?: DeliveryType, to_type?: DeliveryType, overwrite?: boolean, invalidate?: boolean} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function remove_all_tags(public_ids: string[], options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType}, callback?: ErrorCallBack): Promise<any>;
 
-            function replace_tag(tag: string, public_ids: string[], options?: {resource_type?:ResourceType, type?: DeliveryType} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function remove_all_tags(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function text(text: string, options?: {public_id?: string, font_family?: string, font_size?: number, font_color?: string, font_weight?: string, font_style?: string, background?: string, opacity?: number, text_decoration?: string} | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function remove_tag(tag: string, public_ids: string[], options?: {tag?: string, resource_type?: ResourceType, type?: DeliveryType}, callback?: ErrorCallBack): Promise<any>;
+
+            function remove_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
+
+            function rename(from_public_id: string, to_public_id: string, options?: {resource_type?: ResourceType, type?: DeliveryType, to_type?: DeliveryType, overwrite?: boolean, invalidate?: boolean}, callback?: ErrorCallBack): Promise<any>;
+
+            function rename(from_public_id: string, to_public_id: string, callback?: ErrorCallBack): Promise<any>;
+
+            function replace_tag(tag: string, public_ids: string[], options?: {resource_type?:ResourceType, type?: DeliveryType}, callback?: ErrorCallBack): Promise<any>;
+
+            function replace_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
+
+            function text(text: string, options?: {public_id?: string, font_family?: string, font_size?: number, font_color?: string, font_weight?: string, font_style?: string, background?: string, opacity?: number, text_decoration?: string}, callback?: ErrorCallBack): Promise<any>;
+
+            function text(text: string, callback?: ErrorCallBack): Promise<any>;
 
             function unsigned_image_upload_tag(field: string, upload_preset: string, options?: UploadApiOptions): Promise<any>;
 
-            function unsigned_upload(file: string, upload_preset: string, options?: UploadApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function unsigned_upload(file: string, upload_preset: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function unsigned_upload_stream(upload_preset: string, options?: UploadApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function unsigned_upload(file: string, upload_preset: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload(file: string, options?: UploadApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function unsigned_upload_stream(upload_preset: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_chunked(path: string, options?: UploadApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function unsigned_upload_stream(upload_preset: string, callback?: ErrorCallBack): Promise<any>;
+
+            function upload(file: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function upload(file: string, callback?: ErrorCallBack): Promise<any>;
+
+            function upload_chunked(path: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function upload_chunked(path: string, callback?: ErrorCallBack): Promise<any>;
 
             function upload_chunked_stream(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_large(path: string, options?: UploadApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function upload_large(path: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_large_part(args: any): any; // not used?
+            function upload_large(path: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_stream(upload_preset: string, options?: UploadApiOptions | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
+            function upload_stream(upload_preset: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+
+            function upload_stream(upload_preset: string, callback?: ErrorCallBack): Promise<any>;
 
             function upload_tag_params(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
@@ -456,9 +698,7 @@ declare module 'cloudinary' {
             function webhook_signature(data?: string, timestamp?: number, options?: any): string;
 
             function zip_download_url(tag?: string, options?: ApiOptions): string;
-
         }
-
     }
 
     export interface CommonTransformationOptions{
@@ -535,8 +775,9 @@ declare module 'cloudinary' {
         x?: number | string; // pixels or percent
         y?: number | string; // pixels or percent
         zoom?: number | string; // percent
-        "fn"?: string; //Call a custom function
-        "custom_function"?: string | {"function_type" : FunctionType, "source" : string}
+        fn?: string; //Call a custom function
+        custom_function?: string | {function_type : FunctionType, source : string}
+        sign_url?: boolean;
 
     }
 
@@ -565,8 +806,6 @@ declare module 'cloudinary' {
         fallback_content?: string;
         controls?: boolean;
         effect?: string | Array<string | number> | VideoEffect; // name and value, e.g. hue:40
-
-
     }
 
     interface  ConfigOptions {
@@ -610,6 +849,8 @@ declare module 'cloudinary' {
         unsigned?: boolean;
         disallowpublicid?: boolean;
         allowed_formats?: string;
+        custom_function?: string | {function_type : FunctionType, source : string}
+
     }
 
     export interface AdminApiOptions extends ApiOptions{
@@ -672,7 +913,6 @@ declare module 'cloudinary' {
         target_tags?: string;
         keep_derived?: boolean;
         text?: string;
+        chunk_size?: number;
     }
 }
-
-
