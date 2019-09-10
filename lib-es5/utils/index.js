@@ -546,8 +546,8 @@ function generate_transformation_string(options) {
   var overlay = process_layer(utils.option_consume(options, "overlay"));
   var underlay = process_layer(utils.option_consume(options, "underlay"));
   var ifValue = process_if(utils.option_consume(options, "if"));
-  var fps = utils.option_consume(options, 'fps');
   var custom_function = process_custom_function(utils.option_consume(options, "custom_function"));
+  var fps = utils.option_consume(options, 'fps');
   if (isArray(fps)) {
     fps = fps.join('-');
   }
