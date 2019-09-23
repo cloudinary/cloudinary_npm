@@ -45,11 +45,14 @@ cloudinary.image("yellow_tulip.jpg", {
     ]
 });
 
+// $ExpectType string
 cloudinary.image("sample.jpg", {
-    // $ExpectError
     audio_codec: '1', overlay:
         {url: "http://cloudinary.com/images/old_logo.png7"}
 });
+
+// $ExpectType string
+cloudinary.picture("sample.jpg");
 
 // $ExpectType string
 cloudinary.video("dog", {
@@ -141,11 +144,10 @@ cloudinary.api.update_transformation("my_named",
         console.log(result, error);
     });
 
+// $ExpectType Promise<any>
 cloudinary.v2.api.update_transformation(
     {width: 150, height: 100, crop: 'fill'},
-    // $ExpectError
     {density: 2},
-    // $ExpectError
     function (error, result) {
         console.log(result, error);
     });
@@ -249,10 +251,9 @@ cloudinary.api.delete_resources(['image1', 'image2'],
         console.log(result, error);
     });
 
+// $ExpectType Promise<any>
 cloudinary.v2.api.delete_resources(['4'],
-    // $ExpectError
     {width: '100'},
-    // $ExpectError
     function (error, result) {
         console.log(result, error);
     });

@@ -1,8 +1,7 @@
 declare module 'cloudinary' {
-    import {ErrorCallBack, ImageOptions, VideoOptions} from "cloudinary";
 
     /****************************** Constants *************************************/
-    type Transformation = string | VideoOptions | ImageOptions | Object ;
+    type Transformation = string | VideoTransformationOptions | ImageTransformationOptions | Object ;
     type CropMode =
         string
         | "scale"
@@ -58,6 +57,57 @@ declare module 'cloudinary' {
         | "liquid"
         | "ocr_text";
     type Angle = number | string | Array<number | string> | "auto_right" | "auto_left" | "ignore" | "vflip" | "hflip";
+    type ImageFlags =
+        string
+        | Array<string>
+        | "any_format"
+        | "attachment"
+        | "apng"
+        | "awebp"
+        | "clip"
+        | "clip_evenodd"
+        | "cutter"
+        | "force_strip"
+        | "force_strip"
+        | "getinfo"
+        | "ignore_aspect_ratio"
+        | "immutable_cache"
+        | "keep_attribution"
+        | "keep_iptc"
+        | "layer_apply"
+        | "lossy"
+        | "preserve_transparency"
+        | "png8"
+        | "png8"
+        | "png32"
+        | "progressive"
+        | "rasterize"
+        | "region_relative"
+        | "relative"
+        | "replace_image"
+        | "sanitize"
+        | "strip_profile"
+        | "text_no_trim"
+        | "no_overflow"
+        | "text_disallow_overflow"
+        | "tiff8_lzw"
+        | "tiled";
+    type VideoFlags =
+        string
+        | Array<string>
+        | "animated"
+        | "awebp"
+        | "attachment"
+        | "streaming_attachment"
+        | "hlsv3"
+        | "keep_dar"
+        | "splice"
+        | "layer_apply"
+        | "no_stream"
+        | "mono"
+        | "relative"
+        | "truncate_ts"
+        | "waveform";
     type ColorSpace = string | "srgb" | "no_cmyk" | "keep_cmyk";
     type VideoEffect = string | "accelerate" | "reverse" | "boomerang" | "loop" | "make_transparent" | "transition";
     type ImageFileExtension =
@@ -111,57 +161,6 @@ declare module 'cloudinary' {
         | "ogv"
         | "webm"
         | "wmv";
-    type ImageFlags =
-        string
-        | Array<string>
-        | "any_format"
-        | "attachment"
-        | "apng"
-        | "awebp"
-        | "clip"
-        | "clip_evenodd"
-        | "cutter"
-        | "force_strip"
-        | "force_strip"
-        | "getinfo"
-        | "ignore_aspect_ratio"
-        | "immutable_cache"
-        | "keep_attribution"
-        | "keep_iptc"
-        | "layer_apply"
-        | "lossy"
-        | "preserve_transparency"
-        | "png8"
-        | "png8"
-        | "png32"
-        | "progressive"
-        | "rasterize"
-        | "region_relative"
-        | "relative"
-        | "replace_image"
-        | "sanitize"
-        | "strip_profile"
-        | "text_no_trim"
-        | "no_overflow"
-        | "text_disallow_overflow"
-        | "tiff8_lzw"
-        | "tiled";
-    type VideoFlags =
-        string
-        | Array<string>
-        | "animated"
-        | "awebp"
-        | "attachment"
-        | "streaming_attachment"
-        | "hlsv3"
-        | "keep_dar"
-        | "splice"
-        | "layer_apply"
-        | "no_stream"
-        | "mono"
-        | "relative"
-        | "truncate_ts"
-        | "waveform";
     type AudioCodec = string | "none" | "aac" | "vorbis" | "mp3";
     type AudioFrequency =
         string
@@ -210,101 +209,122 @@ declare module 'cloudinary' {
     type TargetFormat = string | "zip" | "tgz";
     type ErrorCallBack = (error: any, result: any) => any;
 
-    // helper functions
+    /****************************** Helpers *************************************/
+
     export function config(new_config: ConfigOptions, new_value?: any): void;
 
-    export function image(source: string, options?: ImageOptions | UtilsOptions): string;
+    export function image(source: string, options?: ImageTransformationOptions | UtilsOptions | UrlOptions): string;
 
-    export function picture(public_id: string, options?: ImageOptions | UtilsOptions): string;
+    export function picture(public_id: string, options?: ImageTransformationOptions | UtilsOptions | UrlOptions): string;
 
-    export function source(public_id: string, options?: ImageOptions | VideoOptions | UtilsOptions): string;
+    export function source(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions | UtilsOptions | UrlOptions): string;
 
-    export function url(public_id: string, options?: ImageOptions | VideoOptions | UtilsOptions): string;
+    export function url(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions | UtilsOptions | UrlOptions): string;
 
-    export function video(public_id: string, options?: VideoOptions | UtilsOptions): string;
+    export function video(public_id: string, options?: VideoTransformationOptions | UtilsOptions | UrlOptions): string;
 
+    /****************************** Admin API Methods *************************************/
+
+    export namespace utils {
+
+        function download_archive_url(options?: CommonApiOptions | ArchiveApiOptions): string;
+
+        function download_zip_url(options?: CommonApiOptions | ArchiveApiOptions): string;
+
+        function generate_auth_token(options?: any): string;
+
+        function url(public_id?: string, options?: CommonApiOptions): string;
+
+        function video_thumbnail_url(public_id?: string, options?: VideoTransformationOptions): string;
+
+        function video_url(public_id?: string, options?: CommonApiOptions): string;
+
+        function webhook_signature(data?: string, timestamp?: number, options?: any): string;
+
+        function zip_download_url(tag?: string, options?: CommonApiOptions | ArchiveApiOptions): string;
+    }
 
     export namespace api {
 
-        function create_streaming_profile(name: string, callback?: ErrorCallBack, options?: { representations: Array<{ transformation?: VideoOptions }> }, display_name?: string): Promise<any>;
+        function create_streaming_profile(name: string, callback?: ErrorCallBack, options?: { representations: Array<{ transformation?: VideoTransformationOptions }> }, display_name?: string): Promise<any>;
 
-        function create_streaming_profile(name: string, options?: { representations: Array<{ transformation?: VideoOptions }> }, display_name?: string): Promise<any>;
+        function create_streaming_profile(name: string, options?: { representations: Array<{ transformation?: VideoTransformationOptions }> }, display_name?: string): Promise<any>;
 
         function create_transformation(name: string, definition: Transformation, callback?: ErrorCallBack, options?: CommonTransformationOptions): Promise<any>;
 
         function create_transformation(name: string, definition: Transformation, options?: CommonTransformationOptions): Promise<any>;
 
-        function update_transformation(transformation_name: Transformation, updates?: UtilsOptions, callback?: ErrorCallBack): Promise<any>;
+        function update_transformation(transformation_name: Transformation, updates?: UtilsOptions | UrlOptions, callback?: ErrorCallBack): Promise<any>;
 
         function create_upload_mapping(folder: string, callback?: ErrorCallBack, options?: { template: string }): Promise<any>;
 
         function create_upload_mapping(folder: string, options?: { template: string }): Promise<any>;
 
-        function create_upload_preset(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function create_upload_preset(callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function create_upload_preset(options?: ApiOptions): Promise<any>;
+        function create_upload_preset(options?: CommonApiOptions): Promise<any>;
 
         function delete_all_resources(callback?: ErrorCallBack, value?: { public_ids?: string[], prefix?: string, all?: boolean, type?: DeliveryType, resource_type?: ResourceType }): Promise<any>;
 
         function delete_all_resources(value?: { public_ids?: string[], prefix?: string, all?: boolean, type?: DeliveryType, resource_type?: ResourceType }): Promise<any>;
 
-        function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: ApiOptions): Promise<any>;
+        function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: CommonApiOptions): Promise<any>;
 
-        function delete_derived_resources(derived_resource_ids: string[], callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_derived_resources(derived_resource_ids: string[], callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_derived_resources(derived_resource_ids: string[], options?: ApiOptions): Promise<any>;
+        function delete_derived_resources(derived_resource_ids: string[], options?: CommonApiOptions): Promise<any>;
 
-        function delete_resources(public_ids: string[], callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_resources(public_ids: string[], callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_resources(public_ids: string[], options?: ApiOptions): Promise<any>;
+        function delete_resources(public_ids: string[], options?: CommonApiOptions): Promise<any>;
 
-        function delete_resources_by_prefix(prefix: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_resources_by_prefix(prefix: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_resources_by_prefix(prefix: string, options?: ApiOptions): Promise<any>;
+        function delete_resources_by_prefix(prefix: string, options?: CommonApiOptions): Promise<any>;
 
-        function delete_resources_by_tag(tag: string, options?: ApiOptions): Promise<any>;
+        function delete_resources_by_tag(tag: string, options?: CommonApiOptions): Promise<any>;
 
-        function delete_resources_by_tag(tag: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_resources_by_tag(tag: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_streaming_profile(name: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_streaming_profile(name: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_streaming_profile(name: string, options?: ApiOptions): Promise<any>;
+        function delete_streaming_profile(name: string, options?: CommonApiOptions): Promise<any>;
 
-        function delete_transformation(transformation: Transformation, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_transformation(transformation: Transformation, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_transformation(transformation: Transformation, options?: ApiOptions): Promise<any>;
+        function delete_transformation(transformation: Transformation, options?: CommonApiOptions): Promise<any>;
 
-        function delete_upload_mapping(folder: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_upload_mapping(folder: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_upload_mapping(folder: string, options?: ApiOptions): Promise<any>;
+        function delete_upload_mapping(folder: string, options?: CommonApiOptions): Promise<any>;
 
-        function delete_upload_preset(name: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function delete_upload_preset(name: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function delete_upload_preset(name: string, options?: ApiOptions): Promise<any>;
+        function delete_upload_preset(name: string, options?: CommonApiOptions): Promise<any>;
 
-        function get_streaming_profile(name: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function get_streaming_profile(name: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function get_streaming_profile(name: string, options?: ApiOptions): Promise<any>;
+        function get_streaming_profile(name: string, options?: CommonApiOptions): Promise<any>;
 
-        function list_streaming_profiles(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function list_streaming_profiles(callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function ping(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function ping(callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function ping(options?: ApiOptions): Promise<any>;
+        function ping(options?: CommonApiOptions): Promise<any>;
 
-        function publish_by_ids(public_ids: string[], callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function publish_by_ids(public_ids: string[], callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function publish_by_ids(public_ids: string[], options?: ApiOptions): Promise<any>;
+        function publish_by_ids(public_ids: string[], options?: CommonApiOptions): Promise<any>;
 
-        function publish_by_prefix(prefix: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function publish_by_prefix(prefix: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function publish_by_prefix(prefix: string, options?: ApiOptions): Promise<any>;
+        function publish_by_prefix(prefix: string, options?: CommonApiOptions): Promise<any>;
 
-        function publish_by_tag(tag: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function publish_by_tag(tag: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function publish_by_tag(tag: string, options?: ApiOptions): Promise<any>;
+        function publish_by_tag(tag: string, options?: CommonApiOptions): Promise<any>;
 
         function resource(public_id: string, callback?: ErrorCallBack, options?: AdminApiOptions): Promise<any>;
 
@@ -382,36 +402,38 @@ declare module 'cloudinary' {
 
         function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, options?: AdminApiOptions): Promise<any>;
 
-        function update_streaming_profile(name: string, callback?: ErrorCallBack, options?: { display_name?: string, representations: Array<{ transformation?: VideoOptions }> }): Promise<any>;
+        function update_streaming_profile(name: string, callback?: ErrorCallBack, options?: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }): Promise<any>;
 
-        function update_streaming_profile(name: string, options?: { display_name?: string, representations: Array<{ transformation?: VideoOptions }> }): Promise<any>;
+        function update_streaming_profile(name: string, options?: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }): Promise<any>;
 
         function update_upload_mapping(name?: string, callback?: ErrorCallBack, options?: { template: string }): Promise<any>;
 
         function update_upload_mapping(name?: string, options?: { template: string }): Promise<any>;
 
-        function update_upload_preset(name?: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function update_upload_preset(name?: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function update_upload_preset(name?: string, options?: ApiOptions): Promise<any>;
+        function update_upload_preset(name?: string, options?: CommonApiOptions): Promise<any>;
 
-        function upload_mapping(name?: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function upload_mapping(name?: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function upload_mapping(name?: string, options?: ApiOptions): Promise<any>
+        function upload_mapping(name?: string, options?: CommonApiOptions): Promise<any>
 
-        function upload_mappings(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function upload_mappings(callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function upload_mappings(options?: ApiOptions): Promise<any>;
+        function upload_mappings(options?: CommonApiOptions): Promise<any>;
 
-        function upload_preset(name?: string, callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function upload_preset(name?: string, callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function upload_preset(name?: string, options?: ApiOptions): Promise<any>;
+        function upload_preset(name?: string, options?: CommonApiOptions): Promise<any>;
 
-        function upload_presets(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function upload_presets(callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-        function upload_presets(options?: ApiOptions): Promise<any>;
+        function upload_presets(options?: CommonApiOptions): Promise<any>;
 
-        function usage(callback: ErrorCallBack, options?: ApiOptions): Promise<any>;
+        function usage(callback: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
     }
+
+    /****************************** Upload API Methods *************************************/
 
     export namespace uploader {
         function add_context(context: string, public_ids: string[], callback?: ErrorCallBack, options?: { type?: DeliveryType, resource_type?: ResourceType }): Promise<any>;
@@ -422,13 +444,13 @@ declare module 'cloudinary' {
 
         function add_tag(tag: string, public_ids: string[], options?: { type?: DeliveryType, resource_type?: ResourceType }): Promise<any>;
 
-        function create_archive(callback?: ErrorCallBack, options?: UploadApiOptions, target_format?: TargetFormat): Promise<any>;
+        function create_archive(callback?: ErrorCallBack, options?: CommonApiOptions | ArchiveApiOptions, target_format?: TargetFormat): Promise<any>;
 
-        function create_archive(options?: UploadApiOptions, target_format?: TargetFormat): Promise<any>;
+        function create_archive(options?: CommonApiOptions | ArchiveApiOptions, target_format?: TargetFormat): Promise<any>;
 
-        function create_zip(callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+        function create_zip(callback?: ErrorCallBack, options?: CommonApiOptions | ArchiveApiOptions): Promise<any>;
 
-        function create_zip(options?: UploadApiOptions): Promise<any>;
+        function create_zip(options?: CommonApiOptions | ArchiveApiOptions): Promise<any>;
 
         function destroy(public_id: string, callback?: ErrorCallBack, options?: { resource_type?: ResourceType, type?: DeliveryType, invalidate?: boolean }): Promise<any>;
 
@@ -436,9 +458,9 @@ declare module 'cloudinary' {
 
         function direct_upload(callback_url?: string, options?: UploadApiOptions): Promise<any>;
 
-        function explicit(public_id: string, callback?: ErrorCallBack, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageOptions | VideoOptions }> }): Promise<any>;
+        function explicit(public_id: string, callback?: ErrorCallBack, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageTransformationOptions | VideoTransformationOptions }> }): Promise<any>;
 
-        function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageOptions | VideoOptions }> }): Promise<any>;
+        function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageTransformationOptions | VideoTransformationOptions }> }): Promise<any>;
 
         function explode(public_id: string, callback?: ErrorCallBack, options?: { page?: 'all', type?: DeliveryType, format?: ImageFileExtension | VideoFileExtension, notification_url?: string }): Promise<any>;
 
@@ -519,25 +541,6 @@ declare module 'cloudinary' {
         function upload_url(options?: UploadApiOptions): Promise<any>;
     }
 
-    export namespace utils {
-
-        function download_archive_url(options?: ApiOptions): string;
-
-        function download_zip_url(options?: ApiOptions): string;
-
-        function generate_auth_token(options?: any): string;
-
-        function url(public_id?: string, options?: ApiOptions): string;
-
-        function video_thumbnail_url(public_id?: string, options?: VideoOptions): string;
-
-        function video_url(public_id?: string, options?: ApiOptions): string;
-
-        function webhook_signature(data?: string, timestamp?: number, options?: any): string;
-
-        function zip_download_url(tag?: string, options?: ApiOptions): string;
-    }
-
     export namespace v2 {
         class search {
 
@@ -576,85 +579,86 @@ declare module 'cloudinary' {
 
         function config(new_config?: any, new_value?: any): any;
 
-        function image(source: string, options?: ImageOptions): string;
+        function image(source: string, options?: ImageTransformationOptions): string;
 
-        function picture(public_id: string, options?: ImageOptions): string;
+        function picture(public_id: string, options?: ImageTransformationOptions): string;
 
-        function source(public_id: string, options?: ImageOptions | VideoOptions): string;
+        function source(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions): string;
 
-        function url(public_id: string, options?: ImageOptions | VideoOptions): string;
+        function url(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions): string;
 
-        function video(public_id: string, options?: VideoOptions): string;
+        function video(public_id: string, options?: VideoTransformationOptions): string;
 
+        /****************************** Admin API  V2 Methods *************************************/
 
         namespace api {
-            function create_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoOptions }> }, callback?: ErrorCallBack): Promise<any>;
+            function create_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
 
             function create_transformation(name: string, transformation: Transformation, callback?: ErrorCallBack): Promise<any>;
 
             function create_upload_mapping(folder: string, options: { template: string }, callback?: ErrorCallBack): Promise<any>;
 
-            function create_upload_preset(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function create_upload_preset(options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_all_resources(value?: { public_ids?: string[], prefix?: string, all?: boolean, type?: DeliveryType, resource_type?: ResourceType }, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_derived_resources(public_ids: string[], options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_resources(public_ids: string[], options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_derived_resources(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function delete_resources(value: string[], options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_resources(value: string[], options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_resources(value: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function delete_resources_by_prefix(prefix: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_resources_by_prefix(prefix: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_resources_by_prefix(prefix: string, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_resources_by_tag(tag: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_resources_by_tag(tag: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_resources_by_tag(tag: string, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_streaming_profile(name: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_streaming_profile(name: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_streaming_profile(name: string, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_transformation(transformation: Transformation, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_transformation(transformation: Transformation, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_transformation(transformation: Transformation, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_upload_mapping(folder: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_upload_mapping(folder: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_upload_mapping(folder: string, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_upload_preset(name: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_upload_preset(name: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_upload_preset(name: string, callback?: ErrorCallBack): Promise<any>;
 
-            function get_streaming_profile(name: string | ErrorCallBack, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function get_streaming_profile(name: string | ErrorCallBack, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function get_streaming_profile(name: string | ErrorCallBack, callback?: ErrorCallBack): Promise<any>;
 
-            function list_streaming_profiles(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function list_streaming_profiles(options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function list_streaming_profiles(callback?: ErrorCallBack): Promise<any>;
 
-            function ping(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function ping(options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function ping(callback?: ErrorCallBack): Promise<any>;
 
-            function publish_by_ids(public_ids: string[], options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function publish_by_ids(public_ids: string[], options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function publish_by_ids(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function publish_by_prefix(prefix: string[] | string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function publish_by_prefix(prefix: string[] | string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function publish_by_prefix(prefix: string[] | string, callback?: ErrorCallBack): Promise<any>;
 
-            function publish_by_tag(tag: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function publish_by_tag(tag: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function publish_by_tag(tag: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -726,37 +730,39 @@ declare module 'cloudinary' {
 
             function update_resources_access_mode_by_tag(access_mode: AccessMode, tag: string, callback?: ErrorCallBack): Promise<any>;
 
-            function update_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoOptions }> }, callback?: ErrorCallBack): Promise<any>;
+            function update_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
 
-            function update_transformation(transformation_name: Transformation, updates?: UtilsOptions, callback?: ErrorCallBack): Promise<any>;
+            function update_transformation(transformation_name: Transformation, updates?: UtilsOptions | UrlOptions, callback?: ErrorCallBack): Promise<any>;
 
             function update_transformation(transformation_name: Transformation, callback?: ErrorCallBack): Promise<any>;
 
             function update_upload_mapping(name: string, options: { template: string }, callback?: ErrorCallBack): Promise<any>;
 
-            function update_upload_preset(name?: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function update_upload_preset(name?: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function update_upload_preset(name?: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_mapping(name?: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_mapping(name?: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function upload_mapping(name?: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_mappings(options?: AdminApiOptions | ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_mappings(options?: AdminApiOptions | CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function upload_mappings(callback?: ErrorCallBack): Promise<any>;
 
-            function upload_preset(name?: string, options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_preset(name?: string, options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function upload_preset(name?: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_presets(options?: ApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_presets(options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function usage(callback?: ErrorCallBack, options?: ApiOptions): Promise<any>;
+            function usage(callback?: ErrorCallBack, options?: CommonApiOptions): Promise<any>;
 
-            function usage(options?: ApiOptions): Promise<any>;
+            function usage(options?: CommonApiOptions): Promise<any>;
 
         }
+
+        /****************************** Upload API V2 Methods *************************************/
 
         namespace uploader {
             function add_context(context: string, public_ids: string[], options?: { type?: DeliveryType, resource_type?: ResourceType }, callback?: ErrorCallBack): Promise<any>;
@@ -767,9 +773,9 @@ declare module 'cloudinary' {
 
             function add_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function create_archive(options?: UploadApiOptions, target_format?: TargetFormat, callback?: ErrorCallBack,): Promise<any>;
+            function create_archive(options?: CommonApiOptions | ArchiveApiOptions, target_format?: TargetFormat, callback?: ErrorCallBack,): Promise<any>;
 
-            function create_zip(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function create_zip(options?: CommonApiOptions | ArchiveApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function destroy(public_id: string, options?: { resource_types?: ResourceType, type?: DeliveryType, invalidate?: boolean }, callback?: ErrorCallBack,): Promise<any>;
 
@@ -777,7 +783,7 @@ declare module 'cloudinary' {
 
             function direct_upload(callback_url: string, options?: UploadApiOptions): Promise<any>;
 
-            function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageOptions | VideoOptions }> }, callback?: ErrorCallBack): Promise<any>;
+            function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageTransformationOptions | VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
 
             function explicit(public_id: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -857,69 +863,84 @@ declare module 'cloudinary' {
 
             function api_sign_request(params_to_sign: any, api_secret: any): any;
 
-            function api_url(action?: string, options?: ApiOptions): Promise<any>;
+            function api_url(action?: string, options?: CommonApiOptions): Promise<any>;
 
-            function archive_params(options?: ApiOptions): Promise<any>;
+            function archive_params(options?: CommonApiOptions | ArchiveApiOptions): Promise<any>;
 
-            function download_archive_url(options?: ApiOptions): string
+            function download_archive_url(options?: CommonApiOptions | ArchiveApiOptions): string
 
-            function download_zip_url(options?: ApiOptions): string;
+            function download_zip_url(options?: CommonApiOptions | ArchiveApiOptions): string;
 
-            function generate_auth_token(options?: ApiOptions): string;
+            function generate_auth_token(options?: CommonApiOptions): string;
 
-            function url(public_id?: string, options?: ApiOptions): string;
+            function url(public_id?: string, options?: CommonApiOptions): string;
 
-            function video_thumbnail_url(public_id?: string, options?: VideoOptions): string;
+            function video_thumbnail_url(public_id?: string, options?: VideoTransformationOptions): string;
 
-            function video_url(public_id?: string, options?: VideoOptions): string;
+            function video_url(public_id?: string, options?: VideoTransformationOptions): string;
 
             function webhook_signature(data?: string, timestamp?: number, options?: any): string;
 
-            function zip_download_url(tag?: string, options?: ApiOptions): string;
+            function zip_download_url(tag?: string, options?: CommonApiOptions | ArchiveApiOptions): string;
         }
     }
 
     export interface CommonTransformationOptions {
-        width?: string | number; // Number of pixels, width % or "auto" with rounding step
-        height?: number | string; // Number of pixels or height %
+        width?: string | number;
+        height?: number | string;
         crop?: CropMode;
-        aspect_ratio?: string | number | string; // ratio or percent, e.g. 1.5 or 16:9
-        gravity?: Gravity; // The last any covers auto:50 which is cropping algorithm aggresiveness and future proofing
-        background?: string; // color, e.g. "blue" or "rgb:9090ff"
-        overlay?: string | Object; // Identifier, e.g. "text:Arial_50:Smile!", or public id of a different
-        angle?: Angle; // degrees or mode
-        delay?: number | string;
-        quality?: string | number; // percent or percent[:chroma_subsampling] or auto[:quality_level]
-        dpr?: number | string; // Deliver the image in the specified device pixel ratio. The parameter accepts any positive float value
-        if?: string; // Apply a transformation only if a specified condition is met (see the conditional transformations documentation).
+        color?: string;
+        aspect_ratio?: string | number | string;
+        gravity?: Gravity;
+        background?: string;
+        overlay?: string | Object;
+        angle?: Angle;
+        quality?: string | number;
+        dpr?: number | string;
+        if?: string;
+        else?: string;
+        end_if?: string;
+        opacity?: number | string;
         variables?: Array<[string, any]>;
-        transformation?: string | Array<ImageOptions> | Array<VideoOptions>; // Apply a pre-defined named transformation of the given name. When using Cloudinary's client integration libraries, the 'transformation' parameter accepts an array of transformation parameters to be chained together.
-        effect?: string | Array<string | number>; // name and value, e.g. hue:40
-        radius?: number | string; // pixels or max
+        transformation?: string | Array<ImageTransformationOptions> | Array<VideoTransformationOptions>;
+        effect?: string | Array<string | number>;
+        radius?: number | string;
         custom_function?: string | { function_type: FunctionType, source: string }
-        sign_url?: boolean;
+        size?: string;
+        underlay?: string;
+        variable?: [string, any];
+        [futureKey: string]: any;
     }
 
-    export interface UtilsOptions extends CommonTransformationOptions {
+    interface ConfigOptions {
+        cloud_name?: string;
+        api_key?: string;
+        api_secret?: string;
+        secure?: boolean;
+        upload_prefix?: string;
+        cdn_subdomain?: boolean;
+        private_cdn?: boolean;
+        cname?: string;
+        ssl_detected?: boolean;
+        secure_distribution?: string;
+        secure_cdn_subdomain?: boolean;
+        auth_token?: string;
+        [futureKey: string]: any;
+    }
+    export interface UrlOptions extends ConfigOptions {
         type?: DeliveryType;
+        transformation?: Transformation;
         resource_type?: ResourceType;
         version?: string;
         force_version?: boolean;
         format?: ImageFileExtension | VideoFileExtension;
-        cloud_name?: string;
-        private_cdn?: string;
-        secure_distribution?: string;
-        ssl_detected?: boolean;
-        secure?: boolean;
-        cdn_subdomain?: string;
-        secure_cdn_subdomain?: boolean;
-        cname?: string;
         shorten?: boolean;
         sign_url?: boolean;
-        api_secret?: string;
         url_suffix?: string;
         use_root_path?: boolean;
-        auth_token?: string;
+        [futureKey: string]: any;
+    }
+    export interface UtilsOptions extends ConfigOptions {
         html_height?: number;
         html_width?: number;
         srcset?: any;
@@ -930,75 +951,58 @@ declare module 'cloudinary' {
         responsive_placeholder?: boolean;
         source_types?: string | string[];
         source_transformation?: string;
-        poster?: string | object;
         fallback_content?: string;
         unsafe_update?: string;
         allowed_for_strict?: boolean;
+        poster?: string | object;
+        controls?: boolean;
+        [futureKey: string]: any;
     }
 
-    export interface ImageOptions extends CommonTransformationOptions {
-        border?: string; // style, e.g. "6px_solid_rgb:00390b60"
-        color?: string; // e.g. "red" or "rgb:20a020"
+    export interface ImageTransformationOptions extends CommonTransformationOptions {
+        border?: string;
         color_space?: ColorSpace;
-        default_image?: string; // public id of an uploaded image
-        density?: number | string; // Control the density to use while converting a PDF document to images. (range: 50-300, default: 150)
+        default_image?: string;
+        density?: number | string;
         fetch_format?: ImageFileExtension;
         format?: ImageFileExtension;
-        flags?: ImageFlags | string; // Set one or more flags that alter the default transformation behavior. Separate multiple flags with a dot (`.`).
-        else?: string;
-        end_if?: string;
-        opacity?: number | string; // percent, 0-100
-        page?: number | string; // Given a multi-page file (PDF, animated GIF, TIFF), generate an image of a single page using the given index.
+        flags?: ImageFlags | string;
+        page?: number | string;
         raw_transformation?: any;
-        size?: string;
-        underlay?: string; // public id of an uploaded image
-        variable?: [string, any];
-        x?: number | string; // pixels or percent
-        y?: number | string; // pixels or percent
-        zoom?: number | string; // percent
+        x?: number | string;
+        y?: number | string;
+        zoom?: number | string;
+        [futureKey: string]: any;
     }
 
-    interface VideoOptions extends CommonTransformationOptions {
+    interface VideoTransformationOptions extends CommonTransformationOptions {
         audio_codec?: AudioCodec;
         audio_frequency?: AudioFrequency;
-        bit_rate?: number | string; // Advanced control of video bitrate in bits per second. By default the video uses a variable bitrate (VBR), with this value indicating the maximum bitrate. If constant is specified, the video plays with a constant bitrate (CBR).
-        // Supported codecs: h264, h265(MPEG - 4); vp8, vp9(WebM).
-        duration?: number | string; // Float or string
-        end_offset?: number | string; // Float or string
+        bit_rate?: number | string;
+        duration?: number | string;
+        delay?: number | string;
+        end_offset?: number | string;
         fallbackContent?: string;
         flags?: VideoFlags;
         fps?: string | Array<string | number>;
         keyframe_interval?: number;
-        offset?: string, // [float, float] or [string, string] or a range. Shortcut to set video cutting using a combination of start_offset and end_offset values
+        offset?: string,
         poster?: string | Object,
         source_types?: string;
         source_transformation?: string;
-        start_offset?: number | string; // Float or string
+        start_offset?: number | string;
         streaming_profile?: StreamingProfiles
-        video_codec?: string | Object; // Select the video codec and control the video content of the profile used. Can be provided in the form <codec>[:<profile>:[<level>]] to specify specific values to apply for video codec, profile and level, e.g. "h264:baseline:3.1". Also accepts a hash of values such as { codec: 'h264', profile: 'basic', level: '3.1' }
-        video_sampling?: number | string; // Integer - The total number of frames to sample from the original video. The frames are spread out over the length of the video, e.g. 20 takes one frame every 5% -- OR -- String - The number of seconds between each frame to sample from the original video. e.g. 2.3s takes one frame every 2.3 seconds.
+        video_codec?: string | Object;
+        video_sampling?: number | string;
         format?: VideoFileExtension;
         fetch_format?: VideoFileExtension;
         preload?: string;
         fallback_content?: string;
-        controls?: boolean;
-        effect?: string | Array<string | number> | VideoEffect; // name and value, e.g. hue:40
+        effect?: string | Array<string | number> | VideoEffect;
+        [futureKey: string]: any;
     }
 
-    interface ConfigOptions {
-        cloud_name?: string;
-        api_key?: string;
-        api_secret?: string;
-        secure?: boolean;
-        upload_preset?: string;
-        upload_prefex?: string;
-        cdn_subdomain?: boolean;
-        private_cdn?: boolean;
-        cname?: string;
-        secure_distribution?: string;
-    }
-
-    export interface ApiOptions  extends ConfigOptions{
+    export interface CommonApiOptions  extends ConfigOptions{
         allow_missing?: boolean;
         async?: boolean;
         public_id?: string;
@@ -1038,9 +1042,25 @@ declare module 'cloudinary' {
         similarity_search?: string;
         timestamp?: number;
         expires_at?: number;
+        upload_preset?: string;
+        prefixes?: string;
+        skip_transformation_name?: boolean;
+        use_original_filename?: boolean;
+        target_format?: string;
+        target_public_id?: string;
+        target_tags?: string;
+        [futureKey: string]: any;
     }
 
-    export interface AdminApiOptions extends ApiOptions {
+    export interface ArchiveApiOptions extends CommonApiOptions{
+        flatten_folders?: boolean;
+        flatten_transformations?: boolean;
+        keep_derived?: boolean;
+        mode?: string;
+        [futureKey: string]: any;
+    }
+
+    export interface AdminApiOptions extends CommonApiOptions {
         prefix?: string;
         max_results?: number;
         next_cursor?: boolean | string;
@@ -1056,9 +1076,10 @@ declare module 'cloudinary' {
         keep_original?: boolean;
         named?: boolean;
         display_name?: string;
+        [futureKey: string]: any;
     }
 
-    export interface UploadApiOptions extends ApiOptions {
+    export interface UploadApiOptions extends CommonApiOptions {
         file?: string;
         folder?: string;
         use_filename?: boolean;
@@ -1081,18 +1102,9 @@ declare module 'cloudinary' {
         max_images?: number;
         to_type?: string;
         command?: string;
-        prefixes?: string;
         transformations?: string;
-        mode?: string;
-        target_format?: string;
-        target_public_id?: string;
-        flatten_folders?: boolean;
-        flatten_transformations?: boolean;
-        skip_transformation_name?: boolean;
-        use_original_filename?: boolean;
-        target_tags?: string;
-        keep_derived?: boolean;
         text?: string;
         chunk_size?: number;
+        [futureKey: string]: any;
     }
 }

@@ -48,7 +48,7 @@
   ],
   "types": "types",
   "scripts": {
-    "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\n && npm run dtslint\nfi",
+    "test": "node_v=$(node --version)z\n && npm run dtslint\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
     "dtslint": "dtslint --expectOnly --localTs node_modules/typescript/lib types ",
     "lint": "eslint .",
     "compile": "node_modules/.bin/babel lib --out-dir lib-es5 --delete-dir-on-start --verbose",
