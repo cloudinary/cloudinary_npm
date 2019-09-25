@@ -87,7 +87,7 @@ function popd
 # ver_lte 1.2.4 1.2.3 && echo "yes" || echo "no" # no
 function ver_lte
 {
-    [[ "$1" == "`echo -e "$1\n$2" | sort -V | head -n1`" ]]
+    [[ $1 == "`echo -e "$1\n$2" | sort -V | head -n1`" ]]
 }
 
 # Extract the last entry or entry for a given version
@@ -226,7 +226,7 @@ function publish
 
     [[ $? == 0 ]] && ${CMD_PREFIX} npm publish
 
-    [[ -z "${CMD_PREFIX}" ]] && echo "Remember to create a new release in github: ${$(git remote get-url origin)%.git}/releases"
+    [[ -z ${CMD_PREFIX} ]] && echo "Remember to create a new release in github: ${$(git remote get-url origin)%.git}/releases"
 
     popd
 }
