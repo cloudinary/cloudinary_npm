@@ -1399,6 +1399,20 @@ describe("utils", function () {
         sign_url: true,
       }, "http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png", {});
     });
+  });
+  context("sign requests", function () {
+    var configBck = void 0;
+    before(function () {
+      configBck = cloudinary.config();
+      cloudinary.config({
+        cloud_name: 'test123',
+        api_key: "1234",
+        api_secret: "b",
+      });
+    });
+    after(function () {
+      cloudinary.config(configBck);
+    });
     it("should correctly sign_request", function () {
       var params = utils.sign_request({
         public_id: "folder/file",
@@ -1409,6 +1423,47 @@ describe("utils", function () {
         version: "1234",
         signature: "7a3349cbb373e4812118d625047ede50b90e7b67",
         api_key: "1234",
+      });
+    });
+    it("should allow timestamp in sign_request", function() {
+      var params = utils.sign_request({
+        public_id: "folder/file",
+        version: "1234",
+        timestamp: 1569707219
+      });
+      expect(params).to.eql({ 
+        public_id: 'folder/file',
+        version: '1234',
+        timestamp: 1569707219,
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
+        api_key: '1234' 
+      });
+    });
+    it("should allow a signature parameter in process_request_params", function() {
+      var configBck = void 0;
+      before(function () {
+        configBck = cloudinary.config();
+        cloudinary.config({
+          api_key: "1234",
+          api_secret: "",
+        });
+      });
+      after(function () {
+        cloudinary.config(configBck);
+      });
+      var params = utils.process_request_params({}, { 
+        public_id: 'folder/file',
+        version: '1234',
+        timestamp: 1569707219,
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
+        api_key: '1234' 
+      });
+      expect(params).to.eql({ 
+        public_id: 'folder/file',
+        version: '1234',
+        timestamp: 1569707219,
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
+        api_key: '1234' 
       });
     });
   });
