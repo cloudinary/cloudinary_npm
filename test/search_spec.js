@@ -179,5 +179,50 @@ describe("search_api", function () {
           });
         });
     });
+
+    describe("general expression", function () {
+      const PREFIX = Math.floor(Math.random() * 999999);
+      const PUBLIC_ID_4 = PREFIX + "1";
+      const PUBLIC_ID_5 = PREFIX + "2";
+      const PUBLIC_ID_4_TAG = PUBLIC_ID_4 + "tag";
+      const PUBLIC_ID_5_TAG = PUBLIC_ID_5 + "tag";
+
+      before(function () {
+        return Q.allSettled([
+          cloudinary.v2.uploader.upload(helper.IMAGE_FILE, {
+            public_id: PUBLIC_ID_4,
+            tags: [...helper.UPLOAD_TAGS, SEARCH_TAG, PUBLIC_ID_4_TAG],
+          }),
+          cloudinary.v2.uploader.upload(helper.IMAGE_FILE, {
+            public_id: PUBLIC_ID_5,
+            tags: [...helper.UPLOAD_TAGS, SEARCH_TAG, PUBLIC_ID_5_TAG],
+          }),
+        ]).delay(3000); // wait for the server to update
+      });
+
+      it(`should treat an underscore as OR when matched in a public_id`, function () {
+        return cloudinary.v2.search
+          .expression(`${PUBLIC_ID_4}_qwerty1234`)
+          .execute()
+          .then(function (results) {
+            expect(results.resources.length).to.eql(1);
+            return cloudinary.v2.search
+              .expression(`${PUBLIC_ID_4}_${PUBLIC_ID_5}`)
+              .execute()
+              .then(function (res) {
+                expect(res.resources.length).to.eql(2);
+              });
+          });
+      });
+
+      it(`should not treat an underscore as OR when matched in a tag`, function () {
+        return cloudinary.v2.search
+          .expression(`${PUBLIC_ID_4_TAG}_qwerty1234`)
+          .execute()
+          .then(function (results) {
+            expect(results.resources.length).to.eql(0);
+          });
+      });
+    });
   });
 });
