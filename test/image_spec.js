@@ -103,8 +103,13 @@ describe('image helper', function () {
     tag = cloudinary.image('sample.jpg', options);
     expect(tag).to.contain("alt='updated alt'");
   });
-  sharedExamples("client_hints", function (options) {
-    it("should not use data-src or set responsive class", function () {
+  it("should escape quotes in html attributes", function() {
+    expect(cloudinary.image("sample.jpg", {
+      alt: "asdfg\"'asdf"
+    })).to.eql(`<img src='${UPLOAD_PATH}/sample.jpg' alt='asdfg&#34;&#39;asdf'/>`);
+  });
+  sharedExamples("client_hints", function(options) {
+    it("should not use data-src or set responsive class", function() {
       var tag = cloudinary.image('sample.jpg', options);
       expect(tag).to.match(/<img.*>/);
       expect(tag).not.to.match(/<.*class.*>/);
