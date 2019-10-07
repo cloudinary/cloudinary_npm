@@ -81,7 +81,7 @@ module.exports = {
   },
   ensurePresenceOf
 };
-exports = module.exports;
+let exports = module.exports;
 var utils = module.exports;
 
 try {
@@ -239,9 +239,19 @@ function process_custom_function(customFunction) {
   }
   if (customFunction.function_type === "remote") {
     return [customFunction.function_type, base64EncodeURL(customFunction.source)].join(":");
-  } else {
-    return [customFunction.function_type, customFunction.source].join(":");
   }
+  return [customFunction.function_type, customFunction.source].join(":");
+}
+
+/**
+ * Parse custom_pre_function options
+ * @private
+ * @param {object|*} customPreFunction a custom function object containing function_type and source values
+ * @return {string|*} custom_pre_function transformation string
+ */
+function process_custom_pre_function(customPreFunction) {
+  var result = process_custom_function(customPreFunction);
+  return utils.isString(result) ? `pre:${result}` : null;
 }
 
 /**
@@ -565,6 +575,7 @@ function generate_transformation_string(options) {
   var underlay = process_layer(utils.option_consume(options, "underlay"));
   var ifValue = process_if(utils.option_consume(options, "if"));
   var custom_function = process_custom_function(utils.option_consume(options, "custom_function"));
+  var custom_pre_function = process_custom_pre_function(utils.option_consume(options, "custom_pre_function"));
   var fps = utils.option_consume(options, 'fps');
   if (isArray(fps)) {
     fps = fps.join('-');
@@ -579,7 +590,7 @@ function generate_transformation_string(options) {
     dpr: normalize_expression(dpr),
     e: normalize_expression(effect),
     fl: flags,
-    fn: custom_function,
+    fn: custom_function || custom_pre_function,
     fps: fps,
     h: normalize_expression(height),
     ki: normalize_expression(utils.option_consume(options, "keyframe_interval")),
