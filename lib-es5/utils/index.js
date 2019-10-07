@@ -1,8 +1,26 @@
 "use strict";
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _stringify = require("babel-runtime/core-js/json/stringify");
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _extends2 = require("babel-runtime/helpers/extends");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _slicedToArray2 = require("babel-runtime/helpers/slicedToArray");
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+var _assign = require("babel-runtime/core-js/object/assign");
+
+var _assign2 = _interopRequireDefault(_assign);
+
+var _keys = require("babel-runtime/core-js/object/keys");
+
+var _keys2 = _interopRequireDefault(_keys);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Utilities
@@ -59,11 +77,11 @@ module.exports = {
   isString,
   isUndefined,
   keys: function keys(source) {
-    return Object.keys(source);
+    return (0, _keys2.default)(source);
   },
   ensurePresenceOf
 };
-exports = module.exports;
+let exports = module.exports;
 var utils = module.exports;
 
 try {
@@ -74,7 +92,7 @@ try {
 }
 
 function generate_auth_token(options) {
-  var token_options = Object.assign({}, config().auth_token, options);
+  var token_options = (0, _assign2.default)({}, config().auth_token, options);
   return generate_token(token_options);
 }
 
@@ -161,7 +179,7 @@ var LAYER_KEYWORD_PARAMS = {
 function textStyle(layer) {
   var keywords = [];
   var style = "";
-  Object.keys(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
+  (0, _keys2.default)(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
     var default_value = LAYER_KEYWORD_PARAMS[attr];
     var attr_value = layer[attr] || default_value;
     if (attr_value !== default_value) {
@@ -169,7 +187,7 @@ function textStyle(layer) {
     }
   });
 
-  Object.keys(layer).forEach(function (attr) {
+  (0, _keys2.default)(layer).forEach(function (attr) {
     if (attr === "letter_spacing" || attr === "line_spacing") {
       keywords.push(`${attr}_${layer[attr]}`);
     }
@@ -201,7 +219,7 @@ function normalize_expression(expression) {
     return expression;
   }
   var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*";
-  var pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  var pattern = "((" + operators + ")(?=[ _])|" + (0, _keys2.default)(PREDEFINED_VARS).join("|") + ")";
   var replaceRE = new RegExp(pattern, "g");
   expression = expression.replace(replaceRE, function (match) {
     return CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match];
@@ -420,7 +438,7 @@ function encode_key_value(arg) {
     return arg;
   }
   return entries(arg).map(function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
+    var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
         k = _ref2[0],
         v = _ref2[1];
 
@@ -433,7 +451,7 @@ function encode_context(arg) {
     return arg;
   }
   return entries(arg).map(function (_ref3) {
-    var _ref4 = _slicedToArray(_ref3, 2),
+    var _ref4 = (0, _slicedToArray3.default)(_ref3, 2),
         k = _ref4[0],
         v = _ref4[1];
 
@@ -463,7 +481,7 @@ function build_custom_headers(headers) {
       return headers.join("\n");
     case isObject(headers):
       return entries(headers).map(function (_ref5) {
-        var _ref6 = _slicedToArray(_ref5, 2),
+        var _ref6 = (0, _slicedToArray3.default)(_ref5, 2),
             k = _ref6[0],
             v = _ref6[1];
 
@@ -491,7 +509,7 @@ function generate_transformation_string(options) {
   if (size) {
     var _size$split = size.split("x");
 
-    var _size$split2 = _slicedToArray(_size$split, 2);
+    var _size$split2 = (0, _slicedToArray3.default)(_size$split, 2);
 
     width = _size$split2[0];
     height = _size$split2[1];
@@ -528,7 +546,7 @@ function generate_transformation_string(options) {
     effect = effect.join(":");
   } else if (isObject(effect)) {
     effect = entries(effect).map(function (_ref8) {
-      var _ref9 = _slicedToArray(_ref8, 2),
+      var _ref9 = (0, _slicedToArray3.default)(_ref8, 2),
           key = _ref9[0],
           value = _ref9[1];
 
@@ -548,7 +566,7 @@ function generate_transformation_string(options) {
   if (options.offset != null) {
     var _split_range = split_range(utils.option_consume(options, "offset"));
 
-    var _split_range2 = _slicedToArray(_split_range, 2);
+    var _split_range2 = (0, _slicedToArray3.default)(_split_range, 2);
 
     options.start_offset = _split_range2[0];
     options.end_offset = _split_range2[1];
@@ -590,7 +608,7 @@ function generate_transformation_string(options) {
   var simple_params = [["audio_codec", "ac"], ["audio_frequency", "af"], ["bit_rate", 'br'], ["color_space", "cs"], ["default_image", "d"], ["delay", "dl"], ["density", "dn"], ["duration", "du"], ["end_offset", "eo"], ["fetch_format", "f"], ["gravity", "g"], ["page", "pg"], ["prefix", "p"], ["start_offset", "so"], ["streaming_profile", "sp"], ["video_codec", "vc"], ["video_sampling", "vs"]];
 
   simple_params.forEach(function (_ref10) {
-    var _ref11 = _slicedToArray(_ref10, 2),
+    var _ref11 = (0, _slicedToArray3.default)(_ref10, 2),
         name = _ref11[0],
         short = _ref11[1];
 
@@ -610,20 +628,20 @@ function generate_transformation_string(options) {
 
   var variablesParam = utils.option_consume(options, "variables", []);
   var variables = entries(options).filter(function (_ref12) {
-    var _ref13 = _slicedToArray(_ref12, 2),
+    var _ref13 = (0, _slicedToArray3.default)(_ref12, 2),
         key = _ref13[0],
         value = _ref13[1];
 
     return key.startsWith('$');
   }).map(function (_ref14) {
-    var _ref15 = _slicedToArray(_ref14, 2),
+    var _ref15 = (0, _slicedToArray3.default)(_ref14, 2),
         key = _ref15[0],
         value = _ref15[1];
 
     delete options[key];
     return `${key}_${normalize_expression(value)}`;
   }).sort().concat(variablesParam.map(function (_ref16) {
-    var _ref17 = _slicedToArray(_ref16, 2),
+    var _ref17 = (0, _slicedToArray3.default)(_ref16, 2),
         name = _ref17[0],
         value = _ref17[1];
 
@@ -631,13 +649,13 @@ function generate_transformation_string(options) {
   })).join(',');
 
   var transformations = entries(params).filter(function (_ref18) {
-    var _ref19 = _slicedToArray(_ref18, 2),
+    var _ref19 = (0, _slicedToArray3.default)(_ref18, 2),
         key = _ref19[0],
         value = _ref19[1];
 
     return utils.present(value);
   }).map(function (_ref20) {
-    var _ref21 = _slicedToArray(_ref20, 2),
+    var _ref21 = (0, _slicedToArray3.default)(_ref20, 2),
         key = _ref21[0],
         value = _ref21[1];
 
@@ -807,14 +825,14 @@ function url(public_id) {
 
   var _finalize_resource_ty = finalize_resource_type(resource_type, type, url_suffix, use_root_path, shorten);
 
-  var _finalize_resource_ty2 = _slicedToArray(_finalize_resource_ty, 2);
+  var _finalize_resource_ty2 = (0, _slicedToArray3.default)(_finalize_resource_ty, 2);
 
   resource_type = _finalize_resource_ty2[0];
   type = _finalize_resource_ty2[1];
 
   var _finalize_source = finalize_source(public_id, format, url_suffix);
 
-  var _finalize_source2 = _slicedToArray(_finalize_source, 2);
+  var _finalize_source2 = (0, _slicedToArray3.default)(_finalize_source, 2);
 
   public_id = _finalize_source2[0];
   source_to_sign = _finalize_source2[1];
@@ -1009,13 +1027,13 @@ function signed_preloaded_image(result) {
 
 function api_sign_request(params_to_sign, api_secret) {
   var to_sign = entries(params_to_sign).filter(function (_ref22) {
-    var _ref23 = _slicedToArray(_ref22, 2),
+    var _ref23 = (0, _slicedToArray3.default)(_ref22, 2),
         k = _ref23[0],
         v = _ref23[1];
 
     return utils.present(v);
   }).map(function (_ref24) {
-    var _ref25 = _slicedToArray(_ref24, 2),
+    var _ref25 = (0, _slicedToArray3.default)(_ref24, 2),
         k = _ref25[0],
         v = _ref25[1];
 
@@ -1029,13 +1047,13 @@ function api_sign_request(params_to_sign, api_secret) {
 function clear_blank(hash) {
   var filtered_hash = {};
   entries(hash).filter(function (_ref26) {
-    var _ref27 = _slicedToArray(_ref26, 2),
+    var _ref27 = (0, _slicedToArray3.default)(_ref26, 2),
         k = _ref27[0],
         v = _ref27[1];
 
     return utils.present(v);
   }).forEach(function (_ref28) {
-    var _ref29 = _slicedToArray(_ref28, 2),
+    var _ref29 = (0, _slicedToArray3.default)(_ref28, 2),
         k = _ref29[0],
         v = _ref29[1];
 
@@ -1045,7 +1063,7 @@ function clear_blank(hash) {
 }
 
 function merge(hash1, hash2) {
-  return _extends({}, hash1, hash2);
+  return (0, _extends3.default)({}, hash1, hash2);
 }
 
 function sign_request(params) {
@@ -1179,22 +1197,31 @@ function join_pair(key, value) {
 }
 
 /**
+ * If the given value is a string, replaces single or double quotes with character entities
+ * @private
+ * @param {*} value The string to encode quotes in
+ * @return {*} Encoded string or original value if not a string
+ */
+function escapeQuotes(value) {
+  return isString(value) ? value.replace('"', '&#34;').replace("'", '&#39;') : value;
+}
+
+/**
  *
  * @param attrs
  * @return {*}
  */
-
-function html_attrs(attrs) {
+exports.html_attrs = function html_attrs(attrs) {
   return filter(map(attrs, function (value, key) {
-    return join_pair(key, value);
+    return join_pair(key, escapeQuotes(value));
   })).sort().join(" ");
-}
+};
 
 var CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain'];
 
 function cloudinary_js_config() {
   var params = utils.only.apply(utils, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
-  return `<script type='text/javascript'>\n$.cloudinary.config(${JSON.stringify(params)});\n</script>`;
+  return `<script type='text/javascript'>\n$.cloudinary.config(${(0, _stringify2.default)(params)});\n</script>`;
 }
 
 function v1_result_adapter(callback) {
@@ -1229,7 +1256,7 @@ function v1_adapter(name, num_pass_args, v1) {
 }
 
 function v1_adapters(exports, v1, mapping) {
-  return Object.keys(mapping).map(function (name) {
+  return (0, _keys2.default)(mapping).map(function (name) {
     var num_pass_args = mapping[name];
     exports[name] = v1_adapter(name, num_pass_args, v1);
     return exports[name];
@@ -1366,7 +1393,7 @@ function generate_responsive_breakpoints_string(breakpoints) {
       }
     }
   }
-  return JSON.stringify(breakpoints);
+  return (0, _stringify2.default)(breakpoints);
 }
 
 function build_streaming_profiles_param() {
@@ -1374,7 +1401,7 @@ function build_streaming_profiles_param() {
 
   var params = utils.only(options, "display_name", "representations");
   if (isArray(params.representations)) {
-    params.representations = JSON.stringify(params.representations.map(function (r) {
+    params.representations = (0, _stringify2.default)(params.representations.map(function (r) {
       return {
         transformation: utils.generate_transformation_string(r.transformation)
       };
@@ -1385,7 +1412,7 @@ function build_streaming_profiles_param() {
 
 function hashToParameters(hash) {
   return entries(hash).reduce(function (parameters, _ref30) {
-    var _ref31 = _slicedToArray(_ref30, 2),
+    var _ref31 = (0, _slicedToArray3.default)(_ref30, 2),
         key = _ref31[0],
         value = _ref31[1];
 
@@ -1410,7 +1437,7 @@ function hashToParameters(hash) {
  */
 function hashToQuery(hash) {
   return hashToParameters(hash).map(function (_ref32) {
-    var _ref33 = _slicedToArray(_ref32, 2),
+    var _ref33 = (0, _slicedToArray3.default)(_ref32, 2),
         key = _ref33[0],
         value = _ref33[1];
 
@@ -1478,7 +1505,7 @@ function jsonArrayParam(data, modifier) {
   if (isFunction(modifier)) {
     data = modifier(data);
   }
-  return JSON.stringify(data);
+  return (0, _stringify2.default)(data);
 }
 
 /**
@@ -1520,7 +1547,6 @@ exports.private_download_url = private_download_url;
 exports.zip_download_url = zip_download_url;
 exports.download_archive_url = download_archive_url;
 exports.download_zip_url = download_zip_url;
-exports.html_attrs = html_attrs;
 exports.cloudinary_js_config = cloudinary_js_config;
 exports.v1_adapters = v1_adapters;
 exports.as_safe_bool = as_safe_bool;

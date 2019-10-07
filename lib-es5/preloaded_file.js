@@ -1,8 +1,18 @@
 "use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _getOwnPropertyNames = require("babel-runtime/core-js/object/get-own-property-names");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _getOwnPropertyNames2 = _interopRequireDefault(_getOwnPropertyNames);
+
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require("babel-runtime/helpers/createClass");
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var PRELOADED_CLOUDINARY_PATH, config, utils;
 
@@ -14,7 +24,7 @@ PRELOADED_CLOUDINARY_PATH = /^([^\/]+)\/([^\/]+)\/v(\d+)\/([^#]+)#([^\/]+)$/;
 
 var PreloadedFile = function () {
   function PreloadedFile(file_info) {
-    _classCallCheck(this, PreloadedFile);
+    (0, _classCallCheck3.default)(this, PreloadedFile);
 
     var matches, public_id_and_format;
     matches = file_info.match(PRELOADED_CLOUDINARY_PATH);
@@ -31,7 +41,7 @@ var PreloadedFile = function () {
     this.format = public_id_and_format[1];
   }
 
-  _createClass(PreloadedFile, [{
+  (0, _createClass3.default)(PreloadedFile, [{
     key: "is_valid",
     value: function is_valid() {
       var expected_signature;
@@ -57,7 +67,7 @@ var PreloadedFile = function () {
       var _this = this;
 
       var result = {};
-      Object.getOwnPropertyNames(this).forEach(function (key) {
+      (0, _getOwnPropertyNames2.default)(this).forEach(function (key) {
         var val = _this[key];
         if (typeof val !== 'function') {
           result[key] = val;
@@ -78,7 +88,6 @@ var PreloadedFile = function () {
       return [public_id, format];
     }
   }]);
-
   return PreloadedFile;
 }();
 

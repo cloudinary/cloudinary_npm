@@ -1,5 +1,11 @@
 "use strict";
 
+var _keys = require("babel-runtime/core-js/object/keys");
+
+var _keys2 = _interopRequireDefault(_keys);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /**
  * Validate that the given values are defined
  * @private
@@ -13,7 +19,7 @@
  *    }
  */
 function ensurePresenceOf(parameters) {
-  var missing = Object.keys(parameters).filter(function (key) {
+  var missing = (0, _keys2.default)(parameters).filter(function (key) {
     return parameters[key] === undefined;
   });
   if (missing.length) {

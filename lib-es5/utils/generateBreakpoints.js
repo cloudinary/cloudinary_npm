@@ -1,6 +1,14 @@
 'use strict';
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _isNan = require('babel-runtime/core-js/number/is-nan');
+
+var _isNan2 = _interopRequireDefault(_isNan);
+
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Helper function. Gets or populates srcset breakpoints using provided parameters
@@ -20,12 +28,12 @@ function generateBreakpoints(srcset) {
   }
 
   var _map = [srcset.min_width, srcset.max_width, srcset.max_images].map(Number),
-      _map2 = _slicedToArray(_map, 3),
+      _map2 = (0, _slicedToArray3.default)(_map, 3),
       min_width = _map2[0],
       max_width = _map2[1],
       max_images = _map2[2];
 
-  if ([min_width, max_width, max_images].some(Number.isNaN)) {
+  if ([min_width, max_width, max_images].some(_isNan2.default)) {
     throw 'Either (min_width, max_width, max_images) ' + 'or breakpoints must be provided to the image srcset attribute';
   }
 
