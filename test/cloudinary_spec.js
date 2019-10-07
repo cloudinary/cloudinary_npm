@@ -424,7 +424,7 @@ describe("cloudinary", function () {
   it('should support custom function of type wasm with a source', function () {
     var options, result;
     options = {
-      custom_function: {function_type: 'wasm', source: 'blur.wasm'}
+      custom_function: { function_type: 'wasm', source: 'blur.wasm' },
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
@@ -433,7 +433,7 @@ describe("cloudinary", function () {
   it('should support arbitrary custom function types', function () {
     var options, result;
     options = {
-      custom_function: {function_type: 'amazing', source: 'awesome'}
+      custom_function: { function_type: 'amazing', source: 'awesome' },
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
@@ -442,7 +442,7 @@ describe("cloudinary", function () {
   it('should support custom function with no source', function () {
     var options, result;
     options = {
-      custom_function: {function_type: 'wasm'}
+      custom_function: { function_type: 'wasm' },
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
@@ -451,7 +451,7 @@ describe("cloudinary", function () {
   it('should support custom function with no function_type', function () {
     var options, result;
     options = {
-      custom_function:  {source: 'blur.wasm'}
+      custom_function: { source: 'blur.wasm' },
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
@@ -460,7 +460,7 @@ describe("cloudinary", function () {
   it('should support custom function that is not an object', function () {
     var options, result;
     options = {
-      custom_function: []
+      custom_function: [],
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
@@ -469,29 +469,55 @@ describe("cloudinary", function () {
   it('should support custom function with no function_type or source', function () {
     var options, result;
     options = {
-      custom_function: {}
+      custom_function: {},
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_:/test");
   });
-  it('should support custom function of type remote', function() {
+  it('should support custom function of type remote', function () {
     var options, result;
     options = {
-      custom_function: {function_type: 'remote', source: 'https://df34ra4a.execute-api.us-west-2.amazonaws.com/default/cloudinaryFunction'}
+      custom_function: {
+        function_type: 'remote',
+        source:
+          'https://df34ra4a.execute-api.us-west-2.amazonaws.com/default/cloudinaryFunction',
+      },
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg==/test");
   });
-  it('should should not include custom function with undefined value', function() {
+  it('should should not include custom function with undefined value', function () {
     var options, result;
     options = {
-      custom_function: undefined
+      custom_function: undefined,
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/test");
+  });
+  it('should support custom pre function', function () {
+    var options, result;
+    options = {
+      custom_pre_function: {
+        function_type: 'remote',
+        source:
+          'https://df34ra4a.execute-api.us-west-2.amazonaws.com/default/cloudinaryFunction',
+      },
+    };
+    result = cloudinary.utils.url("test", options);
+    expect(options).to.eql({});
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_pre:remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg==/test");
+  });
+  it('should support custom pre function with no function_type or source', function () {
+    var options, result;
+    options = {
+      custom_pre_function: {},
+    };
+    result = cloudinary.utils.url("test", options);
+    expect(options).to.eql({});
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_pre::/test");
   });
   it("should support density", function () {
     var options, result;
