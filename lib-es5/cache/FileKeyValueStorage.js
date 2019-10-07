@@ -1,18 +1,8 @@
 'use strict';
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var fs = require('fs');
 var path = require('path');
@@ -23,12 +13,12 @@ var FileKeyValueStorage = function () {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         baseFolder = _ref.baseFolder;
 
-    (0, _classCallCheck3.default)(this, FileKeyValueStorage);
+    _classCallCheck(this, FileKeyValueStorage);
 
     this.init(baseFolder);
   }
 
-  (0, _createClass3.default)(FileKeyValueStorage, [{
+  _createClass(FileKeyValueStorage, [{
     key: 'init',
     value: function init(baseFolder) {
       var _this = this;
@@ -59,7 +49,7 @@ var FileKeyValueStorage = function () {
   }, {
     key: 'set',
     value: function set(key, value) {
-      fs.writeFileSync(this.getFilename(key), (0, _stringify2.default)(value));
+      fs.writeFileSync(this.getFilename(key), JSON.stringify(value));
     }
   }, {
     key: 'clear',
@@ -82,6 +72,7 @@ var FileKeyValueStorage = function () {
       return path.format({ name: key, base: key, ext: '.json', dir: this.baseFolder });
     }
   }]);
+
   return FileKeyValueStorage;
 }();
 

@@ -1,38 +1,16 @@
 'use strict';
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _stringify2 = _interopRequireDefault(_stringify);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = require('babel-runtime/helpers/inherits');
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var fs = require('fs');
 
@@ -106,7 +84,7 @@ exports.upload_large = function upload_large(path, callback) {
     // upload a remote file
     return exports.upload(path, callback, options);
   }
-  return exports.upload_chunked(path, callback, (0, _extends3.default)({ resource_type: 'raw' }, options));
+  return exports.upload_chunked(path, callback, _extends({ resource_type: 'raw' }, options));
 };
 
 exports.upload_chunked = function upload_chunked(path, callback, options) {
@@ -116,12 +94,12 @@ exports.upload_chunked = function upload_chunked(path, callback, options) {
 };
 
 var Chunkable = function (_Writable) {
-  (0, _inherits3.default)(Chunkable, _Writable);
+  _inherits(Chunkable, _Writable);
 
   function Chunkable(options) {
-    (0, _classCallCheck3.default)(this, Chunkable);
+    _classCallCheck(this, Chunkable);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (Chunkable.__proto__ || (0, _getPrototypeOf2.default)(Chunkable)).call(this, options));
+    var _this = _possibleConstructorReturn(this, (Chunkable.__proto__ || Object.getPrototypeOf(Chunkable)).call(this, options));
 
     _this.chunk_size = options.chunk_size != null ? options.chunk_size : 20000000;
     _this.buffer = Buffer.alloc(0);
@@ -134,7 +112,7 @@ var Chunkable = function (_Writable) {
     return _this;
   }
 
-  (0, _createClass3.default)(Chunkable, [{
+  _createClass(Chunkable, [{
     key: '_write',
     value: function _write(data, encoding, done) {
       var _this2 = this;
@@ -158,6 +136,7 @@ var Chunkable = function (_Writable) {
       }
     }
   }]);
+
   return Chunkable;
 }(Writable);
 
@@ -268,8 +247,8 @@ exports.text = function text(content, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("text", callback, options, function () {
-    var textParams = utils.only(options, TEXT_PARAMS);
-    var params = (0, _extends3.default)({
+    var textParams = utils.only.apply(utils, [options].concat(TEXT_PARAMS));
+    var params = _extends({
       timestamp: utils.timestamp(),
       text: content
     }, textParams);
@@ -464,7 +443,7 @@ function call_api(action, callback, options, get_params) {
   }
 
   var _get_params$call = get_params.call(),
-      _get_params$call2 = (0, _slicedToArray3.default)(_get_params$call, 3),
+      _get_params$call2 = _slicedToArray(_get_params$call, 3),
       params = _get_params$call2[0],
       unsigned_params = _get_params$call2[1],
       file = _get_params$call2[2];
@@ -519,13 +498,13 @@ function call_api(action, callback, options, get_params) {
     }
   };
   var post_data = utils.hashToParameters(params).filter(function (_ref3) {
-    var _ref4 = (0, _slicedToArray3.default)(_ref3, 2),
+    var _ref4 = _slicedToArray(_ref3, 2),
         key = _ref4[0],
         value = _ref4[1];
 
     return value != null;
   }).map(function (_ref5) {
-    var _ref6 = (0, _slicedToArray3.default)(_ref5, 2),
+    var _ref6 = _slicedToArray(_ref5, 2),
         key = _ref6[0],
         value = _ref6[1];
 
@@ -634,7 +613,7 @@ exports.upload_tag_params = function upload_tag_params() {
 
   var params = build_upload_params(options);
   params = utils.process_request_params(params, options);
-  return (0, _stringify2.default)(params);
+  return JSON.stringify(params);
 };
 
 exports.upload_url = function upload_url() {
