@@ -1,10 +1,6 @@
 "use strict";
 
-var _toConsumableArray2 = require("babel-runtime/helpers/toConsumableArray");
-
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var _ = require('lodash');
 exports.config = require("./config");
@@ -45,7 +41,7 @@ function chainTransformations(options) {
   var urlOptions = cloudinary.utils.extractUrlParams(options);
   var currentTransformation = cloudinary.utils.extractTransformationParams(options);
   transformation = cloudinary.utils.build_array(transformation);
-  urlOptions.transformation = [currentTransformation].concat((0, _toConsumableArray3.default)(transformation));
+  urlOptions.transformation = [currentTransformation].concat(_toConsumableArray(transformation));
   return urlOptions;
 }
 

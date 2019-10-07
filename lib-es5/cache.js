@@ -1,35 +1,15 @@
 "use strict";
 
-var _getOwnPropertySymbols = require("babel-runtime/core-js/object/get-own-property-symbols");
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _getOwnPropertySymbols2 = _interopRequireDefault(_getOwnPropertySymbols);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _freeze = require("babel-runtime/core-js/object/freeze");
-
-var _freeze2 = _interopRequireDefault(_freeze);
-
-var _extends2 = require("babel-runtime/helpers/extends");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require("babel-runtime/helpers/createClass");
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _for = require("babel-runtime/core-js/symbol/for");
-
-var _for2 = _interopRequireDefault(_for);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /* eslint-disable class-methods-use-this */
 
-var CACHE = (0, _for2.default)("com.cloudinary.cache");
-var CACHE_ADAPTER = (0, _for2.default)("com.cloudinary.cacheAdapter");
+var CACHE = Symbol.for("com.cloudinary.cache");
+var CACHE_ADAPTER = Symbol.for("com.cloudinary.cacheAdapter");
 
 var _require = require('./utils'),
     ensurePresenceOf = _require.ensurePresenceOf,
@@ -42,10 +22,10 @@ var _require = require('./utils'),
 
 var CacheAdapter = function () {
   function CacheAdapter() {
-    (0, _classCallCheck3.default)(this, CacheAdapter);
+    _classCallCheck(this, CacheAdapter);
   }
 
-  (0, _createClass3.default)(CacheAdapter, [{
+  _createClass(CacheAdapter, [{
     key: "get",
 
     /**
@@ -81,6 +61,7 @@ var CacheAdapter = function () {
     key: "flushAll",
     value: function flushAll() {}
   }]);
+
   return CacheAdapter;
 }();
 /**
@@ -123,7 +104,7 @@ var Cache = {
       return undefined;
     }
     ensurePresenceOf({ publicId });
-    var transformation = generate_transformation_string((0, _extends3.default)({}, options));
+    var transformation = generate_transformation_string(_extends({}, options));
     return this.adapter.get(publicId, options.type || 'upload', options.resource_type || 'image', transformation, options.format);
   },
   /**
@@ -138,7 +119,7 @@ var Cache = {
       return undefined;
     }
     ensurePresenceOf({ publicId, value });
-    var transformation = generate_transformation_string((0, _extends3.default)({}, options));
+    var transformation = generate_transformation_string(_extends({}, options));
     return this.adapter.set(publicId, options.type || 'upload', options.resource_type || 'image', transformation, options.format, value);
   },
   /**
@@ -176,10 +157,10 @@ Object.defineProperty(Cache, "adapter", {
     global[CACHE_ADAPTER] = adapter;
   }
 });
-(0, _freeze2.default)(Cache);
+Object.freeze(Cache);
 
 // Instantiate the singleton
-var symbols = (0, _getOwnPropertySymbols2.default)(global);
+var symbols = Object.getOwnPropertySymbols(global);
 if (symbols.indexOf(CACHE) < 0) {
   global[CACHE] = Cache;
 }

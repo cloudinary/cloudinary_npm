@@ -1,18 +1,8 @@
 'use strict';
 
-var _keys = require('babel-runtime/core-js/object/keys');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _keys2 = _interopRequireDefault(_keys);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var api = require('./api');
 
@@ -22,7 +12,7 @@ var _require = require('../utils'),
 
 var Search = function () {
   function Search() {
-    (0, _classCallCheck3.default)(this, Search);
+    _classCallCheck(this, Search);
 
     this.query_hash = {
       sort_by: [],
@@ -31,7 +21,7 @@ var Search = function () {
     };
   }
 
-  (0, _createClass3.default)(Search, [{
+  _createClass(Search, [{
     key: 'expression',
     value: function expression(value) {
       this.query_hash.expression = value;
@@ -77,7 +67,7 @@ var Search = function () {
     value: function to_query() {
       var _this = this;
 
-      (0, _keys2.default)(this.query_hash).forEach(function (k) {
+      Object.keys(this.query_hash).forEach(function (k) {
         var v = _this.query_hash[k];
         if (!isNumber(v) && isEmpty(v)) {
           delete _this.query_hash[k];
@@ -132,6 +122,7 @@ var Search = function () {
       return this.instance().sort_by(field_name, dir);
     }
   }]);
+
   return Search;
 }();
 
