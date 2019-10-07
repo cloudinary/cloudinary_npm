@@ -1,4 +1,31 @@
 
+1.15.0 / 2019-09-08
+===================
+
+New functionality
+-----------------
+
+* Add 'derived_next_resource' to api.resource method
+* Add support for 'delete folder' API
+* Add support for remote/local function invocation (fn:remote and fn:wasm) (#261)
+* Add antialiasing and hinting
+* Add `force_version` transformation parameterAdd automatic JavaScript linting and fix existing code conflicts (#262)
+* Add automatic JavaScript linting and fix existing code conflicts (#262)
+
+Other changes
+-------------
+  * Mock upload preset listing test
+  * Feature/duration to condition video
+  * Update test for change moderation status
+  * Simplified error assertions in a few test specs
+  * Fix base64 URL validation
+  * Rearrange util tests
+  * Test support of `async` option in explicit api
+  * Remove unnecessary return statements and options from tests
+  * Remove unnecessary use of options and API in access_control_spec.js
+  * Merge pull request #239 from tornqvist/remove-coffeescript-transform
+  * Remove coffee script deps and transform
+
 1.14.0 / 2019-03-26
 ===================
 

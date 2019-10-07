@@ -1,5 +1,6 @@
 "use strict";
 
+/* eslint-disable no-bitwise */
 // http://kevin.vanzonneveld.net
 // +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
 // +   improved by: T0bsn

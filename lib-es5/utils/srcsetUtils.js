@@ -1,23 +1,10 @@
 'use strict';
 
-var ensurePresenceOf = require("./ensurePresenceOf");
-
 var utils = require('./index');
-var isEmpty = utils.isEmpty;
 var generateBreakpoints = require('./generateBreakpoints');
-var config = require('../config');
 var Cache = require('../cache');
 
-/**
- * Options used to generate the srcset attribute.
- * @typedef {object} srcset
- * @property {(number[]|string[])}   [breakpoints] An array of breakpoints.
- * @property {number}                [min_width]   Minimal width of the srcset images.
- * @property {number}                [max_width]   Maximal width of the srcset images.
- * @property {number}                [max_images]  Number of srcset images to generate.
- * @property {object|string}         [transformation] The transformation to use in the srcset urls.
- * @property {boolean}               [sizes] Whether to calculate and add the sizes attribute.
- */
+var isEmpty = utils.isEmpty;
 
 /**
  * Options used to generate the srcset attribute.
@@ -178,4 +165,10 @@ function generateMediaAttr() {
   return mediaQuery.join(' and ');
 }
 
-module.exports = { srcsetUrl: scaledUrl, generateSrcsetAttribute, generateSizesAttribute, generateMediaAttr, generateImageResponsiveAttributes };
+module.exports = {
+  srcsetUrl: scaledUrl,
+  generateSrcsetAttribute,
+  generateSizesAttribute,
+  generateMediaAttr,
+  generateImageResponsiveAttributes
+};
