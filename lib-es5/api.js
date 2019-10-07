@@ -1,5 +1,11 @@
 'use strict';
 
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // eslint-disable-next-line import/order
 var config = require("./config");
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
@@ -31,7 +37,7 @@ function call_api(method, uri, params, callback, options) {
   var api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
   var content_type = 'application/x-www-form-urlencoded';
   if (options.content_type === 'json') {
-    query_params = JSON.stringify(params);
+    query_params = (0, _stringify2.default)(params);
     content_type = 'application/json';
   } else {
     query_params = querystring.stringify(params);
