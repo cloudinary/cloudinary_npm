@@ -1399,6 +1399,20 @@ describe("utils", function () {
         sign_url: true,
       }, "http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png", {});
     });
+  });
+  context("sign requests", function () {
+    var configBck = void 0;
+    before(function () {
+      configBck = cloudinary.config();
+      cloudinary.config({
+        cloud_name: 'test123',
+        api_key: "1234",
+        api_secret: "b",
+      });
+    });
+    after(function () {
+      cloudinary.config(configBck);
+    });
     it("should correctly sign_request", function () {
       var params = utils.sign_request({
         public_id: "folder/file",

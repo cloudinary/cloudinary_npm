@@ -936,4 +936,32 @@ describe("uploader", function () {
       });
     });
   });
+
+  describe("sign requests", function () {
+    var configBck2 = void 0;
+    var writeSpy;
+    writeSpy = void 0;
+    beforeEach(function () {
+      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+      configBck2 = cloudinary.config();
+      cloudinary.config({
+        api_key: "1234",
+        api_secret: "",
+      });
+    });
+    afterEach(function () {
+      cloudinary.config(configBck2);
+      writeSpy.restore();
+    });
+    it("should allow a signature and timestamp parameter on uploads", function () {
+      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        public_id: 'folder/file',
+        version: '1234',
+        timestamp: 1569707219,
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
+      });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
+    });
+  });
 });
