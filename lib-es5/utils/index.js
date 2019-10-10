@@ -221,9 +221,19 @@ function process_custom_function(customFunction) {
   }
   if (customFunction.function_type === "remote") {
     return [customFunction.function_type, base64EncodeURL(customFunction.source)].join(":");
-  } else {
-    return [customFunction.function_type, customFunction.source].join(":");
   }
+  return [customFunction.function_type, customFunction.source].join(":");
+}
+
+/**
+ * Parse custom_pre_function options
+ * @private
+ * @param {object|*} customPreFunction a custom function object containing function_type and source values
+ * @return {string|*} custom_pre_function transformation string
+ */
+function process_custom_pre_function(customPreFunction) {
+  var result = process_custom_function(customPreFunction);
+  return utils.isString(result) ? `pre:${result}` : null;
 }
 
 /**
@@ -547,6 +557,7 @@ function generate_transformation_string(options) {
   var underlay = process_layer(utils.option_consume(options, "underlay"));
   var ifValue = process_if(utils.option_consume(options, "if"));
   var custom_function = process_custom_function(utils.option_consume(options, "custom_function"));
+  var custom_pre_function = process_custom_pre_function(utils.option_consume(options, "custom_pre_function"));
   var fps = utils.option_consume(options, 'fps');
   if (isArray(fps)) {
     fps = fps.join('-');
@@ -561,7 +572,7 @@ function generate_transformation_string(options) {
     dpr: normalize_expression(dpr),
     e: normalize_expression(effect),
     fl: flags,
-    fn: custom_function,
+    fn: custom_function || custom_pre_function,
     fps: fps,
     h: normalize_expression(height),
     ki: normalize_expression(utils.option_consume(options, "keyframe_interval")),
@@ -1170,16 +1181,25 @@ function join_pair(key, value) {
 }
 
 /**
+ * If the given value is a string, replaces single or double quotes with character entities
+ * @private
+ * @param {*} value The string to encode quotes in
+ * @return {*} Encoded string or original value if not a string
+ */
+function escapeQuotes(value) {
+  return isString(value) ? value.replace('"', '&#34;').replace("'", '&#39;') : value;
+}
+
+/**
  *
  * @param attrs
  * @return {*}
  */
-
-function html_attrs(attrs) {
+exports.html_attrs = function html_attrs(attrs) {
   return filter(map(attrs, function (value, key) {
-    return join_pair(key, value);
+    return join_pair(key, escapeQuotes(value));
   })).sort().join(" ");
-}
+};
 
 var CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain'];
 
@@ -1511,7 +1531,6 @@ exports.private_download_url = private_download_url;
 exports.zip_download_url = zip_download_url;
 exports.download_archive_url = download_archive_url;
 exports.download_zip_url = download_zip_url;
-exports.html_attrs = html_attrs;
 exports.cloudinary_js_config = cloudinary_js_config;
 exports.v1_adapters = v1_adapters;
 exports.as_safe_bool = as_safe_bool;

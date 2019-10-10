@@ -241,12 +241,26 @@ describe("uploader", function () {
       });
     });
   });
-  it("should successfully generate text image", function () {
-    return cloudinary.v2.uploader.text("hello world", {
-      tags: UPLOAD_TAGS,
-    }).then(function (result) {
-      expect(result.width).to.within(50, 70);
-      expect(result.height).to.within(5, 15);
+  describe("text images", function() {
+    it("should successfully generate text image", function () {
+      return cloudinary.v2.uploader.text("hello world", {
+        tags: UPLOAD_TAGS,
+      }).then(function (result) {
+        expect(result.width).to.within(50, 70);
+        expect(result.height).to.within(5, 15);
+      });
+    });
+    var mocked = helper.mockTest();
+    it("should pass text image parameters to server", function() {
+      cloudinary.v2.uploader.text("hello word",
+      {
+        font_family: "Arial",
+        font_size: 12,
+        font_weight: "black"
+      });
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("font_family", "Arial")));
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("font_size", "12")));
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("font_weight", "black")));
     });
   });
   it("should successfully upload stream", function (done) {

@@ -1,8 +1,10 @@
 var cloudinary = require('cloudinary').v2;
-var schema = require('../config/schema');
 var crypto = require('crypto');
-var Photo = schema.models.Photo;
 var multipart = require('connect-multiparty');
+var schema = require('../config/schema');
+
+var Photo = schema.models.Photo;
+
 var multipartMiddleware = multipart();
 
 function index(req, res) {
@@ -19,7 +21,7 @@ function add_through_server(req, res) {
   })
     .finally(function () {
       res.render('photos/add', {
-        photo: photo
+        photo: photo,
       });
     });
 }
@@ -48,7 +50,7 @@ function create_through_server(req, res) {
       // Save photo with image metadata
       return photo.save();
     })
-    .then(function (photo) {
+    .then(function () {
       console.log('** photo saved');
     })
     .finally(function () {
@@ -67,7 +69,7 @@ function add_direct(req, res) {
     .finally(function () {
       res.render('photos/add_direct', {
         photo: photo,
-        cloudinary_cors: cloudinary_cors
+        cloudinary_cors: cloudinary_cors,
       });
     });
 }
@@ -95,6 +97,7 @@ function add_direct_unsigned(req, res) {
       if (!preset.settings.return_delete_token) {
         return cloudinary.api.update_upload_preset(preset_name, { return_delete_token: true });
       }
+      return undefined;
     })
     .catch(function (err) {
       // Creating an upload preset is done here only for demo purposes.
@@ -104,7 +107,7 @@ function add_direct_unsigned(req, res) {
         unsigned: true,
         name: preset_name,
         folder: "preset_folder",
-        return_delete_token: true
+        return_delete_token: true,
       });
     })
     .finally(function (preset) {
@@ -112,7 +115,7 @@ function add_direct_unsigned(req, res) {
         {
           photo: photo,
           cloudinary_cors: cloudinary_cors,
-          preset_name: preset_name
+          preset_name: preset_name,
         });
     });
 }
@@ -138,7 +141,7 @@ function create_direct(req, res) {
     photo.image = image.toJSON();
     console.dir(photo.image);
   }
-  photo.save().then(function (photo) {
+  photo.save().then(function () {
     console.log('** photo saved');
   })
     .catch(function (err) {

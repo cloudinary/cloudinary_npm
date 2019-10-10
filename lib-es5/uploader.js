@@ -247,7 +247,7 @@ exports.text = function text(content, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("text", callback, options, function () {
-    var textParams = utils.only(options, TEXT_PARAMS);
+    var textParams = utils.only.apply(utils, [options].concat(TEXT_PARAMS));
     var params = _extends({
       timestamp: utils.timestamp(),
       text: content

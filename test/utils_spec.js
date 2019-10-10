@@ -1208,7 +1208,7 @@ describe("utils", function () {
         height: 200,
         crop: 'scale',
       },
-      options,
+      options
     );
     const sepia = options => Object.assign({
       width: 400,
