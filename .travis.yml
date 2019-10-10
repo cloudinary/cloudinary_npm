@@ -9,3 +9,5 @@ matrix:
     script: npm run test-es6
   - node_js: "10"
     script: npm run test-es6
+  - node_js: "12"
+      script: npm run test
