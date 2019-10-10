@@ -320,7 +320,32 @@ function process_layer(layer) {
   return result;
 }
 
+/**
+ * Parse radius options
+ * @private
+ * @param {Array<string|number>|string|number} radius The radius to parse
+ * @return {string} radius transformation string
+ */
+function process_radius(radius) {
+  if (!radius) {
+    return radius;
+  }
+  if (!isArray(radius)) {
+    radius = [radius];
+  }
+  if (radius.length === 0 || radius.length > 4) {
+    throw new Error("Radius array should contain between 1 and 4 values");
+  }
+  if (radius.findIndex(function (x) {
+    return x === null;
+  }) >= 0) {
+    throw new Error("Corner: Cannot be null");
+  }
+  return radius.map(normalize_expression).join(':');
+}
+
 function base64EncodeURL(sourceUrl) {
+  var ignore;
   try {
     sourceUrl = decodeURI(sourceUrl);
   } catch (error) {
@@ -554,6 +579,7 @@ function generate_transformation_string(options) {
     options.end_offset = _split_range2[1];
   }
   var overlay = process_layer(utils.option_consume(options, "overlay"));
+  var radius = process_radius(utils.option_consume(options, "radius"));
   var underlay = process_layer(utils.option_consume(options, "underlay"));
   var ifValue = process_if(utils.option_consume(options, "if"));
   var custom_function = process_custom_function(utils.option_consume(options, "custom_function"));
@@ -579,7 +605,7 @@ function generate_transformation_string(options) {
     l: overlay,
     o: normalize_expression(utils.option_consume(options, "opacity")),
     q: normalize_expression(utils.option_consume(options, "quality")),
-    r: normalize_expression(utils.option_consume(options, "radius")),
+    r: radius,
     t: named_transformation,
     u: underlay,
     w: normalize_expression(width),
