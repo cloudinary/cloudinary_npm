@@ -1425,47 +1425,6 @@ describe("utils", function () {
         api_key: "1234",
       });
     });
-    it("should allow timestamp in sign_request", function () {
-      var params = utils.sign_request({
-        public_id: "folder/file",
-        version: "1234",
-        timestamp: 1569707219,
-      });
-      expect(params).to.eql({
-        public_id: 'folder/file',
-        version: '1234',
-        timestamp: 1569707219,
-        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
-        api_key: '1234',
-      });
-    });
-    it("should allow a signature parameter in process_request_params", function () {
-      var configBck2 = void 0;
-      before(function () {
-        configBck2 = cloudinary.config();
-        cloudinary.config({
-          api_key: "1234",
-          api_secret: "",
-        });
-      });
-      after(function () {
-        cloudinary.config(configBck2);
-      });
-      var params = utils.process_request_params({}, {
-        public_id: 'folder/file',
-        version: '1234',
-        timestamp: 1569707219,
-        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
-        api_key: '1234',
-      });
-      expect(params).to.eql({
-        public_id: 'folder/file',
-        version: '1234',
-        timestamp: 1569707219,
-        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
-        api_key: '1234',
-      });
-    });
   });
   it("should support responsive width", function () {
     test_cloudinary_url("test", {

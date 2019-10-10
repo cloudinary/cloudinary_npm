@@ -939,7 +939,7 @@ describe("uploader", function () {
       cloudinary.config(configBck2);
       writeSpy.restore();
     });
-    it("should allow a signature parameter on uploads", function () {
+    it("should allow a signature and timestamp parameter on uploads", function () {
       cloudinary.v2.uploader.upload(IMAGE_FILE, {
         public_id: 'folder/file',
         version: '1234',
@@ -947,6 +947,7 @@ describe("uploader", function () {
         signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
       });
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
     });
   });
 });
