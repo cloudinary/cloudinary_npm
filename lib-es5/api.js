@@ -1,23 +1,19 @@
 'use strict';
 
+// eslint-disable-next-line import/order
 var config = require("./config");
-var ensureOption = require('./utils/ensureOption').defaults(config());
-
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
+var querystring = require("querystring");
+var Q = require('q');
+var url = require('url');
 var utils = require("./utils");
+var ensureOption = require('./utils/ensureOption').defaults(config());
 
 var extend = utils.extend,
     includes = utils.includes,
-    isString = utils.isString,
     only = utils.only,
     ensurePresenceOf = utils.ensurePresenceOf;
 
-
-var querystring = require("querystring");
-
-var Q = require('q');
-
-var api = module.exports;
 
 var TRANSFORMATIONS_URI = "transformations";
 
@@ -34,7 +30,7 @@ function call_api(method, uri, params, callback, options) {
   method = method.toUpperCase();
   var api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
   var content_type = 'application/x-www-form-urlencoded';
-  if (options['content_type'] === 'json') {
+  if (options.content_type === 'json') {
     query_params = JSON.stringify(params);
     content_type = 'application/json';
   } else {
@@ -43,7 +39,7 @@ function call_api(method, uri, params, callback, options) {
   if (method === "GET") {
     api_url += "?" + query_params;
   }
-  var request_options = require('url').parse(api_url);
+  var request_options = url.parse(api_url);
   request_options = extend(request_options, {
     method: method,
     headers: {
@@ -63,39 +59,40 @@ function call_api(method, uri, params, callback, options) {
       var buffer = "";
       var error = false;
       res.on("data", function (d) {
-        return buffer += d;
+        buffer += d;
+        return buffer;
       });
       res.on("end", function () {
-        var e = void 0,
-            result = void 0;
+        var result = void 0;
         if (error) {
           return;
         }
         try {
           result = JSON.parse(buffer);
-        } catch (error1) {
-          e = error1;
+        } catch (e) {
           result = {
             error: {
               message: "Server return invalid JSON response. Status Code " + res.statusCode
             }
           };
         }
-        if (result["error"]) {
-          result["error"]["http_code"] = res.statusCode;
+        if (result.error) {
+          result.error.http_code = res.statusCode;
         } else {
-          result["rate_limit_allowed"] = parseInt(res.headers["x-featureratelimit-limit"]);
-          result["rate_limit_reset_at"] = new Date(res.headers["x-featureratelimit-reset"]);
-          result["rate_limit_remaining"] = parseInt(res.headers["x-featureratelimit-remaining"]);
+          result.rate_limit_allowed = parseInt(res.headers["x-featureratelimit-limit"]);
+          result.rate_limit_reset_at = new Date(res.headers["x-featureratelimit-reset"]);
+          result.rate_limit_remaining = parseInt(res.headers["x-featureratelimit-remaining"]);
         }
         if (result.error) {
           deferred.reject(result);
         } else {
           deferred.resolve(result);
         }
-        return typeof callback === "function" ? callback(result) : void 0;
+        if (typeof callback === "function") {
+          callback(result);
+        }
       });
-      return res.on("error", function (e) {
+      res.on("error", function (e) {
         error = true;
         var err_obj = {
           error: {
@@ -104,7 +101,9 @@ function call_api(method, uri, params, callback, options) {
           }
         };
         deferred.reject(err_obj.error);
-        return typeof callback === "function" ? callback(err_obj) : void 0;
+        if (typeof callback === "function") {
+          callback(err_obj);
+        }
       });
     } else {
       var err_obj = {
@@ -114,7 +113,9 @@ function call_api(method, uri, params, callback, options) {
         }
       };
       deferred.reject(err_obj.error);
-      return typeof callback === "function" ? callback(err_obj) : void 0;
+      if (typeof callback === "function") {
+        callback(err_obj);
+      }
     }
   };
   var request = https.request(request_options, handle_response);
@@ -128,14 +129,6 @@ function call_api(method, uri, params, callback, options) {
   }
   request.end();
   return deferred.promise;
-}
-
-function transformationString(transformation) {
-  if (isString(transformation)) {
-    return transformation;
-  } else {
-    return utils.generate_transformation_string(extend({}, transformation));
-  }
 }
 
 function deleteResourcesParams(options) {
@@ -165,12 +158,11 @@ exports.resource_types = function resource_types(callback) {
 exports.resources = function resources(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = options["type"];
+  resource_type = options.resource_type || "image";
+  type = options.type;
   uri = ["resources", resource_type];
   if (type != null) {
     uri.push(type);
@@ -184,10 +176,9 @@ exports.resources = function resources(callback) {
 exports.resources_by_tag = function resources_by_tag(tag, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
@@ -196,10 +187,9 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = void 0,
-      ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "context"];
   params = only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
   params.key = key;
@@ -212,10 +202,9 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
 exports.resources_by_moderation = function resources_by_moderation(kind, status, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "moderations", kind, status];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
@@ -224,13 +213,11 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   params = only(options, "tags", "context", "moderations");
   params["public_ids[]"] = public_ids;
@@ -240,27 +227,23 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
 exports.resource = function resource(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
-  return call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
+  return call_api("get", uri, only(options, "exif", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
 };
 
 exports.restore = function restore(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type, "restore"];
   return call_api("post", uri, {
     public_ids: public_ids
@@ -271,13 +254,11 @@ exports.update = function update(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
   params = utils.updateable_resource_params(options);
   if (options.moderation_status != null) {
@@ -289,13 +270,11 @@ exports.update = function update(public_id, callback) {
 exports.delete_resources = function delete_resources(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     "public_ids[]": public_ids
@@ -305,13 +284,11 @@ exports.delete_resources = function delete_resources(public_ids, callback) {
 exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     prefix: prefix
@@ -321,10 +298,9 @@ exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix,
 exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("delete", uri, deleteResourcesParams(options), callback, options);
 };
@@ -332,14 +308,12 @@ exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback
 exports.delete_all_resources = function delete_all_resources(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
 
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     all: true
@@ -363,24 +337,23 @@ exports.delete_derived_by_transformation = function delete_derived_by_transforma
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = options["resource_type"] || "image";
-  type = options["type"] || "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = "resources/" + resource_type + "/" + type;
   params = extend({
     "public_ids[]": public_ids
   }, only(options, "invalidate"));
-  params["keep_original"] = true;
-  params["transformations"] = utils.build_eager(transformations);
+  params.keep_original = true;
+  params.transformations = utils.build_eager(transformations);
   return call_api("delete", uri, params, callback, options);
 };
 
 exports.tags = function tags(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["tags", resource_type];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options);
 };
@@ -392,27 +365,27 @@ exports.transformations = function transformations(callback) {
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.transformation = function transformation(transformation, callback) {
+exports.transformation = function transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = only(options, "next_cursor", "max_results");
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.delete_transformation = function delete_transformation(transformation, callback) {
+exports.delete_transformation = function delete_transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = {};
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   return call_api("delete", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.update_transformation = function update_transformation(transformation, updates, callback) {
+exports.update_transformation = function update_transformation(transformationName, updates, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = only(updates, "allowed_for_strict");
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   if (updates.unsafe_update != null) {
     params.unsafe_update = utils.build_eager(updates.unsafe_update);
   }
@@ -485,6 +458,14 @@ exports.sub_folders = function sub_folders(path, callback) {
   return call_api("get", uri, {}, callback, options);
 };
 
+exports.delete_folder = function delete_folder(path, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var uri = void 0;
+  uri = ["folders", path];
+  return call_api("delete", uri, {}, callback, options);
+};
+
 exports.upload_mappings = function upload_mappings(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -517,7 +498,7 @@ exports.update_upload_mapping = function update_upload_mapping(name, callback) {
 
   var params = void 0;
   params = only(options, "template");
-  params["folder"] = name;
+  params.folder = name;
   return call_api("put", 'upload_mappings', params, callback, options);
 };
 
@@ -526,7 +507,7 @@ exports.create_upload_mapping = function create_upload_mapping(name, callback) {
 
   var params = void 0;
   params = only(options, "template");
-  params["folder"] = name;
+  params.folder = name;
   return call_api("post", 'upload_mappings', params, callback, options);
 };
 
@@ -534,12 +515,11 @@ function publishResource(byKey, value, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = void 0,
-      ref = void 0,
       resource_type = void 0,
       uri = void 0;
   params = only(options, "type", "invalidate", "overwrite");
   params[byKey] = value;
-  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "publish_resources"];
   options = extend({
     resource_type: resource_type
@@ -596,7 +576,7 @@ exports.create_streaming_profile = function create_streaming_profile(name, callb
 
   var params = void 0;
   params = utils.build_streaming_profiles_param(options);
-  params["name"] = name;
+  params.name = name;
   return call_api("post", 'streaming_profiles', params, callback, options);
 };
 
@@ -604,12 +584,10 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0;
-  resource_type = (ref = options.resource_type) != null ? ref : "image";
-  type = (ref1 = options.type) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   params = {
     access_mode: access_mode
   };
@@ -620,7 +598,7 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
 exports.search = function search(params, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  options['content_type'] = 'json';
+  options.content_type = 'json';
   return call_api("post", "resources/search", params, callback, options);
 };
 

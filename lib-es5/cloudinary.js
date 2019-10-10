@@ -3,7 +3,6 @@
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var _ = require('lodash');
-var cloudinary = module.exports;
 exports.config = require("./config");
 exports.utils = require("./utils");
 exports.uploader = require("./uploader");
@@ -11,8 +10,9 @@ exports.api = require("./api");
 exports.PreloadedFile = require("./preloaded_file");
 exports.Cache = require('./cache');
 
+var cloudinary = module.exports;
+
 var optionConsume = cloudinary.utils.option_consume;
-var ensureOption = require('./utils/ensureOption').defaults(cloudinary.config());
 
 exports.url = function url(public_id, options) {
   options = _.extend({}, options);
@@ -41,7 +41,7 @@ function chainTransformations(options) {
   var urlOptions = cloudinary.utils.extractUrlParams(options);
   var currentTransformation = cloudinary.utils.extractTransformationParams(options);
   transformation = cloudinary.utils.build_array(transformation);
-  urlOptions["transformation"] = [currentTransformation].concat(_toConsumableArray(transformation));
+  urlOptions.transformation = [currentTransformation].concat(_toConsumableArray(transformation));
   return urlOptions;
 }
 
@@ -66,8 +66,8 @@ exports.image = function image(source, options) {
   var srcsetParam = optionConsume(localOptions, 'srcset');
   var attributes = optionConsume(localOptions, 'attributes', {});
   var src = cloudinary.utils.url(source, localOptions);
-  if ("html_width" in localOptions) localOptions["width"] = optionConsume(localOptions, "html_width");
-  if ("html_height" in localOptions) localOptions["height"] = optionConsume(localOptions, "html_height");
+  if ("html_width" in localOptions) localOptions.width = optionConsume(localOptions, "html_width");
+  if ("html_height" in localOptions) localOptions.height = optionConsume(localOptions, "html_height");
 
   var client_hints = optionConsume(localOptions, "client_hints", cloudinary.config().client_hints);
   var responsive = optionConsume(localOptions, "responsive");
@@ -78,7 +78,7 @@ exports.image = function image(source, options) {
     var classes = [responsive ? "cld-responsive" : "cld-hidpi"];
     var current_class = optionConsume(localOptions, "class");
     if (current_class) classes.push(current_class);
-    localOptions["class"] = classes.join(" ");
+    localOptions.class = classes.join(" ");
     src = optionConsume(localOptions, "responsive_placeholder", cloudinary.config().responsive_placeholder);
     if (src === "blank") {
       src = cloudinary.BLANK;
@@ -150,18 +150,20 @@ exports.video = function video(public_id, options) {
   if (!multi_source) {
     source = source + '.' + cloudinary.utils.build_array(source_types)[0];
   }
-  var src = cloudinary.utils.url(source, video_options);
-  if (!multi_source) video_options.src = src;
+  var src = cloudinary.utils.url(source, video_options); // calculate src and reduce video_options
+  if (!multi_source) {
+    video_options.src = src;
+  }
   if (video_options.hasOwnProperty("html_width")) video_options.width = optionConsume(video_options, 'html_width');
   if (video_options.hasOwnProperty("html_height")) video_options.height = optionConsume(video_options, 'html_height');
   html = html + cloudinary.utils.html_attrs(video_options) + '>';
   if (multi_source) {
     html += source_types.map(function (source_type) {
       var transformation = source_transformation[source_type] || {};
-      var src = cloudinary.utils.url(source + "." + source_type, _.extend({ resource_type: 'video' }, _.cloneDeep(options), _.cloneDeep(transformation)));
+      var sourceSrc = cloudinary.utils.url(source + "." + source_type, _.extend({ resource_type: 'video' }, _.cloneDeep(options), _.cloneDeep(transformation)));
       var video_type = source_type === 'ogv' ? 'ogg' : source_type;
       var type = "video/" + video_type;
-      return `<source ${cloudinary.utils.html_attrs({ src, type })}>`;
+      return `<source ${cloudinary.utils.html_attrs({ src: sourceSrc, type })}>`;
     }).join('');
   }
 

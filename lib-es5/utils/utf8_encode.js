@@ -1,5 +1,6 @@
 "use strict";
 
+/* eslint-disable no-bitwise */
 // http://kevin.vanzonneveld.net
 // +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
 // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
@@ -46,7 +47,8 @@ module.exports = function utf8_encode(argString) {
         utftext += string.slice(start, end);
       }
       utftext += enc;
-      start = end = n + 1;
+      start = n + 1;
+      end = start;
     }
     n++;
   }

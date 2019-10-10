@@ -2,7 +2,7 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-/***
+/**
  * Assign a value to a nested object
  * @function putNestedValue
  * @param params the parent object - this argument will be modified!
@@ -19,10 +19,18 @@ var entries = require('./utils/entries');
 
 var cloudinary_config = void 0;
 
-function isNestedKey(key) {
-  return key.match(/\w+\[\w+\]/);
-}
-
+/**
+ * Sets a value in an object using a nested key
+ * @param {object} params The object to assign the value in.
+ * @param {string} key The key of the value. A period is used to denote inner keys.
+ * @param {*} value The value to set.
+ * @returns {object} The params argument.
+ * @example
+ *     let o = {foo: {bar: 1}};
+ *     putNestedValue(o, 'foo.bar', 2); // {foo: {bar: 2}}
+ *     putNestedValue(o, 'foo.inner.key', 'this creates an inner object');
+ *     // {{foo: {bar: 2}, inner: {key: 'this creates an inner object'}}}
+ */
 function putNestedValue(params, key, value) {
   var chain = key.split(/[\[\]]+/).filter(function (i) {
     return i.length;
@@ -38,7 +46,8 @@ function putNestedValue(params, key, value) {
     }
     outer = inner;
   }
-  return outer[lastKey] = value;
+  outer[lastKey] = value;
+  return params;
 }
 
 module.exports = function (new_config, new_value) {
@@ -53,7 +62,6 @@ module.exports = function (new_config, new_value) {
 
     var cloudinary_url = process.env.CLOUDINARY_URL;
     if (cloudinary_url != null) {
-
       var uri = url.parse(cloudinary_url, true);
       var parsedConfig = {
         cloud_name: uri.host,

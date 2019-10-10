@@ -1,0 +1,4 @@
+lib-es5/*
+*.min.js
+node_modules
+test_cache/
