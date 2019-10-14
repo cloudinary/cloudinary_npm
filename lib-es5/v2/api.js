@@ -51,5 +51,12 @@ v1_adapters(exports, api, {
   update_resources_access_mode_by_tag: 2,
   update_resources_access_mode_by_ids: 2,
   search: 1,
-  delete_derived_by_transformation: 2
+  delete_derived_by_transformation: 2,
+  create_metadata_field: 1,
+  list_metadata_fields: 1,
+  delete_metadata_field: 1,
+  get_metadata_field: 1,
+  update_metadata_field: 1,
+  update_metadata_field_datasource: 1,
+  delete_entries_field_datasource: 1
 });

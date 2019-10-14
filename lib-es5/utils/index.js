@@ -345,7 +345,6 @@ function process_radius(radius) {
 }
 
 function base64EncodeURL(sourceUrl) {
-  var ignore;
   try {
     sourceUrl = decodeURI(sourceUrl);
   } catch (error) {
@@ -704,6 +703,9 @@ function updateable_resource_params(options) {
   }
   if (options.context != null) {
     params.context = utils.encode_context(options.context);
+  }
+  if (options.metadata != null) {
+    params.metadata = utils.encode_context(options.metadata);
   }
   if (options.custom_coordinates != null) {
     params.custom_coordinates = utils.encode_double_array(options.custom_coordinates);

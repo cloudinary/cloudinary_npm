@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 // eslint-disable-next-line import/order
 var config = require("./config");
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
@@ -618,4 +620,53 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   return updateResourcesAccessMode(access_mode, "public_ids[]", ids, callback, options);
+};
+
+exports.create_metadata_field = function create_metadata_field(metadata, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  options.content_type = "json";
+  return call_api("post", "metadata_fields", metadata, callback, options);
+};
+
+exports.list_metadata_fields = function list_metadata_fields(callback) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return call_api("get", "metadata_fields", {}, callback, options);
+};
+
+exports.delete_metadata_field = function delete_metadata_field(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api("delete", "metadata_fields/" + external_id, {}, callback, options);
+};
+
+exports.get_metadata_field = function get_metadata_field(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api("get", "metadata_fields/" + external_id, {}, callback, options);
+};
+
+exports.update_metadata_field = function update_metadata_field(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = _extends({}, options);
+  options.content_type = "json";
+  return call_api("put", "metadata_fields/" + external_id, params, callback, options);
+};
+
+exports.update_metadata_field_datasource = function update_metadata_field_datasource(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = _extends({}, options);
+  options.content_type = "json";
+  return call_api("put", "metadata_fields/" + external_id + "/datasource", params, callback, options);
+};
+
+exports.delete_entries_field_datasource = function delete_entries_field_datasource(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = _extends({}, options);
+  options.content_type = "json";
+  return call_api("delete", "metadata_fields/" + external_id + "/datasource", params, callback, options);
 };
