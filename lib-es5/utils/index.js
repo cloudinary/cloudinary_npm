@@ -345,7 +345,6 @@ function process_radius(radius) {
 }
 
 function base64EncodeURL(sourceUrl) {
-  var ignore;
   try {
     sourceUrl = decodeURI(sourceUrl);
   } catch (error) {
