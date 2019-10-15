@@ -1,4 +1,16 @@
 
+1.16.0 / 2019-10-15
+===================
+
+  * Support different radius for each corner (containing images and overlays) (#260)
+  * Add feature to allow override on timestamp and signature (#295)
+  * remove package-lock (#303)
+  * Fixed open linting issues (#279)
+  * Feature/publish script (#289)
+  * Fix parameters sent when creating a text image (#298)
+  * Add custom pre function support (#302)
+  * Escape quotes in HTML attributes (#259)
+
 1.15.0 / 2019-09-08
 ===================
 
