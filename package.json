@@ -1,6 +1,6 @@
 {
   "author": "Cloudinary <info@cloudinary.com>",
-  "name": "cloudinary",
+  "name": "cloudinary_npm",
   "description": "Cloudinary NPM for node.js integration",
   "version": "1.16.0",
   "homepage": "http://cloudinary.com",
@@ -11,6 +11,7 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
+    "cloudinary": "^1.16.0",
     "lodash": "^4.17.11",
     "q": "^1.5.1"
   },

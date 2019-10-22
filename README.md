@@ -17,7 +17,7 @@ For Node.js, Cloudinary provides an extension for simplifying the integration ev
 
 ## Setup ######################################################################
 
-npm install cloudinary
+npm install
 
 ## Try it right away
 
@@ -61,7 +61,10 @@ For more details, see our documentation for embedding [Facebook](https://cloudin
 Each request for building a URL of a remote cloud resource must have the `cloud_name` parameter set.
 Each request to our secure APIs (e.g., image uploads, eager sprite generation) must have the `api_key` and `api_secret` parameters set. See [API, URLs and access identifiers](https://cloudinary.com/documentation/solution_overview#account_and_api_setup) for more details.
 
-Setting the `cloud_name`, `api_key` and `api_secret` parameters can be done either directly in each call to a Cloudinary method, by calling the cloudinary.config(), or by using the CLOUDINARY_URL environment variable.
+Setting the `cloud_name`, `api_key` and `api_secret` parameters can be done either directly in each call to a Cloudinary method, by calling the cloudinary.config(), or by using the CLOUDINARY_URL environment variable.  For example, using export you can copy the CLOUDINARY_URL from your [cloudinary dasbboard](https://cloudinary.com/console) once you have signed up for an account.
+```
+export CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+```
 
 ### Require the Cloudinary library
 

@@ -1,6 +1,7 @@
 require('dotenv').load();
 var fs = require('fs');
 var cloudinary = require('cloudinary').v2;
+const open = require('open')
 
 var uploads = {};
 
@@ -145,3 +146,24 @@ function performTransformations() {
   console.log("> That's it. You can now open the URLs above in a browser");
   console.log("> and check out the generated images.");
 }
+
+//using async/await with cloudinary upload
+//using open from node.js command line to open url in browser
+async function uploadImage(filename) {
+  try {
+      const result = await cloudinary.uploader.upload(filename, { tags: 'basic_sample' });
+      console.log(result)
+      const url = await cloudinary.url(result.public_id, {
+          width: 400,
+          quality: 'auto',
+          fetch_format: 'auto',
+          secure: true
+      });
+      console.log(url)
+      await open(url)
+  }
+  catch (err) {
+      console.log(err)
+  }
+}
+uploadImage('pizza.jpg')

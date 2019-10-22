@@ -5,7 +5,8 @@
   "main": "basic.js",
   "dependencies": {
     "cloudinary": "^1.3.0",
-    "dotenv": "1.x"
+    "dotenv": "1.x",
+    "open": "^7.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

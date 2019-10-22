@@ -6,8 +6,9 @@ The basic sample uploads local and remote image to Cloudinary and generates URLs
 
 ### Setting up
 
-1. Before running the sample, copy the Environment variable configuration parameters from Cloudinary's [Management Console](https://cloudinary.com/console) of your account into `.env` file of the project or export it (i.e. export CLOUDINARY_URL=xxx).
-1. Run `npm install` in project directory to bring all the required modules. 
+1. Before running the sample, copy the Environment variable configuration parameters from Cloudinary's [Management Console](https://cloudinary.com/console) of your account into `.env` file of the project or export it (i.e. export CLOUDINARY_URL=xxx). In order to run the basic examples from within the `samples/basic` directory, put the `.env` file in the `samples/basic` directory.
+1. Run `npm install` in project directory to install the required modules.
+1. Change directory to `samples/basic` 
 1. Run the sample using `node basic.js`.
 
 ## Photo Album sample
@@ -17,7 +18,7 @@ This sample uses [jugglingdb orm](https://github.com/1602/jugglingdb).
 See [schema.js](photo_album/config/schema.js) for adapter configuration.
 
 ### Setting up
-1. Before running the sample, copy the Environment variable configuration parameters from Cloudinary's [Management Console](https://cloudinary.com/console) of your account into `.env` file of the project or export it (i.e. export CLOUDINARY_URL=xxx).
+1. Before running the sample, copy the Environment variable configuration parameters from Cloudinary's [Management Console](https://cloudinary.com/console) of your account into `env.sample` file and renamve the `env.sample` to `.env`, or export it (i.e. export CLOUDINARY_URL=xxx).
 1. In the project directory, run `npm install` to install all the required dependencies.
 1. Run `npm start` to start the server , if you want to run a
    development mode server (autoreload) run `node run-script debug`.
