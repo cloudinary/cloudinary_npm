@@ -84,14 +84,6 @@ describe("utils", function () {
       };
       expect([`${authenticated_image.public_id}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image.version}/${authenticated_image.public_id}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
-    it("should correctly sign URL with transformation", function (done) {
-      options.transformation = {
-        crop: "crop",
-        width: 10,
-        height: 20, // TODO duplicate?
-      };
-      expect([`${authenticated_image.public_id}.jpg`, options]).to.produceUrl(new RegExp(`${authenticated_path}/s--[\\w-]+--/c_crop,h_20,w_10/${expected_transformation}v${authenticated_image.version}/${authenticated_image.public_id}.jpg`)).and.emptyOptions().and.beServedByCloudinary(done);
-    });
     it("should correctly sign fetch URL", function (done) {
       options.type = "fetch";
       expect(["http://res.cloudinary.com/demo/sample.png", options]).to.produceUrl(new RegExp(`^${root_path}/image/fetch/s--[\\w-]+--/${expected_transformation}v${authenticated_image.version}/http://res.cloudinary.com/demo/sample.png$`)).and.emptyOptions().and.beServedByCloudinary(done);
