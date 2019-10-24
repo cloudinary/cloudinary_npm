@@ -4,8 +4,13 @@ import * as cloudinary from 'cloudinary';
 cloudinary.config({
     cloud_name: 'demo',
 });
+
+// $ExpectType void
 cloudinary.config(true);
+
+// $ExpectType void
 cloudinary.config("private_cdn", true);
+
 // $ExpectType string
 const test = cloudinary.image("front_face.png", {
     secure: true,

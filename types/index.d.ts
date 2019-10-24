@@ -1,24 +1,3 @@
-import {
-    ArchiveApiOptions,
-    AudioCodec,
-    AudioFrequency,
-    ColorSpace, CommonApiOptions,
-    CommonTransformationOptions,
-    ConfigOptions,
-    CropMode,
-    DeliveryType,
-    ImageFormatExtension,
-    ImageFlags,
-    ImageTransformationOptions,
-    ResourceType,
-    StreamingProfiles,
-    Transformation,
-    VideoEffect,
-    VideoFormatExtension,
-    VideoFlags,
-    VideoTransformationOptions
-} from "cloudinary";
-
 declare module 'cloudinary' {
 
     /****************************** Constants *************************************/
@@ -224,6 +203,14 @@ declare module 'cloudinary' {
         | "ogv"
         | "webm"
 
+    type ImageTransformationAndTags = ImageTransformationOptions | TagOptions;
+    type VideoTransformationAndTags = VideoTransformationOptions | TagOptions;
+    type ImageAndVideoTransformations = ImageTransformationOptions | VideoTransformationOptions;
+    type AllTransformations = CommonTransformationOptions | ImageTransformationOptions | VideoTransformationOptions;
+    type CommonAndArchiveApiOptions = CommonApiOptions | ArchiveApiOptions;
+    type TagAndUrlOptions= TagOptions | UrlOptions;
+    type ImageAndVideoFormat= ImageFormatExtension | VideoFormatExtension;
+
     /****************************** API *************************************/
     type Status = string | "pending" | "approved" | "rejected";
     type StreamingProfiles = string | "4k" | "full_hd" | "hd" | "sd" | "full_hd_wifi" | "full_hd_lean" | "hd_lean";
@@ -234,27 +221,29 @@ declare module 'cloudinary' {
 
     /****************************** Tags *************************************/
 
-    export function config(new_config: ConfigOptions, new_value?: any): void;
+    export function config(new_config: ConfigOptions | string, new_value?: any): void;
 
-    export function image(source: string, options?: ImageTransformationOptions | TagOptions | UrlOptions): string;
+    export function config(new_config: boolean): void;
 
-    export function picture(public_id: string, options?: ImageTransformationOptions | TagOptions | UrlOptions): string;
+    export function image(source: string, options?: ImageTransformationAndTags): string;
 
-    export function source(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions | TagOptions | UrlOptions): string;
+    export function picture(public_id: string, options?: ImageTransformationAndTags): string;
 
-    export function url(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions | TagOptions | UrlOptions): string;
+    export function source(public_id: string, options?: ImageAndVideoTransformations): string;
 
-    export function video(public_id: string, options?: VideoTransformationOptions | TagOptions | UrlOptions): string;
+    export function url(public_id: string, options?: AllTransformations): string;
+
+    export function video(public_id: string, options?: VideoTransformationAndTags): string;
 
     /****************************** Utils *************************************/
 
     export namespace utils {
 
-        function download_archive_url(options?: CommonApiOptions | ArchiveApiOptions): string;
+        function download_archive_url(options?: CommonAndArchiveApiOptions): string;
 
-        function download_zip_url(options?: CommonApiOptions | ArchiveApiOptions): string;
+        function download_zip_url(options?: CommonAndArchiveApiOptions): string;
 
-        function generate_auth_token(options?: any): string;
+        function generate_auth_token(options?: CommonApiOptions): string;
 
         function url(public_id?: string, options?: CommonApiOptions): string;
 
@@ -264,7 +253,7 @@ declare module 'cloudinary' {
 
         function webhook_signature(data?: string, timestamp?: number, options?: any): string;
 
-        function zip_download_url(tag?: string, options?: CommonApiOptions | ArchiveApiOptions): string;
+        function zip_download_url(tag?: string, options?: CommonAndArchiveApiOptions): string;
     }
 
     /****************************** Admin API Methods *************************************/
@@ -279,7 +268,7 @@ declare module 'cloudinary' {
 
         function create_transformation(name: string, definition: Transformation, options?: CommonTransformationOptions): Promise<any>;
 
-        function update_transformation(transformation_name: Transformation, updates?: TagOptions | UrlOptions, callback?: ErrorCallBack): Promise<any>;
+        function update_transformation(transformation_name: Transformation, updates?: TagAndUrlOptions, callback?: ErrorCallBack): Promise<any>;
 
         function create_upload_mapping(folder: string, callback?: ErrorCallBack, options?: { template: string }): Promise<any>;
 
@@ -469,13 +458,13 @@ declare module 'cloudinary' {
 
         function add_tag(tag: string, public_ids: string[], options?: { type?: DeliveryType, resource_type?: ResourceType }): Promise<any>;
 
-        function create_archive(callback?: ErrorCallBack, options?: CommonApiOptions | ArchiveApiOptions, target_format?: TargeArchivetFormat): Promise<any>;
+        function create_archive(callback?: ErrorCallBack, options?: CommonAndArchiveApiOptions, target_format?: TargeArchivetFormat): Promise<any>;
 
-        function create_archive(options?: CommonApiOptions | ArchiveApiOptions, target_format?: TargeArchivetFormat): Promise<any>;
+        function create_archive(options?: CommonAndArchiveApiOptions, target_format?: TargeArchivetFormat): Promise<any>;
 
-        function create_zip(callback?: ErrorCallBack, options?: CommonApiOptions | ArchiveApiOptions): Promise<any>;
+        function create_zip(callback?: ErrorCallBack, options?: CommonAndArchiveApiOptions): Promise<any>;
 
-        function create_zip(options?: CommonApiOptions | ArchiveApiOptions): Promise<any>;
+        function create_zip(options?: CommonAndArchiveApiOptions): Promise<any>;
 
         function destroy(public_id: string, callback?: ErrorCallBack, options?: { resource_type?: ResourceType, type?: DeliveryType, invalidate?: boolean }): Promise<any>;
 
@@ -483,23 +472,23 @@ declare module 'cloudinary' {
 
         function direct_upload(callback_url?: string, options?: UploadApiOptions): Promise<any>;
 
-        function explicit(public_id: string, callback?: ErrorCallBack, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageTransformationOptions | VideoTransformationOptions }> }): Promise<any>;
+        function explicit(public_id: string, callback?: ErrorCallBack, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageAndVideoTransformations }> }): Promise<any>;
 
-        function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageTransformationOptions | VideoTransformationOptions }> }): Promise<any>;
+        function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageAndVideoTransformations }> }): Promise<any>;
 
-        function explode(public_id: string, callback?: ErrorCallBack, options?: { page?: 'all', type?: DeliveryType, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string }): Promise<any>;
+        function explode(public_id: string, callback?: ErrorCallBack, options?: { page?: 'all', type?: DeliveryType, format?: ImageAndVideoTransformations, notification_url?: string }): Promise<any>;
 
-        function explode(public_id: string, options?: { page?: 'all', type?: DeliveryType, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string }): Promise<any>;
+        function explode(public_id: string, options?: { page?: 'all', type?: DeliveryType, format?: ImageAndVideoFormat, notification_url?: string }): Promise<any>;
 
-        function generate_sprite(tag: string, callback?: ErrorCallBack, options?: { transformation?: Transformation, format?: ImageFormatExtension | VideoFormatExtension, async?: boolean, notification_url?: string }): Promise<any>;
+        function generate_sprite(tag: string, callback?: ErrorCallBack, options?: { transformation?: Transformation, format?: ImageAndVideoFormat, async?: boolean, notification_url?: string }): Promise<any>;
 
-        function generate_sprite(tag: string, options?: { transformation?: Transformation, format?: ImageFormatExtension | VideoFormatExtension, async?: boolean, notification_url?: string }): Promise<any>;
+        function generate_sprite(tag: string, options?: { transformation?: Transformation, format?: ImageAndVideoFormat, async?: boolean, notification_url?: string }): Promise<any>;
 
         function image_upload_tag(field?: string, options?: UploadApiOptions): Promise<any>;
 
-        function multi(tag: string, callback?: ErrorCallBack, options?: { transformation?: Transformation, async?: boolean, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string }): Promise<any>;
+        function multi(tag: string, callback?: ErrorCallBack, options?: { transformation?: Transformation, async?: boolean, format?: ImageAndVideoFormat, notification_url?: string }): Promise<any>;
 
-        function multi(tag: string, options?: { transformation?: Transformation, async?: boolean, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string }): Promise<any>;
+        function multi(tag: string, options?: { transformation?: Transformation, async?: boolean, format?: ImageAndVideoFormat, notification_url?: string }): Promise<any>;
 
         function remove_all_context(public_ids: string[], callback?: ErrorCallBack, options?: { context?: string, resource_type?: ResourceType, type?: DeliveryType }): Promise<any>;
 
@@ -572,17 +561,19 @@ declare module 'cloudinary' {
 
         function cloudinary_js_config(): any;
 
-        function config(new_config?: any, new_value?: any): any;
+        function config(new_config: ConfigOptions | string, new_value?: any): void;
 
-        function image(source: string, options?: ImageTransformationOptions): string;
+        function config(new_config: boolean): void;
 
-        function picture(public_id: string, options?: ImageTransformationOptions): string;
+        function image(source: string, options?: ImageTransformationAndTags): string;
 
-        function source(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions): string;
+        function picture(public_id: string, options?: ImageTransformationAndTags): string;
 
-        function url(public_id: string, options?: ImageTransformationOptions | VideoTransformationOptions): string;
+        function source(public_id: string, options?: ImageAndVideoTransformations): string;
 
-        function video(public_id: string, options?: VideoTransformationOptions): string;
+        function url(public_id: string, options?: AllTransformations): string;
+
+        function video(public_id: string, options?: VideoTransformationAndTags): string;
 
         /****************************** Utils *************************************/
 
@@ -592,11 +583,11 @@ declare module 'cloudinary' {
 
             function api_url(action?: string, options?: CommonApiOptions): Promise<any>;
 
-            function archive_params(options?: CommonApiOptions | ArchiveApiOptions): Promise<any>;
+            function archive_params(options?: CommonAndArchiveApiOptions): Promise<any>;
 
-            function download_archive_url(options?: CommonApiOptions | ArchiveApiOptions): string
+            function download_archive_url(options?: CommonAndArchiveApiOptions): string
 
-            function download_zip_url(options?: CommonApiOptions | ArchiveApiOptions): string;
+            function download_zip_url(options?: CommonAndArchiveApiOptions): string;
 
             function generate_auth_token(options?: CommonApiOptions): string;
 
@@ -608,7 +599,7 @@ declare module 'cloudinary' {
 
             function webhook_signature(data?: string, timestamp?: number, options?: any): string;
 
-            function zip_download_url(tag?: string, options?: CommonApiOptions | ArchiveApiOptions): string;
+            function zip_download_url(tag?: string, options?: CommonAndArchiveApiOptions): string;
         }
 
         /****************************** Admin API V2 Methods *************************************/
@@ -754,7 +745,7 @@ declare module 'cloudinary' {
 
             function update_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
 
-            function update_transformation(transformation_name: Transformation, updates?: TagOptions | UrlOptions, callback?: ErrorCallBack): Promise<any>;
+            function update_transformation(transformation_name: Transformation, updates?: TagAndUrlOptions, callback?: ErrorCallBack): Promise<any>;
 
             function update_transformation(transformation_name: Transformation, callback?: ErrorCallBack): Promise<any>;
 
@@ -768,7 +759,7 @@ declare module 'cloudinary' {
 
             function upload_mapping(name?: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_mappings(options?: AdminApiOptions | CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_mappings(options?: CommonApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function upload_mappings(callback?: ErrorCallBack): Promise<any>;
 
@@ -795,9 +786,9 @@ declare module 'cloudinary' {
 
             function add_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function create_archive(options?: CommonApiOptions | ArchiveApiOptions, target_format?: TargeArchivetFormat, callback?: ErrorCallBack,): Promise<any>;
+            function create_archive(options?: CommonAndArchiveApiOptions, target_format?: TargeArchivetFormat, callback?: ErrorCallBack,): Promise<any>;
 
-            function create_zip(options?: CommonApiOptions | ArchiveApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function create_zip(options?: CommonAndArchiveApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function destroy(public_id: string, options?: { resource_types?: ResourceType, type?: DeliveryType, invalidate?: boolean }, callback?: ErrorCallBack,): Promise<any>;
 
@@ -805,21 +796,21 @@ declare module 'cloudinary' {
 
             function direct_upload(callback_url: string, options?: UploadApiOptions): Promise<any>;
 
-            function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageTransformationOptions | VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
+            function explicit(public_id: string, options?: { type?: DeliveryType, transformation?: Transformation, eager: Transformation | Array<{ transformation?: ImageAndVideoTransformations }> }, callback?: ErrorCallBack): Promise<any>;
 
             function explicit(public_id: string, callback?: ErrorCallBack): Promise<any>;
 
-            function explode(public_id: string, options?: { page?: 'all', type?: DeliveryType, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string }, callback?: ErrorCallBack): Promise<any>
+            function explode(public_id: string, options?: { page?: 'all', type?: DeliveryType, format?: ImageAndVideoTransformations, notification_url?: string }, callback?: ErrorCallBack): Promise<any>
 
             function explode(public_id: string, callback?: ErrorCallBack): Promise<any>
 
-            function generate_sprite(tag: string, options?: { transformation?: Transformation, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string, async?: boolean }, callback?: ErrorCallBack): Promise<any>;
+            function generate_sprite(tag: string, options?: { transformation?: Transformation, format?: ImageAndVideoFormat, notification_url?: string, async?: boolean }, callback?: ErrorCallBack): Promise<any>;
 
             function generate_sprite(tag: string, callback?: ErrorCallBack): Promise<any>;
 
             function image_upload_tag(field?: string, options?: any): Promise<any>;
 
-            function multi(tag: string, options?: { transformation?: Transformation, async?: boolean, format?: ImageFormatExtension | VideoFormatExtension, notification_url?: string }, callback?: ErrorCallBack): Promise<any>;
+            function multi(tag: string, options?: { transformation?: Transformation, async?: boolean, format?: ImageAndVideoFormat, notification_url?: string }, callback?: ErrorCallBack): Promise<any>;
 
             function multi(tag: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -878,7 +869,6 @@ declare module 'cloudinary' {
             function upload_tag_params(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function upload_url(options?: UploadApiOptions): Promise<any>;
-
         }
 
         /****************************** Search API *************************************/
@@ -964,7 +954,7 @@ declare module 'cloudinary' {
     interface VideoTransformationOptions extends CommonTransformationOptions {
         audio_codec?: AudioCodec;
         audio_frequency?: AudioFrequency;
-        video_codec?: string | Object; //TODO check if we can enable auto hinting
+        video_codec?: string | Object;
         bit_rate?: number | string;
         fps?: string | Array<string | number>;
         keyframe_interval?: number;
