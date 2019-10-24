@@ -1,12 +1,11 @@
 import * as cloudinary from 'cloudinary';
 
-// npm run dtslint to run tests
-
 // $ExpectType void
 cloudinary.config({
     cloud_name: 'demo',
 });
-
+cloudinary.config(true);
+cloudinary.config("private_cdn", true);
 // $ExpectType string
 const test = cloudinary.image("front_face.png", {
     secure: true,
@@ -302,7 +301,7 @@ cloudinary.v2.api.delete_streaming_profile('custom_square',
 
 // $ExpectType Promise<any>
 cloudinary.api.delete_transformation(
-    {width: 150, height: 100, crop: 'fill'},
+    {width: 150, height: 100, crop: "fill"},
     function (error, result) {
         console.log(result, error);
     }
