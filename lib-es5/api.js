@@ -428,7 +428,7 @@ exports.update_upload_preset = function update_upload_preset(name, callback) {
   var params = void 0,
       uri = void 0;
   uri = ["upload_presets", name];
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id"));
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id", "live"));
   return call_api("put", uri, params, callback, options);
 };
 
@@ -438,7 +438,7 @@ exports.create_upload_preset = function create_upload_preset(callback) {
   var params = void 0,
       uri = void 0;
   uri = ["upload_presets"];
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id"));
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id", "live"));
   return call_api("post", uri, params, callback, options);
 };
 
