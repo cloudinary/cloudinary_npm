@@ -1,6 +1,7 @@
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+
 const api = cloudinary.v2.api;
 
 describe("structured metadata api", function () {
@@ -10,23 +11,23 @@ describe("structured metadata api", function () {
       external_id: helper.generateExId(),
       label: "color",
       type: "string",
-      default_value: "blue"
+      default_value: "blue",
     }, {
       external_id: helper.generateExId(),
       label: "colors",
       type: "set",
       datasource: {
         values: [
-          {external_id: "color_1", value: "red" },
-          {external_id: "color_2", value: "blue"}
-        ]
-      }
-    }
-  ]
+          { external_id: "color_1", value: "red" },
+          { external_id: "color_2", value: "blue" },
+        ],
+      },
+    },
+  ];
   after(function () {
     metadata_field_external_ids.forEach(external_id => api.delete_metadata_field(external_id));
   });
-  
+
   it("should create metadata", () => {
     const labels = metadata_arr.map(item => item.label);
     return Promise.all(metadata_arr.map(field => api.create_metadata_field(field))).then((results) => {
@@ -35,15 +36,15 @@ describe("structured metadata api", function () {
         expect(res).not.to.be.empty();
         expect(labels).to.contain(res.label);
         metadata_field_external_ids.push(res.external_id);
-      })
-    })
+      });
+    });
   });
   it("test creating date field with default value validation ", () => {
     const max = new Date();
     const min = new Date(max.getTime() - 72 * 60 * 60 * 1000);
     const legalValue = new Date(min.getTime() + 36 * 60 * 60 * 1000);
     const illegalValue = new Date(max.getTime() + 36 * 60 * 60 * 1000);
-    
+
     const metadata = {
       external_id: helper.generateExId(),
       label: "dateOfBirth",
@@ -55,14 +56,14 @@ describe("structured metadata api", function () {
         rules: [
           {
             type: "greater_than",
-            value: helper.toISO8601DateOnly(min)
+            value: helper.toISO8601DateOnly(min),
           }, {
             type: "less_than",
-            value: helper.toISO8601DateOnly(max)
-          }
-        ]
-      }
-    }
+            value: helper.toISO8601DateOnly(max),
+          },
+        ],
+      },
+    };
     return api.create_metadata_field(metadata).then(() => {
       expect().fail();
     }).catch((res) => {
@@ -91,8 +92,8 @@ describe("structured metadata api", function () {
   });
   it("should update metadata field by external id", function () {
     const metadata = {
-      default_value: "red"
-    }
+      default_value: "red",
+    };
     return api.update_metadata_field(metadata_arr[0].external_id, metadata).then((result) => {
       expect(result).not.to.be.empty();
       expect(result.label).to.eql(metadata_arr[0].label);
@@ -108,22 +109,22 @@ describe("structured metadata api", function () {
   it("should update metadata field datasource by external id", function () {
     const datasource = {
       values: [
-        {external_id: "color_1", value: "brown"},
-        {external_id: "color_2", value: "black"}
-      ]
-    }
+        { external_id: "color_1", value: "brown" },
+        { external_id: "color_2", value: "black" },
+      ],
+    };
     return api.update_metadata_field_datasource(metadata_arr[1].external_id, datasource).then((result) => {
       expect(result).not.to.be.empty();
       expect(result.values).not.to.be.empty();
       result.values.forEach((item) => {
         let before_update_value = datasource.values.find(val => val.external_id === item.external_id);
         expect(item.value).to.eql(before_update_value.value);
-      })
+      });
     });
   });
   it("should delete entries in metadata field datasource", function () {
     const external_ids = [metadata_arr[1].datasource.values[0].external_id];
-    return api.delete_entries_field_datasource(metadata_arr[1].external_id, {external_ids}).then((result) => {
+    return api.delete_entries_field_datasource(metadata_arr[1].external_id, { external_ids }).then((result) => {
       expect(result).not.to.be.empty();
     });
   });
@@ -135,6 +136,6 @@ describe("structured metadata api", function () {
     }).then(function (result) {
       expect(result).not.to.be.empty();
       expect(result.fieldId).to.eql("123456");
-    })
+    });
   });
 });
