@@ -40,26 +40,26 @@ describe("structured metadata api", function () {
     });
   });
   it("test creating date field with default value validation ", () => {
-    const max = new Date();
-    const min = new Date(max.getTime() - 72 * 60 * 60 * 1000);
-    const legalValue = new Date(min.getTime() + 36 * 60 * 60 * 1000);
-    const illegalValue = new Date(max.getTime() + 36 * 60 * 60 * 1000);
+    const max = '2000-01-01';
+    const min = '1950-01-01';
+    const legalValue = '1980-04-20';
+    const illegalValue = '1940-01-20';
 
     const metadata = {
       external_id: helper.generateExId(),
       label: "dateOfBirth",
       type: "date",
       mandatory: true,
-      default_value: helper.toISO8601DateOnly(illegalValue),
+      default_value: illegalValue,
       validation: {
         type: "and",
         rules: [
           {
             type: "greater_than",
-            value: helper.toISO8601DateOnly(min),
+            value: min,
           }, {
             type: "less_than",
-            value: helper.toISO8601DateOnly(max),
+            value: max,
           },
         ],
       },
@@ -70,7 +70,7 @@ describe("structured metadata api", function () {
       expect(res.error).not.to.be(void 0);
       expect(res.error.message).to.contain("default_value is invalid");
     }).then(() => {
-      metadata.default_value = helper.toISO8601DateOnly(legalValue);
+      metadata.default_value = legalValue;
       return api.create_metadata_field(metadata).then((result) => {
         expect(result).not.to.be.empty();
         expect(result.label).to.eql(metadata.label);

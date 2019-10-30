@@ -272,14 +272,3 @@ exports.generateExId = function () {
   const max = 1000000;
   return `testExId_${this.randomInteger(min, max)}${this.randomInteger(min, max)}`;
 };
-
-/**
- Convert Date to ISO8601 Date Only
- @param {Date} date
- @return {string} converted date
- */
-exports.toISO8601DateOnly = function (date) {
-  const month = date.getMonth() + 1;
-  const dt = date.getDate();
-  return date.getFullYear() + '-' + (month < 10 ? '0' + month : month) + '-' + (dt < 10 ? '0' + dt : dt);
-};
