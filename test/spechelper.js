@@ -270,7 +270,7 @@ exports.randomInteger = function (min, max) {
 exports.generateExId = function () {
   const min = 0;
   const max = 1000000;
-  return `testExId_${this.randomInteger(min,max)}${this.randomInteger(min,max)}`
+  return `testExId_${this.randomInteger(min, max)}${this.randomInteger(min, max)}`;
 };
 
 /**
@@ -281,5 +281,5 @@ exports.generateExId = function () {
 exports.toISO8601DateOnly = function (date) {
   const month = date.getMonth() + 1;
   const dt = date.getDate();
-  return date.getFullYear()+'-' + (month < 10 ? '0' + month : month) + '-' + (dt < 10 ? '0' + dt : dt);
-}
+  return date.getFullYear() + '-' + (month < 10 ? '0' + month : month) + '-' + (dt < 10 ? '0' + dt : dt);
+};
