@@ -250,25 +250,3 @@ exports.setupCache = function () {
 exports.uploadImage = function (options) {
   return cloudinary.v2.uploader.upload(exports.IMAGE_FILE, options);
 };
-
-/**
- Generate random number
- @private
- @param {number} min limit value
- @param {number} max limit value
- @return {number} a new random number
- */
-exports.randomInteger = function (min, max) {
-  const rand = min - 0.5 + Math.random() * (max - min + 1);
-  return Math.round(rand);
-};
-
-/**
- Generate random external id
- @return {string} a new random external id
- */
-exports.generateExId = function () {
-  const min = 0;
-  const max = 1000000;
-  return `testExId_${this.randomInteger(min, max)}${this.randomInteger(min, max)}`;
-};

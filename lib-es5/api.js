@@ -1,7 +1,5 @@
 'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 // eslint-disable-next-line import/order
 var config = require("./config");
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
@@ -650,7 +648,7 @@ exports.get_metadata_field = function get_metadata_field(external_id, callback) 
 exports.update_metadata_field = function update_metadata_field(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var params = _extends({}, options);
+  var params = only(options, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
   return call_api("put", "metadata_fields/" + external_id, params, callback, options);
 };
@@ -658,7 +656,7 @@ exports.update_metadata_field = function update_metadata_field(external_id, call
 exports.update_metadata_field_datasource = function update_metadata_field_datasource(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var params = _extends({}, options);
+  var params = only(options, "values");
   options.content_type = "json";
   return call_api("put", "metadata_fields/" + external_id + "/datasource", params, callback, options);
 };
@@ -666,7 +664,7 @@ exports.update_metadata_field_datasource = function update_metadata_field_dataso
 exports.delete_entries_field_datasource = function delete_entries_field_datasource(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var params = _extends({}, options);
+  var params = only(options, "external_id", "external_ids");
   options.content_type = "json";
   return call_api("delete", "metadata_fields/" + external_id + "/datasource", params, callback, options);
 };

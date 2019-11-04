@@ -2,18 +2,25 @@ const expect = require("expect.js");
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
+const SUFFIX = helper.SUFFIX;
+const EXTERNAL_ID_PREFIX = "metadata";
+const EXTERNAL_ID = EXTERNAL_ID_PREFIX + SUFFIX;
+const EXTERNAL_ID_1 = EXTERNAL_ID + "_1";
+const EXTERNAL_ID_2 = EXTERNAL_ID + "_2";
+const EXTERNAL_ID_3 = EXTERNAL_ID + "_3";
+
 const api = cloudinary.v2.api;
 
 describe("structured metadata api", function () {
   const metadata_field_external_ids = [];
   const metadata_arr = [
     {
-      external_id: helper.generateExId(),
+      external_id: EXTERNAL_ID_1,
       label: "color",
       type: "string",
       default_value: "blue",
     }, {
-      external_id: helper.generateExId(),
+      external_id: EXTERNAL_ID_2,
       label: "colors",
       type: "set",
       datasource: {
@@ -24,6 +31,7 @@ describe("structured metadata api", function () {
       },
     },
   ];
+  const mandatory_fields = ['type', 'external_id', 'label', 'mandatory', 'default_value', 'validation'];
   after(function () {
     metadata_field_external_ids.forEach(external_id => api.delete_metadata_field(external_id));
   });
@@ -39,37 +47,33 @@ describe("structured metadata api", function () {
       });
     });
   });
-  it("test creating date field with default value validation ", () => {
-    const max = '2000-01-01';
-    const min = '1950-01-01';
-    const legalValue = '1980-04-20';
-    const illegalValue = '1940-01-20';
+  describe("date_field_validation", function () {
+    let metadata;
+    beforeEach(function () {
+      const max = '2000-01-01';
+      const min = '1950-01-01';
 
-    const metadata = {
-      external_id: helper.generateExId(),
-      label: "dateOfBirth",
-      type: "date",
-      mandatory: true,
-      default_value: illegalValue,
-      validation: {
-        type: "and",
-        rules: [
-          {
-            type: "greater_than",
-            value: min,
-          }, {
-            type: "less_than",
-            value: max,
-          },
-        ],
-      },
-    };
-    return api.create_metadata_field(metadata).then(() => {
-      expect().fail();
-    }).catch((res) => {
-      expect(res.error).not.to.be(void 0);
-      expect(res.error.message).to.contain("default_value is invalid");
-    }).then(() => {
+      metadata = {
+        external_id: EXTERNAL_ID_3,
+        label: "dateOfBirth",
+        type: "date",
+        mandatory: true,
+        validation: {
+          type: "and",
+          rules: [
+            {
+              type: "greater_than",
+              value: min,
+            }, {
+              type: "less_than",
+              value: max,
+            },
+          ],
+        },
+      };
+    });
+    it("should create date field with default value", () => {
+      const legalValue = '1980-04-20';
       metadata.default_value = legalValue;
       return api.create_metadata_field(metadata).then((result) => {
         expect(result).not.to.be.empty();
@@ -77,16 +81,30 @@ describe("structured metadata api", function () {
         metadata_field_external_ids.push(result.external_id);
       });
     });
+    it("should not create date field with illegal default value", () => {
+      const illegalValue = '1940-01-20';
+      metadata.default_value = illegalValue;
+      return api.create_metadata_field(metadata).then(() => {
+        expect().fail();
+      }).catch((res) => {
+        expect(res.error).not.to.be(void 0);
+        expect(res.error.message).to.contain("default_value is invalid");
+      });
+    });
   });
   it("should return list metadata field definitions", function () {
     return api.list_metadata_fields().then((result) => {
       expect(result).not.to.be.empty();
       expect(result.metadata_fields).not.to.be.empty();
+      result.metadata_fields.forEach((field) => {
+        expect(field).to.include.keys(...mandatory_fields);
+      });
     });
   });
   it("should return metadata field by external id", function () {
     return api.get_metadata_field(metadata_arr[0].external_id).then((result) => {
       expect(result).not.to.be.empty();
+      expect(result).to.include.keys(...mandatory_fields);
       expect(result.label).to.eql(metadata_arr[0].label);
     });
   });
@@ -96,6 +114,7 @@ describe("structured metadata api", function () {
     };
     return api.update_metadata_field(metadata_arr[0].external_id, metadata).then((result) => {
       expect(result).not.to.be.empty();
+      expect(result).to.include.keys(...mandatory_fields);
       expect(result.label).to.eql(metadata_arr[0].label);
       expect(result.default_value).to.eql(metadata.default_value);
     });
