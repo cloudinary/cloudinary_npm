@@ -1,18 +1,18 @@
 import * as cloudinary from 'cloudinary';
 
 // $ExpectType void
-cloudinary.config({
+cloudinary.v2.config({
     cloud_name: 'demo',
 });
 
 // $ExpectType void
-cloudinary.config(true);
+cloudinary.v2.config(true);
 
 // $ExpectType void
-cloudinary.config("private_cdn", true);
+cloudinary.v2.config("private_cdn", true);
 
 // $ExpectType string
-const test = cloudinary.image("front_face.png", {
+const test = cloudinary.v2.image("front_face.png", {
     secure: true,
     transformation: [
         {
@@ -28,7 +28,7 @@ const test = cloudinary.image("front_face.png", {
 });
 
 // $ExpectType string
-cloudinary.image("yellow_tulip.jpg", {
+cloudinary.v2.image("yellow_tulip.jpg", {
     transformation: [
         {width: 220, height: 140, crop: "fill"},
         {overlay: "brown_sheep", width: 220, height: 140, x: 220, crop: "fill"},
@@ -50,16 +50,16 @@ cloudinary.image("yellow_tulip.jpg", {
 });
 
 // $ExpectType string
-cloudinary.image("sample.jpg", {
+cloudinary.v2.image("sample.jpg", {
     audio_codec: '1', overlay:
         {url: "http://cloudinary.com/images/old_logo.png7"}
 });
 
 // $ExpectType string
-cloudinary.picture("sample.jpg");
+cloudinary.v2.picture("sample.jpg");
 
 // $ExpectType string
-cloudinary.video("dog", {
+cloudinary.v2.video("dog", {
     width: 300,
     height: 300,
     crop: "pad",
@@ -70,7 +70,7 @@ cloudinary.video("dog", {
 });
 
 // $ExpectType string
-cloudinary.video("cld_rubiks_guy", {
+cloudinary.v2.video("cld_rubiks_guy", {
     height: 320, width: 480,
     background: "blurred:400:15", crop: "pad"
 });
@@ -105,15 +105,14 @@ cloudinary.v2.api.create_streaming_profile('custom_square',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.create_transformation('small_fill2',
+cloudinary.v2.api.create_transformation('small_fill2',
     {width: 150, height: 100, crop: 'fill'},
     (error, result) => {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
 cloudinary.v2.api.create_transformation('small_fill2',
-    {width: 150, height: 100, crop: 'fill'},
+    {width: 150, height: 100, crop: 'fill'}, {allowed_for_strict: true},
     (error, result) => {
         console.log(result, error);
     });
@@ -126,7 +125,7 @@ cloudinary.v2.api.create_transformation('small_fill',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.update_transformation(
+cloudinary.v2.api.update_transformation(
     {width: 150, height: 100, crop: 'fill'},
     {allowed_for_strict: false},
     function (error, result) {
@@ -135,23 +134,8 @@ cloudinary.api.update_transformation(
 );
 
 // $ExpectType Promise<any>
-cloudinary.api.update_transformation('w_150,h_100,c_fill',
+cloudinary.v2.api.update_transformation('w_150,h_100,c_fill',
     {allowed_for_strict: true},
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.update_transformation("my_named",
-    {crop: 'scale', width: 103},
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.v2.api.update_transformation(
-    {width: 150, height: 100, crop: 'fill'},
-    {density: 2},
     function (error, result) {
         console.log(result, error);
     });
@@ -180,31 +164,11 @@ cloudinary.v2.api.update_transformation("my_named",
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.create_upload_mapping('my_map',
-    function (error, result) {
-        console.log(result);
-    },
-    {template: "http://www.example.com/images/"});
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.create_upload_mapping('my_map',
     {template: "http://www.example.com/images/"},
     function (error, result) {
         console.log(result);
     });
-
-// $ExpectType Promise<any>
-cloudinary.api.create_upload_preset(
-    function (error, result) {
-        console.log(result);
-    },
-    {
-        name: "my_preset",
-        unsigned: true,
-        tags: "remote",
-        allowed_formats: "jpg,png"
-    }
-);
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.create_upload_preset(
@@ -220,40 +184,12 @@ cloudinary.v2.api.create_upload_preset(
 );
 
 // $ExpectType Promise<any>
-cloudinary.api.delete_all_resources(
-    function (error, result) {
-        console.log(result, error);
-    },
-    {type: 'facebook'}
-);
-
-// Testing overload
-
-// $ExpectType Promise<any>
-cloudinary.api.delete_all_resources(
-    {type: 'facebook'}
-);
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.delete_all_resources(
     {type: 'facebook'},
     function (error, result) {
         console.log(result, error);
     }
 );
-
-// $ExpectType Promise<any>
-cloudinary.api.delete_resources(['4'],
-    function (error, result) {
-        console.log(result, error);
-    },
-    {type: 'facebook'});
-
-// $ExpectType Promise<any>
-cloudinary.api.delete_resources(['image1', 'image2'],
-    function (error, result) {
-        console.log(result, error);
-    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_resources(['4'],
@@ -269,19 +205,27 @@ cloudinary.v2.api.delete_resources(['image1', 'image2'],
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.delete_resources_by_prefix('sunday',
-    function (error, result) {
-        console.log(result, error);
-    });
+cloudinary.v2.api.delete_derived_by_transformation(['image1', 'image2'], 'f_auto');
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.delete_derived_by_transformation(['image1', 'image2'], 'f_auto',
+    {content_type: 'json'},
+    function(err,res){console.log(err);});
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.delete_derived_by_transformation(['image1', 'image2'], 'f_auto',
+    function(err,res){console.log(err);});
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.delete_derived_resources(['image1', 'image2'],
+    function (err,res){console.log(err);});
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.delete_derived_resources(['image1', 'image2'], {keep_original: true},
+    function (err,res){console.log(err);});
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_resources_by_prefix('sunday',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.delete_resources_by_tag('mytag',
     function (error, result) {
         console.log(result, error);
     });
@@ -293,34 +237,23 @@ cloudinary.v2.api.delete_resources_by_tag('mytag',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.delete_streaming_profile('custom_square',
-    function (error, result) {
-        console.log(result);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.delete_streaming_profile('custom_square',
     function (error, result) {
         console.log(result);
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.delete_transformation(
-    {width: 150, height: 100, crop: "fill"},
+cloudinary.v2.api.delete_transformation(
+    {width: 150, height: 100, crop: 'fill'},
     function (error, result) {
         console.log(result, error);
     }
 );
 
 // $ExpectType Promise<any>
-cloudinary.api.delete_transformation('w_150,h_100,c_fill',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.delete_transformation(
     {width: 150, height: 100, crop: 'fill'},
+    {content_type: 'json'},
     function (error, result) {
         console.log(result, error);
     }
@@ -333,20 +266,14 @@ cloudinary.v2.api.delete_transformation('w_150,h_100,c_fill',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.delete_upload_mapping('wiki',
+cloudinary.v2.api.delete_upload_mapping('wiki',
     function (error, result) {
         console.log(result);
     });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_upload_mapping('wiki',
-    function (error, result) {
-        console.log(result);
-    });
-
-// $ExpectError
-cloudinary.api.delete_upload_preset(123,
-    // $ExpectError
+    {content_type: 'json'},
     function (error, result) {
         console.log(result);
     });
@@ -358,10 +285,11 @@ cloudinary.v2.api.delete_upload_preset('remote_media',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.get_streaming_profile('custom_square',
+cloudinary.v2.api.delete_upload_preset('remote_media',
+    {content_type: 'json'},
     function (error, result) {
         console.log(result);
-    });
+    })
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.get_streaming_profile('custom_square',
@@ -370,13 +298,13 @@ cloudinary.v2.api.get_streaming_profile('custom_square',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.list_streaming_profiles(
+cloudinary.v2.api.list_streaming_profiles(
     function (err, res) {
         console.log(err);
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.api.list_streaming_profiles(
+cloudinary.v2.api.list_streaming_profiles( {content_type: 'json'},
     function (err, res) {
         console.log(err);
     });
@@ -387,27 +315,24 @@ cloudinary.v2.api.ping(function (err, res) {
 });
 
 // $ExpectType Promise<any>
-cloudinary.api.ping({public_id: '123'});
+cloudinary.v2.api.ping({public_id: '123'});
 
 // $ExpectType Promise<any>
-cloudinary.api.resource('rwkaliebnufp3bxyrvyo.txt',
+cloudinary.v2.api.resource('rwkaliebnufp3bxyrvyo.txt',
+    {resource_type: 'raw'},
     function (error, result) {
         console.log(result, error);
-    },
-    {resource_type: 'raw'});
+    });
 
 // $ExpectType Promise<any>
-cloudinary.api.resource('4',
+cloudinary.v2.api.resource('4',
+    {type: 'facebook'},
     function (error, result) {
         console.log(result, error);
-    },
-    {type: 'facebook'});
+    });
 
 // $ExpectType Promise<any>
-cloudinary.api.resource('sample',
-    function (error, result) {
-        console.log(result, error);
-    },
+cloudinary.v2.api.resource('sample',
     {
         faces: true,
         colors: true,
@@ -415,7 +340,7 @@ cloudinary.api.resource('sample',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.resource('sample',
+cloudinary.v2.api.resource('sample',
     function (error, result) {
         console.log(result, error);
     });
@@ -450,41 +375,6 @@ cloudinary.v2.api.resource('sample',
     function (error, result) {
         console.log(result, error);
     });
-
-// $ExpectType Promise<any>
-cloudinary.api.resources(
-    function (error, result) {
-        console.log(result, error);
-    },
-    {resource_type: 'raw'});
-
-// $ExpectType Promise<any>
-cloudinary.api.resources(
-    function (error, result) {
-        console.log(result, error);
-    },
-    {type: 'facebook'});
-
-// $ExpectType Promise<any>
-cloudinary.api.resources(
-    function (error, result) {
-        console.log(result, error);
-    },
-    {
-        type: 'upload',
-        prefix: 'sample'
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.resources(
-    function (error, result) {
-        console.log(result, error);
-    },
-    {type: 'upload'});
-
-// $ExpectType Promise<any>
-cloudinary.api.resources(
-    {type: 'upload'});
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.resources(
@@ -522,21 +412,8 @@ cloudinary.v2.api.resources(
 );
 
 // $ExpectType Promise<any>
-cloudinary.api.resources_by_context("mycontextkey", "mycontextvalue", function (error, result) {
-        console.log(result, error);
-    },
-    {resource_type: 'video'});
-
-// $ExpectType Promise<any>
-cloudinary.api.resources_by_context("mycontextkey",
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.resources_by_context("mycontextkey", "mycontextvalue",
-    {resource_type: 'video'},
-    function (error, result) {
+    {resource_type: 'video'}, function (error, result) {
         console.log(result, error);
     });
 
@@ -553,28 +430,8 @@ cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.resources_by_ids(["user_photo_1", "user_photo_2"],
-    function (error, result) {
-        console.log(result, error);
-    }, {resource_type: 'video'},);
-
-// Testing overload
-
-// $ExpectType Promise<any>
-cloudinary.api.resources_by_ids(["user_photo_1", "user_photo_2"],
+cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     {resource_type: 'video'},);
-
-// $ExpectType Promise<any>
-cloudinary.api.resources_by_moderation('webpurify', 'approved',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.resources_by_moderation('manual', 'pending',
-    function (error, result) {
-        console.log(result, error);
-    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.resources_by_moderation('webpurify', 'approved',
@@ -584,19 +441,6 @@ cloudinary.v2.api.resources_by_moderation('webpurify', 'approved',
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.resources_by_moderation('manual', 'pending',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.resources_by_tag("mytag",
-    function (error, result) {
-        console.log(result, error);
-    },
-    {resource_type: 'raw'});
-
-// $ExpectType Promise<any>
-cloudinary.api.resources_by_tag("mytag",
     function (error, result) {
         console.log(result, error);
     });
@@ -614,12 +458,6 @@ cloudinary.v2.api.resources_by_tag("mytag",
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
-cloudinary.api.restore(["image1", "image2"],
-    function (error, result) {
-        console.log(result, error);
-    });
-
 cloudinary.v2.api.restore(["image1", "image2"],
     function (error, result) {
         console.log(result, error);
@@ -631,31 +469,9 @@ cloudinary.v2.api.root_folders(function (err, res) {
 });
 
 // $ExpectType Promise<any>
-cloudinary.api.root_folders(function (err, res) {
-    console.log(err);
-});
-
-// $ExpectType Promise<any>
-cloudinary.api.sub_folders("cloud", function (error, result) {
-    console.log(result);
-});
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.sub_folders("cloud", function (error, result) {
     console.log(result);
 });
-
-// $ExpectType Promise<any>
-cloudinary.api.transformation({width: 150, height: 100, crop: 'fill'},
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.transformation('w_150,h_100,c_fill',
-    function (error, result) {
-        console.log(result, error);
-    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.transformation({width: 150, height: 100, crop: 'fill'},
@@ -670,30 +486,12 @@ cloudinary.v2.api.transformation('w_150,h_100,c_fill',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.transformations(function (error, result) {
-    console.log(result);
-});
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.transformations(function (error, result) {
     console.log(result);
 });
 
-// $ExpectError
-cloudinary.api.update_resources_access_mode_by_ids("public", 'image1', 'image2',
-    // $ExpectError
-    function (error, result) {
-        console.log(result);
-    });
-
 // $ExpectType Promise<any>
 cloudinary.v2.api.update_resources_access_mode_by_ids("public", ['image1', 'image2'],
-    function (error, result) {
-        console.log(result);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.update_resources_access_mode_by_tag('public', "20170216",
     function (error, result) {
         console.log(result);
     });
@@ -703,12 +501,6 @@ cloudinary.v2.api.update_resources_access_mode_by_tag('public', "20170216",
     function (error, result) {
         console.log(result);
     });
-
-// $ExpectType Promise<any>
-cloudinary.api.update_resources_access_mode_by_prefix("public", "to-publish", function (error, result) {
-        console.log(result);
-    },
-    {resource_type: 'video'});
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.update_resources_access_mode_by_prefix("public", "to-publish",
@@ -731,26 +523,10 @@ cloudinary.v2.api.update_streaming_profile('custom_square',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.update_upload_mapping('wiki', function (error, result) {
-        console.log(result);
-    },
-    {template: "https://u.wiki.com/images/"});
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.update_upload_mapping('wiki',
     {template: "https://u.wiki.com/images/"},
     function (error, result) {
         console.log(result);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.api.update_upload_preset('wiki', function (error, result) {
-        console.log(result);
-    },
-    {
-        unsigned: true,
-        tags: "remote",
-        allowed_formats: "jpg,png"
     });
 
 // $ExpectType Promise<any>
@@ -765,29 +541,13 @@ cloudinary.v2.api.update_upload_preset('wiki',
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.upload_mapping('wiki',
-    function (error, result) {
-        console.log(result);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.upload_mapping('wiki',
     function (error, result) {
         console.log(result);
     });
 
 // $ExpectType Promise<any>
-cloudinary.api.upload_mappings(function (error, result) {
-    console.log(result);
-});
-
-// $ExpectType Promise<any>
 cloudinary.v2.api.upload_mappings(function (error, result) {
-    console.log(result);
-});
-
-// $ExpectType Promise<any>
-cloudinary.api.usage(function (error, result) {
     console.log(result);
 });
 
@@ -802,19 +562,7 @@ cloudinary.v2.api.usage(function (error, result) {
 cloudinary.v2.api.usage({public_id: 'demo'});
 
 // $ExpectType Promise<any>
-cloudinary.uploader.add_context('alt=Animal|class=Mammalia', ['dog', 'lion'],
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.add_context('alt=Animal|class=Mammalia', ['dog', 'lion'],
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.add_tag('animal', ['dog', 'lion'],
     function (error, result) {
         console.log(result, error);
     });
@@ -824,17 +572,6 @@ cloudinary.v2.uploader.add_tag('animal', ['dog', 'lion'],
     function (error, result) {
         console.log(result, error);
     });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.create_zip(
-    function (error, result) {
-        console.log(result, error);
-    },
-    {
-        tags: 'lion',
-        resource_type: 'image'
-    }
-);
 
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.create_zip(
@@ -848,35 +585,9 @@ cloudinary.v2.uploader.create_zip(
 );
 
 // $ExpectType Promise<any>
-cloudinary.uploader.destroy('sample', function (error, result) {
-    console.log(result, error);
-});
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.destroy('sample', function (error, result) {
     console.log(result, error);
 });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.explicit("sample", function (error, result) {
-        console.log(result, error);
-    },
-    {
-        type: "upload",
-        eager: [
-            {
-                width: 400,
-                height: 400,
-                crop: "crop",
-                gravity: "face"
-            },
-            {
-                width: 660,
-                height: 400,
-                crop: "pad",
-                background: "blue"
-            }]
-    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.explicit("sample",
@@ -901,25 +612,19 @@ cloudinary.v2.uploader.explicit("sample",
     });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.explode('sample', function (error, result) {
-        console.log(result, error);
-    },
-    {page: 'all'});
-
-// Testing overload
-
-// $ExpectType Promise<any>
-cloudinary.uploader.explode('sample', {page: 'all'});
-
-// $ExpectType Promise<any>
-cloudinary.v2.uploader.explode('sample',
-    {page: 'all'},
+cloudinary.v2.uploader.explode('sample', {page: 'all'},
     function (error, result) {
         console.log(result, error);
     });
 
+// Testing overload
+
 // $ExpectType Promise<any>
-cloudinary.uploader.generate_sprite('logo',
+cloudinary.v2.uploader.explode('sample', {page: 'all'});
+
+// $ExpectType Promise<any>
+cloudinary.v2.uploader.explode('sample',
+    {page: 'all'},
     function (error, result) {
         console.log(result, error);
     });
@@ -931,19 +636,7 @@ cloudinary.v2.uploader.generate_sprite('logo',
     });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.multi('logo',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.multi('logo',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.remove_all_context(['dog', 'lion'],
     function (error, result) {
         console.log(result, error);
     });
@@ -955,19 +648,7 @@ cloudinary.v2.uploader.remove_all_context(['dog', 'lion'],
     });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.remove_all_tags(['dog', 'lion'],
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.remove_all_tags(['dog', 'lion'],
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.remove_tag('animal', ['dog', 'lion'],
     function (error, result) {
         console.log(result, error);
     });
@@ -979,19 +660,7 @@ cloudinary.v2.uploader.remove_tag('animal', ['dog', 'lion'],
     });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.rename('canyon', 'grand_canyon',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.rename('canyon', 'grand_canyon',
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.replace_tag('animal', ['dog', 'lion'],
     function (error, result) {
         console.log(result, error);
     });
@@ -1003,17 +672,6 @@ cloudinary.v2.uploader.replace_tag('animal', ['dog', 'lion'],
     });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.text("Sample text string", function (err, res) {
-    },
-    {
-        public_id: "sample_text_image",
-        font_family: "Roboto",
-        font_size: 42,
-        font_color: "red",
-        font_weight: "bold"
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.text("Sample text string",
     {
         public_id: "sample_text_image",
@@ -1021,33 +679,6 @@ cloudinary.v2.uploader.text("Sample text string",
         font_size: 42,
         font_color: "red",
         font_weight: "bold"
-    });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.upload("http://www.example.com/sample.jpg",
-    function (error, result) {
-        console.log(result, error);
-    });
-
-// $ExpectType Promise<any>
-cloudinary.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
-    function (error, result) {
-        console.log(result, error);
-    },
-    {
-        eager: [
-            {width: 400, height: 300, crop: "pad"},
-            {width: 260, height: 200, crop: "crop", gravity: "north"}]
-    });
-
-// Testing overload
-
-// $ExpectType Promise<any>
-cloudinary.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
-    {
-        eager: [
-            {width: 400, height: 300, crop: "pad"},
-            {width: 260, height: 200, crop: "crop", gravity: "north"}]
     });
 
 // $ExpectType Promise<any>
@@ -1077,34 +708,12 @@ cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.upload_large("my_large_video.mp4",
-    function (error, result) {console.log(result, error);
-    },
-    {resource_type: "video"});
-
-// $ExpectType Promise<any>
-cloudinary.uploader.upload_large("my_large_video.mp4", function (error, result) {
-        console.log(result, error);
-    },
-    {
-        resource_type: "video",
-        chunk_size: 6000000
-    });
-
-// $ExpectType Promise<any>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {resource_type: "video"},
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType string
-cloudinary.utils.download_zip_url(
-    {
-        public_ids: 'dog,cat,lion',
-        resource_type: 'image'
-    }
-);
 // $ExpectType string
 cloudinary.v2.utils.download_zip_url(
     {
@@ -1136,7 +745,7 @@ cloudinary.v2.search
     .execute().then(result => console.log(result));
 
 // $ExpectType string
-let test2 = cloudinary.url("sample.jpg", {
+let test2 = cloudinary.v2.url("sample.jpg", {
     sign_url: true,
     custom_function: {
         function_type: "remote",
@@ -1146,11 +755,11 @@ let test2 = cloudinary.url("sample.jpg", {
 });
 
 // $ExpectType Promise<void>
-cloudinary.uploader.remove_tag('12', ['11']).then((value) => {
+cloudinary.v2.uploader.remove_tag('12', ['11']).then((value) => {
     console.log(value);
 });
 
 // $ExpectType Promise<any>
-cloudinary.uploader.remove_tag('12', ['11'], function (err, res) {
+cloudinary.v2.uploader.remove_tag('12', ['11'], function (err, res) {
     console.log(err, res);
 });
