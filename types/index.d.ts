@@ -1,8 +1,9 @@
+import {ConfigAndUrlOptions, TransformationOptions} from "cloudinary";
+
 declare module 'cloudinary' {
 
     /****************************** Constants *************************************/
-    /****************************** Transformations *************************************/
-    type Transformation = string | string[] | CommonTransformationOptions | VideoTransformationOptions | ImageTransformationOptions | Object ;
+    /****************************** Transformations *******************************/
     type CropMode =
         string
         | "scale"
@@ -134,7 +135,6 @@ declare module 'cloudinary' {
         | 96000
         | 176400
         | 192000;
-    type FunctionType = string | "wasm" | "remote";
     /****************************** Flags *************************************/
     type ImageFlags =
         string
@@ -224,16 +224,12 @@ declare module 'cloudinary' {
         | "heic"
         | "ico"
         | "jpg"
-        | "jpe"
-        | "jpeg"
         | "jp2"
         | "wdp"
         | "pdf"
         | "png"
         | "psd"
-        | "svg"
         | "tga"
-        | "tif"
         | "tiff"
         | "webp"
     type VideoFormat =
@@ -242,8 +238,6 @@ declare module 'cloudinary' {
         | "flv"
         | "m3u8"
         | "ts"
-        | "m2ts"
-        | "mts"
         | "mov"
         | "mkv"
         | "mp4"
@@ -251,10 +245,268 @@ declare module 'cloudinary' {
         | "ogv"
         | "webm"
 
-    type ImageAndVideoTransformations = CommonTransformationOptions | ImageTransformationOptions | VideoTransformationOptions;
-    type ImageTransformationAndTags = ImageTransformationOptions | TagOptions;
-    type VideoTransformationAndTags = VideoTransformationOptions | TagOptions;
-    type ImageAndVideoFormat = ImageFormat | VideoFormat;
+    export interface CommonTransformationOptions {
+        transformation?: TransformationOptions;
+        raw_transformation?: string;
+        crop?: CropMode;
+        width?: string | number;
+        height?: string | number;
+        size?: string;
+        aspect_ratio?: string | number;
+        gravity?: Gravity;
+        x?: string | number;
+        y?: string | number;
+        zoom?: string | number;
+        effect?: string | Array<string | number>;
+        background?: string;
+        angle?: Angle;
+        radius?: string | number;
+        overlay?: string | object;
+        custom_function?: string | { function_type: string | "wasm" | "remote", source: string }
+        variables?: Array<string | object>;
+        if?: string;
+        else?: string;
+        end_if?: string;
+        dpr?: string | number;
+        quality?: string | number;
+        delay?: string | number;
+
+        [futureKey: string]: any;
+    }
+
+    export interface ImageTransformationOptions {
+        underlay?: string | Object;
+        color?: string;
+        color_space?: ColorSpace;
+        opacity?: number | string;
+        border?: string;
+        default_image?: string;
+        density?: number | string;
+        format?: ImageFormat;
+        fetch_format?: ImageFormat;
+        effect?: string | Array<string | number> | ImageEffect;
+        page?: number | string;
+        flags?: ImageFlags | string;
+
+        [futureKey: string]: any;
+    }
+
+    interface VideoTransformationOptions {
+        audio_codec?: AudioCodec;
+        audio_frequency?: AudioFrequency;
+        video_codec?: string | Object;
+        bit_rate?: number | string;
+        fps?: string | Array<string | number>;
+        keyframe_interval?: number;
+        offset?: string,
+        start_offset?: number | string;
+        end_offset?: number | string;
+        duration?: number | string;
+        streaming_profile?: StreamingProfiles
+        video_sampling?: number | string;
+        format?: VideoFormat;
+        fetch_format?: VideoFormat;
+        effect?: string | Array<string | number> | VideoEffect;
+        flags?: VideoFlags;
+
+        [futureKey: string]: any;
+    }
+
+    interface ConfigOptions {
+        cloud_name?: string;
+        api_key?: string;
+        api_secret?: string;
+        private_cdn?: boolean;
+        secure_distribution?: boolean;
+        force_version?: boolean;
+        ssl_detected?: boolean;
+        secure?: boolean;
+        cdn_subdomain?: boolean;
+        secure_cdn_subdomain?: boolean;
+        cname?: string;
+        shorten?: boolean;
+        sign_url?: boolean;
+        use_root_path?: boolean;
+        auth_token?: object;
+
+        [futureKey: string]: any;
+    }
+
+    export interface ResourceOptions {
+        type?: string;
+        resource_type?: string;
+    }
+
+    export interface UrlOptions extends ResourceOptions{
+        version?: string;
+        format?: string;
+        url_suffix?: string;
+
+        [futureKey: string]: any;
+    }
+
+    export interface ImageTagOptions {
+        html_height?: number;
+        html_width?: number;
+        srcset?: any;
+        attributes?: any;
+        client_hints?: boolean;
+        responsive?: boolean;
+        hidpi?: boolean;
+        responsive_placeholder?: boolean;
+
+        [futureKey: string]: any;
+    }
+
+    export interface VideoTagOptions {
+        source_types?: string | string[];
+        source_transformation?: string;
+        fallback_content?: string;
+        poster?: string | object;
+        controls?: boolean;
+        preload?: string;
+
+        [futureKey: string]: any;
+    }
+    /****************************** Admin API Options *************************************/
+    export interface AdminApiOptions {
+        agent?: object;
+        content_type?: string;
+
+        [futureKey: string]: any;
+    }
+
+    export interface ArchiveApiOptions {
+        allow_missing?: boolean;
+        async?: boolean;
+        expires_at?: number;
+        flatten_folders?: boolean;
+        flatten_transformations?: boolean;
+        keep_derived?: boolean;
+        mode?: string;
+        notification_url?: string;
+        prefixes?: string;
+        public_ids?: string[] | string;
+        skip_transformation_name?: boolean;
+        tags?: string | string[];
+        target_format?: TargetArchiveFormat;
+        target_public_id?: string;
+        target_tags?: string[];
+        timestamp?: number;
+        transformations?: TransformationOptions;
+        type?: DeliveryType
+        use_original_filename?: boolean;
+
+        [futureKey: string]: any;
+    }
+
+    export interface UpdateApiOptions extends ResourceOptions{
+        access_control?: string[];
+        auto_tagging?: number;
+        background_removal?: string;
+        categorization?: string;
+        context?: boolean | string;
+        custom_coordinates?: string;
+        detection?: string;
+        face_coordinates?: string;
+        headers?: string;
+        notification_url?: string;
+        ocr?: string;
+        raw_convert?: string;
+        similarity_search?: string;
+        tags?: string | boolean | string[];
+        moderation_status?: string;
+        unsafe_update?: object;
+        allowed_for_strict?: boolean;
+
+        [futureKey: string]: any;
+    }
+
+    export interface PublishApiOptions extends ResourceOptions{
+        invalidate?: boolean;
+        overwrite?: boolean;
+
+        [futureKey: string]: any;
+    }
+
+    export interface ResourceApiOptions extends ResourceOptions{
+        transformation?: TransformationOptions;
+        transformations?: string[];
+        keep_original?: boolean;
+        invalidate?: boolean;
+        next_cursor?: boolean | string;
+        public_ids?: string[];
+        prefix?: string;
+        all?: boolean;
+        max_results?: number;
+        tags?: string | boolean | string[];
+        context?: boolean | string;
+        direction?: string | number;
+        moderations?: boolean;
+        start_at?: string;
+        exif?: boolean;
+        colors?: boolean;
+        derived_next_cursor?: string;
+        faces?: boolean;
+        image_metadata?: boolean;
+        pages?: boolean;
+        coordinates?: boolean;
+        phash?: boolean;
+
+        [futureKey: string]: any;
+    }
+
+    export interface UploadApiOptions {
+        access_mode?: AccessMode;
+        allowed_formats?: Array<VideoFormat> | Array<ImageFormat>;
+        async?: boolean;
+        backup?: boolean;
+        callback?: string;
+        colors?: boolean;
+        discard_original_filename?: boolean;
+        eager?: TransformationOptions;
+        eager_async?: boolean;
+        eager_notification_url?: string;
+        exif?: boolean;
+        faces?: boolean;
+        folder?: string;
+        format?: VideoFormat | ImageFormat;
+        image_metadata?: boolean;
+        invalidate?: boolean;
+        moderation?: ModerationKind;
+        notification_url?: string;
+        overwrite?: boolean;
+        phash?: boolean;
+        proxy?: string;
+        public_id?: string;
+        quality_analysis?: boolean;
+        responsive_breakpoints?: object;
+        return_delete_token?: boolean
+        timestamp?: number;
+        transformation?: TransformationOptions;
+        type?: DeliveryType;
+        unique_filename?: boolean;
+        upload_preset?: string;
+        use_filename?: boolean;
+        resource_types?: ResourceType | "auto";
+        chunk_size?: number;
+
+        [futureKey: string]: any;
+    }
+
+    type TransformationOptions =
+        string
+        | string[]
+        | CommonTransformationOptions
+        | VideoTransformationOptions
+        | ImageTransformationOptions
+        | Object
+        | Array<ImageTransformationOptions>
+        | Array<VideoTransformationOptions>;
+
+    type ImageTransformationAndTagsOptions = ImageTransformationOptions | ImageTagOptions;
+    type VideoTransformationAndTagsOptions = VideoTransformationOptions | VideoTagOptions;
+    type ImageAndVideoFormatOptions = ImageFormat | VideoFormat;
     type ConfigAndUrlOptions = ConfigOptions | UrlOptions;
     type AdminAndPublishOptions = AdminApiOptions | PublishApiOptions;
     type AdminAndResourceOptions = AdminApiOptions | ResourceApiOptions;
@@ -265,12 +517,12 @@ declare module 'cloudinary' {
     type StreamingProfiles = string | "4k" | "full_hd" | "hd" | "sd" | "full_hd_wifi" | "full_hd_lean" | "hd_lean";
     type ModerationKind = string | "manual" | "webpurify" | "aws_rek" | "metascan";
     type AccessMode = string | "public" | "authenticated";
-    type TargeArchivetFormat = string | "zip" | "tgz";
+    type TargetArchiveFormat = string | "zip" | "tgz";
     type ErrorCallBack = (error: any, result: any) => any;
 
     export namespace v2 {
 
-        /****************************** Tags *************************************/
+        /****************************** Global Utils *************************************/
 
         function cloudinary_js_config(): string;
 
@@ -278,15 +530,17 @@ declare module 'cloudinary' {
 
         function config(new_config: boolean | object): void;
 
-        function image(source: string, options?: ImageTransformationAndTags): string;
+        function url(public_id: string, options?: ConfigAndUrlOptions | TransformationOptions): string;
 
-        function picture(public_id: string, options?: ImageTransformationAndTags): string;
+        /****************************** Tags *************************************/
 
-        function source(public_id: string, options?: ImageAndVideoTransformations): string;
+        function image(source: string, options?: ImageTransformationAndTagsOptions | ConfigAndUrlOptions): string;
 
-        function url(public_id: string, options?: ConfigAndUrlOptions): string;
+        function picture(public_id: string, options?: ImageTransformationAndTagsOptions | ConfigAndUrlOptions): string;
 
-        function video(public_id: string, options?: VideoTransformationAndTags): string;
+        function source(public_id: string, options?: ConfigAndUrlOptions | TransformationOptions): string;
+
+        function video(public_id: string, options?: VideoTransformationAndTagsOptions | ConfigAndUrlOptions): string;
 
         /****************************** Utils *************************************/
 
@@ -296,7 +550,7 @@ declare module 'cloudinary' {
 
             function api_url(action?: string, options?: ConfigAndUrlOptions): Promise<any>;
 
-            function url(public_id?: string, options?: ConfigAndUrlOptions): string;
+            function url(public_id?: string, options?: ConfigAndUrlOptions | TransformationOptions): string;
 
             function video_thumbnail_url(public_id?: string, options?: ConfigAndUrlOptions): string;
 
@@ -316,11 +570,11 @@ declare module 'cloudinary' {
         /****************************** Admin API V2 Methods *************************************/
 
         namespace api {
-            function create_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
+            function create_streaming_profile(name: string, options: AdminApiOptions | { display_name?: string, representations: TransformationOptions }, callback?: ErrorCallBack): Promise<any>;
 
-            function create_transformation(name: string, transformation: Transformation, callback?: ErrorCallBack): Promise<any>;
+            function create_transformation(name: string, transformation: TransformationOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function create_transformation(name: string, transformation: Transformation, options?: AdminApiOptions | {allowed_for_strict?: boolean}, callback?: ErrorCallBack): Promise<any>;
+            function create_transformation(name: string, transformation: TransformationOptions, options?: AdminApiOptions | { allowed_for_strict?: boolean }, callback?: ErrorCallBack): Promise<any>;
 
             function create_upload_mapping(folder: string, options: AdminApiOptions | { template: string }, callback?: ErrorCallBack): Promise<any>;
 
@@ -328,9 +582,9 @@ declare module 'cloudinary' {
 
             function delete_all_resources(value?: AdminAndResourceOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_by_transformation(public_ids: string[], transformations: TransformationOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_derived_by_transformation(public_ids: string[], transformations: Transformation, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_derived_by_transformation(public_ids: string[], transformations: TransformationOptions, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_derived_resources(public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
@@ -352,9 +606,9 @@ declare module 'cloudinary' {
 
             function delete_streaming_profile(name: string, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_transformation(transformationName: Transformation, callback?: ErrorCallBack): Promise<any>;
+            function delete_transformation(transformationName: TransformationOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function delete_transformation(transformationName: Transformation, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function delete_transformation(transformationName: TransformationOptions, options?: AdminApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function delete_upload_mapping(folder: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -430,11 +684,11 @@ declare module 'cloudinary' {
 
             function sub_folders(root_folder: string, callback?: ErrorCallBack): Promise<any>;
 
-            function tags(callback?: ErrorCallBack, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, prefix?: string}): Promise<any>;
+            function tags(callback?: ErrorCallBack, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, prefix?: string }): Promise<any>;
 
-            function transformation(transformation: Transformation, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, named?: boolean}, callback?: ErrorCallBack): Promise<any>;
+            function transformation(transformation: TransformationOptions, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, named?: boolean }, callback?: ErrorCallBack): Promise<any>;
 
-            function transformation(transformation: Transformation, callback?: ErrorCallBack): Promise<any>;
+            function transformation(transformation: TransformationOptions, callback?: ErrorCallBack): Promise<any>;
 
             function transformations(options?: AdminApiOptions | { max_results?: number, next_cursor?: string, named?: boolean }, callback?: ErrorCallBack): Promise<any>;
 
@@ -458,13 +712,13 @@ declare module 'cloudinary' {
 
             function update_streaming_profile(name: string, options: { display_name?: string, representations: Array<{ transformation?: VideoTransformationOptions }> }, callback?: ErrorCallBack): Promise<any>;
 
-            function update_transformation(transformation_name: Transformation, updates?: Transformation, callback?: ErrorCallBack): Promise<any>;
+            function update_transformation(transformation_name: TransformationOptions, updates?: TransformationOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function update_transformation(transformation_name: Transformation, callback?: ErrorCallBack): Promise<any>;
+            function update_transformation(transformation_name: TransformationOptions, callback?: ErrorCallBack): Promise<any>;
 
             function update_upload_mapping(name: string, options: AdminApiOptions | { template: string }, callback?: ErrorCallBack): Promise<any>;
 
-            function update_upload_preset(name?: string, options?: AdminApiOptions | {unsigned?: boolean, disallow_public_id?: boolean}, callback?: ErrorCallBack): Promise<any>;
+            function update_upload_preset(name?: string, options?: AdminApiOptions | { unsigned?: boolean, disallow_public_id?: boolean }, callback?: ErrorCallBack): Promise<any>;
 
             function update_upload_preset(name?: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -498,7 +752,7 @@ declare module 'cloudinary' {
 
             function add_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function create_archive(options?: ArchiveApiOptions, target_format?: TargeArchivetFormat, callback?: ErrorCallBack,): Promise<any>;
+            function create_archive(options?: ArchiveApiOptions, target_format?: TargetArchiveFormat, callback?: ErrorCallBack,): Promise<any>;
 
             function create_zip(options?: ArchiveApiOptions, callback?: ErrorCallBack): Promise<any>;
 
@@ -510,17 +764,17 @@ declare module 'cloudinary' {
 
             function explicit(public_id: string, callback?: ErrorCallBack): Promise<any>;
 
-            function explode(public_id: string, options?: { page?: 'all', type?: DeliveryType, format?: ImageAndVideoFormat, notification_url?: string, transformations?: Transformation }, callback?: ErrorCallBack): Promise<any>
+            function explode(public_id: string, options?: { page?: 'all', type?: DeliveryType, format?: ImageAndVideoFormatOptions, notification_url?: string, transformations?: TransformationOptions }, callback?: ErrorCallBack): Promise<any>
 
             function explode(public_id: string, callback?: ErrorCallBack): Promise<any>
 
-            function generate_sprite(tag: string, options?: { transformation?: Transformation, format?: ImageAndVideoFormat, notification_url?: string, async?: boolean }, callback?: ErrorCallBack): Promise<any>;
+            function generate_sprite(tag: string, options?: { transformation?: TransformationOptions, format?: ImageAndVideoFormatOptions, notification_url?: string, async?: boolean }, callback?: ErrorCallBack): Promise<any>;
 
             function generate_sprite(tag: string, callback?: ErrorCallBack): Promise<any>;
 
             function image_upload_tag(field?: string, options?: UploadApiOptions): Promise<any>;
 
-            function multi(tag: string, options?: { transformation?: Transformation, async?: boolean, format?: ImageAndVideoFormat, notification_url?: string }, callback?: ErrorCallBack): Promise<any>;
+            function multi(tag: string, options?: { transformation?: TransformationOptions, async?: boolean, format?: ImageAndVideoFormatOptions, notification_url?: string }, callback?: ErrorCallBack): Promise<any>;
 
             function multi(tag: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -615,252 +869,5 @@ declare module 'cloudinary' {
 
             static with_field(args?: string): search;
         }
-    }
-
-    export interface CommonTransformationOptions {
-        transformation?: string | Array<ImageTransformationOptions> | Array<VideoTransformationOptions>;
-        raw_transformation?: any;
-        crop?: CropMode;
-        width?: string | number;
-        height?: number | string;
-        size?: string;
-        aspect_ratio?: string | number | string;
-        gravity?: Gravity;
-        x?: number | string;
-        y?: number | string;
-        zoom?: number | string;
-        effect?: string | Array<string | number>;
-        background?: string;
-        angle?: Angle;
-        radius?: number | string;
-        overlay?: string | Object;
-        custom_function?: string | { function_type: FunctionType, source: string }
-        variable?: [string, any];
-        variables?: Array<[string, any]>;
-        if?: string;
-        else?: string;
-        end_if?: string;
-        dpr?: number | string;
-        quality?: string | number;
-        delay?: number | string;
-        [futureKey: string]: any;
-    }
-
-    export interface ImageTransformationOptions {
-        underlay?: string | Object;
-        color?: string;
-        color_space?: ColorSpace;
-        opacity?: number | string;
-        border?: string;
-        default_image?: string;
-        density?: number | string;
-        fetch_format?: ImageFormat;
-        format?: ImageFormat;
-        effect?: string | Array<string | number> | ImageEffect;
-        flags?: ImageFlags | string;
-        page?: number | string;
-
-        [futureKey: string]: any;
-    }
-
-    interface VideoTransformationOptions {
-        audio_codec?: AudioCodec;
-        audio_frequency?: AudioFrequency;
-        video_codec?: string | Object;
-        bit_rate?: number | string;
-        fps?: string | Array<string | number>;
-        keyframe_interval?: number;
-        offset?: string,
-        start_offset?: number | string;
-        end_offset?: number | string;
-        duration?: number | string;
-        streaming_profile?: StreamingProfiles
-        video_sampling?: number | string;
-        format?: VideoFormat;
-        fetch_format?: VideoFormat;
-        effect?: string | Array<string | number> | VideoEffect;
-        flags?: VideoFlags;
-
-        [futureKey: string]: any;
-    }
-
-    interface ConfigOptions {
-        cloud_name?: string;
-        api_key?: string;
-        api_secret?: string;
-        private_cdn?: boolean;
-        secure_distribution?: boolean;
-        force_version?: boolean;
-        ssl_detected?: boolean;
-        secure?: boolean;
-        cdn_subdomain?: boolean;
-        secure_cdn_subdomain?: boolean;
-        cname?: string;
-        shorten?: boolean;
-        sign_url?: boolean;
-        use_root_path?: boolean;
-        auth_token?: object;
-
-        [futureKey: string]: any;
-    }
-
-    export interface UrlOptions {
-        type?: string;
-        resource_type?: string;
-        version?: string;
-        format?: string;
-        url_suffix?: string;
-
-        [futureKey: string]: any;
-    }
-
-    export interface TagOptions {
-        html_height?: number;
-        html_width?: number;
-        srcset?: any;
-        attributes?: any;
-        client_hints?: boolean;
-        responsive?: boolean;
-        hidpi?: boolean;
-        responsive_placeholder?: boolean;
-        source_types?: string | string[];
-        source_transformation?: string;
-        fallback_content?: string;
-        unsafe_update?: string;
-        allowed_for_strict?: boolean;
-        poster?: string | object;
-        controls?: boolean;
-        preload?: string;
-
-        [futureKey: string]: any;
-    }
-
-    export interface ArchiveApiOptions {
-        allow_missing?: boolean;
-        async?: boolean;
-        expires_at?: number;
-        flatten_folders?: boolean;
-        flatten_transformations?: boolean;
-        keep_derived?: boolean;
-        mode?: string;
-        notification_url?: string;
-        prefixes?: string;
-        public_ids?: string[] | string;
-        skip_transformation_name?: boolean;
-        tags?: string | boolean | string[];
-        target_format?: TargeArchivetFormat;
-        target_public_id?: string;
-        target_tags?: string;
-        timestamp?: number;
-        transformations?: string;
-        type?: DeliveryType
-        use_original_filename?: boolean;
-
-        [futureKey: string]: any;
-    }
-
-    export interface AdminApiOptions {
-        agent?: object;
-        content_type?: string;
-
-        [futureKey: string]: any;
-    }
-
-    export interface UpdateApiOptions {
-        access_control?: string[];
-        auto_tagging?: number;
-        background_removal?: string;
-        categorization?: string;
-        context?: boolean | string;
-        custom_coordinates?: string;
-        detection?: string;
-        face_coordinates?: string;
-        headers?: string;
-        notification_url?: string;
-        ocr?: string;
-        raw_convert?: string;
-        similarity_search?: string;
-        tags?: string | boolean | string[];
-        moderation_status?: string;
-        type?: DeliveryType;
-        resource_type?: ResourceType;
-
-        [futureKey: string]: any;
-    }
-
-    export interface PublishApiOptions {
-        type?: string;
-        resource_type?: string;
-        invalidate?: boolean;
-        overwrite?: boolean;
-
-        [futureKey: string]: any;
-    }
-
-    export interface ResourceApiOptions {
-        transformation?: Transformation;
-        transformations?: string[];
-        type?: DeliveryType;
-        resource_type?: ResourceType;
-        keep_original?: boolean;
-        invalidate?: boolean;
-        next_cursor?: boolean | string;
-        public_ids?: string[];
-        prefix?: string;
-        all?: boolean;
-        max_results?: number;
-        tags?: string | boolean | string[];
-        context?: boolean | string;
-        direction?: string | number;
-        moderations?: boolean;
-        start_at?: string;
-        exif?: boolean;
-        colors?: boolean;
-        derived_next_cursor?: string;
-        faces?: boolean;
-        image_metadata?: boolean;
-        pages?: boolean;
-        coordinates?: boolean;
-        phash?: boolean;
-
-        [futureKey: string]: any;
-    }
-
-    export interface UploadApiOptions {
-        access_mode?: AccessMode;
-        allowed_formats?: Array<VideoFormat> | Array<ImageFormat>;
-        async?: boolean;
-        backup?: boolean;
-        callback?: string;
-        colors?: boolean;
-        discard_original_filename?: boolean;
-        eager?: Transformation;
-        eager_async?: boolean;
-        eager_notification_url?: string;
-        exif?: boolean;
-        faces?: boolean;
-        folder?: string;
-        format?: VideoFormat | ImageFormat;
-        image_metadata?: boolean;
-        invalidate?: boolean;
-        moderation?: ModerationKind;
-        notification_url?: string;
-        overwrite?: boolean;
-        phash?: boolean;
-        proxy?: string;
-        public_id?: string;
-        quality_analysis?: boolean;
-        responsive_breakpoints?: object;
-        return_delete_token?: boolean
-        timestamp?: number;
-        transformation?: Transformation;
-        type?: DeliveryType;
-        unique_filename?: boolean;
-        upload_preset?: string;
-        use_filename?: boolean;
-        resource_types?: ResourceType;
-        chunk_size?: number;
-
-        [futureKey: string]: any;
     }
 }
