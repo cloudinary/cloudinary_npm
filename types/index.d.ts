@@ -1,5 +1,3 @@
-import {ConfigAndUrlOptions, TransformationOptions} from "cloudinary";
-
 declare module 'cloudinary' {
 
     /****************************** Constants *************************************/
@@ -213,25 +211,31 @@ declare module 'cloudinary' {
     type ResourceType = string | "image" | "raw" | "video";
     type ImageFormat =
         string
-        | "auto"
-        | "ai"
         | "gif"
-        | "webp"
-        | "bmp"
-        | "eps"
-        | "flif"
-        | "gif"
-        | "heic"
-        | "ico"
-        | "jpg"
-        | "jp2"
-        | "wdp"
-        | "pdf"
         | "png"
-        | "psd"
-        | "tga"
+        | "jpg"
+        | "bmp"
+        | "ico"
+        | "pdf"
         | "tiff"
+        | "eps"
+        | "jpc"
+        | "jp2"
+        | "psd"
         | "webp"
+        | "zip"
+        | "svg"
+        | "mp4"
+        | "webm"
+        | "wdp"
+        | "hpx"
+        | "djvu"
+        | "ai"
+        | "flif"
+        | "bpg"
+        | "miff"
+        | "tga"
+        | "heic"
     type VideoFormat =
         string
         | "auto"
@@ -249,32 +253,32 @@ declare module 'cloudinary' {
         transformation?: TransformationOptions;
         raw_transformation?: string;
         crop?: CropMode;
-        width?: string | number;
-        height?: string | number;
+        width?: number | string;
+        height?: number | string;
         size?: string;
-        aspect_ratio?: string | number;
+        aspect_ratio?: number | string;
         gravity?: Gravity;
-        x?: string | number;
-        y?: string | number;
-        zoom?: string | number;
-        effect?: string | Array<string | number>;
+        x?: number | string;
+        y?: number | string;
+        zoom?: number | string;
+        effect?: string | Array<number | string>;
         background?: string;
         angle?: Angle;
-        radius?: string | number;
+        radius?: number | string;
         overlay?: string | object;
         custom_function?: string | { function_type: string | "wasm" | "remote", source: string }
         variables?: Array<string | object>;
         if?: string;
         else?: string;
         end_if?: string;
-        dpr?: string | number;
-        quality?: string | number;
-        delay?: string | number;
+        dpr?: number | string;
+        quality?: number | string;
+        delay?: number | string;
 
         [futureKey: string]: any;
     }
 
-    export interface ImageTransformationOptions {
+    export interface ImageTransformationOptions extends CommonTransformationOptions{
         underlay?: string | Object;
         color?: string;
         color_space?: ColorSpace;
@@ -284,20 +288,20 @@ declare module 'cloudinary' {
         density?: number | string;
         format?: ImageFormat;
         fetch_format?: ImageFormat;
-        effect?: string | Array<string | number> | ImageEffect;
+        effect?: string | Array<number | string> | ImageEffect;
         page?: number | string;
         flags?: ImageFlags | string;
 
         [futureKey: string]: any;
     }
 
-    interface VideoTransformationOptions {
+    interface VideoTransformationOptions extends CommonTransformationOptions{
         audio_codec?: AudioCodec;
         audio_frequency?: AudioFrequency;
         video_codec?: string | Object;
         bit_rate?: number | string;
-        fps?: string | Array<string | number>;
-        keyframe_interval?: number;
+        fps?: string | Array<number | string>;
+        keyframe_interval?: string;
         offset?: string,
         start_offset?: number | string;
         end_offset?: number | string;
@@ -306,10 +310,20 @@ declare module 'cloudinary' {
         video_sampling?: number | string;
         format?: VideoFormat;
         fetch_format?: VideoFormat;
-        effect?: string | Array<string | number> | VideoEffect;
+        effect?: string | Array<number | string> | VideoEffect;
         flags?: VideoFlags;
 
         [futureKey: string]: any;
+    }
+
+    interface TextStyleOptions {
+        font_family?: string;
+        font_size?: number;
+        font_color?: string;
+        font_weight?: string;
+        font_style?: string; background?: string;
+        opacity?: number;
+        text_decoration?: string
     }
 
     interface ConfigOptions {
@@ -346,10 +360,10 @@ declare module 'cloudinary' {
     }
 
     export interface ImageTagOptions {
-        html_height?: number;
-        html_width?: number;
-        srcset?: any;
-        attributes?: any;
+        html_height?: string;
+        html_width?: string;
+        srcset?: object;
+        attributes?: object;
         client_hints?: boolean;
         responsive?: boolean;
         hidpi?: boolean;
@@ -360,7 +374,7 @@ declare module 'cloudinary' {
 
     export interface VideoTagOptions {
         source_types?: string | string[];
-        source_transformation?: string;
+        source_transformation?: TransformationOptions;
         fallback_content?: string;
         poster?: string | object;
         controls?: boolean;
@@ -414,7 +428,7 @@ declare module 'cloudinary' {
         ocr?: string;
         raw_convert?: string;
         similarity_search?: string;
-        tags?: string | boolean | string[];
+        tags?: string | string[];
         moderation_status?: string;
         unsafe_update?: object;
         allowed_for_strict?: boolean;
@@ -431,17 +445,17 @@ declare module 'cloudinary' {
 
     export interface ResourceApiOptions extends ResourceOptions{
         transformation?: TransformationOptions;
-        transformations?: string[];
+        transformations?: TransformationOptions;
         keep_original?: boolean;
-        invalidate?: boolean;
         next_cursor?: boolean | string;
         public_ids?: string[];
         prefix?: string;
         all?: boolean;
         max_results?: number;
-        tags?: string | boolean | string[];
-        context?: boolean | string;
-        direction?: string | number;
+        tags?: boolean;
+        tag?: string;
+        context?: boolean;
+        direction?: number | string;
         moderations?: boolean;
         start_at?: string;
         exif?: boolean;
@@ -488,7 +502,6 @@ declare module 'cloudinary' {
         unique_filename?: boolean;
         upload_preset?: string;
         use_filename?: boolean;
-        resource_types?: ResourceType | "auto";
         chunk_size?: number;
 
         [futureKey: string]: any;
@@ -497,7 +510,6 @@ declare module 'cloudinary' {
     type TransformationOptions =
         string
         | string[]
-        | CommonTransformationOptions
         | VideoTransformationOptions
         | ImageTransformationOptions
         | Object
@@ -530,7 +542,7 @@ declare module 'cloudinary' {
 
         function config(new_config: boolean | object): void;
 
-        function url(public_id: string, options?: ConfigAndUrlOptions | TransformationOptions): string;
+        function url(public_id: string, options?: TransformationOptions | ConfigAndUrlOptions): string;
 
         /****************************** Tags *************************************/
 
@@ -538,7 +550,7 @@ declare module 'cloudinary' {
 
         function picture(public_id: string, options?: ImageTransformationAndTagsOptions | ConfigAndUrlOptions): string;
 
-        function source(public_id: string, options?: ConfigAndUrlOptions | TransformationOptions): string;
+        function source(public_id: string, options?: TransformationOptions | ConfigAndUrlOptions): string;
 
         function video(public_id: string, options?: VideoTransformationAndTagsOptions | ConfigAndUrlOptions): string;
 
@@ -550,17 +562,17 @@ declare module 'cloudinary' {
 
             function api_url(action?: string, options?: ConfigAndUrlOptions): Promise<any>;
 
-            function url(public_id?: string, options?: ConfigAndUrlOptions | TransformationOptions): string;
+            function url(public_id?: string, options?:TransformationOptions | ConfigAndUrlOptions ): string;
 
-            function video_thumbnail_url(public_id?: string, options?: ConfigAndUrlOptions): string;
+            function video_thumbnail_url(public_id?: string, options?: VideoTransformationOptions | ConfigAndUrlOptions): string;
 
-            function video_url(public_id?: string, options?: ConfigAndUrlOptions): string;
+            function video_url(public_id?: string, options?: VideoTransformationOptions | ConfigAndUrlOptions): string;
 
             function archive_params(options?: ArchiveApiOptions): Promise<any>;
 
-            function download_archive_url(options?: ArchiveApiOptions): string
+            function download_archive_url(options?: ArchiveApiOptions | ConfigAndUrlOptions): string
 
-            function download_zip_url(options?: ArchiveApiOptions): string;
+            function download_zip_url(options?: ArchiveApiOptions | ConfigAndUrlOptions): string;
 
             function generate_auth_token(options?: ConfigOptions): string;
 
@@ -798,7 +810,7 @@ declare module 'cloudinary' {
 
             function replace_tag(tag: string, public_ids: string[], callback?: ErrorCallBack): Promise<any>;
 
-            function text(text: string, options?: { public_id?: string, font_family?: string, font_size?: number, font_color?: string, font_weight?: string, font_style?: string, background?: string, opacity?: number, text_decoration?: string }, callback?: ErrorCallBack): Promise<any>;
+            function text(text: string, options?: TextStyleOptions | { public_id?: string }, callback?: ErrorCallBack): Promise<any>;
 
             function text(text: string, callback?: ErrorCallBack): Promise<any>;
 
@@ -832,28 +844,28 @@ declare module 'cloudinary' {
 
             function upload_tag_params(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_url(options?: UploadApiOptions): Promise<any>;
+            function upload_url(options?: ConfigOptions): Promise<any>;
         }
 
         /****************************** Search API *************************************/
 
         class search {
 
-            aggregate(args?: string): search;
+            aggregate(value?: string): search;
 
             execute(): Promise<any>;
 
-            expression(args?: string): search;
+            expression(value?: string): search;
 
-            max_results(args?: number): search;
+            max_results(value?: number): search;
 
-            next_cursor(args?: string): search;
+            next_cursor(value?: string): search;
 
             sort_by(key: string, value: 'asc' | 'desc'): search;
 
-            to_query(args?: string): search;
+            to_query(value?: string): search;
 
-            with_field(args?: string): search;
+            with_field(value?: string): search;
 
             static aggregate(args?: string): search;
 
