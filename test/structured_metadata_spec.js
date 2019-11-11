@@ -49,10 +49,12 @@ describe("structured metadata api", function () {
   });
   describe("date_field_validation", function () {
     let metadata;
-    beforeEach(function () {
-      const max = '2000-01-01';
-      const min = '1950-01-01';
+    const maxValidDate = '2000-01-01';
+    const minValidDate = '1950-01-01';
+    const validDate = '1980-04-20';
+    const invalidDate = '1940-01-20';
 
+    beforeEach(function () {
       metadata = {
         external_id: EXTERNAL_ID_3,
         label: "dateOfBirth",
@@ -63,18 +65,17 @@ describe("structured metadata api", function () {
           rules: [
             {
               type: "greater_than",
-              value: min,
+              value: minValidDate,
             }, {
               type: "less_than",
-              value: max,
+              value: maxValidDate,
             },
           ],
         },
       };
     });
     it("should create date field with default value", () => {
-      const legalValue = '1980-04-20';
-      metadata.default_value = legalValue;
+      metadata.default_value = validDate;
       return api.create_metadata_field(metadata).then((result) => {
         expect(result).not.to.be.empty();
         expect(result.label).to.eql(metadata.label);
@@ -82,8 +83,7 @@ describe("structured metadata api", function () {
       });
     });
     it("should not create date field with illegal default value", () => {
-      const illegalValue = '1940-01-20';
-      metadata.default_value = illegalValue;
+      metadata.default_value = invalidDate;
       return api.create_metadata_field(metadata).then(() => {
         expect().fail();
       }).catch((res) => {
