@@ -1,4 +1,10 @@
 
+1.17.0 / 2019-11-11
+===================
+
+  * Update ejs dependency in photo album
+  * Add Type Script declaration file
+
 1.16.0 / 2019-10-15
 ===================
 
