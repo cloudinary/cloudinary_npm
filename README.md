@@ -204,8 +204,8 @@ cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"
 
 ### Typescript
 
-We added support for TS, The SDK can now be consumed in a TS environment.
-You can view the decleration file [here](https://github.com/cloudinary/cloudinary_npm/types/index.d.ts).  
+This SDK can be consumed in a TS environment.
+You can view the declaration file [here](https://github.com/cloudinary/cloudinary_npm/types/index.d.ts).  
 
 ### Samples
 
