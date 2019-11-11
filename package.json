@@ -12,7 +12,8 @@
   "main": "cloudinary.js",
   "dependencies": {
     "lodash": "^4.17.11",
-    "q": "^1.5.1"
+    "q": "^1.5.1",
+    "typescript": "^2.9.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -24,6 +25,7 @@
     "babel-register": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "dotenv": "4.x",
+    "dtslint": "^0.9.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
@@ -36,8 +38,18 @@
     "sinon": "^6.1.4",
     "webpack-cli": "^3.2.1"
   },
+  "files": [
+    "lib/**/*",
+    "lib-es5/**/*",
+    "cloudinary.js",
+    "babel.config.js",
+    "package.json",
+    "types/*"
+  ],
+  "types": "types",
   "scripts": {
-    "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
+    "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi\nnpm run dtslint",
+    "dtslint": "dtslint --expectOnly --localTs node_modules/typescript/lib types ",
     "lint": "eslint .",
     "compile": "node_modules/.bin/babel lib --out-dir lib-es5 --delete-dir-on-start --verbose",
     "test-es6": "which node && node node_modules/.bin/mocha --ui bdd -R spec --recursive test/",
