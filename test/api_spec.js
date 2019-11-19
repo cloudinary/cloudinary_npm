@@ -654,6 +654,7 @@ describe("api", function () {
             colors: true,
             unsigned: true,
             disallow_public_id: true,
+            live: true
           });
         var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET3+"$";
         sinon.assert.calledWith(request, sinon.match({
@@ -663,6 +664,19 @@ describe("api", function () {
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1 , "colors=1")));
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true , "unsigned=true")));
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true , "disallow_public_id=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
+      });
+    });
+    it("should allow creating upload_presets", function () {
+      return helper.mockPromise(function (xhr, write) {
+        cloudinary.v2.api.create_upload_preset({
+          folder: "upload_folder",
+          unsigned: true,
+          tags: UPLOAD_TAGS,
+          live: true
+        });
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
       });
     });
   });
