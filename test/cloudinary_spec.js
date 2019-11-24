@@ -151,7 +151,7 @@ describe("cloudinary", function () {
         gravity: "center",
         quality: 80,
         prefix: "a",
-      }), `${upload_path}/g_center,p_a,q_80,r_3,x_1,y_2/test`);
+      })).to.eql(`${upload_path}/g_center,p_a,q_80,r_3,x_1,y_2/test`);
       expect(cloudinary.utils.url("test", {
         x: 1,
         y: 2,
@@ -159,7 +159,7 @@ describe("cloudinary", function () {
         gravity: "center",
         quality: "80:444",
         prefix: "a",
-      }), `${upload_path}/g_center,p_a,q_80:444,r_3,x_1,y_2/test`);
+      })).to.eql(`${upload_path}/g_center,p_a,q_80:444,r_3,x_1,y_2/test`);
     });
     it("should support auto value", function () {
       expect(cloudinary.utils.url("test", {
@@ -169,7 +169,7 @@ describe("cloudinary", function () {
         gravity: "center",
         quality: "auto",
         prefix: "a",
-      }), `${upload_path}/g_center,p_a,q_auto,r_3,x_1,y_2/test`);
+      })).to.eql(`${upload_path}/g_center,p_a,q_auto,r_3,x_1,y_2/test`);
       expect(cloudinary.utils.url("test", {
         x: 1,
         y: 2,
@@ -177,7 +177,7 @@ describe("cloudinary", function () {
         gravity: "center",
         quality: "auto:good",
         prefix: "a",
-      }), `${upload_path}/g_center,p_a,q_auto:good,r_3,x_1,y_2/test`);
+      })).to.eql(`${upload_path}/g_center,p_a,q_auto:good,r_3,x_1,y_2/test`);
     });
   });
   describe(":radius", function() {
