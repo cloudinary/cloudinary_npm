@@ -1095,6 +1095,27 @@ function webhook_signature(data, timestamp) {
   return shasum.digest('hex');
 }
 
+/**
+ * Verifies the authenticity of a notification signature
+ *
+ * @param {string} body JSON of the request's body
+ * @param {number} timestamp Unix timestamp. Can be retrieved from the X-Cld-Timestamp header
+ * @param {string} signature Actual signature. Can be retrieved from the X-Cld-Signature header
+ * @param {number} [valid_for=7200] The desired time in seconds for considering the request valid
+ *
+ * @return {boolean}
+ */
+function verifyNotificationSignature(body, timestamp, signature) {
+  var valid_for = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 7200;
+
+  // verify that signature is valid for the given timestamp
+  if (timestamp < Date.now() - valid_for) {
+    return false;
+  }
+  var payload_hash = utils.webhook_signature(body, timestamp, { api_secret: config().api_secret });
+  return signature === payload_hash;
+}
+
 function process_request_params(params, options) {
   if (options.unsigned != null && options.unsigned) {
     params = exports.clear_blank(params);
@@ -1551,6 +1572,7 @@ exports.clear_blank = clear_blank;
 exports.merge = merge;
 exports.sign_request = sign_request;
 exports.webhook_signature = webhook_signature;
+exports.verifyNotificationSignature = verifyNotificationSignature;
 exports.process_request_params = process_request_params;
 exports.private_download_url = private_download_url;
 exports.zip_download_url = zip_download_url;
