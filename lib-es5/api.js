@@ -645,18 +645,18 @@ exports.get_metadata_field = function get_metadata_field(external_id, callback) 
   return call_api("get", "metadata_fields/" + external_id, {}, callback, options);
 };
 
-exports.update_metadata_field = function update_metadata_field(external_id, callback) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+exports.update_metadata_field = function update_metadata_field(external_id, metadata, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(options, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  var params = only(metadata, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
   return call_api("put", "metadata_fields/" + external_id, params, callback, options);
 };
 
-exports.update_metadata_field_datasource = function update_metadata_field_datasource(external_id, callback) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+exports.update_metadata_field_datasource = function update_metadata_field_datasource(external_id, datasource, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(options, "values");
+  var params = only(datasource, "values");
   options.content_type = "json";
   return call_api("put", "metadata_fields/" + external_id + "/datasource", params, callback, options);
 };

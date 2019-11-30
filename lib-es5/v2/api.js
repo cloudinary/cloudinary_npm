@@ -56,7 +56,7 @@ v1_adapters(exports, api, {
   list_metadata_fields: 1,
   delete_metadata_field: 1,
   get_metadata_field: 1,
-  update_metadata_field: 1,
-  update_metadata_field_datasource: 1,
+  update_metadata_field: 2,
+  update_metadata_field_datasource: 2,
   delete_entries_field_datasource: 1
 });
