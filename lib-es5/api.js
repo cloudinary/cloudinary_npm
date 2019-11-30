@@ -620,6 +620,15 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
   return updateResourcesAccessMode(access_mode, "public_ids[]", ids, callback, options);
 };
 
+/**
+ * Creates the metadata field definition
+ *
+ * @param {Object}   metadata Data of metadata field
+ * @param {Function} callback Callback function
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.create_metadata_field = function create_metadata_field(metadata, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -627,24 +636,60 @@ exports.create_metadata_field = function create_metadata_field(metadata, callbac
   return call_api("post", "metadata_fields", metadata, callback, options);
 };
 
+/**
+ * Returns the list metadata field definitions
+ *
+ * @param {Function} callback Callback function
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.list_metadata_fields = function list_metadata_fields(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   return call_api("get", "metadata_fields", {}, callback, options);
 };
 
+/**
+ * Deletes the metadata field
+ *
+ * @param {String}   external_id External Id of existing metadata field
+ * @param {Function} callback Callback function.
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.delete_metadata_field = function delete_metadata_field(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("delete", "metadata_fields/" + external_id, {}, callback, options);
 };
 
+/**
+ * Returns the metadata field
+ *
+ * @param {String}   external_id External Id of existing metadata field
+ * @param {Function} callback Callback function
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.get_metadata_field = function get_metadata_field(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("get", "metadata_fields/" + external_id, {}, callback, options);
 };
 
+/**
+ * Updates the metadata field
+ *
+ * @param {String}   external_id External Id of existing metadata field
+ * @param {Object}   metadata Updated values of metadata field
+ * @param {Function} callback Callback function
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.update_metadata_field = function update_metadata_field(external_id, metadata, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
@@ -653,6 +698,16 @@ exports.update_metadata_field = function update_metadata_field(external_id, meta
   return call_api("put", "metadata_fields/" + external_id, params, callback, options);
 };
 
+/**
+ * Updates the metadata field datasource
+ *
+ * @param {String}   external_id External Id of existing metadata field
+ * @param {Object}   datasource Updated values of datasource.
+ * @param {Function} callback Callback function.
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.update_metadata_field_datasource = function update_metadata_field_datasource(external_id, datasource, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
@@ -661,6 +716,15 @@ exports.update_metadata_field_datasource = function update_metadata_field_dataso
   return call_api("put", "metadata_fields/" + external_id + "/datasource", params, callback, options);
 };
 
+/**
+ * Deletes the entries in metadata field datasource
+ *
+ * @param {String}   external_id External Id of existing metadata field
+ * @param {Function} callback Callback function.
+ * @param {Object}   options Configuration options
+ *
+ * @return {Object}
+ */
 exports.delete_entries_field_datasource = function delete_entries_field_datasource(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
