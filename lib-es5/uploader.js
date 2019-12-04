@@ -80,7 +80,7 @@ exports.upload = function upload(file, callback) {
 exports.upload_large = function upload_large(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  if (path != null && path.match(/^https?:/)) {
+  if (path != null && isRemoteUrl(path)) {
     // upload a remote file
     return exports.upload(path, callback, options);
   }
