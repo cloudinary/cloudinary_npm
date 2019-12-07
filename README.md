@@ -204,7 +204,7 @@ cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"
 
 ### Typescript
 
-🎉New 🎉TypeScript support was just added. Check out the [declaration file](https://github.com/cloudinary/cloudinary_npm/types/index.d.ts).  
+🎉New 🎉TypeScript support was just added. Check out the [declaration file](https://github.com/cloudinary/cloudinary_npm/blob/master/types/index.d.ts).
 
 ### Samples
 
