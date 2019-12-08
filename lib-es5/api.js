@@ -725,10 +725,9 @@ exports.update_metadata_field_datasource = function update_metadata_field_dataso
  *
  * @return {Object}
  */
-exports.delete_entries_field_datasource = function delete_entries_field_datasource(external_id, callback) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+exports.delete_datasource_entries = function delete_entries_field_datasource(external_id, external_ids, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(options, "external_id", "external_ids");
   options.content_type = "json";
-  return call_api("delete", "metadata_fields/" + external_id + "/datasource", params, callback, options);
+  return call_api("delete", "metadata_fields/" + external_id + "/datasource", { external_ids }, callback, options);
 };
