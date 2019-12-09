@@ -1,3 +1,14 @@
+1.18.0 / 2019-12-09
+===================
+
+ New functionality
+ -----------------
+  * Add live parameter to create_upload_preset and update_upload_preset
+
+ Other changes
+ -------------
+  * Fixed tests on Utils and Cloudinary_spec and removed a duplicate one
+
 
 1.17.0 / 2019-11-11
 ===================
