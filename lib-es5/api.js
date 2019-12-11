@@ -621,26 +621,31 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
 };
 
 /**
- * Creates the metadata field definition
+ * Add a new metadata field definition
  *
- * @param {Object}   metadata Data of metadata field
+ * @see https://cloudinary.com/documentation/admin_api#create_a_metadata_field
+ *
+ * @param {Object}   field    The field to add
  * @param {Function} callback Callback function
  * @param {Object}   options Configuration options
  *
  * @return {Object}
  */
-exports.create_metadata_field = function create_metadata_field(metadata, callback) {
+exports.add_metadata_field = function add_metadata_field(field, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
-  return call_api("post", "metadata_fields", metadata, callback, options);
+  return call_api("post", "metadata_fields", params, callback, options);
 };
 
 /**
- * Returns the list metadata field definitions
+ * Returns a list of all metadata field definitions
+ *
+ * @see https://cloudinary.com/documentation/admin_api#get_metadata_fields
  *
  * @param {Function} callback Callback function
- * @param {Object}   options Configuration options
+ * @param {Object}   options  Configuration options
  *
  * @return {Object}
  */
@@ -651,11 +656,14 @@ exports.list_metadata_fields = function list_metadata_fields(callback) {
 };
 
 /**
- * Deletes the metadata field
+ * Deletes a metadata field definition.
+ * The field should no longer be considered a valid candidate for all other endpoints
  *
- * @param {String}   external_id External Id of existing metadata field
- * @param {Function} callback Callback function.
- * @param {Object}   options Configuration options
+ * @see https://cloudinary.com/documentation/admin_api#delete_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id The external id of the field to delete
+ * @param {Function} callback   Callback function
+ * @param {Object}   options    Configuration options
  *
  * @return {Object}
  */
@@ -666,45 +674,53 @@ exports.delete_metadata_field = function delete_metadata_field(external_id, call
 };
 
 /**
- * Returns the metadata field
+ * Get a metadata field by external id
  *
- * @param {String}   external_id External Id of existing metadata field
- * @param {Function} callback Callback function
- * @param {Object}   options Configuration options
+ * @see https://cloudinary.com/documentation/admin_api#get_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id  The ID of the metadata field to retrieve
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
  *
  * @return {Object}
  */
-exports.get_metadata_field = function get_metadata_field(external_id, callback) {
+exports.metadata_field_by_field_id = function metadata_field_by_field_id(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("get", "metadata_fields/" + external_id, {}, callback, options);
 };
 
 /**
- * Updates the metadata field
+ * Updates a metadata field definition (partially, no need to pass the entire object)
  *
- * @param {String}   external_id External Id of existing metadata field
- * @param {Object}   metadata Updated values of metadata field
- * @param {Function} callback Callback function
- * @param {Object}   options Configuration options
+ * @see https://cloudinary.com/documentation/admin_api#update_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id  The ID of the metadata field to update
+ * @param {Object}   field        Updated values of metadata field
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
  *
  * @return {Object}
  */
-exports.update_metadata_field = function update_metadata_field(external_id, metadata, callback) {
+exports.update_metadata_field = function update_metadata_field(external_id, field, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(metadata, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
   return call_api("put", "metadata_fields/" + external_id, params, callback, options);
 };
 
 /**
- * Updates the metadata field datasource
+ * Updates the datasource of a supported field type (currently only enum and set), passed as JSON data. The
+ * update is partial: datasource entries with an existing external_id will be updated and entries with new
+ * external_id’s (or without external_id’s) will be appended.
  *
- * @param {String}   external_id External Id of existing metadata field
- * @param {Object}   datasource Updated values of datasource.
- * @param {Function} callback Callback function.
- * @param {Object}   options Configuration options
+ * @see https://cloudinary.com/documentation/admin_api#update_a_metadata_field_datasource
+ *
+ * @param {String}   external_id  The ID of the field to update
+ * @param {Object}   datasource   Updated values for datasource
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
  *
  * @return {Object}
  */
@@ -717,15 +733,20 @@ exports.update_metadata_field_datasource = function update_metadata_field_dataso
 };
 
 /**
- * Deletes the entries in metadata field datasource
+ * Deletes (blocks) the datasource entries for a specified metadata field definition. Sets the state of the
+ * entries to inactive. This is a soft delete, the entries still exist under the hood and can be activated again
+ * with the restore datasource entries method.
  *
- * @param {String}   external_id External Id of existing metadata field
- * @param {Function} callback Callback function.
- * @param {Object}   options Configuration options
+ * @see https://cloudinary.com/documentation/admin_api#delete_entries_in_a_metadata_field_datasource
+ *
+ * @param {String}   external_id  The ID of the metadata field
+ * @param {Array}    external_ids An array of IDs of datasource entries to delete
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
  *
  * @return {Object}
  */
-exports.delete_datasource_entries = function delete_entries_field_datasource(external_id, external_ids, callback) {
+exports.delete_datasource_entries = function delete_datasource_entries(external_id, external_ids, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   options.content_type = "json";

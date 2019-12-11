@@ -62,7 +62,7 @@ describe("structured metadata api", function () {
       },
     ];
     const labels = metadataArr.map(item => item.label);
-    return Promise.all(metadataArr.map(field => api.create_metadata_field(field))).then((results) => {
+    return Promise.all(metadataArr.map(field => api.add_metadata_field(field))).then((results) => {
       expect(results).not.to.be.empty();
       results.forEach((res) => {
         expect(res).not.to.be.empty();
@@ -114,13 +114,13 @@ describe("structured metadata api", function () {
       },
     };
     it("should create date field with default value", function () {
-      return api.create_metadata_field(validMetadata).then((result) => {
+      return api.add_metadata_field(validMetadata).then((result) => {
         expect(result).not.to.be.empty();
         expect(result.label).to.eql(validMetadata.label);
       });
     });
     it("should not create date field with illegal default value", function () {
-      return api.create_metadata_field(invalidMetadata).then(() => {
+      return api.add_metadata_field(invalidMetadata).then(() => {
         expect().fail();
       }).catch((res) => {
         expect(res.error).not.to.be(void 0);
@@ -129,7 +129,7 @@ describe("structured metadata api", function () {
     });
   });
   it("should return list metadata field definitions", function () {
-    return api.create_metadata_field({
+    return api.add_metadata_field({
       external_id: EXTERNAL_ID_5,
       label: "age",
       type: "integer",
@@ -144,14 +144,14 @@ describe("structured metadata api", function () {
       });
   });
   it("should return metadata field by external id", function () {
-    return api.create_metadata_field({
+    return api.add_metadata_field({
       external_id: EXTERNAL_ID_6,
       label: "length",
       type: "integer",
       default_value: 1,
     }).then(({ external_id, label }) => {
       expect(label).to.eql("length");
-      return api.get_metadata_field(external_id);
+      return api.metadata_field_by_field_id(external_id);
     }).then((result) => {
       expect(result).not.to.be.empty();
       expect(result).to.include.keys(...mandatory_fields);
@@ -161,7 +161,7 @@ describe("structured metadata api", function () {
     const metadata = {
       default_value: 10,
     };
-    return api.create_metadata_field({
+    return api.add_metadata_field({
       external_id: EXTERNAL_ID_7,
       label: "width",
       type: "integer",
@@ -175,7 +175,7 @@ describe("structured metadata api", function () {
       });
   });
   it("should delete metadata field by external id", function () {
-    return api.create_metadata_field({
+    return api.add_metadata_field({
       external_id: EXTERNAL_ID_8,
       label: "height",
       type: "integer",
@@ -193,7 +193,7 @@ describe("structured metadata api", function () {
         { external_id: "color_2", value: "black" },
       ],
     };
-    return api.create_metadata_field({
+    return api.add_metadata_field({
       external_id: EXTERNAL_ID_9,
       label: "colors",
       type: "set",
@@ -232,7 +232,7 @@ describe("structured metadata api", function () {
       },
     };
     const external_ids = [metadata.datasource.values[0].external_id];
-    return api.create_metadata_field(metadata)
+    return api.add_metadata_field(metadata)
       .then(({ external_id }) => api.delete_datasource_entries(external_id, external_ids))
       .then((result) => {
         expect(result).not.to.be.empty();
@@ -245,7 +245,7 @@ describe("structured metadata api", function () {
       type: "string",
     };
     const public_id = "sample";
-    return api.create_metadata_field(metadata).then(({ external_id }) => api.update(public_id, {
+    return api.add_metadata_field(metadata).then(({ external_id }) => api.update(public_id, {
       type: "upload",
       metadata: { [external_id]: "123456" },
     }))
@@ -261,7 +261,7 @@ describe("structured metadata api", function () {
       type: "string",
     };
     const public_id = "sample";
-    return api.create_metadata_field(metadata).then(({ external_id }) => uploader.update_metadata({ [external_id]: "123456" }, [public_id]))
+    return api.add_metadata_field(metadata).then(({ external_id }) => uploader.update_metadata({ [external_id]: "123456" }, [public_id]))
       .then((result) => {
         expect(result).not.to.be.empty();
         expect(result.public_ids[0]).to.eql(public_id);
@@ -273,7 +273,7 @@ describe("structured metadata api", function () {
       label: "input",
       type: "string",
     };
-    return api.create_metadata_field(metadata).then(({ external_id }) => uploader.upload(IMAGE_FILE, {
+    return api.add_metadata_field(metadata).then(({ external_id }) => uploader.upload(IMAGE_FILE, {
       tags: 'metadata_sample',
       metadata: { [external_id]: "123456" },
     }))
@@ -288,7 +288,7 @@ describe("structured metadata api", function () {
       label: "field",
       type: "string",
     };
-    return api.create_metadata_field(metadata).then(({ external_id }) => uploader.explicit("sample", {
+    return api.add_metadata_field(metadata).then(({ external_id }) => uploader.explicit("sample", {
       type: "upload",
       metadata: { [external_id]: "123456" },
     }))
