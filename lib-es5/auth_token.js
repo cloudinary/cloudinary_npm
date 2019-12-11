@@ -62,7 +62,7 @@ module.exports = function (options) {
     tokenParts.push(`acl=${escapeToLower(options.acl)}`);
   }
   var toSign = [].concat(tokenParts);
-  if (options.url) {
+  if (options.url != null && options.acl == null) {
     var url = escapeToLower(options.url);
     toSign.push(`url=${url}`);
   }
