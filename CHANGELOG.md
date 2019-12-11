@@ -1,3 +1,8 @@
+1.18.1 / 2019-12-11
+==================
+
+* Fix acl and url escaping in auth_token generation
+
 1.18.0 / 2019-12-09
 ===================
 
