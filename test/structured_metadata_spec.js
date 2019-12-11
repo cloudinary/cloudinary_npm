@@ -3,6 +3,8 @@ const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
+const IMAGE_FILE = helper.IMAGE_FILE;
+
 const SUFFIX = helper.SUFFIX;
 const EXTERNAL_ID_PREFIX = "metadata";
 const EXTERNAL_ID = EXTERNAL_ID_PREFIX + SUFFIX;
@@ -16,11 +18,17 @@ const EXTERNAL_ID_7 = EXTERNAL_ID + "_7";
 const EXTERNAL_ID_8 = EXTERNAL_ID + "_8";
 const EXTERNAL_ID_9 = EXTERNAL_ID + "_9";
 const EXTERNAL_ID_10 = EXTERNAL_ID + "_10";
+const EXTERNAL_ID_11 = EXTERNAL_ID + "_11";
+const EXTERNAL_ID_12 = EXTERNAL_ID + "_12";
+const EXTERNAL_ID_13 = EXTERNAL_ID + "_13";
+const EXTERNAL_ID_14 = EXTERNAL_ID + "_14";
 
 const api = cloudinary.v2.api;
+const uploader = cloudinary.v2.uploader;
 
 describe("structured metadata api", function () {
   const mandatory_fields = ['type', 'external_id', 'label', 'mandatory', 'default_value', 'validation'];
+  this.timeout(helper.TIMEOUT_MEDIUM);
   after(function () {
     return Q.allSettled(
       [
@@ -32,6 +40,10 @@ describe("structured metadata api", function () {
         api.delete_metadata_field(EXTERNAL_ID_7),
         api.delete_metadata_field(EXTERNAL_ID_9),
         api.delete_metadata_field(EXTERNAL_ID_10),
+        api.delete_metadata_field(EXTERNAL_ID_11),
+        api.delete_metadata_field(EXTERNAL_ID_12),
+        api.delete_metadata_field(EXTERNAL_ID_13),
+        api.delete_metadata_field(EXTERNAL_ID_14),
       ]
     ).finally(function () {});
   });
@@ -122,15 +134,14 @@ describe("structured metadata api", function () {
       label: "age",
       type: "integer",
       default_value: 10,
-    }).then(() => {
-      api.list_metadata_fields().then((result) => {
+    }).then(() => api.list_metadata_fields())
+      .then((result) => {
         expect(result).not.to.be.empty();
         expect(result.metadata_fields).not.to.be.empty();
         result.metadata_fields.forEach((field) => {
           expect(field).to.include.keys(...mandatory_fields);
         });
       });
-    });
   });
   it("should return metadata field by external id", function () {
     return api.create_metadata_field({
@@ -139,11 +150,11 @@ describe("structured metadata api", function () {
       type: "integer",
       default_value: 1,
     }).then(({ external_id, label }) => {
-      api.get_metadata_field(external_id).then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result).to.include.keys(...mandatory_fields);
-        expect(label).to.eql("length");
-      });
+      expect(label).to.eql("length");
+      return api.get_metadata_field(external_id);
+    }).then((result) => {
+      expect(result).not.to.be.empty();
+      expect(result).to.include.keys(...mandatory_fields);
     });
   });
   it("should update metadata field by external id", function () {
@@ -155,14 +166,13 @@ describe("structured metadata api", function () {
       label: "width",
       type: "integer",
       default_value: 1,
-    }).then(({ external_id }) => {
-      api.update_metadata_field(external_id, metadata).then((result) => {
+    }).then(({ external_id }) => api.update_metadata_field(external_id, metadata))
+      .then((result) => {
         expect(result).not.to.be.empty();
         expect(result).to.include.keys(...mandatory_fields);
         expect(result.label).to.eql("width");
         expect(result.default_value).to.eql(metadata.default_value);
       });
-    });
   });
   it("should delete metadata field by external id", function () {
     return api.create_metadata_field({
@@ -170,12 +180,11 @@ describe("structured metadata api", function () {
       label: "height",
       type: "integer",
       default_value: 6,
-    }).then(({ external_id }) => {
-      api.delete_metadata_field(external_id).then((result) => {
+    }).then(({ external_id }) => api.delete_metadata_field(external_id))
+      .then((result) => {
         expect(result).not.to.be.empty();
         expect(result.message).to.eql("ok");
       });
-    });
   });
   it("should update metadata field datasource by external id", function () {
     const new_datasource = {
@@ -194,8 +203,8 @@ describe("structured metadata api", function () {
           { external_id: "color_2", value: "blue" },
         ],
       },
-    }).then(({ external_id }) => {
-      api.update_metadata_field_datasource(external_id, new_datasource).then((result) => {
+    }).then(({ external_id }) => api.update_metadata_field_datasource(external_id, new_datasource))
+      .then((result) => {
         expect(result).not.to.be.empty();
         expect(result.values).not.to.be.empty();
         result.values.forEach((item) => {
@@ -203,7 +212,6 @@ describe("structured metadata api", function () {
           expect(item.value).to.eql(before_update_value.value);
         });
       });
-    });
   });
   it("should delete entries in metadata field datasource", function () {
     const metadata = {
@@ -224,20 +232,69 @@ describe("structured metadata api", function () {
       },
     };
     const external_ids = [metadata.datasource.values[0].external_id];
-    return api.create_metadata_field(metadata).then(({ external_id }) => {
-      api.delete_datasource_entries(external_id, external_ids).then((result) => {
+    return api.create_metadata_field(metadata)
+      .then(({ external_id }) => api.delete_datasource_entries(external_id, external_ids))
+      .then((result) => {
         expect(result).not.to.be.empty();
       });
-    });
   });
-  it.skip("should upload image with metadata option", function () {
-    cloudinary.v2.config(true);
-    return cloudinary.v2.uploader.upload("https://res.cloudinary.com/rtlstudio/image/upload/v1570730435/67870254_2481490465263818_8372213315262218240_n_nzajfq.jpg", {
+  it("should update metadata", function () {
+    const metadata = {
+      external_id: EXTERNAL_ID_11,
+      label: "figure",
+      type: "string",
+    };
+    const public_id = "sample";
+    return api.create_metadata_field(metadata).then(({ external_id }) => api.update(public_id, {
+      type: "upload",
+      metadata: { [external_id]: "123456" },
+    }))
+      .then((result) => {
+        expect(result).not.to.be.empty();
+        expect(result.metadata[EXTERNAL_ID_11]).to.eql("123456");
+      });
+  });
+  it("should update metadata via uploader", function () {
+    const metadata = {
+      external_id: EXTERNAL_ID_12,
+      label: "subject",
+      type: "string",
+    };
+    const public_id = "sample";
+    return api.create_metadata_field(metadata).then(({ external_id }) => uploader.update_metadata({ [external_id]: "123456" }, [public_id]))
+      .then((result) => {
+        expect(result).not.to.be.empty();
+        expect(result.public_ids[0]).to.eql(public_id);
+      });
+  });
+  it("should upload image with metadata option", function () {
+    const metadata = {
+      external_id: EXTERNAL_ID_13,
+      label: "input",
+      type: "string",
+    };
+    return api.create_metadata_field(metadata).then(({ external_id }) => uploader.upload(IMAGE_FILE, {
       tags: 'metadata_sample',
-      metadata: `${metadata_arr[0].external_id}=123456`,
-    }).then(function (result) {
-      expect(result).not.to.be.empty();
-      expect(result.fieldId).to.eql("123456");
-    });
+      metadata: { [external_id]: "123456" },
+    }))
+      .then(function (result) {
+        expect(result).not.to.be.empty();
+        expect(result.metadata[EXTERNAL_ID_13]).to.eql("123456");
+      });
+  });
+  it("should successfully call explicit api with metadata option", function () {
+    const metadata = {
+      external_id: EXTERNAL_ID_14,
+      label: "field",
+      type: "string",
+    };
+    return api.create_metadata_field(metadata).then(({ external_id }) => uploader.explicit("sample", {
+      type: "upload",
+      metadata: { [external_id]: "123456" },
+    }))
+      .then(function (result) {
+        expect(result).not.to.be.empty();
+        expect(result.metadata[EXTERNAL_ID_14]).to.eql("123456");
+      });
   });
 });
