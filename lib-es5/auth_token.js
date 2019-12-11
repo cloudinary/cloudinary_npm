@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Authorization Token
@@ -6,6 +6,9 @@
  */
 
 var crypto = require('crypto');
+var smart_escape = require('./utils/smart_escape').smart_escape;
+
+var unsafe = /([ "#%&'/:;<=>?@[\]^`{|}~]+)/g;
 
 function digest(message, key) {
   return crypto.createHmac("sha256", Buffer.from(key, "hex")).update(message).digest('hex');
@@ -17,7 +20,8 @@ function digest(message, key) {
  * @return {string} escaped url
  */
 function escapeToLower(url) {
-  return encodeURIComponent(url).replace(/%../g, function (match) {
+  var safeUrl = smart_escape(url, unsafe);
+  return safeUrl.replace(/%../g, function (match) {
     return match.toLowerCase();
   });
 }
@@ -43,6 +47,7 @@ function escapeToLower(url) {
  */
 module.exports = function (options) {
   var tokenName = options.token_name ? options.token_name : "__cld_token__";
+  var tokenSeparator = "~";
   if (options.expiration == null) {
     if (options.duration != null) {
       var start = options.start_time != null ? options.start_time : Math.round(Date.now() / 1000);
@@ -63,11 +68,11 @@ module.exports = function (options) {
     tokenParts.push(`acl=${escapeToLower(options.acl)}`);
   }
   var toSign = [].concat(tokenParts);
-  if (options.url) {
+  if (options.url != null && options.acl == null) {
     var url = escapeToLower(options.url);
     toSign.push(`url=${url}`);
   }
-  var auth = digest(toSign.join("~"), options.key);
+  var auth = digest(toSign.join(tokenSeparator), options.key);
   tokenParts.push(`hmac=${auth}`);
-  return `${tokenName}=${tokenParts.join('~')}`;
+  return `${tokenName}=${tokenParts.join(tokenSeparator)}`;
 };

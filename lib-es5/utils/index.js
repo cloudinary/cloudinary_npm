@@ -35,6 +35,7 @@ var isNumber = require("lodash/isNumber");
 var isObject = require("lodash/isObject");
 var isString = require("lodash/isString");
 var isUndefined = require("lodash/isUndefined");
+var smart_escape = require("./smart_escape").smart_escape;
 
 var config = require("../config");
 var generate_token = require("../auth_token");
@@ -1000,18 +1001,6 @@ function unsigned_url_prefix(source, cloud_name, private_cdn, cdn_subdomain, sec
     prefix += '/' + cloud_name;
   }
   return prefix;
-}
-// Based on CGI::unescape. In addition does not escape / :
-// smart_escape = (string)->
-//  encodeURIComponent(string).replace(/%3A/g, ":").replace(/%2F/g, "/")
-function smart_escape(string) {
-  var unsafe = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : /([^a-zA-Z0-9_.\-\/:]+)/g;
-
-  return string.replace(unsafe, function (match) {
-    return match.split("").map(function (c) {
-      return "%" + c.charCodeAt(0).toString(16).toUpperCase();
-    }).join("");
-  });
 }
 
 function api_url() {
