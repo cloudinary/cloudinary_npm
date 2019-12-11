@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Authorization Token
@@ -6,6 +6,9 @@
  */
 
 var crypto = require('crypto');
+var smart_escape = require('./utils/smart_escape').smart_escape;
+
+var unsafe = /([ "#%&'/:;<=>?@[\]^`{|}~]+)/g;
 
 function digest(message, key) {
   return crypto.createHmac("sha256", Buffer.from(key, "hex")).update(message).digest('hex');
@@ -17,7 +20,10 @@ function digest(message, key) {
  * @return {string} escaped url
  */
 function escapeToLower(url) {
-  return encodeURIComponent(url).replace(/%2C/g, ",").toLowerCase();
+  var safeUrl = smart_escape(url, unsafe);
+  return safeUrl.replace(/%../g, function (match) {
+    return match.toLowerCase();
+  });
 }
 
 /**
