@@ -653,10 +653,10 @@ exports.unsigned_image_upload_tag = function unsigned_image_upload_tag(field, up
 /**
  * Populates metadata fields with the given values. Existing values will be overwritten.
  *
- * @param {Object}   metadata Metadata field
- * @param {Array}    public_ids the public IDs of the resources to update
- * @param {Function} callback Callback function
- * @param {Object}   options Configuration options
+ * @param {Object}   metadata   A list of custom metadata fields (by external_id) and the values to assign to each
+ * @param {Array}    public_ids The public IDs of the resources to update
+ * @param {Function} callback   Callback function
+ * @param {Object}   options    Configuration options
  *
  * @return {Object}
  */
