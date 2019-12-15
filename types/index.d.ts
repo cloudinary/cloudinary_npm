@@ -820,7 +820,7 @@ declare module 'cloudinary' {
 
             function unsigned_upload(file: string, upload_preset: string, callback?: ErrorCallBack): Promise<any>;
 
-            function unsigned_upload_stream(upload_preset: string, callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+            function unsigned_upload_stream(upload_preset: string, callback?: ErrorCallBack, options?: UploadApiOptions): NodeJS.ReadWriteStream;
 
             function upload(file: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
@@ -836,7 +836,7 @@ declare module 'cloudinary' {
 
             function upload_large(path: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_stream(callback?: ErrorCallBack, options?: UploadApiOptions): Promise<any>;
+            function upload_stream(callback?: ErrorCallBack, options?: UploadApiOptions): NodeJS.ReadWriteStream;
 
             function upload_tag_params(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
