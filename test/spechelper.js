@@ -11,7 +11,7 @@ const https = require('https');
 const cloudinary = require("../cloudinary");
 
 const { utils, config, Cache } = cloudinary;
-const { isEmpty } = utils;
+const { isEmpty, includes } = utils;
 
 const libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
 const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
@@ -26,7 +26,8 @@ exports.TIMEOUT_LONG = 50000;
 exports.SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
 exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
 exports.TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDK's tests
-exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; // identifies resources created in the current test run
+exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; // identifies resources created in the current test run with a unique tag
+exports.TEST_ID = exports.TEST_TAG; // identifies resources created in the current test run with a unique id
 exports.UPLOAD_TAGS = [exports.TEST_TAG, exports.TEST_TAG_PREFIX, exports.SDK_TAG];
 exports.IMAGE_FILE = "test/resources/logo.png";
 exports.LARGE_RAW_FILE = "test/resources/TheCompleteWorksOfShakespeare.mobi";
@@ -88,6 +89,60 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
     });
     return done();
   });
+  return this;
+};
+
+/**
+ * Asserts that a given object is a metadata field.
+ * Optionally tests the values in the metadata field for equality
+ *
+ * @returns {expect.Assertion}
+ */
+expect.Assertion.prototype.beAMetadataField = function () {
+  let metadataField, expectedValues;
+  if (Array.isArray(this.obj)) {
+    [metadataField, expectedValues] = this.obj;
+  } else {
+    metadataField = this.obj;
+  }
+  // Check that all mandatory keys exist
+  const mandatoryKeys = ['type', 'external_id', 'label', 'mandatory', 'default_value', 'validation'];
+  mandatoryKeys.forEach((key) => {
+    this.assert(key in metadataField, function () {
+      return `expected metadata field to contain mandatory field: ${key}`;
+    }, function () {
+      return `expected metadata field not to contain a ${key} field`;
+    });
+  });
+
+  // If type is enum or set test it
+  if (includes(['enum', 'set'], metadataField.type)) {
+    this.assert('datasource' in metadataField, function () {
+      return `expected metadata field of type ${metadataField.type} to contain a datasource field`;
+    }, function () {
+      return `expected metadata field of type ${metadataField.type} not to contain a datasource field`;
+    });
+  }
+
+  // Make sure type is acceptable
+  const acceptableTypes = ['string', 'integer', 'date', 'enum', 'set'];
+  this.assert(includes(acceptableTypes, metadataField.type), function () {
+    return `expected metadata field type to be one of ${acceptableTypes.join(', ')}. Unknown field type ${metadataField.type} received`;
+  }, function () {
+    return `expected metadata field not to be of a certain type`;
+  });
+
+  // Verify object values
+  if (expectedValues) {
+    Object.entries(expectedValues).forEach(([key, value]) => {
+      this.assert(metadataField[key] === value, function () {
+        return `expected metadata field's ${key} to equal ${value} but got ${metadataField[key]} instead`;
+      }, function () {
+        return `expected metadata field's ${key} not to equal ${value}`;
+      });
+    });
+  }
+
   return this;
 };
 

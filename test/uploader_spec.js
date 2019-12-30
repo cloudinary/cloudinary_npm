@@ -241,7 +241,7 @@ describe("uploader", function () {
       });
     });
   });
-  describe("text images", function() {
+  describe("text images", function () {
     it("should successfully generate text image", function () {
       return cloudinary.v2.uploader.text("hello world", {
         tags: UPLOAD_TAGS,
@@ -251,13 +251,13 @@ describe("uploader", function () {
       });
     });
     var mocked = helper.mockTest();
-    it("should pass text image parameters to server", function() {
+    it("should pass text image parameters to server", function () {
       cloudinary.v2.uploader.text("hello word",
-      {
-        font_family: "Arial",
-        font_size: 12,
-        font_weight: "black"
-      });
+        {
+          font_family: "Arial",
+          font_size: 12,
+          font_weight: "black",
+        });
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("font_family", "Arial")));
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("font_size", "12")));
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("font_weight", "black")));

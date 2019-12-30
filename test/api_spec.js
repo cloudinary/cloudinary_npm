@@ -11,13 +11,12 @@ const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
-const { merge } = cloudinary.utils;
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
 const TEST_TAG = helper.TEST_TAG;
-const IMAGE_FILE = helper.IMAGE_FILE;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
+const TEST_ID = helper.TEST_ID;
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
@@ -45,6 +44,9 @@ const EXPLICIT_TRANSFORMATION2 = {
   crop: "scale",
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
+const METADATA_EXTERNAL_ID_UPLOAD = "metadata_upload_" + TEST_ID;
+const METADATA_EXTERNAL_ID_UPDATE = "metadata_uploader_update_" + TEST_ID;
+const METADATA_EXTERNAL_ID_EXPLICIT = "metadata_explicit_" + TEST_ID;
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
@@ -128,34 +130,30 @@ describe("api", function () {
   before(function () {
     this.timeout(helper.TIMEOUT_LONG);
     return Q.allSettled([
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: PUBLIC_ID,
-          tags: UPLOAD_TAGS,
-          context: "key=value",
-          eager: [EXPLICIT_TRANSFORMATION],
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: PUBLIC_ID_2,
-          tags: UPLOAD_TAGS,
-          context: "key=value",
-          eager: [EXPLICIT_TRANSFORMATION],
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: PUBLIC_ID_5,
-          tags: UPLOAD_TAGS,
-          context: `${contextKey}=test`,
-          eager: [EXPLICIT_TRANSFORMATION],
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: PUBLIC_ID_6,
-          tags: UPLOAD_TAGS,
-          context: `${contextKey}=alt-test`,
-          eager: [EXPLICIT_TRANSFORMATION],
-        }),
+      uploadImage({
+        public_id: PUBLIC_ID,
+        tags: UPLOAD_TAGS,
+        context: "key=value",
+        eager: [EXPLICIT_TRANSFORMATION],
+      }),
+      uploadImage({
+        public_id: PUBLIC_ID_2,
+        tags: UPLOAD_TAGS,
+        context: "key=value",
+        eager: [EXPLICIT_TRANSFORMATION],
+      }),
+      uploadImage({
+        public_id: PUBLIC_ID_5,
+        tags: UPLOAD_TAGS,
+        context: `${contextKey}=test`,
+        eager: [EXPLICIT_TRANSFORMATION],
+      }),
+      uploadImage({
+        public_id: PUBLIC_ID_6,
+        tags: UPLOAD_TAGS,
+        context: `${contextKey}=alt-test`,
+        eager: [EXPLICIT_TRANSFORMATION],
+      }),
     ]).finally(function () {});
   });
   after(function () {
@@ -188,7 +186,7 @@ describe("api", function () {
       var publicId;
       this.timeout(helper.TIMEOUT_MEDIUM);
       publicId = '';
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         tags: UPLOAD_TAGS,
       }).then(function (result) {
         publicId = result.public_id;
@@ -201,7 +199,7 @@ describe("api", function () {
     });
     it("should allow listing resources by type", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         tags: UPLOAD_TAGS,
       }).then(
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
@@ -294,7 +292,7 @@ describe("api", function () {
     });
     it("should allow get resource metadata", function () {
       this.timeout(helper.TIMEOUT_LONG);
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         tags: UPLOAD_TAGS,
         eager: [EXPLICIT_TRANSFORMATION],
       }).then(({ public_id }) => cloudinary.v2.api.resource(public_id)
@@ -321,7 +319,7 @@ describe("api", function () {
   describe("delete", function () {
     it("should allow deleting derived resource", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         tags: UPLOAD_TAGS,
         eager: [
           {
@@ -349,25 +347,21 @@ describe("api", function () {
     it("should allow deleting derived resources by transformations", function () {
       this.timeout(helper.TIMEOUT_LONG);
       return Q.all([
-        cloudinary.v2.uploader.upload(IMAGE_FILE,
-          {
-            public_id: PUBLIC_ID_1,
-            tags: UPLOAD_TAGS,
-            eager: [EXPLICIT_TRANSFORMATION],
-          }),
-        cloudinary.v2.uploader.upload(IMAGE_FILE,
-          {
-            public_id: PUBLIC_ID_2,
-            tags: UPLOAD_TAGS,
-            eager: [EXPLICIT_TRANSFORMATION2],
-          }),
-        cloudinary.v2.uploader.upload(IMAGE_FILE,
-          {
-            public_id: PUBLIC_ID_3,
-            tags: UPLOAD_TAGS,
-            eager: [EXPLICIT_TRANSFORMATION,
-              EXPLICIT_TRANSFORMATION2],
-          }),
+        uploadImage({
+          public_id: PUBLIC_ID_1,
+          tags: UPLOAD_TAGS,
+          eager: [EXPLICIT_TRANSFORMATION],
+        }),
+        uploadImage({
+          public_id: PUBLIC_ID_2,
+          tags: UPLOAD_TAGS,
+          eager: [EXPLICIT_TRANSFORMATION2],
+        }),
+        uploadImage({
+          public_id: PUBLIC_ID_3,
+          tags: UPLOAD_TAGS,
+          eager: [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2],
+        }),
       ]).then(() => cloudinary.v2.api.delete_derived_by_transformation(
         [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2]
       )).then(
@@ -385,7 +379,7 @@ describe("api", function () {
     });
     it("should allow deleting resources", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         public_id: PUBLIC_ID_3,
         tags: UPLOAD_TAGS,
       }).then(
@@ -406,7 +400,7 @@ describe("api", function () {
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
       return it("should allow deleting resources by prefix", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
-        return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        return uploadImage({
           public_id: "api_test_by_prefix",
           tags: UPLOAD_TAGS,
         }).then(
@@ -429,7 +423,7 @@ describe("api", function () {
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
       it("should allow deleting resources by tags", function () {
         this.timeout(helper.TIMEOUT_MEDIUM);
-        return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        return uploadImage({
           public_id: PUBLIC_ID_4,
           tags: UPLOAD_TAGS.concat([deleteTestTag])
         }).then(
@@ -701,7 +695,7 @@ describe("api", function () {
       });
       it("should support changing moderation status with notification-url", function () {
         this.timeout(helper.TIMEOUT_LONG);
-        return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        return uploadImage({
           moderation: "manual",
         }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           moderation_status: "approved",
@@ -716,7 +710,7 @@ describe("api", function () {
     });
     it("should support setting manual moderation status", function () {
       this.timeout(helper.TIMEOUT_LONG);
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         moderation: "manual",
       }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
         moderation_status: "approved",
@@ -793,6 +787,85 @@ describe("api", function () {
       });
     });
   });
+  describe("structured metadata fields", function () {
+    this.timeout(helper.TIMEOUT_LONG);
+    const METADATA_VALUE = "123456";
+    before(function () {
+      return Q.allSettled(
+        [
+          cloudinary.v2.api.add_metadata_field({
+            external_id: METADATA_EXTERNAL_ID_UPDATE,
+            label: "subject",
+            type: "string",
+          }),
+          cloudinary.v2.api.add_metadata_field({
+            external_id: METADATA_EXTERNAL_ID_UPLOAD,
+            label: "input",
+            type: "string",
+          }),
+          cloudinary.v2.api.add_metadata_field({
+            external_id: METADATA_EXTERNAL_ID_EXPLICIT,
+            label: "field",
+            type: "string",
+          }),
+        ]
+      ).finally(function () {});
+    });
+    after(function () {
+      return Q.allSettled(
+        [
+          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_UPDATE),
+          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_UPLOAD),
+          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_EXPLICIT),
+        ]
+      ).finally(function () {});
+    });
+    it("should be updatable with uploader.update_metadata", function () {
+      let publicId;
+      return uploadImage({
+        tags: [TEST_TAG],
+      })
+        .then((result) => {
+          publicId = result.public_id;
+          return cloudinary.v2.uploader.update_metadata({ [METADATA_EXTERNAL_ID_UPDATE]: METADATA_VALUE }, [publicId]);
+        })
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.public_ids[0]).to.eql(publicId);
+          return cloudinary.v2.api.resource(publicId);
+        })
+        .then((result) => {
+          expect(result.metadata[METADATA_EXTERNAL_ID_UPDATE]).to.eql(METADATA_VALUE);
+        });
+    });
+    it("should be supported when uploading a resource with metadata", function () {
+      return uploadImage({
+        tags: [TEST_TAG],
+        metadata: { [METADATA_EXTERNAL_ID_UPLOAD]: METADATA_VALUE },
+      }).then((result) => {
+        expect(result).not.to.be.empty();
+        return cloudinary.v2.api.resource(result.public_id);
+      }).then((result) => {
+        expect(result.metadata[METADATA_EXTERNAL_ID_UPLOAD]).to.eql(METADATA_VALUE);
+      });
+    });
+    it("should be supported when calling explicit with metadata", function () {
+      return uploadImage({
+        tags: [TEST_TAG],
+      }).then((result) => {
+        return cloudinary.v2.uploader.explicit(result.public_id, {
+          type: "upload",
+          tags: [TEST_TAG],
+          metadata: { [METADATA_EXTERNAL_ID_EXPLICIT]: METADATA_VALUE },
+        });
+      }).then(function (result) {
+        expect(result).not.to.be.empty();
+        return cloudinary.v2.api.resource(result.public_id);
+      }).then((result) => {
+        expect(result.metadata[METADATA_EXTERNAL_ID_EXPLICIT]).to.eql(METADATA_VALUE);
+      });
+    });
+  });
   it("should support listing by moderation kind and value", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
     return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
@@ -816,31 +889,26 @@ describe("api", function () {
   it("should list folders in cloudinary", function () {
     this.timeout(helper.TIMEOUT_LONG);
     return Q.all([
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: 'test_folder1/item',
-          tags: UPLOAD_TAGS,
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: 'test_folder2/item',
-          tags: UPLOAD_TAGS,
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: 'test_folder2/item',
-          tags: UPLOAD_TAGS,
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: 'test_folder1/test_subfolder1/item',
-          tags: UPLOAD_TAGS,
-        }),
-      cloudinary.v2.uploader.upload(IMAGE_FILE,
-        {
-          public_id: 'test_folder1/test_subfolder2/item',
-          tags: UPLOAD_TAGS,
-        }),
+      uploadImage({
+        public_id: 'test_folder1/item',
+        tags: UPLOAD_TAGS,
+      }),
+      uploadImage({
+        public_id: 'test_folder2/item',
+        tags: UPLOAD_TAGS,
+      }),
+      uploadImage({
+        public_id: 'test_folder2/item',
+        tags: UPLOAD_TAGS,
+      }),
+      uploadImage({
+        public_id: 'test_folder1/test_subfolder1/item',
+        tags: UPLOAD_TAGS,
+      }),
+      uploadImage({
+        public_id: 'test_folder1/test_subfolder2/item',
+        tags: UPLOAD_TAGS,
+      }),
     ]).then(function (results) {
       return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
     }).then(function (results) {
@@ -871,7 +939,7 @@ describe("api", function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
     const folderPath= "test_folder/delete_folder/"+TEST_TAG;
     before(function(){
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         folder: folderPath,
         tags: UPLOAD_TAGS
       }).delay(2 * 1000).then(function() {
@@ -896,7 +964,7 @@ describe("api", function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
 
     const publicId = "api_test_restore" + SUFFIX;
-    before(() => cloudinary.v2.uploader.upload(IMAGE_FILE, {
+    before(() => uploadImage({
       public_id: publicId,
       backup: true,
       tags: UPLOAD_TAGS,
@@ -967,7 +1035,7 @@ describe("api", function () {
     idsToDelete = [];
     beforeEach(function () {
       publishTestTag = TEST_TAG + i++;
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         type: "authenticated",
         tags: UPLOAD_TAGS.concat([publishTestTag])
       }).then((result) => {
@@ -1032,7 +1100,7 @@ describe("api", function () {
     access_mode_tag = '';
     beforeEach(function () {
       access_mode_tag = TEST_TAG + "access_mode" + i++;
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return uploadImage({
         access_mode: "authenticated",
         tags: UPLOAD_TAGS.concat([access_mode_tag]),
       }).then((result) => {

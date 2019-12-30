@@ -3,298 +3,354 @@ const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
-const IMAGE_FILE = helper.IMAGE_FILE;
-
-const SUFFIX = helper.SUFFIX;
-const EXTERNAL_ID_PREFIX = "metadata";
-const EXTERNAL_ID = EXTERNAL_ID_PREFIX + SUFFIX;
-const EXTERNAL_ID_1 = EXTERNAL_ID + "_1";
-const EXTERNAL_ID_2 = EXTERNAL_ID + "_2";
-const EXTERNAL_ID_3 = EXTERNAL_ID + "_3";
-const EXTERNAL_ID_4 = EXTERNAL_ID + "_4";
-const EXTERNAL_ID_5 = EXTERNAL_ID + "_5";
-const EXTERNAL_ID_6 = EXTERNAL_ID + "_6";
-const EXTERNAL_ID_7 = EXTERNAL_ID + "_7";
-const EXTERNAL_ID_8 = EXTERNAL_ID + "_8";
-const EXTERNAL_ID_9 = EXTERNAL_ID + "_9";
-const EXTERNAL_ID_10 = EXTERNAL_ID + "_10";
-const EXTERNAL_ID_11 = EXTERNAL_ID + "_11";
-const EXTERNAL_ID_12 = EXTERNAL_ID + "_12";
-const EXTERNAL_ID_13 = EXTERNAL_ID + "_13";
-const EXTERNAL_ID_14 = EXTERNAL_ID + "_14";
+const TEST_ID = helper.TEST_ID;
+const TEST_TAG = helper.TEST_TAG;
+const UPLOAD_TAGS = helper.UPLOAD_TAGS;
+const uploadImage = helper.uploadImage;
+const EXTERNAL_ID_CREATE = 'metadata_create_' + TEST_ID;
+const EXTERNAL_ID_CREATE_2 = 'metadata_create_2_' + TEST_ID;
+const EXTERNAL_ID_DATE_VALIDATION = 'metadata_validate_date_' + TEST_ID;
+const EXTERNAL_ID_DATE_VALIDATION_2 = 'metadata_validate_date_2_' + TEST_ID;
+const EXTERNAL_ID_GET_LIST = 'metadata_list_' + TEST_ID;
+const EXTERNAL_ID_GET_FIELD = 'metadata_get_by_id_' + TEST_ID;
+const EXTERNAL_ID_UPDATE_BY_ID = 'metadata_update_by_id_' + TEST_ID;
+const EXTERNAL_ID_DELETE = 'metadata_delete_' + TEST_ID;
+const EXTERNAL_ID_UPDATE_DATASOURCE = 'metadata_datasource_update_' + TEST_ID;
+const EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES = 'metadata_delete_datasource_entries_' + TEST_ID;
+const EXTERNAL_ID_RESTORE_DATASOURCE_ENTRIES = 'metadata_restore_datasource_entries_' + TEST_ID;
+const EXTERNAL_ID_UPDATE = 'metadata_update_' + TEST_ID;
+const PUBLIC_ID_UPLOAD = "metadata_upload_" + TEST_ID;
+const LABEL_INT_1 = 'metadata_label_1_' + TEST_ID;
+const LABEL_INT_2 = 'metadata_label_2_' + TEST_ID;
+const LABEL_INT_3 = 'metadata_label_3_' + TEST_ID;
+const LABEL_INT_4 = 'metadata_label_4_' + TEST_ID;
+const LABEL_SET_1 = 'metadata_set_1_' + TEST_ID;
+const LABEL_SET_2 = 'metadata_set_2_' + TEST_ID;
+const LABEL_STRING_1 = 'metadata_string_1_' + TEST_ID;
+const LABEL_STRING_2 = 'metadata_string_2_' + TEST_ID;
+const LABEL_STRING_3 = 'metadata_string_3_' + TEST_ID;
+const LABEL_DATE = 'metadata_date_' + TEST_ID;
 
 const api = cloudinary.v2.api;
-const uploader = cloudinary.v2.uploader;
 
 describe("structured metadata api", function () {
-  const mandatory_fields = ['type', 'external_id', 'label', 'mandatory', 'default_value', 'validation'];
   this.timeout(helper.TIMEOUT_MEDIUM);
-  after(function () {
+
+  before(function () {
     return Q.allSettled(
       [
-        api.delete_metadata_field(EXTERNAL_ID_1),
-        api.delete_metadata_field(EXTERNAL_ID_2),
-        api.delete_metadata_field(EXTERNAL_ID_3),
-        api.delete_metadata_field(EXTERNAL_ID_5),
-        api.delete_metadata_field(EXTERNAL_ID_6),
-        api.delete_metadata_field(EXTERNAL_ID_7),
-        api.delete_metadata_field(EXTERNAL_ID_9),
-        api.delete_metadata_field(EXTERNAL_ID_10),
-        api.delete_metadata_field(EXTERNAL_ID_11),
-        api.delete_metadata_field(EXTERNAL_ID_12),
-        api.delete_metadata_field(EXTERNAL_ID_13),
-        api.delete_metadata_field(EXTERNAL_ID_14),
+        api.add_metadata_field({
+          external_id: EXTERNAL_ID_GET_LIST,
+          label: LABEL_INT_1,
+          type: "integer",
+          default_value: 10,
+        }),
+        api.add_metadata_field({
+          external_id: EXTERNAL_ID_GET_FIELD,
+          label: LABEL_INT_2,
+          type: "integer",
+          default_value: 1,
+        }),
+        api.add_metadata_field({
+          external_id: EXTERNAL_ID_UPDATE_BY_ID,
+          label: LABEL_INT_3,
+          type: "integer",
+          default_value: 1,
+        }),
+        api.add_metadata_field({
+          external_id: EXTERNAL_ID_DELETE,
+          label: LABEL_INT_4,
+          type: "integer",
+          default_value: 6,
+        }),
+        api.add_metadata_field({
+          external_id: EXTERNAL_ID_UPDATE_DATASOURCE,
+          label: LABEL_SET_1,
+          type: "set",
+          datasource: {
+            values: [
+              { external_id: "color_1", value: "red" },
+              { external_id: "color_2", value: "blue" },
+            ],
+          },
+        }),
+        api.add_metadata_field({
+          external_id: EXTERNAL_ID_UPDATE,
+          label: LABEL_STRING_1,
+          type: "string",
+        }),
+        uploadImage({
+          public_id: PUBLIC_ID_UPLOAD,
+          tags: UPLOAD_TAGS,
+        }),
       ]
     ).finally(function () {});
   });
 
-  it("should create metadata", function () {
-    const metadataArr = [
-      {
-        external_id: EXTERNAL_ID_1,
-        label: "color",
-        type: "string",
-        default_value: "blue",
-      }, {
-        external_id: EXTERNAL_ID_2,
-        label: "text",
-        type: "string",
-      },
-    ];
-    const labels = metadataArr.map(item => item.label);
-    return Promise.all(metadataArr.map(field => api.add_metadata_field(field))).then((results) => {
-      expect(results).not.to.be.empty();
-      results.forEach((res) => {
-        expect(res).not.to.be.empty();
-        expect(labels).to.contain(res.label);
-      });
-    });
+  after(function () {
+    // Delete all metadata fields created during the test
+    return Q.allSettled(
+      [
+        EXTERNAL_ID_CREATE,
+        EXTERNAL_ID_CREATE_2,
+        EXTERNAL_ID_DATE_VALIDATION,
+        EXTERNAL_ID_DATE_VALIDATION_2,
+        EXTERNAL_ID_GET_LIST,
+        EXTERNAL_ID_GET_FIELD,
+        EXTERNAL_ID_UPDATE_BY_ID,
+        EXTERNAL_ID_DELETE,
+        EXTERNAL_ID_UPDATE_DATASOURCE,
+        EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES,
+        EXTERNAL_ID_RESTORE_DATASOURCE_ENTRIES,
+        EXTERNAL_ID_UPDATE,
+      ].map(field => api.delete_metadata_field(field))
+    ).then(function () {
+      return api.delete_resources_by_tag(TEST_TAG);
+    }).finally(function () {});
   });
-  describe("date_field_validation", function () {
-    const maxValidDate = '2000-01-01';
-    const minValidDate = '1950-01-01';
-    const validDate = '1980-04-20';
-    const invalidDate = '1940-01-20';
-    const validMetadata = {
-      external_id: EXTERNAL_ID_3,
-      label: "dateOfBirth",
-      type: "date",
-      mandatory: true,
-      default_value: validDate,
-      validation: {
-        type: "and",
-        rules: [
-          {
-            type: "greater_than",
-            value: minValidDate,
-          }, {
-            type: "less_than",
-            value: maxValidDate,
-          },
-        ],
-      },
-    };
-    const invalidMetadata = {
-      external_id: EXTERNAL_ID_4,
-      label: "dateOfBirth",
-      type: "date",
-      mandatory: true,
-      default_value: invalidDate,
-      validation: {
-        type: "and",
-        rules: [
-          {
-            type: "greater_than",
-            value: minValidDate,
-          }, {
-            type: "less_than",
-            value: maxValidDate,
-          },
-        ],
-      },
-    };
-    it("should create date field with default value", function () {
-      return api.add_metadata_field(validMetadata).then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result.label).to.eql(validMetadata.label);
-      });
+
+  describe("add metadata field", function () {
+    it("should create metadata", function () {
+      const metadataFields = [
+        {
+          external_id: EXTERNAL_ID_CREATE,
+          label: LABEL_STRING_2,
+          type: "string",
+          default_value: "blue",
+        }, {
+          external_id: EXTERNAL_ID_CREATE_2,
+          label: LABEL_STRING_3,
+          type: "string",
+        },
+      ];
+      return Q.all(metadataFields.map(field => api.add_metadata_field(field)))
+        .then((results) => {
+          expect([results[0], metadataFields[0]]).to.beAMetadataField();
+          expect([results[1], metadataFields[1]]).to.beAMetadataField();
+          return Q.all(
+            [
+              api.metadata_field_by_field_id(EXTERNAL_ID_CREATE),
+              api.metadata_field_by_field_id(EXTERNAL_ID_CREATE_2),
+            ]
+          );
+        })
+        .then((results) => {
+          expect([results[0], metadataFields[0]]).to.beAMetadataField();
+          expect([results[1], metadataFields[1]]).to.beAMetadataField();
+        });
     });
-    it("should not create date field with illegal default value", function () {
-      return api.add_metadata_field(invalidMetadata).then(() => {
-        expect().fail();
-      }).catch((res) => {
-        expect(res.error).not.to.be(void 0);
-        expect(res.error.message).to.contain("default_value is invalid");
+
+    describe("date_field_validation", function () {
+      const maxValidDate = '2000-01-01';
+      const minValidDate = '1950-01-01';
+      const validDate = '1980-04-20';
+      const invalidDate = '1940-01-20';
+      const validMetadata = {
+        external_id: EXTERNAL_ID_DATE_VALIDATION,
+        label: LABEL_DATE,
+        type: "date",
+        mandatory: true,
+        default_value: validDate,
+        validation: {
+          type: "and",
+          rules: [
+            {
+              type: "greater_than",
+              value: minValidDate,
+            }, {
+              type: "less_than",
+              value: maxValidDate,
+            },
+          ],
+        },
+      };
+      const invalidMetadata = {
+        ...validMetadata,
+        external_id: EXTERNAL_ID_DATE_VALIDATION_2,
+        default_value: invalidDate,
+      };
+
+      it("should create date field when default value validation passes", function () {
+        return api.add_metadata_field(validMetadata)
+          .then((result) => {
+            expect(result).to.beAMetadataField();
+            return api.metadata_field_by_field_id(EXTERNAL_ID_DATE_VALIDATION);
+          })
+          .then((result) => {
+            expect(result).to.beAMetadataField();
+            expect(result.default_value).to.eql(validMetadata.default_value);
+          });
       });
-    });
-  });
-  it("should return list metadata field definitions", function () {
-    return api.add_metadata_field({
-      external_id: EXTERNAL_ID_5,
-      label: "age",
-      type: "integer",
-      default_value: 10,
-    }).then(() => api.list_metadata_fields())
-      .then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result.metadata_fields).not.to.be.empty();
-        result.metadata_fields.forEach((field) => {
-          expect(field).to.include.keys(...mandatory_fields);
+
+      it("should not create date field with illegal default value", function () {
+        return api.add_metadata_field(invalidMetadata).then(() => {
+          expect().fail();
+        }).catch((res) => {
+          expect(res.error).not.to.be(void 0);
+          expect(res.error.message).to.contain("default_value is invalid");
         });
       });
-  });
-  it("should return metadata field by external id", function () {
-    return api.add_metadata_field({
-      external_id: EXTERNAL_ID_6,
-      label: "length",
-      type: "integer",
-      default_value: 1,
-    }).then(({ external_id, label }) => {
-      expect(label).to.eql("length");
-      return api.metadata_field_by_field_id(external_id);
-    }).then((result) => {
-      expect(result).not.to.be.empty();
-      expect(result).to.include.keys(...mandatory_fields);
     });
   });
-  it("should update metadata field by external id", function () {
-    const metadata = {
-      default_value: 10,
-    };
-    return api.add_metadata_field({
-      external_id: EXTERNAL_ID_7,
-      label: "width",
-      type: "integer",
-      default_value: 1,
-    }).then(({ external_id }) => api.update_metadata_field(external_id, metadata))
-      .then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result).to.include.keys(...mandatory_fields);
-        expect(result.label).to.eql("width");
-        expect(result.default_value).to.eql(metadata.default_value);
-      });
-  });
-  it("should delete metadata field by external id", function () {
-    return api.add_metadata_field({
-      external_id: EXTERNAL_ID_8,
-      label: "height",
-      type: "integer",
-      default_value: 6,
-    }).then(({ external_id }) => api.delete_metadata_field(external_id))
-      .then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result.message).to.eql("ok");
-      });
-  });
-  it("should update metadata field datasource by external id", function () {
-    const new_datasource = {
-      values: [
-        { external_id: "color_1", value: "brown" },
-        { external_id: "color_2", value: "black" },
-      ],
-    };
-    return api.add_metadata_field({
-      external_id: EXTERNAL_ID_9,
-      label: "colors",
-      type: "set",
-      datasource: {
-        values: [
-          { external_id: "color_1", value: "red" },
-          { external_id: "color_2", value: "blue" },
-        ],
-      },
-    }).then(({ external_id }) => api.update_metadata_field_datasource(external_id, new_datasource))
-      .then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result.values).not.to.be.empty();
-        result.values.forEach((item) => {
-          let before_update_value = new_datasource.values.find(val => val.external_id === item.external_id);
-          expect(item.value).to.eql(before_update_value.value);
+
+  describe("list_metadata_fields", function () {
+    it("should return all metadata field definitions", function () {
+      return api.list_metadata_fields()
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.metadata_fields).not.to.be.empty();
+          expect(result.metadata_fields).to.be.an("array");
+          result.metadata_fields.forEach((field) => {
+            expect(field).to.beAMetadataField();
+          });
         });
-      });
+    });
   });
-  it("should delete entries in metadata field datasource", function () {
-    const metadata = {
-      external_id: EXTERNAL_ID_10,
-      label: "size",
-      type: "set",
-      datasource: {
+
+  describe("metadata_field_by_field_id", function () {
+    it("should return metadata field by external id", function () {
+      return api.metadata_field_by_field_id(EXTERNAL_ID_GET_FIELD)
+        .then((result) => {
+          expect([result, { external_id: EXTERNAL_ID_GET_FIELD }]).to.beAMetadataField();
+        });
+    });
+  });
+
+  describe("update_metadata_field", function () {
+    it("should update metadata field by external id", function () {
+      const metadataChanges = {
+        default_value: 10,
+      };
+      return api.update_metadata_field(EXTERNAL_ID_UPDATE_BY_ID, metadataChanges)
+        .then((result) => {
+          expect([result, metadataChanges]).to.beAMetadataField();
+          return api.metadata_field_by_field_id(EXTERNAL_ID_UPDATE_BY_ID);
+        })
+        .then((result) => {
+          expect([result, metadataChanges]).to.beAMetadataField();
+        });
+    });
+  });
+
+  describe("delete_metadata_field", function () {
+    it("should delete metadata field by external id", function () {
+      return api.delete_metadata_field(EXTERNAL_ID_DELETE)
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.message).to.eql("ok");
+          return api.metadata_field_by_field_id(EXTERNAL_ID_DELETE);
+        })
+        .catch(({ error }) => {
+          expect(error).not.to.be(void 0);
+          expect(error.http_code).to.eql(404);
+          expect(error.message).to.contain(`External ID ${EXTERNAL_ID_DELETE} doesn't exist`);
+        });
+    });
+  });
+
+  describe("update_metadata_field_datasource", function () {
+    it("should update metadata field datasource by external id", function () {
+      const datasource_changes = {
         values: [
-          {
-            external_id: "size_1",
-            value: "big",
-          },
-          {
-            external_id: "size_2",
-            value: "small",
-          },
+          { external_id: "color_1", value: "brown" },
+          { external_id: "color_2", value: "black" },
         ],
-      },
-    };
-    const external_ids = [metadata.datasource.values[0].external_id];
-    return api.add_metadata_field(metadata)
-      .then(({ external_id }) => api.delete_datasource_entries(external_id, external_ids))
-      .then((result) => {
-        expect(result).not.to.be.empty();
-      });
+      };
+      return api.update_metadata_field_datasource(EXTERNAL_ID_UPDATE_DATASOURCE, datasource_changes)
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          return api.metadata_field_by_field_id(EXTERNAL_ID_UPDATE_DATASOURCE);
+        })
+        .then((result) => {
+          expect(result).to.beAMetadataField();
+          result.datasource.values.forEach((item) => {
+            const old_value = datasource_changes.values.find(val => val.external_id === item.external_id).value;
+            expect(item.value).to.eql(old_value);
+          });
+        });
+    });
   });
-  it("should update metadata", function () {
-    const metadata = {
-      external_id: EXTERNAL_ID_11,
-      label: "figure",
-      type: "string",
-    };
-    const public_id = "sample";
-    return api.add_metadata_field(metadata).then(({ external_id }) => api.update(public_id, {
-      type: "upload",
-      metadata: { [external_id]: "123456" },
-    }))
-      .then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result.metadata[EXTERNAL_ID_11]).to.eql("123456");
-      });
+
+  describe("delete_datasource_entries", function () {
+    it("should delete entries in metadata field datasource", function () {
+      const metadata = {
+        external_id: EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES,
+        label: LABEL_SET_2,
+        type: "set",
+        datasource: {
+          values: [
+            {
+              external_id: "size_1",
+              value: "big",
+            },
+            {
+              external_id: "size_2",
+              value: "small",
+            },
+          ],
+        },
+      };
+      const external_ids_for_deletion = [metadata.datasource.values[0].external_id];
+      return api.add_metadata_field(metadata)
+        .then(() => api.delete_datasource_entries(EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES, external_ids_for_deletion))
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.values.length).to.eql(1);
+          expect(result.values[0].external_id).to.eql(metadata.datasource.values[1].external_id);
+        });
+    });
   });
-  it("should update metadata via uploader", function () {
-    const metadata = {
-      external_id: EXTERNAL_ID_12,
-      label: "subject",
-      type: "string",
-    };
-    const public_id = "sample";
-    return api.add_metadata_field(metadata).then(({ external_id }) => uploader.update_metadata({ [external_id]: "123456" }, [public_id]))
-      .then((result) => {
-        expect(result).not.to.be.empty();
-        expect(result.public_ids[0]).to.eql(public_id);
-      });
+
+  describe("restore_metadata_field_datasource", function () {
+    it("should restore a deleted entry in a metadata field datasource", function () {
+      const metadata = {
+        external_id: EXTERNAL_ID_RESTORE_DATASOURCE_ENTRIES,
+        label: LABEL_SET_2,
+        type: "set",
+        datasource: {
+          values: [
+            {
+              external_id: "size_1",
+              value: "big",
+            },
+            {
+              external_id: "size_2",
+              value: "small",
+            },
+          ],
+        },
+      };
+      const DELETED_ENTRY = [metadata.datasource.values[0].external_id];
+      return api.add_metadata_field(metadata)
+        .then(() => api.delete_datasource_entries(EXTERNAL_ID_RESTORE_DATASOURCE_ENTRIES, DELETED_ENTRY))
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.values.length).to.eql(1);
+          expect(result.values[0].external_id).to.eql(metadata.datasource.values[1].external_id);
+        })
+        .then(() => api.restore_metadata_field_datasource(EXTERNAL_ID_RESTORE_DATASOURCE_ENTRIES, DELETED_ENTRY))
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.values.length).to.eql(2);
+          expect(result.values[0].external_id).to.eql(metadata.datasource.values[0].external_id);
+          expect(result.values[1].external_id).to.eql(metadata.datasource.values[1].external_id);
+        });
+    });
   });
-  it("should upload image with metadata option", function () {
-    const metadata = {
-      external_id: EXTERNAL_ID_13,
-      label: "input",
-      type: "string",
-    };
-    return api.add_metadata_field(metadata).then(({ external_id }) => uploader.upload(IMAGE_FILE, {
-      tags: 'metadata_sample',
-      metadata: { [external_id]: "123456" },
-    }))
-      .then(function (result) {
-        expect(result).not.to.be.empty();
-        expect(result.metadata[EXTERNAL_ID_13]).to.eql("123456");
-      });
-  });
-  it("should successfully call explicit api with metadata option", function () {
-    const metadata = {
-      external_id: EXTERNAL_ID_14,
-      label: "field",
-      type: "string",
-    };
-    return api.add_metadata_field(metadata).then(({ external_id }) => uploader.explicit("sample", {
-      type: "upload",
-      metadata: { [external_id]: "123456" },
-    }))
-      .then(function (result) {
-        expect(result).not.to.be.empty();
-        expect(result.metadata[EXTERNAL_ID_14]).to.eql("123456");
-      });
+
+  describe("api.update", function () {
+    const METADATA_VALUE = "123456";
+    it("should update metadata", function () {
+      return api.update(PUBLIC_ID_UPLOAD, {
+        metadata: { [EXTERNAL_ID_UPDATE]: METADATA_VALUE },
+      })
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          return api.resource(PUBLIC_ID_UPLOAD);
+        })
+        .then((result) => {
+          expect(result.metadata[EXTERNAL_ID_UPDATE]).to.eql(METADATA_VALUE);
+        });
+    });
   });
 });
