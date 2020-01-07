@@ -89,7 +89,6 @@ describe("utils", function () {
       expect(["http://res.cloudinary.com/demo/sample.png", options]).to.produceUrl(new RegExp(`^${root_path}/image/fetch/s--[\\w-]+--/${expected_transformation}v${authenticated_image.version}/http://res.cloudinary.com/demo/sample.png$`)).and.emptyOptions().and.beServedByCloudinary(done);
     });
   });
-
   describe('URL options', function () {
     it("should use cloud_name from config", function () {
       test_cloudinary_url("test", {}, `http://res.cloudinary.com/${cloud_name}/image/upload/test`, {});
@@ -338,19 +337,19 @@ describe("utils", function () {
     it("should disallow radius arrays that contain 0 or more than 4 values", function () {
       expect(function () {
         return utils.url("test", {
-          radius: [10, 20, 30, 10, 20]
+          radius: [10, 20, 30, 10, 20],
         });
       }).to.throwError(/Radius array should contain between 1 and 4 values/);
       expect(function () {
         return utils.url("test", {
-          radius: []
+          radius: [],
         });
       }).to.throwError(/Radius array should contain between 1 and 4 values/);
     });
     it("should disallow radius arrays containing null values", function () {
       expect(function () {
         return utils.url("test", {
-          radius: [null, 20, 30, 10]
+          radius: [null, 20, 30, 10],
         });
       }).to.throwError(/Corner: Cannot be null/);
     });
@@ -1216,7 +1215,6 @@ describe("utils", function () {
       });
     });
   });
-
   describe('build_eager', function () {
     const scaled = options => Object.assign(
       {
@@ -1254,7 +1252,10 @@ describe("utils", function () {
         ([scaled({ format: 'gif' }), sepia({ format: 'jpg' })]),
         'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400/jpg'],
       ['should support transformations with multiple components and format',
-        [{ transformation: [scaled(), sepia()], format: 'gif' }, sepia()],
+        [{
+          transformation: [scaled(), sepia()],
+          format: 'gif',
+        }, sepia()],
         'c_scale,h_200,w_100/c_lfill,e_sepia,w_400/gif|c_lfill,e_sepia,w_400'],
     ].forEach(function ([subject, input, expected]) {
       it(subject, function () {
@@ -1331,9 +1332,15 @@ describe("utils", function () {
   });
   it("explicitly set version is always passed", function () {
     test_cloudinary_url("test",
-      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
+      {
+        force_version: false,
+        version: '1234',
+      }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/test`, {});
     test_cloudinary_url("folder/test",
-      { force_version: false, version: '1234' }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/folder/test`, {});
+      {
+        force_version: false,
+        version: '1234',
+      }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/folder/test`, {});
   });
   it("should use force_version from config", function () {
     cloudinary.config({ force_version: false });
@@ -1363,6 +1370,85 @@ describe("utils", function () {
     ];
     expressions.forEach(([source, target]) => {
       expect(utils.url(source)).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/${target}`);
+    });
+  });
+  describe('verifyNotificationSignature', function () {
+    let expected_parameters, unexpected_parameters, response_json, unexpected_response_json,
+      valid_response_timestamp, invalid_response_timestamp, response_signature;
+    before(function () {
+      expected_parameters = {
+        'public_id': "b8sjhoslj8cq8ovoa0ma",
+        'version': "1555337587",
+        'width': 1000,
+        'height': 800,
+      };
+      unexpected_parameters = {
+        'public_id': "b8sjhoslj8cq8ovoa0er",
+        'version': "1555337587",
+        'width': 100,
+        'height': 100,
+      };
+      valid_response_timestamp = Date.now() - 5000;
+      invalid_response_timestamp = Date.now() - 50 * 1000;
+      response_json = JSON.stringify(expected_parameters);
+      unexpected_response_json = JSON.stringify(unexpected_parameters);
+    });
+    it("should return true when signature is valid", function () {
+      response_signature = utils.webhook_signature(response_json, valid_response_timestamp, {
+        api_secret: cloudinary.config().api_secret,
+      });
+      expect(
+        utils.verifyNotificationSignature(
+          response_json,
+          valid_response_timestamp,
+          response_signature
+        )
+      ).to.eql(true);
+    });
+    it("should return false when signature is not valid", function () {
+      response_signature = utils.webhook_signature(response_json, valid_response_timestamp, {
+        api_secret: cloudinary.config().api_secret,
+      });
+      expect(
+        utils.verifyNotificationSignature(
+          unexpected_response_json,
+          valid_response_timestamp,
+          response_signature
+        )
+      ).to.eql(false);
+    });
+    it("should return false when body, timestamp, or signature aren't given", function () {
+      response_signature = utils.webhook_signature(response_json, valid_response_timestamp, {
+        api_secret: cloudinary.config().api_secret,
+      });
+      expect(utils.verifyNotificationSignature(response_json, valid_response_timestamp)).to.eql(false);
+      expect(utils.verifyNotificationSignature(response_json)).to.eql(false);
+      expect(utils.verifyNotificationSignature()).to.eql(false);
+    });
+    it("should return false when timestamp is too far past with default validity expiration time", function () {
+      response_signature = utils.webhook_signature(response_json, invalid_response_timestamp, {
+        api_secret: cloudinary.config().api_secret,
+      });
+      expect(
+        utils.verifyNotificationSignature(
+          response_json,
+          invalid_response_timestamp,
+          response_signature
+        )
+      ).to.eql(false);
+    });
+    it("should return false when timestamp is too far past with custom validity expiration time", function () {
+      response_signature = utils.webhook_signature(response_json, valid_response_timestamp, {
+        api_secret: cloudinary.config().api_secret,
+      });
+      expect(
+        utils.verifyNotificationSignature(
+          response_json,
+          valid_response_timestamp,
+          response_signature,
+          10
+        )
+      ).to.eql(false);
     });
   });
   context("sign URLs", function () {
@@ -1536,4 +1622,3 @@ describe("utils", function () {
     });
   });
 });
-
