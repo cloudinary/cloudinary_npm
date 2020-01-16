@@ -422,10 +422,14 @@ function parseResult(buffer, res) {
   var result = '';
   try {
     result = JSON.parse(buffer);
+    if (result.error && !result.error.name) {
+      result.error.name = "Error";
+    }
   } catch (jsonError) {
     result = {
       error: {
-        message: `Server return invalid JSON response. Status Code ${res.statusCode}. ${jsonError}`
+        message: `Server return invalid JSON response. Status Code ${res.statusCode}. ${jsonError}`,
+        name: "Error"
       }
     };
   }
@@ -491,7 +495,8 @@ function call_api(action, callback, options, get_params) {
     } else {
       var error = {
         message: `Server returned unexpected status code - ${res.statusCode}`,
-        http_code: res.statusCode
+        http_code: res.statusCode,
+        name: "UnexpectedResponse"
       };
       deferred.reject(error);
       callback({ error });
@@ -551,7 +556,8 @@ function post(url, post_data, boundary, file, callback, options) {
     if (timeout) {
       error = {
         message: "Request Timeout",
-        http_code: 499
+        http_code: 499,
+        name: "TimeoutError"
       };
     }
     return callback({ error });
