@@ -26,6 +26,7 @@ const LABEL_INT_3 = 'metadata_label_3_' + TEST_ID;
 const LABEL_INT_4 = 'metadata_label_4_' + TEST_ID;
 const LABEL_SET_1 = 'metadata_set_1_' + TEST_ID;
 const LABEL_SET_2 = 'metadata_set_2_' + TEST_ID;
+const LABEL_SET_3 = 'metadata_set_3_' + TEST_ID;
 const LABEL_STRING_1 = 'metadata_string_1_' + TEST_ID;
 const LABEL_STRING_2 = 'metadata_string_2_' + TEST_ID;
 const LABEL_STRING_3 = 'metadata_string_3_' + TEST_ID;
@@ -275,7 +276,7 @@ describe("structured metadata api", function () {
     it("should delete entries in metadata field datasource", function () {
       const metadata = {
         external_id: EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES,
-        label: LABEL_SET_2,
+        label: LABEL_SET_3,
         type: "set",
         datasource: {
           values: [

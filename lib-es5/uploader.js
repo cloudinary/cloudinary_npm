@@ -667,7 +667,8 @@ exports.update_metadata = function update_metadata(metadata, public_ids, callbac
     var params = {
       metadata: utils.encode_context(metadata),
       public_ids: utils.build_array(public_ids),
-      timestamp: utils.timestamp()
+      timestamp: utils.timestamp(),
+      type: options.type
     };
     return [params];
   });

@@ -636,7 +636,7 @@ exports.add_metadata_field = function add_metadata_field(field, callback) {
 
   var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
-  return call_api("post", "metadata_fields", params, callback, options);
+  return call_api("post", ["metadata_fields"], params, callback, options);
 };
 
 /**
@@ -652,7 +652,7 @@ exports.add_metadata_field = function add_metadata_field(field, callback) {
 exports.list_metadata_fields = function list_metadata_fields(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return call_api("get", "metadata_fields", {}, callback, options);
+  return call_api("get", ["metadata_fields"], {}, callback, options);
 };
 
 /**
@@ -671,7 +671,7 @@ exports.list_metadata_fields = function list_metadata_fields(callback) {
 exports.delete_metadata_field = function delete_metadata_field(field_external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  return call_api("delete", "metadata_fields/" + field_external_id, {}, callback, options);
+  return call_api("delete", ["metadata_fields", field_external_id], {}, callback, options);
 };
 
 /**
@@ -688,7 +688,7 @@ exports.delete_metadata_field = function delete_metadata_field(field_external_id
 exports.metadata_field_by_field_id = function metadata_field_by_field_id(external_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  return call_api("get", "metadata_fields/" + external_id, {}, callback, options);
+  return call_api("get", ["metadata_fields", external_id], {}, callback, options);
 };
 
 /**
@@ -711,7 +711,7 @@ exports.update_metadata_field = function update_metadata_field(external_id, fiel
 
   var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
-  return call_api("put", "metadata_fields/" + external_id, params, callback, options);
+  return call_api("put", ["metadata_fields", external_id], params, callback, options);
 };
 
 /**
@@ -735,7 +735,7 @@ exports.update_metadata_field_datasource = function update_metadata_field_dataso
 
   var params = only(entries_external_id, "values");
   options.content_type = "json";
-  return call_api("put", "metadata_fields/" + field_external_id + "/datasource", params, callback, options);
+  return call_api("put", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
 };
 
 /**
@@ -759,7 +759,7 @@ exports.delete_datasource_entries = function delete_datasource_entries(field_ext
 
   options.content_type = "json";
   var params = { external_ids: entries_external_id };
-  return call_api("delete", "metadata_fields/" + field_external_id + "/datasource", params, callback, options);
+  return call_api("delete", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
 };
 
 /**
@@ -782,5 +782,5 @@ exports.restore_metadata_field_datasource = function restore_metadata_field_data
 
   options.content_type = "json";
   var params = { external_ids: entries_external_id };
-  return call_api("post", "metadata_fields/" + field_external_id + "/datasource_restore", params, callback, options);
+  return call_api("post", ["metadata_fields", field_external_id, "datasource_restore"], params, callback, options);
 };
