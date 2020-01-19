@@ -619,3 +619,168 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
 
   return updateResourcesAccessMode(access_mode, "public_ids[]", ids, callback, options);
 };
+
+/**
+ * Creates a new metadata field definition
+ *
+ * @see https://cloudinary.com/documentation/admin_api#create_a_metadata_field
+ *
+ * @param {Object}   field    The field to add
+ * @param {Function} callback Callback function
+ * @param {Object}   options  Configuration options
+ *
+ * @return {Object}
+ */
+exports.add_metadata_field = function add_metadata_field(field, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  options.content_type = "json";
+  return call_api("post", ["metadata_fields"], params, callback, options);
+};
+
+/**
+ * Returns a list of all metadata field definitions
+ *
+ * @see https://cloudinary.com/documentation/admin_api#get_metadata_fields
+ *
+ * @param {Function} callback Callback function
+ * @param {Object}   options  Configuration options
+ *
+ * @return {Object}
+ */
+exports.list_metadata_fields = function list_metadata_fields(callback) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return call_api("get", ["metadata_fields"], {}, callback, options);
+};
+
+/**
+ * Deletes a metadata field definition.
+ *
+ * The field should no longer be considered a valid candidate for all other endpoints
+ *
+ * @see https://cloudinary.com/documentation/admin_api#delete_a_metadata_field_by_external_id
+ *
+ * @param {String}   field_external_id  The external id of the field to delete
+ * @param {Function} callback           Callback function
+ * @param {Object}   options            Configuration options
+ *
+ * @return {Object}
+ */
+exports.delete_metadata_field = function delete_metadata_field(field_external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api("delete", ["metadata_fields", field_external_id], {}, callback, options);
+};
+
+/**
+ * Get a metadata field by external id
+ *
+ * @see https://cloudinary.com/documentation/admin_api#get_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id  The ID of the metadata field to retrieve
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
+ *
+ * @return {Object}
+ */
+exports.metadata_field_by_field_id = function metadata_field_by_field_id(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api("get", ["metadata_fields", external_id], {}, callback, options);
+};
+
+/**
+ * Updates a metadata field by external id
+ *
+ * Updates a metadata field definition (partially, no need to pass the entire object) passed as JSON data.
+ * See {@link https://cloudinary.com/documentation/admin_api#generic_structure_of_a_metadata_field Generic structure of a metadata field} for details.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#update_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id  The ID of the metadata field to update
+ * @param {Object}   field        Updated values of metadata field
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
+ *
+ * @return {Object}
+ */
+exports.update_metadata_field = function update_metadata_field(external_id, field, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  options.content_type = "json";
+  return call_api("put", ["metadata_fields", external_id], params, callback, options);
+};
+
+/**
+ * Updates a metadata field datasource
+ *
+ * Updates the datasource of a supported field type (currently only enum and set), passed as JSON data. The
+ * update is partial: datasource entries with an existing external_id will be updated and entries with new
+ * external_id’s (or without external_id’s) will be appended.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#update_a_metadata_field_datasource
+ *
+ * @param {String}   field_external_id    The ID of the field to update
+ * @param {Object}   entries_external_id  Updated values for datasource
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.update_metadata_field_datasource = function update_metadata_field_datasource(field_external_id, entries_external_id, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = only(entries_external_id, "values");
+  options.content_type = "json";
+  return call_api("put", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
+};
+
+/**
+ * Deletes entries in a metadata field datasource
+ *
+ * Deletes (blocks) the datasource entries for a specified metadata field definition. Sets the state of the
+ * entries to inactive. This is a soft delete, the entries still exist under the hood and can be activated again
+ * with the restore datasource entries method.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#delete_entries_in_a_metadata_field_datasource
+ *
+ * @param {String}   field_external_id    The ID of the metadata field
+ * @param {Array}    entries_external_id  An array of IDs of datasource entries to delete
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.delete_datasource_entries = function delete_datasource_entries(field_external_id, entries_external_id, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  options.content_type = "json";
+  var params = { external_ids: entries_external_id };
+  return call_api("delete", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
+};
+
+/**
+ * Restores entries in a metadata field datasource
+ *
+ * Restores (unblocks) any previously deleted datasource entries for a specified metadata field definition.
+ * Sets the state of the entries to active.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#restore_entries_in_a_metadata_field_datasource
+ *
+ * @param {String}   field_external_id    The ID of the metadata field
+ * @param {Array}    entries_external_id  An array of IDs of datasource entries to delete
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.restore_metadata_field_datasource = function restore_metadata_field_datasource(field_external_id, entries_external_id, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  options.content_type = "json";
+  var params = { external_ids: entries_external_id };
+  return call_api("post", ["metadata_fields", field_external_id, "datasource_restore"], params, callback, options);
+};

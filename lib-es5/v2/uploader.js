@@ -26,7 +26,8 @@ v1_adapters(exports, uploader, {
   remove_all_context: 1,
   replace_tag: 2,
   create_archive: 0,
-  create_zip: 0
+  create_zip: 0,
+  update_metadata: 2
 });
 
 exports.direct_upload = uploader.direct_upload;
