@@ -527,6 +527,11 @@ describe("utils", function () {
           transformation: ["blip", "blop"],
         }, `http://res.cloudinary.com/${cloud_name}/image/upload/t_blip.blop/test`, {});
       });
+      it("should support named transformations with spaces", function () {
+        test_cloudinary_url("test", {
+          transformation: "blip blop",
+        }, `http://res.cloudinary.com/${cloud_name}/image/upload/t_blip%20blop/test`, {});
+      });
       it("should support base transformation", function () {
         test_cloudinary_url("test", {
           transformation: {
