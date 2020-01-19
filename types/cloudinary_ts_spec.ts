@@ -763,3 +763,10 @@ cloudinary.v2.uploader.remove_tag('12', ['11']).then((value) => {
 cloudinary.v2.uploader.remove_tag('12', ['11'], function (err, res) {
     console.log(err, res);
 });
+
+// $ExpectType Promise<any>
+cloudinary.v2.uploader.upload_stream(
+    {template: "http://www.example.com/images/"},
+    function (error, result) {
+        console.log(result);
+    });
