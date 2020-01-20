@@ -3,7 +3,7 @@ const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
-const TEST_ID = helper.TEST_ID;
+const TEST_ID = Date.now();
 const TEST_TAG = helper.TEST_TAG;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
@@ -35,7 +35,7 @@ const LABEL_DATE = 'metadata_date_' + TEST_ID;
 const api = cloudinary.v2.api;
 
 describe("structured metadata api", function () {
-  this.timeout(helper.TIMEOUT_MEDIUM);
+  this.timeout(helper.TIMEOUT_LARGE);
 
   before(function () {
     return Q.allSettled(
