@@ -348,7 +348,7 @@ describe("api", function () {
         });
     });
     it("should allow deleting derived resources by transformations", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(helper.TIMEOUT_LARGE);
       return Q.all([
         uploadImage({
           public_id: PUBLIC_ID_1,

@@ -35,7 +35,7 @@ const LABEL_DATE = 'metadata_date_' + TEST_ID;
 const api = cloudinary.v2.api;
 
 describe("structured metadata api", function () {
-  this.timeout(helper.TIMEOUT_LONG);
+  this.timeout(helper.TIMEOUT_LARGE);
 
   before(function () {
     return Q.allSettled(
