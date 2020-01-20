@@ -207,7 +207,7 @@ declare module 'cloudinary' {
         | "animoto"
         | "worldstarhiphop"
         | "dailymotion";
-    /****************************** URL *************************************/
+    /****************************** URL ************************************/
     type ResourceType = string | "image" | "raw" | "video";
     type ImageFormat =
         string
@@ -225,7 +225,6 @@ declare module 'cloudinary' {
         | "webp"
         | "zip"
         | "svg"
-        | "mp4"
         | "webm"
         | "wdp"
         | "hpx"
@@ -839,7 +838,7 @@ declare module 'cloudinary' {
             function upload_large(path: string, callback?: ErrorCallBack): Promise<any>;
 
             function upload_stream(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
- 
+
             function upload_stream(callback?: ErrorCallBack): Promise<any>;
 
             function upload_tag_params(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
