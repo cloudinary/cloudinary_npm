@@ -1,3 +1,18 @@
+1.19.0 / 2020-01-20
+==================
+
+New functionality and features
+------------------------------ 
+ * Add structured metadata support
+ * Add verifyNotificationSignature()
+
+Other Changes
+-------------
+  * Fix isRemoteUrl to correctly detect docx files
+  * Fix named transformations with spaces
+  * Fix/fixed type def for upload stream
+  * Add name to errors in uploader.js
+
 1.18.1 / 2019-12-11
 ==================
 
