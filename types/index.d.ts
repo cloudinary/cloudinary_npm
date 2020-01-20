@@ -207,7 +207,7 @@ declare module 'cloudinary' {
         | "animoto"
         | "worldstarhiphop"
         | "dailymotion";
-    /****************************** URL ************************************/
+    /****************************** URL *************************************/
     type ResourceType = string | "image" | "raw" | "video";
     type ImageFormat =
         string
