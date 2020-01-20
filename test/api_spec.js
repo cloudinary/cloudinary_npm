@@ -47,6 +47,9 @@ const EXPLICIT_TRANSFORMATION2 = {
 const METADATA_EXTERNAL_ID_UPLOAD = "metadata_upload_" + TEST_ID;
 const METADATA_EXTERNAL_ID_UPDATE = "metadata_uploader_update_" + TEST_ID;
 const METADATA_EXTERNAL_ID_EXPLICIT = "metadata_explicit_" + TEST_ID;
+const LABEL_INT_1 = 'metadata_label_1_' + TEST_ID;
+const LABEL_INT_2 = 'metadata_label_2_' + TEST_ID;
+const LABEL_INT_3 = 'metadata_label_3_' + TEST_ID;
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
@@ -809,17 +812,17 @@ describe("api", function () {
         [
           cloudinary.v2.api.add_metadata_field({
             external_id: METADATA_EXTERNAL_ID_UPDATE,
-            label: "subject",
+            label: LABEL_INT_1,
             type: "string",
           }),
           cloudinary.v2.api.add_metadata_field({
             external_id: METADATA_EXTERNAL_ID_UPLOAD,
-            label: "input",
+            label: LABEL_INT_2,
             type: "string",
           }),
           cloudinary.v2.api.add_metadata_field({
             external_id: METADATA_EXTERNAL_ID_EXPLICIT,
-            label: "field",
+            label: LABEL_INT_3,
             type: "string",
           }),
         ]
