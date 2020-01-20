@@ -3,7 +3,7 @@ const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
-const TEST_ID = helper.TEST_ID;
+const TEST_ID = Date.now();
 const TEST_TAG = helper.TEST_TAG;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
