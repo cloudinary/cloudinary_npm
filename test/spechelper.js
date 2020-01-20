@@ -22,7 +22,7 @@ const api_http = String(config().upload_prefix).startsWith('http:') ? http : htt
 
 exports.TIMEOUT_SHORT = 5000;
 exports.TIMEOUT_MEDIUM = 20000;
-exports.TIMEOUT_LONG = 70000;
+exports.TIMEOUT_LONG = 60000;
 exports.SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
 exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
 exports.TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDK's tests
