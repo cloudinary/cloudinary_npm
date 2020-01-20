@@ -6,7 +6,7 @@
  */
 
 var crypto = require('crypto');
-var smart_escape = require('./utils/smart_escape').smart_escape;
+var smart_escape = require('./utils/encoding/smart_escape');
 
 var unsafe = /([ "#%&'/:;<=>?@[\]^`{|}~]+)/g;
 

@@ -4,6 +4,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 /**
  * Utilities
  * @module utils
@@ -35,7 +37,15 @@ var isNumber = require("lodash/isNumber");
 var isObject = require("lodash/isObject");
 var isString = require("lodash/isString");
 var isUndefined = require("lodash/isUndefined");
-var smart_escape = require("./smart_escape").smart_escape;
+
+var smart_escape = require("./encoding/smart_escape");
+var consumeOption = require('./parsing/consumeOption');
+var toArray = require('./parsing/toArray');
+
+var _require = require('./encoding/base64EncodeURL'),
+    base64EncodeURL = _require.base64EncodeURL;
+
+var encodeDoubleArray = require('./encoding/encodeDoubleArray');
 
 var config = require("../config");
 var generate_token = require("../auth_token");
@@ -46,24 +56,6 @@ var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
 
-module.exports = {
-  at,
-  clone,
-  extend,
-  filter,
-  includes,
-  isArray,
-  isEmpty,
-  isNumber,
-  isObject,
-  isRemoteUrl,
-  isString,
-  isUndefined,
-  keys: function keys(source) {
-    return Object.keys(source);
-  },
-  ensurePresenceOf
-};
 exports = module.exports;
 var utils = module.exports;
 
@@ -80,13 +72,9 @@ function generate_auth_token(options) {
 }
 
 exports.CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net";
-
 exports.OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net";
-
 exports.AKAMAI_SHARED_CDN = "res.cloudinary.com";
-
 exports.SHARED_CDN = exports.AKAMAI_SHARED_CDN;
-
 exports.USER_AGENT = `CloudinaryNodeJS/${exports.VERSION}`;
 
 // Add platform information to the USER_AGENT header
@@ -97,67 +85,15 @@ function getUserAgent() {
   return isEmpty(utils.userPlatform) ? `${utils.USER_AGENT}` : `${utils.userPlatform} ${utils.USER_AGENT}`;
 }
 
-var DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = {
-  width: "auto",
-  crop: "limit"
-};
-
-exports.DEFAULT_POSTER_OPTIONS = {
-  format: 'jpg',
-  resource_type: 'video'
-};
-
-exports.DEFAULT_VIDEO_SOURCE_TYPES = ['webm', 'mp4', 'ogv'];
-
-var CONDITIONAL_OPERATORS = {
-  "=": 'eq',
-  "!=": 'ne',
-  "<": 'lt',
-  ">": 'gt',
-  "<=": 'lte',
-  ">=": 'gte',
-  "&&": 'and',
-  "||": 'or',
-  "*": "mul",
-  "/": "div",
-  "+": "add",
-  "-": "sub"
-};
-
-var PREDEFINED_VARS = {
-  "aspect_ratio": "ar",
-  "aspectRatio": "ar",
-  "current_page": "cp",
-  "currentPage": "cp",
-  "duration": "du",
-  "face_count": "fc",
-  "faceCount": "fc",
-  "height": "h",
-  "initial_aspect_ratio": "iar",
-  "initial_height": "ih",
-  "initial_width": "iw",
-  "initialAspectRatio": "iar",
-  "initialHeight": "ih",
-  "initialWidth": "iw",
-  "initial_duration": "idu",
-  "initialDuration": "idu",
-  "page_count": "pc",
-  "page_x": "px",
-  "page_y": "py",
-  "pageCount": "pc",
-  "pageX": "px",
-  "pageY": "py",
-  "tags": "tags",
-  "width": "w"
-};
-
-var LAYER_KEYWORD_PARAMS = {
-  font_weight: "normal",
-  font_style: "normal",
-  text_decoration: "none",
-  text_align: null,
-  stroke: "none"
-};
+var _require2 = require('./defaults'),
+    DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = _require2.DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION,
+    DEFAULT_POSTER_OPTIONS = _require2.DEFAULT_POSTER_OPTIONS,
+    DEFAULT_VIDEO_SOURCE_TYPES = _require2.DEFAULT_VIDEO_SOURCE_TYPES,
+    CONDITIONAL_OPERATORS = _require2.CONDITIONAL_OPERATORS,
+    PREDEFINED_VARS = _require2.PREDEFINED_VARS,
+    LAYER_KEYWORD_PARAMS = _require2.LAYER_KEYWORD_PARAMS,
+    TRANSFORMATION_PARAMS = _require2.TRANSFORMATION_PARAMS,
+    SIMPLE_PARAMS = _require2.SIMPLE_PARAMS;
 
 function textStyle(layer) {
   var keywords = [];
@@ -345,27 +281,10 @@ function process_radius(radius) {
   return radius.map(normalize_expression).join(':');
 }
 
-function base64EncodeURL(sourceUrl) {
-  try {
-    sourceUrl = decodeURI(sourceUrl);
-  } catch (error) {
-    // ignore errors
-  }
-  sourceUrl = encodeURI(sourceUrl);
-  return base64Encode(sourceUrl);
-}
-
-function base64Encode(input) {
-  if (!(input instanceof Buffer)) {
-    input = Buffer.from(String(input), 'binary');
-  }
-  return input.toString('base64');
-}
-
 function build_upload_params(options) {
   var params = {
     access_mode: options.access_mode,
-    allowed_formats: options.allowed_formats && utils.build_array(options.allowed_formats).join(","),
+    allowed_formats: options.allowed_formats && toArray(options.allowed_formats).join(","),
     async: utils.as_safe_bool(options.async),
     backup: utils.as_safe_bool(options.backup),
     callback: options.callback,
@@ -399,47 +318,6 @@ function build_upload_params(options) {
   return utils.updateable_resource_params(options, params);
 }
 
-/**
- * Deletes `option_name` from `options` and return the value if present.
- * If `options` doesn't contain `option_name` the default value is returned.
- * @param {Object} options a collection
- * @param {String} option_name the name (key) of the desired value
- * @param {*} [default_value] the value to return is option_name is missing
- */
-
-function option_consume(options, option_name, default_value) {
-  var result = options[option_name];
-  delete options[option_name];
-  return result != null ? result : default_value;
-}
-
-function build_array(arg) {
-  switch (true) {
-    case arg == null:
-      return [];
-    case isArray(arg):
-      return arg;
-    default:
-      return [arg];
-  }
-}
-
-/**
- * Serialize an array of arrays into a string
- * @param {[]|[[]]} array - An array of arrays.
- *                          If the first element is not an array the argument is wrapped in an array.
- * @returns {string} A string representation of the arrays.
- */
-
-function encode_double_array(array) {
-  array = utils.build_array(array);
-  if (!isArray(array[0])) {
-    array = [array];
-  }
-  return array.map(function (e) {
-    return utils.build_array(e).join(",");
-  }).join("|");
-}
 function encode_key_value(arg) {
   if (!isObject(arg)) {
     return arg;
@@ -467,7 +345,7 @@ function encode_context(arg) {
 }
 
 function build_eager(transformations) {
-  return utils.build_array(transformations).map(function (transformation) {
+  return toArray(transformations).map(function (transformation) {
     var transformationString = utils.generate_transformation_string(clone(transformation));
     var format = transformation.format;
     return format == null ? transformationString : `${transformationString}/${format}`;
@@ -498,7 +376,6 @@ function build_custom_headers(headers) {
       return headers;
   }
 }
-var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom'];
 
 function generate_transformation_string(options) {
   if (utils.isString(options)) {
@@ -509,10 +386,11 @@ function generate_transformation_string(options) {
       return utils.generate_transformation_string(clone(t));
     }).filter(utils.present).join('/');
   }
-  var responsive_width = utils.option_consume(options, "responsive_width", config().responsive_width);
+
+  var responsive_width = consumeOption(options, "responsive_width", config().responsive_width);
   var width = options.width;
   var height = options.height;
-  var size = utils.option_consume(options, "size");
+  var size = consumeOption(options, "size");
   if (size) {
     var _size$split = size.split("x");
 
@@ -525,8 +403,8 @@ function generate_transformation_string(options) {
     options.height = _ref7[1];
   }
   var has_layer = options.overlay || options.underlay;
-  var crop = utils.option_consume(options, "crop");
-  var angle = utils.build_array(utils.option_consume(options, "angle")).join(".");
+  var crop = consumeOption(options, "crop");
+  var angle = toArray(consumeOption(options, "angle")).join(".");
   var no_html_sizes = has_layer || utils.present(angle) || crop === "fit" || crop === "limit" || responsive_width;
   if (width && (width.toString().indexOf("auto") === 0 || no_html_sizes || parseFloat(width) < 1)) {
     delete options.width;
@@ -534,11 +412,11 @@ function generate_transformation_string(options) {
   if (height && (no_html_sizes || parseFloat(height) < 1)) {
     delete options.height;
   }
-  var background = utils.option_consume(options, "background");
+  var background = consumeOption(options, "background");
   background = background && background.replace(/^#/, "rgb:");
-  var color = utils.option_consume(options, "color");
+  var color = consumeOption(options, "color");
   color = color && color.replace(/^#/, "rgb:");
-  var base_transformations = utils.build_array(utils.option_consume(options, "transformation", []));
+  var base_transformations = toArray(consumeOption(options, "transformation", []));
   var named_transformation = [];
   if (base_transformations.some(isObject)) {
     base_transformations = base_transformations.map(function (tr) {
@@ -548,7 +426,7 @@ function generate_transformation_string(options) {
     named_transformation = base_transformations.join(".");
     base_transformations = [];
   }
-  var effect = utils.option_consume(options, "effect");
+  var effect = consumeOption(options, "effect");
   if (isArray(effect)) {
     effect = effect.join(":");
   } else if (isObject(effect)) {
@@ -560,7 +438,7 @@ function generate_transformation_string(options) {
       return `${key}:${value}`;
     });
   }
-  var border = utils.option_consume(options, "border");
+  var border = consumeOption(options, "border");
   if (isObject(border)) {
     border = `${border.width != null ? border.width : 2}px_solid_${(border.color != null ? border.color : "black").replace(/^#/, 'rgb:')}`;
   } else if (/^\d+$/.exec(border)) {
@@ -568,29 +446,29 @@ function generate_transformation_string(options) {
     options.border = border;
     border = void 0;
   }
-  var flags = utils.build_array(utils.option_consume(options, "flags")).join(".");
-  var dpr = utils.option_consume(options, "dpr", config().dpr);
+  var flags = toArray(consumeOption(options, "flags")).join(".");
+  var dpr = consumeOption(options, "dpr", config().dpr);
   if (options.offset != null) {
-    var _split_range = split_range(utils.option_consume(options, "offset"));
+    var _split_range = split_range(consumeOption(options, "offset"));
 
     var _split_range2 = _slicedToArray(_split_range, 2);
 
     options.start_offset = _split_range2[0];
     options.end_offset = _split_range2[1];
   }
-  var overlay = process_layer(utils.option_consume(options, "overlay"));
-  var radius = process_radius(utils.option_consume(options, "radius"));
-  var underlay = process_layer(utils.option_consume(options, "underlay"));
-  var ifValue = process_if(utils.option_consume(options, "if"));
-  var custom_function = process_custom_function(utils.option_consume(options, "custom_function"));
-  var custom_pre_function = process_custom_pre_function(utils.option_consume(options, "custom_pre_function"));
-  var fps = utils.option_consume(options, 'fps');
+  var overlay = process_layer(consumeOption(options, "overlay"));
+  var radius = process_radius(consumeOption(options, "radius"));
+  var underlay = process_layer(consumeOption(options, "underlay"));
+  var ifValue = process_if(consumeOption(options, "if"));
+  var custom_function = process_custom_function(consumeOption(options, "custom_function"));
+  var custom_pre_function = process_custom_pre_function(consumeOption(options, "custom_pre_function"));
+  var fps = consumeOption(options, 'fps');
   if (isArray(fps)) {
     fps = fps.join('-');
   }
   var params = {
     a: normalize_expression(angle),
-    ar: normalize_expression(utils.option_consume(options, "aspect_ratio")),
+    ar: normalize_expression(consumeOption(options, "aspect_ratio")),
     b: background,
     bo: border,
     c: crop,
@@ -601,26 +479,25 @@ function generate_transformation_string(options) {
     fn: custom_function || custom_pre_function,
     fps: fps,
     h: normalize_expression(height),
-    ki: normalize_expression(utils.option_consume(options, "keyframe_interval")),
+    ki: normalize_expression(consumeOption(options, "keyframe_interval")),
     l: overlay,
-    o: normalize_expression(utils.option_consume(options, "opacity")),
-    q: normalize_expression(utils.option_consume(options, "quality")),
+    o: normalize_expression(consumeOption(options, "opacity")),
+    q: normalize_expression(consumeOption(options, "quality")),
     r: radius,
     t: named_transformation,
     u: underlay,
     w: normalize_expression(width),
-    x: normalize_expression(utils.option_consume(options, "x")),
-    y: normalize_expression(utils.option_consume(options, "y")),
-    z: normalize_expression(utils.option_consume(options, "zoom"))
+    x: normalize_expression(consumeOption(options, "x")),
+    y: normalize_expression(consumeOption(options, "y")),
+    z: normalize_expression(consumeOption(options, "zoom"))
   };
-  var simple_params = [["audio_codec", "ac"], ["audio_frequency", "af"], ["bit_rate", 'br'], ["color_space", "cs"], ["default_image", "d"], ["delay", "dl"], ["density", "dn"], ["duration", "du"], ["end_offset", "eo"], ["fetch_format", "f"], ["gravity", "g"], ["page", "pg"], ["prefix", "p"], ["start_offset", "so"], ["streaming_profile", "sp"], ["video_codec", "vc"], ["video_sampling", "vs"]];
 
-  simple_params.forEach(function (_ref10) {
+  SIMPLE_PARAMS.forEach(function (_ref10) {
     var _ref11 = _slicedToArray(_ref10, 2),
         name = _ref11[0],
         short = _ref11[1];
 
-    var value = utils.option_consume(options, name);
+    var value = consumeOption(options, name);
     if (value !== undefined) {
       params[short] = value;
     }
@@ -634,7 +511,7 @@ function generate_transformation_string(options) {
     }
   });
 
-  var variablesParam = utils.option_consume(options, "variables", []);
+  var variablesParam = consumeOption(options, "variables", []);
   var variables = entries(options).filter(function (_ref12) {
     var _ref13 = _slicedToArray(_ref12, 2),
         key = _ref13[0],
@@ -670,12 +547,13 @@ function generate_transformation_string(options) {
     return key + '_' + value;
   }).sort().join(',');
 
-  var raw_transformation = utils.option_consume(options, 'raw_transformation');
+  var raw_transformation = consumeOption(options, 'raw_transformation');
   transformations = compact([ifValue, variables, transformations, raw_transformation]).join(",");
   base_transformations.push(transformations);
   transformations = base_transformations;
   if (responsive_width) {
     var responsive_width_transformation = config().responsive_width_transformation || DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION;
+
     transformations.push(utils.generate_transformation_string(clone(responsive_width_transformation)));
   }
   if (String(width).startsWith("auto") || responsive_width) {
@@ -709,13 +587,13 @@ function updateable_resource_params(options) {
     params.metadata = utils.encode_context(options.metadata);
   }
   if (options.custom_coordinates != null) {
-    params.custom_coordinates = utils.encode_double_array(options.custom_coordinates);
+    params.custom_coordinates = encodeDoubleArray(options.custom_coordinates);
   }
   if (options.detection != null) {
     params.detection = options.detection;
   }
   if (options.face_coordinates != null) {
-    params.face_coordinates = utils.encode_double_array(options.face_coordinates);
+    params.face_coordinates = encodeDoubleArray(options.face_coordinates);
   }
   if (options.headers != null) {
     params.headers = utils.build_custom_headers(options.headers);
@@ -733,7 +611,7 @@ function updateable_resource_params(options) {
     params.similarity_search = options.similarity_search;
   }
   if (options.tags != null) {
-    params.tags = utils.build_array(options.tags).join(",");
+    params.tags = toArray(options.tags).join(",");
   }
   return params;
 }
@@ -761,7 +639,7 @@ function extractUrlParams(options) {
  */
 
 function extractTransformationParams(options) {
-  return utils.only.apply(utils, [options].concat(TRANSFORMATION_PARAMS));
+  return utils.only.apply(utils, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
 }
 
 /**
@@ -775,7 +653,7 @@ function patchFetchFormat() {
 
   if (options.type === "fetch") {
     if (options.fetch_format == null) {
-      options.fetch_format = utils.option_consume(options, "format");
+      options.fetch_format = consumeOption(options, "format");
     }
   }
 }
@@ -783,38 +661,40 @@ function patchFetchFormat() {
 function url(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
+
   var signature = void 0,
       source_to_sign = void 0;
   utils.patchFetchFormat(options);
-  var type = utils.option_consume(options, "type", null);
+  var type = consumeOption(options, "type", null);
   var transformation = utils.generate_transformation_string(options);
-  var resource_type = utils.option_consume(options, "resource_type", "image");
-  var version = utils.option_consume(options, "version");
-  var force_version = utils.option_consume(options, "force_version", config().force_version);
+
+  var resource_type = consumeOption(options, "resource_type", "image");
+  var version = consumeOption(options, "version");
+  var force_version = consumeOption(options, "force_version", config().force_version);
   if (force_version == null) {
     force_version = true;
   }
-  var format = utils.option_consume(options, "format");
-  var cloud_name = utils.option_consume(options, "cloud_name", config().cloud_name);
+  var format = consumeOption(options, "format");
+  var cloud_name = consumeOption(options, "cloud_name", config().cloud_name);
   if (!cloud_name) {
     throw "Unknown cloud_name";
   }
-  var private_cdn = utils.option_consume(options, "private_cdn", config().private_cdn);
-  var secure_distribution = utils.option_consume(options, "secure_distribution", config().secure_distribution);
-  var secure = utils.option_consume(options, "secure", null);
-  var ssl_detected = utils.option_consume(options, "ssl_detected", config().ssl_detected);
+  var private_cdn = consumeOption(options, "private_cdn", config().private_cdn);
+  var secure_distribution = consumeOption(options, "secure_distribution", config().secure_distribution);
+  var secure = consumeOption(options, "secure", null);
+  var ssl_detected = consumeOption(options, "ssl_detected", config().ssl_detected);
   if (secure === null) {
     secure = ssl_detected || config().secure;
   }
-  var cdn_subdomain = utils.option_consume(options, "cdn_subdomain", config().cdn_subdomain);
-  var secure_cdn_subdomain = utils.option_consume(options, "secure_cdn_subdomain", config().secure_cdn_subdomain);
-  var cname = utils.option_consume(options, "cname", config().cname);
-  var shorten = utils.option_consume(options, "shorten", config().shorten);
-  var sign_url = utils.option_consume(options, "sign_url", config().sign_url);
-  var api_secret = utils.option_consume(options, "api_secret", config().api_secret);
-  var url_suffix = utils.option_consume(options, "url_suffix");
-  var use_root_path = utils.option_consume(options, "use_root_path", config().use_root_path);
-  var auth_token = utils.option_consume(options, "auth_token");
+  var cdn_subdomain = consumeOption(options, "cdn_subdomain", config().cdn_subdomain);
+  var secure_cdn_subdomain = consumeOption(options, "secure_cdn_subdomain", config().secure_cdn_subdomain);
+  var cname = consumeOption(options, "cname", config().cname);
+  var shorten = consumeOption(options, "shorten", config().shorten);
+  var sign_url = consumeOption(options, "sign_url", config().sign_url);
+  var api_secret = consumeOption(options, "api_secret", config().api_secret);
+  var url_suffix = consumeOption(options, "url_suffix");
+  var use_root_path = consumeOption(options, "use_root_path", config().use_root_path);
+  var auth_token = consumeOption(options, "auth_token");
   if (auth_token !== false) {
     auth_token = exports.merge(config().auth_token, auth_token);
   }
@@ -894,7 +774,7 @@ function video_url(public_id, options) {
 }
 
 function finalize_source(source, format, url_suffix) {
-  var source_to_sign;
+  var source_to_sign = void 0;
   source = source.replace(/([^:])\/\//g, '$1/');
   if (source.match(/^https?:\//i)) {
     source = smart_escape(source);
@@ -917,7 +797,7 @@ function finalize_source(source, format, url_suffix) {
 }
 
 function video_thumbnail_url(public_id, options) {
-  options = extend({}, exports.DEFAULT_POSTER_OPTIONS, options);
+  options = extend({}, DEFAULT_POSTER_OPTIONS, options);
   return utils.url(public_id, options);
 }
 
@@ -1036,7 +916,7 @@ function api_sign_request(params_to_sign, api_secret) {
         k = _ref25[0],
         v = _ref25[1];
 
-    return `${k}=${utils.build_array(v).join(",")}`;
+    return `${k}=${toArray(v).join(",")}`;
   }).sort().join("&");
   var shasum = crypto.createHash('sha1');
   shasum.update(utf8_encode(to_sign + api_secret), 'binary');
@@ -1379,13 +1259,13 @@ function archive_params() {
     keep_derived: exports.as_safe_bool(options.keep_derived),
     mode: options.mode,
     notification_url: options.notification_url,
-    prefixes: options.prefixes && exports.build_array(options.prefixes),
-    public_ids: options.public_ids && exports.build_array(options.public_ids),
+    prefixes: options.prefixes && toArray(options.prefixes),
+    public_ids: options.public_ids && toArray(options.public_ids),
     skip_transformation_name: exports.as_safe_bool(options.skip_transformation_name),
-    tags: options.tags && exports.build_array(options.tags),
+    tags: options.tags && toArray(options.tags),
     target_format: options.target_format,
     target_public_id: options.target_public_id,
-    target_tags: options.target_tags && exports.build_array(options.target_tags),
+    target_tags: options.target_tags && toArray(options.target_tags),
     timestamp: options.timestamp || exports.timestamp(),
     transformations: utils.build_eager(options.transformations),
     type: options.type,
@@ -1541,9 +1421,9 @@ exports.build_upload_params = build_upload_params;
 exports.timestamp = function () {
   return Math.floor(new Date().getTime() / 1000);
 };
-exports.option_consume = option_consume;
-exports.build_array = build_array;
-exports.encode_double_array = encode_double_array;
+exports.option_consume = consumeOption; // for backwards compatibility
+exports.build_array = toArray; // for backwards compatibility
+exports.encode_double_array = encodeDoubleArray;
 exports.encode_key_value = encode_key_value;
 exports.encode_context = encode_context;
 exports.build_eager = build_eager;
@@ -1581,3 +1461,25 @@ exports.hashToParameters = hashToParameters;
 exports.present = present;
 exports.only = only;
 exports.jsonArrayParam = jsonArrayParam;
+// was exported before, so kept for backwards compatibility
+exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
+exports.DEFAULT_VIDEO_SOURCE_TYPES = DEFAULT_VIDEO_SOURCE_TYPES;
+
+Object.assign(module.exports, {
+  at,
+  clone,
+  extend,
+  filter,
+  includes,
+  isArray,
+  isEmpty,
+  isNumber,
+  isObject,
+  isRemoteUrl,
+  isString,
+  isUndefined,
+  keys: function keys(source) {
+    return Object.keys(source);
+  },
+  ensurePresenceOf
+});

@@ -458,7 +458,7 @@ function call_api(action, callback, options, get_params) {
   var boundary = utils.random_public_id();
   var errorRaised = false;
   var handle_response = function handle_response(res) {
-    // var buffer;
+    // let buffer;
     if (errorRaised) {
 
       // Already reported
@@ -524,7 +524,7 @@ function call_api(action, callback, options, get_params) {
 }
 
 function post(url, post_data, boundary, file, callback, options) {
-  var file_header;
+  var file_header = void 0;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
   if (file != null || options.stream) {
     var filename = options.stream ? "file" : basename(file);

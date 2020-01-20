@@ -56,7 +56,7 @@ var Search = function () {
     value: function sort_by(field_name) {
       var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "desc";
 
-      var sort_bucket;
+      var sort_bucket = void 0;
       sort_bucket = {};
       sort_bucket[field_name] = dir;
       this.query_hash.sort_by.push(sort_bucket);
