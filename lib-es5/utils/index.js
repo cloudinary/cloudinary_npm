@@ -85,7 +85,7 @@ function getUserAgent() {
   return isEmpty(utils.userPlatform) ? `${utils.USER_AGENT}` : `${utils.userPlatform} ${utils.USER_AGENT}`;
 }
 
-var _require2 = require('./defaults'),
+var _require2 = require('./consts'),
     DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = _require2.DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION,
     DEFAULT_POSTER_OPTIONS = _require2.DEFAULT_POSTER_OPTIONS,
     DEFAULT_VIDEO_SOURCE_TYPES = _require2.DEFAULT_VIDEO_SOURCE_TYPES,
