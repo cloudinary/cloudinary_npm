@@ -1,3 +1,6 @@
+import { Transform } from 'stream';
+
+
 declare module 'cloudinary' {
 
     /****************************** Constants *************************************/
@@ -531,6 +534,9 @@ declare module 'cloudinary' {
     type TargetArchiveFormat = string | "zip" | "tgz";
     type ErrorCallBack = (error: any, result: any) => any;
 
+    class UploadStream extends Transform {
+    }
+
     export namespace v2 {
 
         /****************************** Global Utils *************************************/
@@ -819,9 +825,9 @@ declare module 'cloudinary' {
 
             function unsigned_upload(file: string, upload_preset: string, callback?: ErrorCallBack): Promise<any>;
 
-            function unsigned_upload_stream(upload_preset: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function unsigned_upload_stream(upload_preset: string, options?: UploadApiOptions, callback?: ErrorCallBack): UploadStream;
 
-            function unsigned_upload_stream(upload_preset: string, callback?: ErrorCallBack): Promise<any>;
+            function unsigned_upload_stream(upload_preset: string, callback?: ErrorCallBack): UploadStream;
 
             function upload(file: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
@@ -831,15 +837,15 @@ declare module 'cloudinary' {
 
             function upload_chunked(path: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_chunked_stream(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_chunked_stream(options?: UploadApiOptions, callback?: ErrorCallBack): UploadStream;
 
             function upload_large(path: string, options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
             function upload_large(path: string, callback?: ErrorCallBack): Promise<any>;
 
-            function upload_stream(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
+            function upload_stream(options?: UploadApiOptions, callback?: ErrorCallBack): UploadStream;
 
-            function upload_stream(callback?: ErrorCallBack): Promise<any>;
+            function upload_stream(callback?: ErrorCallBack): UploadStream;
 
             function upload_tag_params(options?: UploadApiOptions, callback?: ErrorCallBack): Promise<any>;
 
