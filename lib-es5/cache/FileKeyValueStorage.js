@@ -21,13 +21,13 @@ var FileKeyValueStorage = function () {
   _createClass(FileKeyValueStorage, [{
     key: 'init',
     value: function init(baseFolder) {
-      var _this = this;
-
       if (baseFolder) {
-        fs.access(baseFolder, function (err, result) {
-          if (err) throw err;
-          _this.baseFolder = baseFolder;
-        });
+        try {
+          fs.accessSync(baseFolder);
+          this.baseFolder = baseFolder;
+        } catch (err) {
+          throw err;
+        }
       } else {
         if (!fs.existsSync('test_cache')) {
           fs.mkdirSync('test_cache');
@@ -54,17 +54,20 @@ var FileKeyValueStorage = function () {
   }, {
     key: 'clear',
     value: function clear() {
-      var _this2 = this;
+      var _this = this;
 
       var files = fs.readdirSync(this.baseFolder);
       files.forEach(function (file) {
-        return fs.unlinkSync(path.join(_this2.baseFolder, file));
+        return fs.unlinkSync(path.join(_this.baseFolder, file));
       });
     }
   }, {
     key: 'deleteBaseFolder',
     value: function deleteBaseFolder() {
-      rimraf(this.baseFolder);
+      console.log('Deleting');
+      console.log(this.baseFolder);
+      var res = rimraf(this.baseFolder);
+      console.log(res);
     }
   }, {
     key: 'getFilename',
