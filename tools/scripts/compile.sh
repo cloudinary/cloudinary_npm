@@ -1,1 +1,2 @@
-babel lib --out-dir lib-es5 --delete-dir-on-start --verbose
+rimraf ./lib-es5
+babel lib --out-dir lib-es5 --verbose
