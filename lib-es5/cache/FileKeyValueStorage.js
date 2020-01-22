@@ -64,10 +64,7 @@ var FileKeyValueStorage = function () {
   }, {
     key: 'deleteBaseFolder',
     value: function deleteBaseFolder() {
-      console.log('Deleting');
-      console.log(this.baseFolder);
-      var res = rimraf(this.baseFolder);
-      console.log(res);
+      rimraf(this.baseFolder);
     }
   }, {
     key: 'getFilename',
