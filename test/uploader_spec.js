@@ -722,21 +722,21 @@ describe("uploader", function () {
       tags: UPLOAD_TAGS,
     }).catch((err) => {
       console.log(err);
-      throw new Error('Create upload preset call failed');
+      throw new Error('create_upload_preset failed');
     });
 
     let uploadResponse = await cloudinary.v2.uploader.unsigned_upload(IMAGE_FILE, preset.name, {
       tags: UPLOAD_TAGS,
     }).catch((err) => {
       console.log(err);
-      throw new Error('Unsigned_upload failed');
+      throw new Error('unsigned_upload failed');
     });
 
     expect(uploadResponse.public_id).to.match(/^upload_folder\/[a-z0-9]+$/);
 
     await cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
       console.log(err);
-      throw new Error('delete_upload_preset failed');
+      // we don't fail the test if the delete fails
     });
   });
 
