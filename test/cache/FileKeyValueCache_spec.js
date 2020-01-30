@@ -12,7 +12,7 @@ const VALUE2 = "test_value_2";
 
 describe("FileKeyValueStorage", () => {
   var storage;
-  var basefolder;
+  var baseFolder;
 
   function getTestValue(key) {
     let storedValue = fs.readFileSync(storage.getFilename(key));
@@ -22,13 +22,13 @@ describe("FileKeyValueStorage", () => {
   before(() => {
     const cwd = process.cwd();
     const { sep } = path;
-    basefolder = fs.mkdtempSync(`${cwd}${sep}`);
-    storage = new FileKeyValueStorage(basefolder);
+    baseFolder = fs.mkdtempSync(`${cwd}${sep}`);
+    storage = new FileKeyValueStorage({ baseFolder });
   });
 
   after(() => {
     storage.deleteBaseFolder();
-    expect(fs.accessSync(basefolder)).to.be(undefined);
+    expect(fs.existsSync(baseFolder)).to.be(false);
   });
 
   it("should set a value in a file", () => {
