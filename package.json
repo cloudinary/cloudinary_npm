@@ -45,7 +45,7 @@
     "cloudinary.js",
     "babel.config.js",
     "package.json",
-    "types/*"
+    "types/index.d.ts"
   ],
   "types": "types",
   "scripts": {
