@@ -11,7 +11,7 @@ done
 
 if [ "$COLLECT_COVERAGE" -eq "1" ]; then
   echo 'Running code coverage test on ES6 code'
-  nyc --reporter=text mocha --ui bdd -R spec --recursive test/
+  nyc --reporter=lcov mocha --ui bdd -R spec --recursive test/
   exit;
 else
   echo 'Running tests on ES6 Code'

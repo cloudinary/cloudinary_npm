@@ -692,6 +692,7 @@ describe("cloudinary", function () {
     });
     expect(actual).to.eql(expected);
   });
+
   it("should correctly sign_request", function () {
     var params = cloudinary.utils.sign_request({
       public_id: "folder/file",
@@ -707,6 +708,7 @@ describe("cloudinary", function () {
       api_key: "1234",
     });
   });
+
   it("should correctly process_request_params", function () {
     var params = cloudinary.utils.process_request_params({
       public_id: "folder/file",
