@@ -9,4 +9,3 @@ bin
 test_cache/
 .nyc_output
 docs
-coverage

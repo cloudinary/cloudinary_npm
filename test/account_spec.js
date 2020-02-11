@@ -11,7 +11,7 @@ describe('account API - Provisioning', function () {
   let CLOUD_API;
   let CLOUD_NAME;
   let CLOUD_ID;
-  let USER_NAME = 'SDK TEST';
+  let USER_NAME = `SDK TEST ${Date.now()}`;
   let USER_EMAIL = `sdk-test+${Date.now()}@cloudinary.com`;
   let USER_ROLE = 'billing';
   let USER_ID;
@@ -42,7 +42,7 @@ describe('account API - Provisioning', function () {
 
     // create a user group
 
-    let createGroupRes = await cloudinary.provisioning.account.createUserGroup('test-group').catch((err) => {
+    let createGroupRes = await cloudinary.provisioning.account.createUserGroup(`test-group-${Date.now()}`).catch((err) => {
       throw err;
     });
     GROUP_ID = createGroupRes.id;

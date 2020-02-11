@@ -64,11 +64,9 @@ module.exports = {
     // "no-restricted-syntax": "off",
     // "no-return-assign": "off",
     // "no-shadow": "off",
-    "no-trailing-spaces": "off",
     "no-throw-literal": "off",
-    "arrow-body-style": "off",
     // "no-unreachable": "off",
-    "no-unused-vars": ["warn", {
+    "no-unused-vars": ["error", {
       "args": "none",
       "caughtErrors": "none"
     }],
