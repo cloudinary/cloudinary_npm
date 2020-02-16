@@ -844,7 +844,7 @@ cloudinary.v2.provisioning.account.users(
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.createUser(
+cloudinary.v2.provisioning.account.create_user(
     'str',
     'str',
     'str',
@@ -856,7 +856,7 @@ cloudinary.v2.provisioning.account.createUser(
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.updateUser(
+cloudinary.v2.provisioning.account.update_user(
     'str',
     'str',
     'str',
@@ -867,7 +867,7 @@ cloudinary.v2.provisioning.account.updateUser(
 
     });
 
-cloudinary.v2.provisioning.account.deleteUser(
+cloudinary.v2.provisioning.account.delete_user(
     'str',
     {},
     (res) => {
@@ -875,7 +875,7 @@ cloudinary.v2.provisioning.account.deleteUser(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.createUserGroup(
+cloudinary.v2.provisioning.account.create_user_group(
     'str',
     {},
     (res) => {
@@ -883,34 +883,7 @@ cloudinary.v2.provisioning.account.createUserGroup(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.updateUserGroup(
-    'str',
-    'str',
-    {},
-    (res) => {
-
-    });
-
-
-// $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.deleteUserGroup(
-    'str',
-    {},
-    (res) => {
-
-    });
-
-// $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.addUserToGroup(
-    'str',
-    'str',
-    {},
-    (res) => {
-
-    });
-
-// $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.removeUserFromGroup(
+cloudinary.v2.provisioning.account.update_user_group(
     'str',
     'str',
     {},
@@ -920,7 +893,7 @@ cloudinary.v2.provisioning.account.removeUserFromGroup(
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.userGroup(
+cloudinary.v2.provisioning.account.delete_user_group(
     'str',
     {},
     (res) => {
@@ -928,14 +901,41 @@ cloudinary.v2.provisioning.account.userGroup(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.userGroups(
+cloudinary.v2.provisioning.account.add_user_to_group(
+    'str',
+    'str',
     {},
     (res) => {
 
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.userGroupUsers(
+cloudinary.v2.provisioning.account.remove_user_from_group(
+    'str',
+    'str',
+    {},
+    (res) => {
+
+    });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user_group(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user_groups(
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user_group_users(
     'str',
     {
         provisioning_api_key: 'foo',

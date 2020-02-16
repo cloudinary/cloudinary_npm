@@ -902,41 +902,41 @@ declare module 'cloudinary' {
 
         namespace provisioning {
             namespace account {
-                function subAccounts(enabled: boolean, ids?: string[], prefix?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function sub_accounts(enabled: boolean, ids?: string[], prefix?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function subAccount(subAccountId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function sub_account(subAccountId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function createSubAccount(name: string, cloudName: string, customAttributes?: object, enabled?: boolean, baseAccount?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function create_sub_account(name: string, cloudName: string, customAttributes?: object, enabled?: boolean, baseAccount?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function deleteSubAccount(subAccountId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function delete_sub_account(subAccountId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function updateSubAccount(subAccountId: string, name?: string, cloudName?: string, customAttributes?: object, enabled?: boolean, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function update_sub_account(subAccountId: string, name?: string, cloudName?: string, customAttributes?: object, enabled?: boolean, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
                 function user(userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
                 function users(pending: boolean, userIds?: string[], prefix?: string, subAccountId?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function createUser(name: string, email: string, role: string, subAccountIds?: string[], options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function create_user(name: string, email: string, role: string, subAccountIds?: string[], options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function updateUser(userId: string, name?: string, email?: string, role?: string, subAccountIds?: string[], options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function update_user(userId: string, name?: string, email?: string, role?: string, subAccountIds?: string[], options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function deleteUser(userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function delete_user(userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function createUserGroup(name: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function create_user_group(name: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function updateUserGroup(groupId: string, name: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function update_user_group(groupId: string, name: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function deleteUserGroup(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function delete_user_group(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function addUserToGroup(groupId: string, userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function add_user_to_group(groupId: string, userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function removeUserFromGroup(groupId: string, userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function remove_user_from_group(groupId: string, userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function userGroup(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function user_group(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function userGroups(options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function user_groups(options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function userGroupUsers(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function user_group_users(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
             }
         }
     }
