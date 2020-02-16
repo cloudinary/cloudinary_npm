@@ -3,8 +3,8 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
-const cloudinary = require("../cloudinary");
-const helper = require("./spechelper");
+const cloudinary = require("../../cloudinary");
+const helper = require("../spechelper");
 
 describe('account API - Provisioning', function () {
   let CLOUD_SECRET;
@@ -25,7 +25,7 @@ describe('account API - Provisioning', function () {
     }
 
     // Create a sub account(sub cloud)
-    let res = await cloudinary.provisioning.account.createSubAccount('jutaname' + Date.now(), 'jutaname' + Date.now(), {}, true).catch((err) => {
+    let res = await cloudinary.provisioning.account.create_sub_account('jutaname' + Date.now(), 'jutaname' + Date.now(), {}, true).catch((err) => {
       throw err;
     });
 
@@ -34,7 +34,7 @@ describe('account API - Provisioning', function () {
     CLOUD_NAME = res.api_access_keys.cloud_name;
     CLOUD_ID = res.id;
 
-    let createUser = await cloudinary.provisioning.account.createUser(USER_NAME, USER_EMAIL, USER_ROLE, []).catch((err) => {
+    let createUser = await cloudinary.provisioning.account.create_user(USER_NAME, USER_EMAIL, USER_ROLE, []).catch((err) => {
       throw err;
     });
 
@@ -42,7 +42,7 @@ describe('account API - Provisioning', function () {
 
     // create a user group
 
-    let createGroupRes = await cloudinary.provisioning.account.createUserGroup(`test-group-${Date.now()}`).catch((err) => {
+    let createGroupRes = await cloudinary.provisioning.account.create_user_group(`test-group-${Date.now()}`).catch((err) => {
       throw err;
     });
     GROUP_ID = createGroupRes.id;
@@ -51,14 +51,14 @@ describe('account API - Provisioning', function () {
   });
 
   after('Destroy the sub account and user that was created', async () => {
-    let delRes = await cloudinary.provisioning.account.deleteSubAccount(CLOUD_ID);
+    let delRes = await cloudinary.provisioning.account.delete_sub_account(CLOUD_ID);
     expect(delRes.message).to.eql('ok');
 
 
-    let delUserRes = await cloudinary.provisioning.account.deleteUser(USER_ID);
+    let delUserRes = await cloudinary.provisioning.account.delete_user(USER_ID);
     expect(delUserRes.message).to.eql('ok');
 
-    let delGroupRes = await cloudinary.provisioning.account.deleteUserGroup(GROUP_ID);
+    let delGroupRes = await cloudinary.provisioning.account.delete_user_group(GROUP_ID);
     expect(delGroupRes.ok).to.eql(true); // notice the different response structure
   });
 
@@ -69,7 +69,7 @@ describe('account API - Provisioning', function () {
       provisioning_api_secret: 'abc',
     };
 
-    await cloudinary.provisioning.account.createSubAccount(CLOUD_ID, NEW_NAME, {}, null, null, options).catch((errRes) => {
+    await cloudinary.provisioning.account.create_sub_account(CLOUD_ID, NEW_NAME, {}, null, null, options).catch((errRes) => {
       expect(errRes.error.http_code).to.eql(401);
     });
   });
@@ -81,21 +81,21 @@ describe('account API - Provisioning', function () {
       provisioning_api_secret: 'abc',
     };
 
-    await cloudinary.provisioning.account.createSubAccount(CLOUD_ID, NEW_NAME, {}, null, null, options).catch((errRes) => {
+    await cloudinary.provisioning.account.create_sub_account(CLOUD_ID, NEW_NAME, {}, null, null, options).catch((errRes) => {
       expect(errRes.error.http_code).to.eql(401);
     });
   });
 
   it('Updates a sub account', async () => {
     let NEW_NAME = 'new-test-name';
-    await cloudinary.provisioning.account.updateSubAccount(CLOUD_ID, NEW_NAME);
+    await cloudinary.provisioning.account.update_sub_account(CLOUD_ID, NEW_NAME);
 
-    let subAccRes = await cloudinary.provisioning.account.subAccount(CLOUD_ID);
+    let subAccRes = await cloudinary.provisioning.account.sub_account(CLOUD_ID);
     expect(subAccRes.name).to.eql(NEW_NAME);
   });
 
   it('Get all sub accounts', async function () {
-    return cloudinary.provisioning.account.subAccounts(true).then((res) => {
+    return cloudinary.provisioning.account.sub_accounts(true).then((res) => {
       // ensure the cloud we created exists (there might be other clouds there...
       let item = res.sub_accounts.find((subAccount) => {
         return subAccount.id === CLOUD_ID;
@@ -108,7 +108,7 @@ describe('account API - Provisioning', function () {
   });
 
   it('Gets a specific subAccount', async function () {
-    return cloudinary.provisioning.account.subAccount(CLOUD_ID).then((res) => {
+    return cloudinary.provisioning.account.sub_account(CLOUD_ID).then((res) => {
       expect(res.id).to.eql(CLOUD_ID);
     }).catch((err) => {
       throw err;
@@ -118,7 +118,7 @@ describe('account API - Provisioning', function () {
   it('Updates a user', async function () {
     let NEW_EMAIL_ADDRESS = `updated+${Date.now()}@cloudinary.com`;
 
-    await cloudinary.provisioning.account.updateUser(USER_ID, 'updated', NEW_EMAIL_ADDRESS).then((res) => {
+    await cloudinary.provisioning.account.update_user(USER_ID, 'updated', NEW_EMAIL_ADDRESS).then((res) => {
       expect(res.name).to.eql('updated');
       expect(res.email).to.eql(NEW_EMAIL_ADDRESS);
     }).catch((err) => {
@@ -153,25 +153,25 @@ describe('account API - Provisioning', function () {
 
   it('Updates the user group', async () => {
     let NEW_NAME = `new-test-name_${Date.now()}`;
-    let res = await cloudinary.provisioning.account.updateUserGroup(GROUP_ID, NEW_NAME);
+    let res = await cloudinary.provisioning.account.update_user_group(GROUP_ID, NEW_NAME);
     expect(res.id).to.eql(GROUP_ID);
-    let groupData = await cloudinary.provisioning.account.userGroup((GROUP_ID));
+    let groupData = await cloudinary.provisioning.account.user_group((GROUP_ID));
     expect(groupData.name).to.eql(NEW_NAME);
   });
 
   it('Adds and remove a user from a group', async () => {
-    let res = await cloudinary.provisioning.account.addUserToGroup(GROUP_ID, USER_ID);
+    let res = await cloudinary.provisioning.account.add_user_to_group(GROUP_ID, USER_ID);
     expect(res.users.length).to.eql(1);
 
-    let groupUserData = await cloudinary.provisioning.account.userGroupUsers((GROUP_ID));
+    let groupUserData = await cloudinary.provisioning.account.user_group_users((GROUP_ID));
     expect(groupUserData.users.length).to.eql(1);
     //
-    let remUserFromGroupResp = await cloudinary.provisioning.account.removeUserFromGroup(GROUP_ID, USER_ID);
+    let remUserFromGroupResp = await cloudinary.provisioning.account.remove_user_from_group(GROUP_ID, USER_ID);
     expect(remUserFromGroupResp.users.length).to.eql(0);
   });
 
   it('Tests userGroups in account', async () => {
-    let res = await cloudinary.provisioning.account.userGroups();
+    let res = await cloudinary.provisioning.account.user_groups();
     let matchedGroup = res.user_groups.find((group) => {
       return group.id === GROUP_ID;
     });
