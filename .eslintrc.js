@@ -70,6 +70,9 @@ module.exports = {
       "args": "none",
       "caughtErrors": "none"
     }],
+    "no-trailing-spaces": ['error',{
+      "skipBlankLines" : true
+    }],
     "no-use-before-define": "off",
     "no-useless-concat": "off",
     "no-useless-constructor": "off",
