@@ -773,7 +773,7 @@ cloudinary.v2.uploader.upload_stream(
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.subAccounts(
+cloudinary.v2.provisioning.account.sub_accounts(
     true,
     [],
     'str',
@@ -783,7 +783,7 @@ cloudinary.v2.provisioning.account.subAccounts(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.subAccount(
+cloudinary.v2.provisioning.account.sub_account(
     'str',
     [],
         (res) => {
@@ -792,7 +792,7 @@ cloudinary.v2.provisioning.account.subAccount(
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.createSubAccount(
+cloudinary.v2.provisioning.account.create_sub_account(
     'str',
     'str',
     {foo:'bar'},
@@ -804,7 +804,7 @@ cloudinary.v2.provisioning.account.createSubAccount(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.deleteSubAccount(
+cloudinary.v2.provisioning.account.delete_sub_account(
     'str',
     {},
     (res) => {
@@ -812,7 +812,7 @@ cloudinary.v2.provisioning.account.deleteSubAccount(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.provisioning.account.updateSubAccount(
+cloudinary.v2.provisioning.account.update_sub_account(
     'str',
     'str',
     'str',
