@@ -17,7 +17,7 @@ For Node.js, Cloudinary provides an extension for simplifying the integration ev
 
 ## Setup ######################################################################
 
-npm install cloudinary
+``` npm install cloudinary ```
 
 ## Try it right away
 
