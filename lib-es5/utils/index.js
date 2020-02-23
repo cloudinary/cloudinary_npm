@@ -313,7 +313,8 @@ function build_upload_params(options) {
     type: options.type,
     unique_filename: utils.as_safe_bool(options.unique_filename),
     upload_preset: options.upload_preset,
-    use_filename: utils.as_safe_bool(options.use_filename)
+    use_filename: utils.as_safe_bool(options.use_filename),
+    quality_override: options.quality_override
   };
   return utils.updateable_resource_params(options, params);
 }
@@ -612,6 +613,9 @@ function updateable_resource_params(options) {
   }
   if (options.tags != null) {
     params.tags = toArray(options.tags).join(",");
+  }
+  if (options.quality_override != null) {
+    params.quality_override = options.quality_override;
   }
   return params;
 }
