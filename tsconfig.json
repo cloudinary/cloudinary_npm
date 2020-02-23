@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true
+  },
+  "include": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

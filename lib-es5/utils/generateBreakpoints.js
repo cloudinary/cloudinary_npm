@@ -25,7 +25,7 @@ function generateBreakpoints(srcset) {
       max_width = _map2[1],
       max_images = _map2[2];
 
-  if ([min_width, max_width, max_images].some(isNaN)) {
+  if ([min_width, max_width, max_images].some(Number.isNaN)) {
     throw 'Either (min_width, max_width, max_images) ' + 'or breakpoints must be provided to the image srcset attribute';
   }
 

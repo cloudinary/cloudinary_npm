@@ -17,7 +17,7 @@ For Node.js, Cloudinary provides an extension for simplifying the integration ev
 
 ## Setup ######################################################################
 
-npm install cloudinary
+``` npm install cloudinary ```
 
 ## Try it right away
 
@@ -201,6 +201,10 @@ cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"
 
 // <img src='http://res.cloudinary.com/demo/image/upload/c_fill,h_100,w_100/sample.png' height='100' width='100'/>
 ```
+
+### Typescript
+
+🎉New 🎉TypeScript support was just added. Check out the [declaration file](https://github.com/cloudinary/cloudinary_npm/blob/master/types/index.d.ts).  
 
 ### Samples
 

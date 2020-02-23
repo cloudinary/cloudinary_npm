@@ -2,7 +2,7 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
-  "version": "1.13.2",
+  "version": "1.19.0",
   "homepage": "http://cloudinary.com",
   "license": "MIT",
   "repository": {
@@ -24,29 +24,42 @@
     "babel-register": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "dotenv": "4.x",
+    "dtslint": "^0.9.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
     "expect.js": "0.3.x",
     "jsdoc": "^3.5.5",
     "jsdom": "^9.12.0",
     "jsdom-global": "2.1.1",
     "mocha": "^5.0.0",
-    "nyc": "^13.0.1",
+    "nyc": "^13.3.0",
+    "rimraf": "^3.0.0",
     "sinon": "^6.1.4",
+    "typescript": "^3.7.5",
     "webpack-cli": "^3.2.1"
   },
+  "files": [
+    "lib/**/*",
+    "lib-es5/**/*",
+    "cloudinary.js",
+    "babel.config.js",
+    "package.json",
+    "types/index.d.ts"
+  ],
+  "types": "types",
   "scripts": {
-    "test": "node_v=$(node --version)z\nif [[ \"${node_v%%.*z}\" == 'v4' ]]\nthen\nnpm run test-es5\nelse\necho 10 && npm run test-es6\nfi",
-    "compile": "node_modules/.bin/babel lib --out-dir lib-es5 --delete-dir-on-start --verbose",
-    "test-es6": "which node && node node_modules/.bin/mocha --ui bdd -R spec --recursive test/",
-    "test-es5": "node node_modules/.bin/mocha -R spec --recursive --require 'babel-register' --require 'babel-polyfill' test/",
-    "docs": "npm run compile && node_modules/.bin/jsdoc -d docs -r -p lib/*"
+    "test": "tools/scripts/test.sh",
+    "dtslint": "tools/scripts/ditslint.sh",
+    "lint": "eslint .",
+    "compile": "tools/scripts/compile.sh",
+    "coverage": "tools/scripts/test.es6.sh --coverage",
+    "test-es6": "tools/scripts/test.es6.sh",
+    "test-es5": "tools/scripts/test.es5.sh",
+    "docs": "tools/scripts/docs.sh"
   },
   "optionalDependencies": {},
   "engines": {
     "node": ">=0.6"
-  },
-  "browserify": {
-    "transform": [
-      "coffeeify"
-    ]
   }
 }

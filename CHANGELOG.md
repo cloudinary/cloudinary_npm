@@ -1,3 +1,105 @@
+1.19.0 / 2020-01-20
+==================
+
+New functionality and features
+------------------------------ 
+ * Add structured metadata support
+ * Add verifyNotificationSignature()
+
+Other Changes
+-------------
+  * Fix isRemoteUrl to correctly detect docx files
+  * Fix named transformations with spaces
+  * Fix/fixed type def for upload stream
+  * Add name to errors in uploader.js
+
+1.18.1 / 2019-12-11
+==================
+
+* Fix acl and url escaping in auth_token generation
+
+1.18.0 / 2019-12-09
+===================
+
+ New functionality
+ -----------------
+  * Add live parameter to create_upload_preset and update_upload_preset
+
+ Other changes
+ -------------
+  * Fixed tests on Utils and Cloudinary_spec and removed a duplicate one
+
+
+1.17.0 / 2019-11-11
+===================
+
+  * Update ejs dependency in photo album
+  * Add Type Script declaration file
+
+1.16.0 / 2019-10-15
+===================
+
+  * Support different radius for each corner (containing images and overlays) (#260)
+  * Add feature to allow override on timestamp and signature (#295)
+  * remove package-lock (#303)
+  * Fixed open linting issues (#279)
+  * Feature/publish script (#289)
+  * Fix parameters sent when creating a text image (#298)
+  * Add custom pre function support (#302)
+  * Escape quotes in HTML attributes (#259)
+
+1.15.0 / 2019-09-08
+===================
+
+New functionality
+-----------------
+
+* Add 'derived_next_resource' to api.resource method
+* Add support for 'delete folder' API
+* Add support for remote/local function invocation (fn:remote and fn:wasm) (#261)
+* Add antialiasing and hinting
+* Add `force_version` transformation parameterAdd automatic JavaScript linting and fix existing code conflicts (#262)
+* Add automatic JavaScript linting and fix existing code conflicts (#262)
+
+Other changes
+-------------
+  * Mock upload preset listing test
+  * Feature/duration to condition video
+  * Update test for change moderation status
+  * Simplified error assertions in a few test specs
+  * Fix base64 URL validation
+  * Rearrange util tests
+  * Test support of `async` option in explicit api
+  * Remove unnecessary return statements and options from tests
+  * Remove unnecessary use of options and API in access_control_spec.js
+  * Merge pull request #239 from tornqvist/remove-coffeescript-transform
+  * Remove coffee script deps and transform
+
+1.14.0 / 2019-03-26
+===================
+
+New functionality
+-----------------
+
+  * Support format in transformation API
+  * Add support for `start_offset` value `auto`
+  * Add support for gs:// urls in uploader
+  * Add support for the `quality_analysis` upload parameter. Fixes #171
+  * Add `fps` transformation parameter (#230)
+
+Other changes
+-------------
+
+  * Update code samples in the README file. Fixes #135
+  * Reject deferred on request error. Fixes #136
+  * Refactor test code after conversion from CoffeeScript
+  * Convert test code from CoffeeScript to JavaScript
+  * Merge pull request #208 from cloudinary/fix_update_samples_readme
+  * Fix the "upload large" test for node 4
+  * Remove bower from the sample code
+  * Add timeout to search integration tests
+  * Fix detection test
+  * Fix broken links in node sample project readme
 
 1.13.2 / 2018-11-14
 ===================

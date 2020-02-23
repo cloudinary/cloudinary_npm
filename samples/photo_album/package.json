@@ -4,7 +4,7 @@
   "description": "Cloudinary Express demo",
   "main": "server.js",
   "scripts": {
-    "debug": "./node_modules/.bin/supervisor -e 'js|ejs|node|coffee' server.js"
+    "debug": "./node_modules/.bin/supervisor -e 'js|ejs|node' server.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,7 +14,7 @@
     "connect-multiparty": "^1.1.0",
     "cloudinary-jquery-file-upload": "^2.0.1",
     "dotenv": "^0.4.0",
-    "ejs": "^1.0.0",
+    "ejs": "^2.5.5",
     "ejs-locals": "^1.0.2",
     "express": "^4.7.2",
     "jugglingdb": "^1.0.1",
@@ -22,7 +22,6 @@
     "method-override": "^2.1.2"
   },
   "devDependencies": {
-    "coffee-script": "^1.10.0",
     "supervisor": "^0.6.0"
   }
 }
