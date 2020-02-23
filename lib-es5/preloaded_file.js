@@ -4,7 +4,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var PRELOADED_CLOUDINARY_PATH, config, utils;
+var PRELOADED_CLOUDINARY_PATH = void 0,
+    config = void 0,
+    utils = void 0;
 
 utils = require("./utils");
 
@@ -16,7 +18,8 @@ var PreloadedFile = function () {
   function PreloadedFile(file_info) {
     _classCallCheck(this, PreloadedFile);
 
-    var matches, public_id_and_format;
+    var matches = void 0,
+        public_id_and_format = void 0;
     matches = file_info.match(PRELOADED_CLOUDINARY_PATH);
     if (!matches) {
       throw "Invalid preloaded file info";
@@ -34,7 +37,7 @@ var PreloadedFile = function () {
   _createClass(PreloadedFile, [{
     key: "is_valid",
     value: function is_valid() {
-      var expected_signature;
+      var expected_signature = void 0;
       expected_signature = utils.api_sign_request({
         public_id: this.public_id,
         version: this.version
@@ -68,7 +71,9 @@ var PreloadedFile = function () {
   }], [{
     key: "split_format",
     value: function split_format(identifier) {
-      var format, last_dot, public_id;
+      var format = void 0,
+          last_dot = void 0,
+          public_id = void 0;
       last_dot = identifier.lastIndexOf(".");
       if (last_dot === -1) {
         return [identifier, null];

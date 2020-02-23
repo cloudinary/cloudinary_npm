@@ -1,3 +1,40 @@
+1.19.0 / 2020-01-20
+==================
+
+New functionality and features
+------------------------------ 
+ * Add structured metadata support
+ * Add verifyNotificationSignature()
+
+Other Changes
+-------------
+  * Fix isRemoteUrl to correctly detect docx files
+  * Fix named transformations with spaces
+  * Fix/fixed type def for upload stream
+  * Add name to errors in uploader.js
+
+1.18.1 / 2019-12-11
+==================
+
+* Fix acl and url escaping in auth_token generation
+
+1.18.0 / 2019-12-09
+===================
+
+ New functionality
+ -----------------
+  * Add live parameter to create_upload_preset and update_upload_preset
+
+ Other changes
+ -------------
+  * Fixed tests on Utils and Cloudinary_spec and removed a duplicate one
+
+
+1.17.0 / 2019-11-11
+===================
+
+  * Update ejs dependency in photo album
+  * Add Type Script declaration file
 
 1.16.0 / 2019-10-15
 ===================

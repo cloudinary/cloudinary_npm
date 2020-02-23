@@ -2,9 +2,9 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -80,11 +80,16 @@ exports.upload = function upload(file, callback) {
 exports.upload_large = function upload_large(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  if (path != null && path.match(/^https?:/)) {
+  if (path != null && isRemoteUrl(path)) {
     // upload a remote file
     return exports.upload(path, callback, options);
   }
-  return exports.upload_chunked(path, callback, _extends({ resource_type: 'raw' }, options));
+  if (path != null) {
+    options.filename = path.split(/(\\|\/)/g).pop().replace(/\.[^/.]+$/, "");
+  }
+  return exports.upload_chunked(path, callback, extend({
+    resource_type: 'raw'
+  }, options));
 };
 
 exports.upload_chunked = function upload_chunked(path, callback, options) {
@@ -422,10 +427,14 @@ function parseResult(buffer, res) {
   var result = '';
   try {
     result = JSON.parse(buffer);
+    if (result.error && !result.error.name) {
+      result.error.name = "Error";
+    }
   } catch (jsonError) {
     result = {
       error: {
-        message: `Server return invalid JSON response. Status Code ${res.statusCode}. ${jsonError}`
+        message: `Server return invalid JSON response. Status Code ${res.statusCode}. ${jsonError}`,
+        name: "Error"
       }
     };
   }
@@ -454,7 +463,7 @@ function call_api(action, callback, options, get_params) {
   var boundary = utils.random_public_id();
   var errorRaised = false;
   var handle_response = function handle_response(res) {
-    // var buffer;
+    // let buffer;
     if (errorRaised) {
 
       // Already reported
@@ -491,7 +500,8 @@ function call_api(action, callback, options, get_params) {
     } else {
       var error = {
         message: `Server returned unexpected status code - ${res.statusCode}`,
-        http_code: res.statusCode
+        http_code: res.statusCode,
+        name: "UnexpectedResponse"
       };
       deferred.reject(error);
       callback({ error });
@@ -519,10 +529,11 @@ function call_api(action, callback, options, get_params) {
 }
 
 function post(url, post_data, boundary, file, callback, options) {
-  var file_header;
+  var file_header = void 0;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
   if (file != null || options.stream) {
-    var filename = options.stream ? "file" : basename(file);
+    // eslint-disable-next-line no-nested-ternary
+    var filename = options.stream ? options.filename ? options.filename : "file" : basename(file);
     file_header = Buffer.from(encodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary');
   }
   var post_options = urlLib.parse(url);
@@ -551,7 +562,8 @@ function post(url, post_data, boundary, file, callback, options) {
     if (timeout) {
       error = {
         message: "Request Timeout",
-        http_code: 499
+        http_code: 499,
+        name: "TimeoutError"
       };
     }
     return callback({ error });
@@ -648,4 +660,28 @@ exports.unsigned_image_upload_tag = function unsigned_image_upload_tag(field, up
     unsigned: true,
     upload_preset: upload_preset
   }));
+};
+
+/**
+ * Populates metadata fields with the given values. Existing values will be overwritten.
+ *
+ * @param {Object}   metadata   A list of custom metadata fields (by external_id) and the values to assign to each
+ * @param {Array}    public_ids The public IDs of the resources to update
+ * @param {Function} callback   Callback function
+ * @param {Object}   options    Configuration options
+ *
+ * @return {Object}
+ */
+exports.update_metadata = function update_metadata(metadata, public_ids, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  return call_api("metadata", callback, options, function () {
+    var params = {
+      metadata: utils.encode_context(metadata),
+      public_ids: utils.build_array(public_ids),
+      timestamp: utils.timestamp(),
+      type: options.type
+    };
+    return [params];
+  });
 };
