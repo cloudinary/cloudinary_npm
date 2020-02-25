@@ -84,7 +84,7 @@ exports.upload_large = function upload_large(path, callback) {
     // upload a remote file
     return exports.upload(path, callback, options);
   }
-  if (path != null) {
+  if (path != null && !options.filename) {
     options.filename = path.split(/(\\|\/)/g).pop().replace(/\.[^/.]+$/, "");
   }
   return exports.upload_chunked(path, callback, extend({
