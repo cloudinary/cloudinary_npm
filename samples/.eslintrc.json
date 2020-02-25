@@ -1,0 +1,9 @@
+{
+  "env": {
+    "jquery": true,
+    "browser": true
+  },
+  "rules": {
+    "import/no-unresolved": "off"
+  }
+}

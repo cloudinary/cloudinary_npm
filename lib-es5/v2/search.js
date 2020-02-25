@@ -56,7 +56,7 @@ var Search = function () {
     value: function sort_by(field_name) {
       var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "desc";
 
-      var sort_bucket;
+      var sort_bucket = void 0;
       sort_bucket = {};
       sort_bucket[field_name] = dir;
       this.query_hash.sort_by.push(sort_bucket);
@@ -65,12 +65,14 @@ var Search = function () {
   }, {
     key: 'to_query',
     value: function to_query() {
-      for (var k in this.query_hash) {
-        var v = this.query_hash[k];
+      var _this = this;
+
+      Object.keys(this.query_hash).forEach(function (k) {
+        var v = _this.query_hash[k];
         if (!isNumber(v) && isEmpty(v)) {
-          delete this.query_hash[k];
+          delete _this.query_hash[k];
         }
-      }
+      });
       return this.query_hash;
     }
   }, {
@@ -79,7 +81,7 @@ var Search = function () {
       if (callback === null) {
         callback = options;
       }
-      options || (options = {});
+      options = options || {};
       return api.search(this.to_query(), options, callback);
     }
   }], [{
