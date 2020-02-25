@@ -650,6 +650,19 @@ describe("uploader", function () {
         });
       });
     });
+    it("should add original filename on upload large", function (done) {
+      fs.stat(RAW_FILE, function (err, stat) {
+        cloudinary.v2.uploader.upload_large(RAW_FILE, {
+          filename: 'my_file_name',
+        }, function (error, result) {
+          if (error != null) {
+            done(new Error(error.message));
+          }
+          expect(result.original_filename).to.eql('my_file_name');
+          done();
+        });
+      });
+    });
     it("should support uploading a small image file", function (done) {
       fs.stat(IMAGE_FILE, function (err, stat) {
         return cloudinary.v2.uploader.upload_chunked(IMAGE_FILE, {
@@ -931,26 +944,26 @@ describe("uploader", function () {
     expect(input_element.getAttribute("name")).to.be('file');
     expect(input_element.getAttribute("type")).to.be('file');
   });
-  describe(":quality_override", function() {
+  describe(":quality_override", function () {
     const mocked = helper.mockTest();
     const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
     function testValue(quality) {
-      return it("should pass '" + quality + "'", function() {
+      return it("should pass '" + quality + "'", function () {
         cloudinary.v2.uploader.upload(IMAGE_FILE, {
-          "quality_override": quality
+          "quality_override": quality,
         });
         sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", quality));
       });
     }
     qualityValues.forEach(value => testValue(value));
-    it("should be supported by explicit api", function() {
+    it("should be supported by explicit api", function () {
       cloudinary.v2.uploader.explicit("cloudinary", {
-        "quality_override": "auto:best"
+        "quality_override": "auto:best",
       });
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", "auto:best"));
     });
   });
-  describe("access_control", function() {
+  describe("access_control", function () {
     var acl, acl_string, options, requestSpy, writeSpy;
     writeSpy = void 0;
     requestSpy = void 0;
