@@ -805,6 +805,10 @@ describe("cloudinary", function () {
       process.env.CLOUDINARY_URL = "cloudinary://123456789012345:ALKJdjklLJAjhkKJ45hBK92baj3@test";
       cloudinary.config(true);
     });
+    it("should not be sensitive to case in CLOUDINARY_URL's protocol", function () {
+      process.env.CLOUDINARY_URL = "CLOUDINARY://123456789012345:ALKJdjklLJAjhkKJ45hBK92baj3@test";
+      cloudinary.config(true);
+    });
     it("should throw error when CLOUDINARY_URL doesn't start with 'cloudinary://'", function () {
       process.env.CLOUDINARY_URL = "https://123456789012345:ALKJdjklLJAjhkKJ45hBK92baj3@test?cloudinary=foo";
       try {

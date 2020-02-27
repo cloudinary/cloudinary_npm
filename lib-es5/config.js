@@ -60,7 +60,7 @@ module.exports = function (new_config, new_value) {
       });
     }
     var cloudinary_url = process.env.CLOUDINARY_URL;
-    if (cloudinary_url === null || !cloudinary_url.startsWith('cloudinary://')) {
+    if (cloudinary_url === null || !cloudinary_url.toLowerCase().startsWith('cloudinary://')) {
       throw new Error("Invalid CLOUDINARY_URL scheme. Expecting to start with 'cloudinary://'");
     }
     var uri = url.parse(cloudinary_url, true);
