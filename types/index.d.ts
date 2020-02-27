@@ -400,6 +400,7 @@ declare module 'cloudinary' {
         notification_url?: string;
         prefixes?: string;
         public_ids?: string[] | string;
+        fully_qualified_public_ids?: string[] | string;
         skip_transformation_name?: boolean;
         tags?: string | string[];
         target_format?: TargetArchiveFormat;

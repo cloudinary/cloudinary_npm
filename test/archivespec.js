@@ -16,12 +16,15 @@ const helper = require("./spechelper");
 const { utils, api, uploader } = cloudinary.v2;
 const TEST_TAG = helper.TEST_TAG;
 const IMAGE_URL = helper.IMAGE_URL;
+const VIDEO_URL = helper.VIDEO_URL;
 const sharedExamples = helper.sharedExamples;
 const includeContext = helper.includeContext;
 const ARCHIVE_TAG = TEST_TAG + "_archive";
 const PUBLIC_ID1 = ARCHIVE_TAG + "_1";
 const PUBLIC_ID2 = ARCHIVE_TAG + "_2";
 const PUBLIC_ID_RAW = ARCHIVE_TAG + "_3";
+const FULLY_QUALIFIED_IMAGE = "image/upload/sample";
+const FULLY_QUALIFIED_VIDEO = "video/upload/dog";
 
 sharedExamples('archive', function () {
   before("Verify Configuration", function () {
@@ -54,6 +57,12 @@ sharedExamples('archive', function () {
         {
           public_id: PUBLIC_ID_RAW,
           resource_type: "raw",
+          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+        }),
+      uploader.upload(VIDEO_URL,
+        {
+          public_id: "dog",
+          resource_type: "video",
           tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
         }),
     ]);
@@ -150,6 +159,14 @@ describe("archive", function () {
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
+        });
+      });
+      it('should create archive with "zip" format and include multiple resource types', function () {
+        return uploader.create_zip({
+          fully_qualified_public_ids: [FULLY_QUALIFIED_IMAGE, FULLY_QUALIFIED_VIDEO],
+          resource_type: "auto",
+        }).then((result) => {
+          expect(result.file_count).to.eql(2);
         });
       });
     });

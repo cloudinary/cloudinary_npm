@@ -661,7 +661,6 @@ function patchFetchFormat() {
 function url(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-
   var signature = void 0,
       source_to_sign = void 0;
   utils.patchFetchFormat(options);
@@ -1039,6 +1038,8 @@ function zip_download_url(tag) {
  * @param {string|Array} [options.tags] list of tags to include in the archive
  * @param {string|Array<string>} [options.public_ids] list of public_ids to include in the archive
  * @param {string|Array<string>} [options.prefixes]  list of prefixes of public IDs (e.g., folders).
+ * @param {string|Array<string>} [options.fully_qualified_public_ids] list of fully qualified public_ids to include
+ *   in the archive.
  * @param {string|Array<string>} [options.transformations]  list of transformations.
  *   The derived images of the given transformations are included in the archive. Using the string representation of
  *   multiple chained transformations as we use for the 'eager' upload parameter.
@@ -1260,6 +1261,7 @@ function archive_params() {
     mode: options.mode,
     notification_url: options.notification_url,
     prefixes: options.prefixes && toArray(options.prefixes),
+    fully_qualified_public_ids: options.fully_qualified_public_ids && toArray(options.fully_qualified_public_ids),
     public_ids: options.public_ids && toArray(options.public_ids),
     skip_transformation_name: exports.as_safe_bool(options.skip_transformation_name),
     tags: options.tags && toArray(options.tags),
