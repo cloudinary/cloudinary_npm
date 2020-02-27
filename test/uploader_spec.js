@@ -713,24 +713,33 @@ describe("uploader", function () {
       });
     });
   });
-  it("should support unsigned uploading using presets", function () {
+  it("should support unsigned uploading using presets", async function () {
     this.timeout(helper.TIMEOUT_LONG);
-    let presetName;
-    return cloudinary.v2.api.create_upload_preset({
+
+    let preset = await cloudinary.v2.api.create_upload_preset({
       folder: "upload_folder",
       unsigned: true,
       tags: UPLOAD_TAGS,
-    }).then(function (preset) {
-      presetName = preset.name;
-      return cloudinary.v2.uploader.unsigned_upload(IMAGE_FILE, preset.name, {
-        tags: UPLOAD_TAGS,
-      });
-    }).then(function ({ public_id }) {
-      expect(public_id).to.match(/^upload_folder\/[a-z0-9]+$/);
-    }).finally(function () {
-      return cloudinary.v2.api.delete_upload_preset(presetName);
+    }).catch((err) => {
+      console.log(err);
+      throw new Error('create_upload_preset failed');
+    });
+
+    let uploadResponse = await cloudinary.v2.uploader.unsigned_upload(IMAGE_FILE, preset.name, {
+      tags: UPLOAD_TAGS,
+    }).catch((err) => {
+      console.log(err);
+      throw new Error('unsigned_upload failed');
+    });
+
+    expect(uploadResponse.public_id).to.match(/^upload_folder\/[a-z0-9]+$/);
+
+    await cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
+      console.log(err);
+      // we don't fail the test if the delete fails
     });
   });
+
   it("should reject promise if error code is returned from the server", function () {
     return cloudinary.v2.uploader.upload(EMPTY_IMAGE, {
       tags: UPLOAD_TAGS,
