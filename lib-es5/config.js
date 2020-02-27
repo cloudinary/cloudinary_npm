@@ -50,6 +50,61 @@ function putNestedValue(params, key, value) {
   return params;
 }
 
+function parseCloudinaryConfigFromEnvURL(ENV_STR) {
+  var conf = {};
+
+  var uri = url.parse(ENV_STR, true);
+
+  if (uri.protocol === 'cloudinary:') {
+    conf = Object.assign({}, conf, {
+      cloud_name: uri.host,
+      api_key: uri.auth && uri.auth.split(":")[0],
+      api_secret: uri.auth && uri.auth.split(":")[1],
+      private_cdn: uri.pathname != null,
+      secure_distribution: uri.pathname && uri.pathname.substring(1)
+    });
+  } else if (uri.protocol === 'account:') {
+    conf = Object.assign({}, conf, {
+      account_id: uri.host,
+      provisioning_api_key: uri.auth && uri.auth.split(":")[0],
+      provisioning_api_secret: uri.auth && uri.auth.split(":")[1]
+    });
+  }
+
+  return conf;
+}
+
+function extendCloudinaryConfigFromQuery(ENV_URL) {
+  var confToExtend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var uri = url.parse(ENV_URL, true);
+  if (uri.query != null) {
+    entries(uri.query).forEach(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          key = _ref2[0],
+          value = _ref2[1];
+
+      return putNestedValue(confToExtend, key, value);
+    });
+  }
+}
+
+function extendCloudinaryConfig(parsedConfig) {
+  var confToExtend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  entries(parsedConfig).forEach(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        key = _ref4[0],
+        value = _ref4[1];
+
+    if (value !== undefined) {
+      confToExtend[key] = value;
+    }
+  });
+
+  return confToExtend;
+}
+
 module.exports = function (new_config, new_value) {
   if (cloudinary_config == null || new_config === true) {
     if (cloudinary_config == null) {
@@ -60,35 +115,18 @@ module.exports = function (new_config, new_value) {
       });
     }
 
-    var cloudinary_url = process.env.CLOUDINARY_URL;
-    if (cloudinary_url != null) {
-      var uri = url.parse(cloudinary_url, true);
-      var parsedConfig = {
-        cloud_name: uri.host,
-        api_key: uri.auth && uri.auth.split(":")[0],
-        api_secret: uri.auth && uri.auth.split(":")[1],
-        private_cdn: uri.pathname != null,
-        secure_distribution: uri.pathname && uri.pathname.substring(1)
-      };
-      entries(parsedConfig).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            key = _ref2[0],
-            value = _ref2[1];
+    var CLOUDINARY_ENV_URL = process.env.CLOUDINARY_URL;
+    var CLOUDINARY_ENV_ACCOUNT_URL = process.env.CLOUDINARY_ACCOUNT_URL;
 
-        if (value !== undefined) {
-          cloudinary_config[key] = value;
-        }
-      });
-      if (uri.query != null) {
-        entries(uri.query).forEach(function (_ref3) {
-          var _ref4 = _slicedToArray(_ref3, 2),
-              key = _ref4[0],
-              value = _ref4[1];
-
-          return putNestedValue(cloudinary_config, key, value);
-        });
+    [CLOUDINARY_ENV_URL, CLOUDINARY_ENV_ACCOUNT_URL].forEach(function (ENV_URL) {
+      if (ENV_URL) {
+        var parsedConfig = parseCloudinaryConfigFromEnvURL(ENV_URL);
+        extendCloudinaryConfig(parsedConfig, cloudinary_config);
+        // Provide Query support in ENV url cloudinary://key:secret@test123?foo[bar]=value
+        // expect(cloudinary_config.foo.bar).to.eql('value')
+        extendCloudinaryConfigFromQuery(ENV_URL, cloudinary_config);
       }
-    }
+    });
   }
   if (!isUndefined(new_value)) {
     cloudinary_config[new_config] = new_value;
