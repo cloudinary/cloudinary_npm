@@ -725,7 +725,17 @@ describe("api", function () {
         });
       });
     });
-    it("should support setting manual moderation status", function () {
+    describe("quality override", function() {
+      const mocked = helper.mockTest();
+      const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
+      qualityValues.forEach(quality => {
+        it("should support '" + quality + "' in update", function() {
+          cloudinary.v2.api.update("sample", {quality_override: quality});
+          sinon.assert.calledWith(mocked.write, sinon.match(helper.apiParamMatcher("quality_override", quality)));
+        });
+      });
+    });
+    it("should support setting manual moderation status", () => {
       this.timeout(helper.TIMEOUT_LONG);
       return uploadImage({
         moderation: "manual",

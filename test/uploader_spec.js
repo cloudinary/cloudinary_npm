@@ -623,6 +623,19 @@ describe("uploader", function () {
         });
       });
     });
+    it("should use file name", function (done) {
+      fs.stat(LARGE_RAW_FILE, function (err, stat) {
+        return cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
+          use_filename: true,
+        }, function (error, result) {
+          if (error != null) {
+            done(new Error(error.message));
+          }
+          expect(result.public_id).to.match(/TheCompleteWorksOfShakespeare_[a-zA-Z0-9]{6}/);
+          done();
+        });
+      });
+    });
     it("should support uploading a small raw file", function (done) {
       fs.stat(RAW_FILE, function (err, stat) {
         cloudinary.v2.uploader.upload_large(RAW_FILE, {
@@ -633,6 +646,19 @@ describe("uploader", function () {
           }
           expect(result.bytes).to.eql(stat.size);
           expect(result.etag).to.eql("ffc265d8d1296247972b4d478048e448");
+          done();
+        });
+      });
+    });
+    it("should add original filename on upload large", function (done) {
+      fs.stat(RAW_FILE, function (err, stat) {
+        cloudinary.v2.uploader.upload_large(RAW_FILE, {
+          filename: 'my_file_name',
+        }, function (error, result) {
+          if (error != null) {
+            done(new Error(error.message));
+          }
+          expect(result.original_filename).to.eql('my_file_name');
           done();
         });
       });
@@ -917,6 +943,25 @@ describe("uploader", function () {
     expect(input_element.getAttribute("class")).to.match(/cloudinary-fileupload/);
     expect(input_element.getAttribute("name")).to.be('file');
     expect(input_element.getAttribute("type")).to.be('file');
+  });
+  describe(":quality_override", function () {
+    const mocked = helper.mockTest();
+    const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
+    function testValue(quality) {
+      return it("should pass '" + quality + "'", function () {
+        cloudinary.v2.uploader.upload(IMAGE_FILE, {
+          "quality_override": quality,
+        });
+        sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", quality));
+      });
+    }
+    qualityValues.forEach(value => testValue(value));
+    it("should be supported by explicit api", function () {
+      cloudinary.v2.uploader.explicit("cloudinary", {
+        "quality_override": "auto:best",
+      });
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", "auto:best"));
+    });
   });
   describe("access_control", function () {
     var acl, acl_string, options, requestSpy, writeSpy;
