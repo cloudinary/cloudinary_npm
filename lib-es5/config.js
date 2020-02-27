@@ -59,35 +59,35 @@ module.exports = function (new_config, new_value) {
         return delete cloudinary_config[key];
       });
     }
-
     var cloudinary_url = process.env.CLOUDINARY_URL;
-    if (cloudinary_url != null) {
-      var uri = url.parse(cloudinary_url, true);
-      var parsedConfig = {
-        cloud_name: uri.host,
-        api_key: uri.auth && uri.auth.split(":")[0],
-        api_secret: uri.auth && uri.auth.split(":")[1],
-        private_cdn: uri.pathname != null,
-        secure_distribution: uri.pathname && uri.pathname.substring(1)
-      };
-      entries(parsedConfig).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            key = _ref2[0],
-            value = _ref2[1];
+    if (cloudinary_url === null || !cloudinary_url.startsWith('cloudinary://')) {
+      throw new Error("Invalid CLOUDINARY_URL scheme. Expecting to start with 'cloudinary://'");
+    }
+    var uri = url.parse(cloudinary_url, true);
+    var parsedConfig = {
+      cloud_name: uri.host,
+      api_key: uri.auth && uri.auth.split(":")[0],
+      api_secret: uri.auth && uri.auth.split(":")[1],
+      private_cdn: uri.pathname != null,
+      secure_distribution: uri.pathname && uri.pathname.substring(1)
+    };
+    entries(parsedConfig).forEach(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          key = _ref2[0],
+          value = _ref2[1];
 
-        if (value !== undefined) {
-          cloudinary_config[key] = value;
-        }
-      });
-      if (uri.query != null) {
-        entries(uri.query).forEach(function (_ref3) {
-          var _ref4 = _slicedToArray(_ref3, 2),
-              key = _ref4[0],
-              value = _ref4[1];
-
-          return putNestedValue(cloudinary_config, key, value);
-        });
+      if (value !== undefined) {
+        cloudinary_config[key] = value;
       }
+    });
+    if (uri.query != null) {
+      entries(uri.query).forEach(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            key = _ref4[0],
+            value = _ref4[1];
+
+        return putNestedValue(cloudinary_config, key, value);
+      });
     }
   }
   if (!isUndefined(new_value)) {

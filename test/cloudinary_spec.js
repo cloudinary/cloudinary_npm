@@ -801,5 +801,27 @@ describe("cloudinary", function () {
       const foo = cloudinary.config().foo;
       expect(foo && foo.bar).to.eql('value');
     });
+    it("should load a properly formatted CLOUDINARY_URL", function () {
+      process.env.CLOUDINARY_URL = "cloudinary://123456789012345:ALKJdjklLJAjhkKJ45hBK92baj3@test";
+      cloudinary.config(true);
+    });
+    it("should throw error when CLOUDINARY_URL doesn't start with 'cloudinary://'", function () {
+      process.env.CLOUDINARY_URL = "https://123456789012345:ALKJdjklLJAjhkKJ45hBK92baj3@test?cloudinary=foo";
+      try {
+        cloudinary.config(true);
+        expect().fail();
+      } catch (err) {
+        expect(err.message).to.eql("Invalid CLOUDINARY_URL scheme. Expecting to start with 'cloudinary://'");
+      }
+    });
+    it("should throw error when CLOUDINARY_URL is empty", function () {
+      process.env.CLOUDINARY_URL = " ";
+      try {
+        cloudinary.config(true);
+        expect().fail();
+      } catch (err) {
+        expect(err.message).to.eql("Invalid CLOUDINARY_URL scheme. Expecting to start with 'cloudinary://'");
+      }
+    });
   });
 });
