@@ -770,3 +770,178 @@ cloudinary.v2.uploader.upload_stream(
     function (error, result) {
         console.log(result);
     });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.sub_accounts(
+    true,
+    [],
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.sub_account(
+    'str',
+    [],
+        (res) => {
+
+    });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.create_sub_account(
+    'str',
+    'str',
+    {foo:'bar'},
+    false,
+    'sds',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.delete_sub_account(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.update_sub_account(
+    'str',
+    'str',
+    'str',
+    {},
+    true,
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.users(
+    true,
+    ['str'],
+    'str',
+    'str',
+    {},
+    (res) => {
+
+    });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.create_user(
+    'str',
+    'str',
+    'str',
+    [],
+    {},
+    (res) => {
+
+    });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.update_user(
+    'str',
+    'str',
+    'str',
+    'str',
+    [],
+    {},
+    (res) => {
+
+    });
+
+cloudinary.v2.provisioning.account.delete_user(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.create_user_group(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.update_user_group(
+    'str',
+    'str',
+    {},
+    (res) => {
+
+    });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.delete_user_group(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.add_user_to_group(
+    'str',
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.remove_user_from_group(
+    'str',
+    'str',
+    {},
+    (res) => {
+
+    });
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user_group(
+    'str',
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user_groups(
+    {},
+    (res) => {
+
+    });
+
+// $ExpectType Promise<any>
+cloudinary.v2.provisioning.account.user_group_users(
+    'str',
+    {
+        provisioning_api_key: 'foo',
+        provisioning_api_secret: 'foo',
+        account_id: 'bar'
+    },
+    (res) => {
+
+    });

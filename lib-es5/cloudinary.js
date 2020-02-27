@@ -7,6 +7,11 @@ exports.config = require("./config");
 exports.utils = require("./utils");
 exports.uploader = require("./uploader");
 exports.api = require("./api");
+var account = require("./provisioning/account");
+
+exports.provisioning = {
+  account: account
+};
 exports.PreloadedFile = require("./preloaded_file");
 exports.Cache = require('./cache');
 
