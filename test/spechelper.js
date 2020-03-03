@@ -94,12 +94,51 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
 };
 
 /**
- * Asserts that a given object is a metadata field.
- * Optionally tests the values in the metadata field for equality
+ * Asserts that a given object is a datasource.
  *
  * @returns {expect.Assertion}
  */
-expect.Assertion.prototype.beAMetadataField = function () {
+expect.Assertion.prototype.beADatasource = function () {
+  let datasource;
+  datasource = this.obj;
+  this.assert('values' in datasource, function () {
+    return `expected datasource to contain mandatory field: 'values'`;
+  }, function () {
+    return `expected datasource not to contain a 'values' field`;
+  });
+  if (!isEmpty(datasource.values)) {
+    datasource.values.forEach((value) => {
+      this.assert(typeof value.value === 'string', function () {
+        return `expected datasource to contain item with mandatory field 'value' type string`;
+      }, function () {
+        return `expected datasource not to contain item with mandatory field 'value' type string`;
+      });
+      this.assert(typeof value.external_id === 'string', function () {
+        return `expected datasource field to contain item with mandatory field: 'value' type string`;
+      }, function () {
+        return `expected datasource not to contain item with mandatory field 'external_id' type string`;
+      });
+      if (!isEmpty(value.state)) {
+        const states = ['active', 'inactive'];
+        this.assert(includes(states, value.state), function () {
+          return `expected datasource field state to be one of ${states.join(', ')}. Unknown state ${value.state} received`;
+        }, function () {
+          return `expected datasource field state not to be of a certain state`;
+        });
+      }
+    });
+  }
+  return this;
+};
+
+/**
+ * Asserts that a given object is a metadata field.
+ * Optionally tests the values in the metadata field for equality
+ *
+ * @param {string} type The type of metadata field we expect
+ * @returns {expect.Assertion}
+ */
+expect.Assertion.prototype.beAMetadataField = function (type = '') {
   let metadataField, expectedValues;
   if (Array.isArray(this.obj)) {
     [metadataField, expectedValues] = this.obj;
@@ -123,16 +162,24 @@ expect.Assertion.prototype.beAMetadataField = function () {
     }, function () {
       return `expected metadata field of type ${metadataField.type} not to contain a datasource field`;
     });
+    expect(metadataField.datasource).to.beADatasource();
   }
 
   // Make sure type is acceptable
-  const acceptableTypes = ['string', 'integer', 'date', 'enum', 'set'];
-  this.assert(includes(acceptableTypes, metadataField.type), function () {
-    return `expected metadata field type to be one of ${acceptableTypes.join(', ')}. Unknown field type ${metadataField.type} received`;
-  }, function () {
-    return `expected metadata field not to be of a certain type`;
-  });
-
+  if (type) {
+    this.assert(type === metadataField.type, function () {
+      return `expected metadata field type to equal ${type}`;
+    }, function () {
+      return `expected metadata field type ${metadataField.type} not to equal ${type}`;
+    });
+  } else {
+    const acceptableTypes = ['string', 'integer', 'date', 'enum', 'set'];
+    this.assert(includes(acceptableTypes, metadataField.type), function () {
+      return `expected metadata field type to be one of ${acceptableTypes.join(', ')}. Unknown field type ${metadataField.type} received`;
+    }, function () {
+      return `expected metadata field not to be of a certain type`;
+    });
+  }
   // Verify object values
   if (expectedValues) {
     Object.entries(expectedValues).forEach(([key, value]) => {
@@ -208,6 +255,23 @@ exports.apiParamMatcher = function (name, value) {
   expected = querystring.stringify(params);
   return function (arg) {
     return new RegExp(expected).test(arg);
+  };
+};
+
+/**
+ Create a matcher method for api JSON parameters
+ @private
+ @function helper.apiJsonParamMatcher
+ @param {string} name the parameter name
+ @param {*} value the parameter value
+ @return {function} the matcher function as (arg)->Boolean
+ */
+exports.apiJsonParamMatcher = function (name, value) {
+  return function (arg) {
+    var expected, jsonArg;
+    jsonArg = JSON.parse(arg);
+    expected = JSON.stringify(value);
+    return jsonArg[name] && JSON.stringify(jsonArg[name]) === expected;
   };
 };
 
@@ -305,4 +369,15 @@ exports.setupCache = function () {
 */
 exports.uploadImage = function (options) {
   return cloudinary.v2.uploader.upload(exports.IMAGE_FILE, options);
+};
+
+/**
+ * Convert a timestamp to the date part of an ISO8601 string
+ *
+ * @param {string} timestamp The timestamp to convert
+ * @returns {string} The date part of a ISO8601 date time
+ */
+exports.toISO8601DateOnly = function (timestamp) {
+  const date = new Date(timestamp);
+  return date.toISOString().split('T')[0];
 };

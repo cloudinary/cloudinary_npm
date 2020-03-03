@@ -1,4 +1,3 @@
-
 require('dotenv').load({
   silent: true,
 });
@@ -16,7 +15,6 @@ const itBehavesLike = helper.itBehavesLike;
 const TEST_TAG = helper.TEST_TAG;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
-const TEST_ID = Date.now();
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
@@ -44,13 +42,6 @@ const EXPLICIT_TRANSFORMATION2 = {
   crop: "scale",
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
-const METADATA_EXTERNAL_ID_UPLOAD = "metadata_upload_" + TEST_ID;
-const METADATA_EXTERNAL_ID_UPDATE = "metadata_uploader_update_" + TEST_ID;
-const METADATA_EXTERNAL_ID_EXPLICIT = "metadata_explicit_" + TEST_ID;
-const LABEL_INT_1 = 'metadata_label_1_' + TEST_ID;
-const LABEL_INT_2 = 'metadata_label_2_' + TEST_ID;
-const LABEL_INT_3 = 'metadata_label_3_' + TEST_ID;
-
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
     return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
@@ -208,10 +199,11 @@ describe("api", function () {
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result])
           .then(([public_id, result]) => {
-        let resource = findByAttr(result.resources, "public_id", public_id);
-        expect(resource).to.be.an(Object);
-        expect(resource.type).to.eql("upload");
-      }));
+            let resource = findByAttr(result.resources, "public_id", public_id);
+            expect(resource).to.be.an(Object);
+            expect(resource.type).to.eql("upload");
+          })
+      );
     });
     it("should allow listing resources by prefix", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -307,13 +299,13 @@ describe("api", function () {
           expect(resource.derived).to.have.length(1);
         });
     });
-    describe("derived pagination", function(){
-      it("should send the derived_next_cursor to the server", function() {
+    describe("derived pagination", function () {
+      it("should send the derived_next_cursor to the server", function () {
         return helper.mockPromise((xhr, writeSpy, requestSpy) => {
-          cloudinary.v2.api.resource(PUBLIC_ID, {derived_next_cursor: 'aaa'});
+          cloudinary.v2.api.resource(PUBLIC_ID, { derived_next_cursor: 'aaa' });
           return sinon.assert.calledWith(
             requestSpy, sinon.match(sinon.match({
-              query: sinon.match('derived_next_cursor=aaa')
+              query: sinon.match('derived_next_cursor=aaa'),
             }, 'derived_next_cursor=aaa')));
         });
       });
@@ -627,21 +619,21 @@ describe("api", function () {
     it("should allow getting a single upload_preset", function () {
       return helper.mockPromise(function (xhr, write, request) {
         cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET1);
-        var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET1+"$";
+        var expectedPath = "/.*\/upload_presets/" + API_TEST_UPLOAD_PRESET1 + "$";
         return sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("GET")
+          method: sinon.match("GET"),
         }));
       });
     });
     it("should allow deleting upload_presets", function () {
       return helper.mockPromise(function (xhr, write, request) {
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2);
-        var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET2+"$";
+        var expectedPath = "/.*\/upload_presets/" + API_TEST_UPLOAD_PRESET2 + "$";
         return sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("DELETE")
-        }))
+          method: sinon.match("DELETE"),
+        }));
       });
     });
     it("should allow updating upload_presets", function () {
@@ -651,16 +643,16 @@ describe("api", function () {
             colors: true,
             unsigned: true,
             disallow_public_id: true,
-            live: true
+            live: true,
           });
-        var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET3+"$";
+        var expectedPath = "/.*\/upload_presets/" + API_TEST_UPLOAD_PRESET3 + "$";
         sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("PUT")
+          method: sinon.match("PUT"),
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1 , "colors=1")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true , "unsigned=true")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true , "disallow_public_id=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1, "colors=1")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true, "disallow_public_id=true")));
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
       });
     });
@@ -670,7 +662,7 @@ describe("api", function () {
           folder: "upload_folder",
           unsigned: true,
           tags: UPLOAD_TAGS,
-          live: true
+          live: true,
         });
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
@@ -814,85 +806,6 @@ describe("api", function () {
       });
     });
   });
-  describe("structured metadata fields", function () {
-    this.timeout(helper.TIMEOUT_LONG);
-    const METADATA_VALUE = "123456";
-    before(function () {
-      return Q.allSettled(
-        [
-          cloudinary.v2.api.add_metadata_field({
-            external_id: METADATA_EXTERNAL_ID_UPDATE,
-            label: LABEL_INT_1,
-            type: "string",
-          }),
-          cloudinary.v2.api.add_metadata_field({
-            external_id: METADATA_EXTERNAL_ID_UPLOAD,
-            label: LABEL_INT_2,
-            type: "string",
-          }),
-          cloudinary.v2.api.add_metadata_field({
-            external_id: METADATA_EXTERNAL_ID_EXPLICIT,
-            label: LABEL_INT_3,
-            type: "string",
-          }),
-        ]
-      ).finally(function () {});
-    });
-    after(function () {
-      return Q.allSettled(
-        [
-          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_UPDATE),
-          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_UPLOAD),
-          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_EXPLICIT),
-        ]
-      ).finally(function () {});
-    });
-    it("should be updatable with uploader.update_metadata", function () {
-      let publicId;
-      return uploadImage({
-        tags: [TEST_TAG],
-      })
-        .then((result) => {
-          publicId = result.public_id;
-          return cloudinary.v2.uploader.update_metadata({ [METADATA_EXTERNAL_ID_UPDATE]: METADATA_VALUE }, [publicId]);
-        })
-        .then((result) => {
-          expect(result).not.to.be.empty();
-          expect(result.public_ids[0]).to.eql(publicId);
-          return cloudinary.v2.api.resource(publicId);
-        })
-        .then((result) => {
-          expect(result.metadata[METADATA_EXTERNAL_ID_UPDATE]).to.eql(METADATA_VALUE);
-        });
-    });
-    it("should be supported when uploading a resource with metadata", function () {
-      return uploadImage({
-        tags: [TEST_TAG],
-        metadata: { [METADATA_EXTERNAL_ID_UPLOAD]: METADATA_VALUE },
-      }).then((result) => {
-        expect(result).not.to.be.empty();
-        return cloudinary.v2.api.resource(result.public_id);
-      }).then((result) => {
-        expect(result.metadata[METADATA_EXTERNAL_ID_UPLOAD]).to.eql(METADATA_VALUE);
-      });
-    });
-    it("should be supported when calling explicit with metadata", function () {
-      return uploadImage({
-        tags: [TEST_TAG],
-      }).then((result) => {
-        return cloudinary.v2.uploader.explicit(result.public_id, {
-          type: "upload",
-          tags: [TEST_TAG],
-          metadata: { [METADATA_EXTERNAL_ID_EXPLICIT]: METADATA_VALUE },
-        });
-      }).then(function (result) {
-        expect(result).not.to.be.empty();
-        return cloudinary.v2.api.resource(result.public_id);
-      }).then((result) => {
-        expect(result.metadata[METADATA_EXTERNAL_ID_EXPLICIT]).to.eql(METADATA_VALUE);
-      });
-    });
-  });
   it("should support listing by moderation kind and value", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
     return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
@@ -962,20 +875,20 @@ describe("api", function () {
       expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
     }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
   });
-  describe("delete folders", function() {
+  describe("delete folders", function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
-    const folderPath= "test_folder/delete_folder/"+TEST_TAG;
-    before(function(){
+    const folderPath = "test_folder/delete_folder/" + TEST_TAG;
+    before(function () {
       return uploadImage({
         folder: folderPath,
-        tags: UPLOAD_TAGS
-      }).delay(2 * 1000).then(function() {
+        tags: UPLOAD_TAGS,
+      }).delay(2 * 1000).then(function () {
         return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
           .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
             expect(folder).not.to.be(null);
             expect(folder["total_count"]).to.eql(0);
             expect(folder["folders"]).to.be.empty;
-        }));
+          }));
       });
     });
     it('should delete an empty folder', function () {
@@ -983,8 +896,8 @@ describe("api", function () {
       return cloudinary.v2.api.delete_folder(
         folderPath
       ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
-      ).then(()=> expect().fail()
-      ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
+      ).then(() => expect().fail()
+      ).catch(({ error }) => expect(error.message).to.contain("Can't find folder with path"));
     });
   });
   describe('.restore', function () {
