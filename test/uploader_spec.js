@@ -1037,33 +1037,6 @@ describe("uploader", function () {
     });
   });
 
-  describe("sign requests", function () {
-    var configBck2 = void 0;
-    var writeSpy;
-    writeSpy = void 0;
-    beforeEach(function () {
-      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-      configBck2 = cloudinary.config();
-      cloudinary.config({
-        api_key: "1234",
-        api_secret: "",
-      });
-    });
-    afterEach(function () {
-      cloudinary.config(configBck2);
-      writeSpy.restore();
-    });
-    it("should allow a signature and timestamp parameter on uploads", function () {
-      cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        public_id: 'folder/file',
-        version: '1234',
-        timestamp: 1569707219,
-        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
-      });
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
-    });
-  });
   describe("structured metadata fields", function () {
     const metadata_fields = { [METADATA_FIELD_UNIQUE_EXTERNAL_ID]: METADATA_FIELD_VALUE };
     before(function () {
@@ -1135,6 +1108,34 @@ describe("uploader", function () {
           expect(result.public_ids).to.contain(resource_1.public_id);
           expect(result.public_ids).to.contain(resource_2.public_id);
         });
+    });
+  });
+
+  describe("sign requests", function () {
+    var configBck2 = void 0;
+    var writeSpy;
+    writeSpy = void 0;
+    beforeEach(function () {
+      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+      configBck2 = cloudinary.config();
+      cloudinary.config({
+        api_key: "1234",
+        api_secret: "",
+      });
+    });
+    afterEach(function () {
+      cloudinary.config(configBck2);
+      writeSpy.restore();
+    });
+    it("should allow a signature and timestamp parameter on uploads", function () {
+      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        public_id: 'folder/file',
+        version: '1234',
+        timestamp: 1569707219,
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
+      });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
     });
   });
 });
