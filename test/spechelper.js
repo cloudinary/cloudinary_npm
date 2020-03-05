@@ -36,6 +36,7 @@ exports.LARGE_VIDEO = "test/resources/CloudBookStudy-HD.mp4";
 exports.EMPTY_IMAGE = "test/resources/empty.gif";
 exports.RAW_FILE = "test/resources/docx.docx";
 exports.ICON_FILE = "test/resources/favicon.ico";
+exports.VIDEO_URL = "http://res.cloudinary.com/demo/video/upload/dog.mp4";
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
 exports.test_cloudinary_url = function (public_id, options, expected_url, expected_options) {
