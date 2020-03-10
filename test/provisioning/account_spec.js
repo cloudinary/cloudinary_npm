@@ -53,13 +53,11 @@ describe('account API - Provisioning', function () {
 
   after('Destroy the sub account and user that was created', async () => {
     let delRes = await cloudinary.provisioning.account.delete_sub_account(CLOUD_ID);
-    expect(delRes.message).to.eql('ok');
-
-
     let delUserRes = await cloudinary.provisioning.account.delete_user(USER_ID);
-    expect(delUserRes.message).to.eql('ok');
-
     let delGroupRes = await cloudinary.provisioning.account.delete_user_group(GROUP_ID);
+
+    expect(delRes.message).to.eql('ok');
+    expect(delUserRes.message).to.eql('ok');
     expect(delGroupRes.ok).to.eql(true); // notice the different response structure
   });
 
