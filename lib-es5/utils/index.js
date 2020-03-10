@@ -1279,6 +1279,18 @@ function archive_params() {
   };
 }
 
+exports.create_source_tag = function create_source_tag(src, source_type) {
+  var codecs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  var video_type = source_type === 'ogv' ? 'ogg' : source_type;
+  var mime_type = `video/${video_type}`;
+  if (!isEmpty(codecs)) {
+    var codecs_str = isArray(codecs) ? codecs.join(', ') : codecs;
+    mime_type += `; codecs=${codecs_str}`;
+  }
+  return `<source ${utils.html_attrs({ src, type: mime_type })}>`;
+};
+
 function build_explicit_api_params(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
