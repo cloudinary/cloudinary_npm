@@ -60,18 +60,6 @@ describe('account API - Provisioning', function () {
     expect(delGroupRes.ok).to.eql(true); // notice the different response structure
   });
 
-  it('Accepts auth when a new instance of cloudinary is created', async () => {
-    let NEW_NAME = 'This wont be created';
-    let options = {
-      provisioning_api_key: 'abc',
-      provisioning_api_secret: 'abc',
-    };
-
-    await cloudinary.provisioning.account.create_sub_account(CLOUD_ID, NEW_NAME, {}, null, null, options).catch((errRes) => {
-      expect(errRes.error.http_code).to.eql(401);
-    });
-  });
-
   it('Accepts credentials as an argument', async () => {
     let NEW_NAME = 'This wont be created';
     let options = {
