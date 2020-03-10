@@ -51,6 +51,14 @@ const LABEL_INT_1 = 'metadata_label_1_' + TEST_ID;
 const LABEL_INT_2 = 'metadata_label_2_' + TEST_ID;
 const LABEL_INT_3 = 'metadata_label_3_' + TEST_ID;
 
+function wait(ms = 0) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
+
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
     return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
@@ -365,7 +373,7 @@ describe("api", function () {
           tags: UPLOAD_TAGS,
           eager: [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2],
         }),
-      ]).then(() => cloudinary.v2.api.delete_derived_by_transformation(
+      ]).then(wait(2000)).then(() => cloudinary.v2.api.delete_derived_by_transformation(
         [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2]
       )).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_1)
