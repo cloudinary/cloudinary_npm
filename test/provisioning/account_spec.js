@@ -74,7 +74,7 @@ describe('account API - Provisioning', function () {
   });
 
   it('Updates a sub account', async () => {
-    let NEW_NAME = 'new-test-name';
+    let NEW_NAME = CLOUD_NAME_PREFIX + Date.now();
     await cloudinary.provisioning.account.update_sub_account(CLOUD_ID, NEW_NAME);
 
     let subAccRes = await cloudinary.provisioning.account.sub_account(CLOUD_ID);
