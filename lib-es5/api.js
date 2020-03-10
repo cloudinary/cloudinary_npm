@@ -1,142 +1,13 @@
-'use strict';
+"use strict";
 
-var config = require("./config");
-var ensureOption = require('./utils/ensureOption').defaults(config());
-
-var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
 var utils = require("./utils");
+var call_api = require("./api_client/call_api");
 
 var extend = utils.extend,
-    includes = utils.includes,
-    isString = utils.isString,
-    only = utils.only,
-    ensurePresenceOf = utils.ensurePresenceOf;
+    only = utils.only;
 
-
-var querystring = require("querystring");
-
-var Q = require('q');
-
-var api = module.exports;
 
 var TRANSFORMATIONS_URI = "transformations";
-
-function call_api(method, uri, params, callback, options) {
-  var handle_response = void 0,
-      query_params = void 0;
-  ensurePresenceOf({ method, uri });
-  var deferred = Q.defer();
-  var cloudinary = ensureOption(options, "upload_prefix", "https://api.cloudinary.com");
-  var cloud_name = ensureOption(options, "cloud_name");
-  var api_key = ensureOption(options, "api_key");
-  var api_secret = ensureOption(options, "api_secret");
-
-  method = method.toUpperCase();
-  var api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
-  var content_type = 'application/x-www-form-urlencoded';
-  if (options['content_type'] === 'json') {
-    query_params = JSON.stringify(params);
-    content_type = 'application/json';
-  } else {
-    query_params = querystring.stringify(params);
-  }
-  if (method === "GET") {
-    api_url += "?" + query_params;
-  }
-  var request_options = require('url').parse(api_url);
-  request_options = extend(request_options, {
-    method: method,
-    headers: {
-      'Content-Type': content_type,
-      'User-Agent': utils.getUserAgent()
-    },
-    auth: api_key + ":" + api_secret
-  });
-  if (options.agent != null) {
-    request_options.agent = options.agent;
-  }
-  if (method !== "GET") {
-    request_options.headers['Content-Length'] = Buffer.byteLength(query_params);
-  }
-  handle_response = function handle_response(res) {
-    if (includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)) {
-      var buffer = "";
-      var error = false;
-      res.on("data", function (d) {
-        return buffer += d;
-      });
-      res.on("end", function () {
-        var e = void 0,
-            result = void 0;
-        if (error) {
-          return;
-        }
-        try {
-          result = JSON.parse(buffer);
-        } catch (error1) {
-          e = error1;
-          result = {
-            error: {
-              message: "Server return invalid JSON response. Status Code " + res.statusCode
-            }
-          };
-        }
-        if (result["error"]) {
-          result["error"]["http_code"] = res.statusCode;
-        } else {
-          result["rate_limit_allowed"] = parseInt(res.headers["x-featureratelimit-limit"]);
-          result["rate_limit_reset_at"] = new Date(res.headers["x-featureratelimit-reset"]);
-          result["rate_limit_remaining"] = parseInt(res.headers["x-featureratelimit-remaining"]);
-        }
-        if (result.error) {
-          deferred.reject(result);
-        } else {
-          deferred.resolve(result);
-        }
-        return typeof callback === "function" ? callback(result) : void 0;
-      });
-      return res.on("error", function (e) {
-        error = true;
-        var err_obj = {
-          error: {
-            message: e,
-            http_code: res.statusCode
-          }
-        };
-        deferred.reject(err_obj.error);
-        return typeof callback === "function" ? callback(err_obj) : void 0;
-      });
-    } else {
-      var err_obj = {
-        error: {
-          message: "Server returned unexpected status code - " + res.statusCode,
-          http_code: res.statusCode
-        }
-      };
-      deferred.reject(err_obj.error);
-      return typeof callback === "function" ? callback(err_obj) : void 0;
-    }
-  };
-  var request = https.request(request_options, handle_response);
-  request.on("error", function (e) {
-    deferred.reject(e);
-    return typeof callback === "function" ? callback({ error: e }) : void 0;
-  });
-  request.setTimeout(ensureOption(options, "timeout", 60000));
-  if (method !== "GET") {
-    request.write(query_params);
-  }
-  request.end();
-  return deferred.promise;
-}
-
-function transformationString(transformation) {
-  if (isString(transformation)) {
-    return transformation;
-  } else {
-    return utils.generate_transformation_string(extend({}, transformation));
-  }
-}
 
 function deleteResourcesParams(options) {
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -165,12 +36,11 @@ exports.resource_types = function resource_types(callback) {
 exports.resources = function resources(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = options["type"];
+  resource_type = options.resource_type || "image";
+  type = options.type;
   uri = ["resources", resource_type];
   if (type != null) {
     uri.push(type);
@@ -184,10 +54,9 @@ exports.resources = function resources(callback) {
 exports.resources_by_tag = function resources_by_tag(tag, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
@@ -196,10 +65,9 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = void 0,
-      ref = void 0,
       resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "context"];
   params = only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
   params.key = key;
@@ -212,10 +80,9 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
 exports.resources_by_moderation = function resources_by_moderation(kind, status, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "moderations", kind, status];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
@@ -224,13 +91,11 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   params = only(options, "tags", "context", "moderations");
   params["public_ids[]"] = public_ids;
@@ -240,27 +105,23 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
 exports.resource = function resource(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
-  return call_api("get", uri, only(options, "exif", "colors", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
+  return call_api("get", uri, only(options, "exif", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
 };
 
 exports.restore = function restore(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type, "restore"];
   return call_api("post", uri, {
     public_ids: public_ids
@@ -271,13 +132,11 @@ exports.update = function update(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
   params = utils.updateable_resource_params(options);
   if (options.moderation_status != null) {
@@ -289,13 +148,11 @@ exports.update = function update(public_id, callback) {
 exports.delete_resources = function delete_resources(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     "public_ids[]": public_ids
@@ -305,13 +162,11 @@ exports.delete_resources = function delete_resources(public_ids, callback) {
 exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     prefix: prefix
@@ -321,10 +176,9 @@ exports.delete_resources_by_prefix = function delete_resources_by_prefix(prefix,
 exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
   return call_api("delete", uri, deleteResourcesParams(options), callback, options);
 };
@@ -332,14 +186,12 @@ exports.delete_resources_by_tag = function delete_resources_by_tag(tag, callback
 exports.delete_all_resources = function delete_all_resources(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      ref1 = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       type = void 0,
       uri = void 0;
 
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
-  type = (ref1 = options["type"]) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = ["resources", resource_type, type];
   return call_api("delete", uri, deleteResourcesParams(options, {
     all: true
@@ -363,24 +215,23 @@ exports.delete_derived_by_transformation = function delete_derived_by_transforma
       resource_type = void 0,
       type = void 0,
       uri = void 0;
-  resource_type = options["resource_type"] || "image";
-  type = options["type"] || "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   uri = "resources/" + resource_type + "/" + type;
   params = extend({
     "public_ids[]": public_ids
   }, only(options, "invalidate"));
-  params["keep_original"] = true;
-  params["transformations"] = utils.build_eager(transformations);
+  params.keep_original = true;
+  params.transformations = utils.build_eager(transformations);
   return call_api("delete", uri, params, callback, options);
 };
 
 exports.tags = function tags(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var ref = void 0,
-      resource_type = void 0,
+  var resource_type = void 0,
       uri = void 0;
-  resource_type = (ref = options["resource_type"]) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["tags", resource_type];
   return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options);
 };
@@ -392,27 +243,27 @@ exports.transformations = function transformations(callback) {
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.transformation = function transformation(transformation, callback) {
+exports.transformation = function transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = only(options, "next_cursor", "max_results");
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.delete_transformation = function delete_transformation(transformation, callback) {
+exports.delete_transformation = function delete_transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = {};
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   return call_api("delete", TRANSFORMATIONS_URI, params, callback, options);
 };
 
-exports.update_transformation = function update_transformation(transformation, updates, callback) {
+exports.update_transformation = function update_transformation(transformationName, updates, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = only(updates, "allowed_for_strict");
-  params.transformation = utils.build_eager(transformation);
+  params.transformation = utils.build_eager(transformationName);
   if (updates.unsafe_update != null) {
     params.unsafe_update = utils.build_eager(updates.unsafe_update);
   }
@@ -455,7 +306,7 @@ exports.update_upload_preset = function update_upload_preset(name, callback) {
   var params = void 0,
       uri = void 0;
   uri = ["upload_presets", name];
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id"));
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id", "live"));
   return call_api("put", uri, params, callback, options);
 };
 
@@ -465,7 +316,7 @@ exports.create_upload_preset = function create_upload_preset(callback) {
   var params = void 0,
       uri = void 0;
   uri = ["upload_presets"];
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id"));
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id", "live"));
   return call_api("post", uri, params, callback, options);
 };
 
@@ -483,6 +334,14 @@ exports.sub_folders = function sub_folders(path, callback) {
   var uri = void 0;
   uri = ["folders", path];
   return call_api("get", uri, {}, callback, options);
+};
+
+exports.delete_folder = function delete_folder(path, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var uri = void 0;
+  uri = ["folders", path];
+  return call_api("delete", uri, {}, callback, options);
 };
 
 exports.upload_mappings = function upload_mappings(callback) {
@@ -517,7 +376,7 @@ exports.update_upload_mapping = function update_upload_mapping(name, callback) {
 
   var params = void 0;
   params = only(options, "template");
-  params["folder"] = name;
+  params.folder = name;
   return call_api("put", 'upload_mappings', params, callback, options);
 };
 
@@ -526,7 +385,7 @@ exports.create_upload_mapping = function create_upload_mapping(name, callback) {
 
   var params = void 0;
   params = only(options, "template");
-  params["folder"] = name;
+  params.folder = name;
   return call_api("post", 'upload_mappings', params, callback, options);
 };
 
@@ -534,12 +393,11 @@ function publishResource(byKey, value, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = void 0,
-      ref = void 0,
       resource_type = void 0,
       uri = void 0;
   params = only(options, "type", "invalidate", "overwrite");
   params[byKey] = value;
-  resource_type = (ref = options.resource_type) != null ? ref : "image";
+  resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "publish_resources"];
   options = extend({
     resource_type: resource_type
@@ -596,7 +454,7 @@ exports.create_streaming_profile = function create_streaming_profile(name, callb
 
   var params = void 0;
   params = utils.build_streaming_profiles_param(options);
-  params["name"] = name;
+  params.name = name;
   return call_api("post", 'streaming_profiles', params, callback, options);
 };
 
@@ -604,12 +462,10 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
   var params = void 0,
-      ref = void 0,
-      ref1 = void 0,
       resource_type = void 0,
       type = void 0;
-  resource_type = (ref = options.resource_type) != null ? ref : "image";
-  type = (ref1 = options.type) != null ? ref1 : "upload";
+  resource_type = options.resource_type || "image";
+  type = options.type || "upload";
   params = {
     access_mode: access_mode
   };
@@ -620,7 +476,7 @@ function updateResourcesAccessMode(access_mode, by_key, value, callback) {
 exports.search = function search(params, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  options['content_type'] = 'json';
+  options.content_type = 'json';
   return call_api("post", "resources/search", params, callback, options);
 };
 
@@ -640,4 +496,169 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   return updateResourcesAccessMode(access_mode, "public_ids[]", ids, callback, options);
+};
+
+/**
+ * Creates a new metadata field definition
+ *
+ * @see https://cloudinary.com/documentation/admin_api#create_a_metadata_field
+ *
+ * @param {Object}   field    The field to add
+ * @param {Function} callback Callback function
+ * @param {Object}   options  Configuration options
+ *
+ * @return {Object}
+ */
+exports.add_metadata_field = function add_metadata_field(field, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  options.content_type = "json";
+  return call_api("post", ["metadata_fields"], params, callback, options);
+};
+
+/**
+ * Returns a list of all metadata field definitions
+ *
+ * @see https://cloudinary.com/documentation/admin_api#get_metadata_fields
+ *
+ * @param {Function} callback Callback function
+ * @param {Object}   options  Configuration options
+ *
+ * @return {Object}
+ */
+exports.list_metadata_fields = function list_metadata_fields(callback) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return call_api("get", ["metadata_fields"], {}, callback, options);
+};
+
+/**
+ * Deletes a metadata field definition.
+ *
+ * The field should no longer be considered a valid candidate for all other endpoints
+ *
+ * @see https://cloudinary.com/documentation/admin_api#delete_a_metadata_field_by_external_id
+ *
+ * @param {String}   field_external_id  The external id of the field to delete
+ * @param {Function} callback           Callback function
+ * @param {Object}   options            Configuration options
+ *
+ * @return {Object}
+ */
+exports.delete_metadata_field = function delete_metadata_field(field_external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api("delete", ["metadata_fields", field_external_id], {}, callback, options);
+};
+
+/**
+ * Get a metadata field by external id
+ *
+ * @see https://cloudinary.com/documentation/admin_api#get_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id  The ID of the metadata field to retrieve
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
+ *
+ * @return {Object}
+ */
+exports.metadata_field_by_field_id = function metadata_field_by_field_id(external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api("get", ["metadata_fields", external_id], {}, callback, options);
+};
+
+/**
+ * Updates a metadata field by external id
+ *
+ * Updates a metadata field definition (partially, no need to pass the entire object) passed as JSON data.
+ * See {@link https://cloudinary.com/documentation/admin_api#generic_structure_of_a_metadata_field Generic structure of a metadata field} for details.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#update_a_metadata_field_by_external_id
+ *
+ * @param {String}   external_id  The ID of the metadata field to update
+ * @param {Object}   field        Updated values of metadata field
+ * @param {Function} callback     Callback function
+ * @param {Object}   options      Configuration options
+ *
+ * @return {Object}
+ */
+exports.update_metadata_field = function update_metadata_field(external_id, field, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  options.content_type = "json";
+  return call_api("put", ["metadata_fields", external_id], params, callback, options);
+};
+
+/**
+ * Updates a metadata field datasource
+ *
+ * Updates the datasource of a supported field type (currently only enum and set), passed as JSON data. The
+ * update is partial: datasource entries with an existing external_id will be updated and entries with new
+ * external_id’s (or without external_id’s) will be appended.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#update_a_metadata_field_datasource
+ *
+ * @param {String}   field_external_id    The ID of the field to update
+ * @param {Object}   entries_external_id  Updated values for datasource
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.update_metadata_field_datasource = function update_metadata_field_datasource(field_external_id, entries_external_id, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = only(entries_external_id, "values");
+  options.content_type = "json";
+  return call_api("put", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
+};
+
+/**
+ * Deletes entries in a metadata field datasource
+ *
+ * Deletes (blocks) the datasource entries for a specified metadata field definition. Sets the state of the
+ * entries to inactive. This is a soft delete, the entries still exist under the hood and can be activated again
+ * with the restore datasource entries method.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#delete_entries_in_a_metadata_field_datasource
+ *
+ * @param {String}   field_external_id    The ID of the metadata field
+ * @param {Array}    entries_external_id  An array of IDs of datasource entries to delete
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.delete_datasource_entries = function delete_datasource_entries(field_external_id, entries_external_id, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  options.content_type = "json";
+  var params = { external_ids: entries_external_id };
+  return call_api("delete", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
+};
+
+/**
+ * Restores entries in a metadata field datasource
+ *
+ * Restores (unblocks) any previously deleted datasource entries for a specified metadata field definition.
+ * Sets the state of the entries to active.
+ *
+ * @see https://cloudinary.com/documentation/admin_api#restore_entries_in_a_metadata_field_datasource
+ *
+ * @param {String}   field_external_id    The ID of the metadata field
+ * @param {Array}    entries_external_id  An array of IDs of datasource entries to delete
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.restore_metadata_field_datasource = function restore_metadata_field_datasource(field_external_id, entries_external_id, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  options.content_type = "json";
+  var params = { external_ids: entries_external_id };
+  return call_api("post", ["metadata_fields", field_external_id, "datasource_restore"], params, callback, options);
 };

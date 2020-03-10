@@ -6,32 +6,37 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/* eslint-disable class-methods-use-this */
+
 var CACHE = Symbol.for("com.cloudinary.cache");
 var CACHE_ADAPTER = Symbol.for("com.cloudinary.cacheAdapter");
-var utils = require('./utils');
-var ensurePresenceOf = utils.ensurePresenceOf;
+
+var _require = require('./utils'),
+    ensurePresenceOf = _require.ensurePresenceOf,
+    generate_transformation_string = _require.generate_transformation_string;
 
 /**
  * The adapter used to communicate with the underlying cache storage
  */
 
+
 var CacheAdapter = function () {
-  function CacheAdapter(storage) {
+  function CacheAdapter() {
     _classCallCheck(this, CacheAdapter);
   }
 
-  /**
-   * Get a value from the cache
-   * @param {string} publicId
-   * @param {string} type
-   * @param {string} resourceType
-   * @param {string} transformation
-   * @return {*} the value associated with the provided arguments
-   */
-
-
   _createClass(CacheAdapter, [{
     key: "get",
+
+    /**
+     * Get a value from the cache
+     * @param {string} publicId
+     * @param {string} type
+     * @param {string} resourceType
+     * @param {string} transformation
+     * @param {string} format
+     * @return {*} the value associated with the provided arguments
+     */
     value: function get(publicId, type, resourceType, transformation, format) {}
 
     /**
@@ -40,6 +45,7 @@ var CacheAdapter = function () {
      * @param {string} type
      * @param {string} resourceType
      * @param {string} transformation
+     * @param {string} format
      * @param {*} value
      */
 
@@ -98,7 +104,7 @@ var Cache = {
       return undefined;
     }
     ensurePresenceOf({ publicId });
-    var transformation = utils.generate_transformation_string(_extends({}, options));
+    var transformation = generate_transformation_string(_extends({}, options));
     return this.adapter.get(publicId, options.type || 'upload', options.resource_type || 'image', transformation, options.format);
   },
   /**
@@ -113,7 +119,7 @@ var Cache = {
       return undefined;
     }
     ensurePresenceOf({ publicId, value });
-    var transformation = utils.generate_transformation_string(_extends({}, options));
+    var transformation = generate_transformation_string(_extends({}, options));
     return this.adapter.set(publicId, options.type || 'upload', options.resource_type || 'image', transformation, options.format, value);
   },
   /**
@@ -153,7 +159,7 @@ Object.defineProperty(Cache, "adapter", {
 });
 Object.freeze(Cache);
 
-// Instantiate singleton
+// Instantiate the singleton
 var symbols = Object.getOwnPropertySymbols(global);
 if (symbols.indexOf(CACHE) < 0) {
   global[CACHE] = Cache;

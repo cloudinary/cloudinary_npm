@@ -1,109 +1,112 @@
 const expect = require('expect.js');
 const cloudinary = require('../cloudinary');
-const utils = cloudinary.utils;
-const helper = require("./spechelper");
-const sharedExamples = helper.sharedExamples;
-const includeContext = helper.includeContext;
-const extend = require('lodash/extend');
+const { setupCache, sharedExamples, includeContext } = require("./spechelper");
+
+const { extend, isEmpty } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
 const Cache = cloudinary.Cache;
-const srcRegExp = function(name, path) {
+const srcRegExp = function (name, path) {
   return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "\/"));
 };
 
-describe('image helper', function() {
+describe('image helper', function () {
   var commonTrans, commonTransformationStr, customAttributes;
   commonTrans = {
     effect: 'sepia',
     cloud_name: 'test123',
-    client_hints: false
+    client_hints: false,
   };
   commonTransformationStr = 'e_sepia';
   customAttributes = {
     custom_attr1: 'custom_value1',
-    custom_attr2: 'custom_value2'
+    custom_attr2: 'custom_value2',
   };
-  beforeEach(function() {
+  beforeEach(function () {
     cloudinary.config(true); // Reset
     cloudinary.config({
       cloud_name: "test123",
-      api_secret: "1234"
+      api_secret: "1234",
     });
   });
-  it("should generate image", function() {
+  it("should generate image", function () {
     expect(cloudinary.image("hello", {
-      format: "png"
+      format: "png",
     })).to.eql(`<img src='${UPLOAD_PATH}/hello.png' />`);
   });
-  it("should accept scale crop and pass width/height to image tag ", function() {
+  it("should accept scale crop and pass width/height to image tag ", function () {
     expect(cloudinary.image("hello", {
       format: "png",
       crop: 'scale',
       width: 100,
-      height: 100
+      height: 100,
     })).to.eql(`<img src='${UPLOAD_PATH}/c_scale,h_100,w_100/hello.png' height='100' width='100'/>`);
   });
-  it("should add responsive width transformation", function() {
+  it("should add responsive width transformation", function () {
     expect(cloudinary.image("hello", {
       format: "png",
-      responsive_width: true
+      responsive_width: true,
     })).to.eql(`<img class='cld-responsive' data-src='${UPLOAD_PATH}/c_limit,w_auto/hello.png'/>`);
   });
-  it("should support width auto transformation", function() {
+  it("should support width auto transformation", function () {
     expect(cloudinary.image("hello", {
       format: "png",
       width: "auto",
-      crop: "limit"
+      crop: "limit",
     })).to.eql(`<img class='cld-responsive' data-src='${UPLOAD_PATH}/c_limit,w_auto/hello.png'/>`);
   });
-  it("should support dpr auto transformation", function() {
+  it("should support dpr auto transformation", function () {
     expect(cloudinary.image("hello", {
       format: "png",
-      dpr: "auto"
+      dpr: "auto",
     })).to.eql(`<img class='cld-hidpi' data-src='${UPLOAD_PATH}/dpr_auto/hello.png'/>`);
   });
-  it("should support e_art:incognito transformation", function() {
+  it("should support e_art:incognito transformation", function () {
     expect(cloudinary.image("hello", {
       format: "png",
-      effect: "art:incognito"
+      effect: "art:incognito",
     })).to.eql(`<img src='${UPLOAD_PATH}/e_art:incognito/hello.png' />`);
   });
-  it("should not mutate the options argument", function() {
+  it("should not mutate the options argument", function () {
     var options = {
       fetch_format: 'auto',
-      flags: 'progressive'
+      flags: 'progressive',
     };
     cloudinary.image('hello', options);
     expect(options.fetch_format).to.eql('auto');
     expect(options.flags).to.eql('progressive');
   });
-  it("Should consume custom attributes from 'attributes' key", function() {
-    var tag = cloudinary.image('sample.jpg', utils.extend({
-      attributes: customAttributes
+  it("Should consume custom attributes from 'attributes' key", function () {
+    var tag = cloudinary.image('sample.jpg', extend({
+      attributes: customAttributes,
     }, commonTrans));
-    Object.entries(customAttributes).forEach(function([key, value]) {
+    Object.entries(customAttributes).forEach(function ([key, value]) {
       expect(tag).to.contain(`${key}='${value}'`);
     });
   });
-  it("Should consume custom attributes as is from options", function() {
+  it("Should consume custom attributes as is from options", function () {
     var options, tag;
-    options = utils.extend({}, commonTrans, customAttributes);
+    options = extend({}, commonTrans, customAttributes);
     tag = cloudinary.image('sample.jpg', options);
-    Object.entries(customAttributes).forEach(function([key, value]) {
+    Object.entries(customAttributes).forEach(function ([key, value]) {
       expect(tag).to.contain(`${key}='${value}'`);
     });
   });
-  it("Attributes from 'attributes' dict should override existing attributes", function() {
+  it("Attributes from 'attributes' dict should override existing attributes", function () {
     var options, tag;
-    options = utils.extend({}, commonTrans, {
+    options = extend({}, commonTrans, {
       alt: "original alt",
       attributes: {
-        alt: "updated alt"
-      }
+        alt: "updated alt",
+      },
     });
     tag = cloudinary.image('sample.jpg', options);
     expect(tag).to.contain("alt='updated alt'");
+  });
+  it("should escape quotes in html attributes", function() {
+    expect(cloudinary.image("sample.jpg", {
+      alt: "asdfg\"'asdf"
+    })).to.eql(`<img src='${UPLOAD_PATH}/sample.jpg' alt='asdfg&#34;&#39;asdf'/>`);
   });
   sharedExamples("client_hints", function(options) {
     it("should not use data-src or set responsive class", function() {
@@ -113,10 +116,10 @@ describe('image helper', function() {
       expect(tag).not.to.match(/\bdata-src\b/);
       expect(tag).to.match(srcRegExp("src", "c_scale,dpr_auto,w_auto/sample.jpg"));
     });
-    it("should override responsive", function() {
+    it("should override responsive", function () {
       var tag;
       cloudinary.config({
-        responsive: true
+        responsive: true,
       });
       tag = cloudinary.image('sample.jpg', options);
       expect(tag).to.match(/<img.*>/);
@@ -125,101 +128,101 @@ describe('image helper', function() {
       expect(tag).to.match(srcRegExp("src", "c_scale,dpr_auto,w_auto/sample.jpg"));
     });
   });
-  describe(":client_hints", function() {
-    describe("as option", function() {
+  describe(":client_hints", function () {
+    describe("as option", function () {
       includeContext("client_hints", {
         dpr: "auto",
         cloud_name: "test123",
         width: "auto",
         crop: "scale",
-        client_hints: true
+        client_hints: true,
       });
     });
-    describe("as global configuration", function() {
-      beforeEach(function() {
+    describe("as global configuration", function () {
+      beforeEach(function () {
         cloudinary.config().client_hints = true;
       });
       includeContext("client_hints", {
         dpr: "auto",
         cloud_name: "test123",
         width: "auto",
-        crop: "scale"
+        crop: "scale",
       });
     });
-    describe("false", function() {
-      it("should use normal responsive behaviour", function() {
+    describe("false", function () {
+      it("should use normal responsive behaviour", function () {
         var tag;
         cloudinary.config().responsive = true;
         tag = cloudinary.image('sample.jpg', {
           width: "auto",
           crop: "scale",
           cloud_name: "test123",
-          client_hints: false
+          client_hints: false,
         });
         expect(tag).to.match(/<img.*>/);
         expect(tag).to.match(/class=["']cld-responsive["']/);
         expect(tag).to.match(srcRegExp("data-src", "c_scale,w_auto/sample.jpg"));
       });
     });
-    describe("width", function() {
-      it("supports auto width", function() {
+    describe("width", function () {
+      it("supports auto width", function () {
         var tag = cloudinary.image('sample.jpg', {
           crop: "scale",
           dpr: "auto",
           cloud_name: "test123",
           width: "auto:breakpoints",
-          client_hints: true
+          client_hints: true,
         });
         expect(tag).to.match(srcRegExp("src", "c_scale,dpr_auto,w_auto:breakpoints/sample.jpg"));
       });
     });
   });
-  describe("srcset", function() {
+  describe("srcset", function () {
     var lastBreakpoint = 399;
     var breakpoints = [100, 200, 300, lastBreakpoint];
-    before(function() {
-      helper.setupCache();
+    before(function () {
+      setupCache();
     });
-    it("Should create srcset attribute with provided breakpoints", function() {
+    it("Should create srcset attribute with provided breakpoints", function () {
       var expected, tagWithBreakpoints;
-      tagWithBreakpoints = cloudinary.image('sample.jpg', utils.extend({}, commonTrans, {
+      tagWithBreakpoints = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
-          breakpoints: breakpoints
-        }
+          breakpoints: breakpoints,
+        },
       }));
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', breakpoints);
       expect(tagWithBreakpoints).to.eql(expected);
     });
-    it("Support srcset attribute defined by min width max width and max images", function() {
+    it("Support srcset attribute defined by min width max width and max images", function () {
       var tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           min_width: breakpoints[0],
           max_width: lastBreakpoint,
-          max_images: breakpoints.length
-        }
+          max_images: breakpoints.length,
+        },
       }));
       var expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', breakpoints);
       expect(tag).to.eql(expected);
     });
-    it("should support a single srcset image", function() {
+    it("should support a single srcset image", function () {
       var expected, tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           min_width: breakpoints[0],
           max_width: lastBreakpoint,
-          max_images: 1
-        }
+          max_images: 1,
+        },
       }));
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', [lastBreakpoint]);
       expect(tag).to.eql(expected);
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
-          breakpoints: [lastBreakpoint]
-        }
+          breakpoints: [lastBreakpoint],
+        },
       }));
       expect(tag).to.eql(expected);
     });
-    it("Should support custom transformation for srcset items", function() {
+    it("Should support custom transformation for srcset items", function () {
       var expected, tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
@@ -227,142 +230,142 @@ describe('image helper', function() {
           transformation: {
             crop: "crop",
             width: 10,
-            height: 20
-          }
-        }
+            height: 20,
+          },
+        },
       }));
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, 'c_crop,h_20,w_10', breakpoints);
       expect(tag).to.eql(expected);
     });
-    it("Should populate sizes attribute", function() {
+    it("Should populate sizes attribute", function () {
       var expected, expectedSizesAttr, tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         srcset: {
           breakpoints: breakpoints,
-          sizes: true
-        }
+          sizes: true,
+        },
       }));
       expectedSizesAttr = '(max-width: 100px) 100px, (max-width: 200px) 200px, ' + '(max-width: 300px) 300px, (max-width: 399px) 399px';
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', breakpoints, {
-        sizes: expectedSizesAttr
+        sizes: expectedSizesAttr,
       });
       expect(tag).to.eql(expected);
     });
-    it("Should support srcset string value", function() {
+    it("Should support srcset string value", function () {
       var expected, rawSrcSet, tag;
       rawSrcSet = "some srcset data as is";
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
-        srcset: rawSrcSet
+        srcset: rawSrcSet,
       }));
       expected = getExpectedSrcsetTag('sample.jpg', commonTransformationStr, '', [], {
-        srcset: rawSrcSet
+        srcset: rawSrcSet,
       });
       expect(tag).to.eql(expected);
     });
-    it("Should remove width and height attributes in case srcset is specified, but passed to transformation", function() {
+    it("Should remove width and height attributes in case srcset is specified, but passed to transformation", function () {
       var expected, tag;
       tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         width: 500,
-        height: 500
+        height: 500,
       }, {
-        srcset: {breakpoints}
+        srcset: { breakpoints },
       }));
       expected = getExpectedSrcsetTag('sample.jpg', 'e_sepia,h_500,w_500', '', breakpoints);
       expect(tag).to.eql(expected);
     });
-    it("should use cached breakpoints", function() {
+    it("should use cached breakpoints", function () {
       var srcset, tag;
       Cache.set('sample.jpg', {}, BREAKPOINTS);
       tag = cloudinary.image('sample.jpg', {
         srcset: {
-          useCache: true
-        }
+          useCache: true,
+        },
       });
       srcset = tag.match(/srcset=['"]([^"']+)['"]/)[1];
       expect(srcset).to.be.ok();
       srcset = srcset.split(/, /);
       expect(srcset.length).to.be(BREAKPOINTS.length);
-      BREAKPOINTS.forEach(function(bp, i) {
+      BREAKPOINTS.forEach(function (bp, i) {
         expect(srcset[i].slice(-2)).to.eql(`${bp}w`);
       });
     });
-    describe("errors", function() {
+    describe("errors", function () {
       [
         [
           {
-            sizes: true
+            sizes: true,
           },
-          "srcset data not provided"
+          "srcset data not provided",
         ],
         [
           {
             max_width: 300,
-            max_images: 3
+            max_images: 3,
           },
-          "no min_width"
+          "no min_width",
         ],
         [
           {
             min_width: 100,
-            max_images: 3
+            max_images: 3,
           },
-          "no max_width"
+          "no max_width",
         ],
         [
           {
             min_width: 200,
             max_width: 100,
-            max_images: 3
+            max_images: 3,
           },
-          "min_width > max_width"
-        ],
-        [
-          {
-            min_width: 100,
-            max_width: 300
-          },
-          "no max_images"
+          "min_width > max_width",
         ],
         [
           {
             min_width: 100,
             max_width: 300,
-            max_images: 0
           },
-          "invalid max_images"
+          "no max_images",
         ],
         [
           {
             min_width: 100,
             max_width: 300,
-            max_images: -17
+            max_images: 0,
           },
-          "invalid max_images"
+          "invalid max_images",
         ],
         [
           {
             min_width: 100,
             max_width: 300,
-            max_images: null
+            max_images: -17,
           },
-          "invalid max_images"
-        ]
+          "invalid max_images",
+        ],
+        [
+          {
+            min_width: 100,
+            max_width: 300,
+            max_images: null,
+          },
+          "invalid max_images",
+        ],
       ].forEach(([srcset, subject]) => {
-        it("Should throw an exception when " + subject, function() {
-          expect(function() {
-            cloudinary.image('sample.jpg', utils.extend({
-              srcset: srcset
+        it("Should throw an exception when " + subject, function () {
+          expect(function () {
+            cloudinary.image('sample.jpg', extend({
+              srcset: srcset,
             }, commonTrans));
           }).to.throwException();
         });
       });
     });
-    it("Should throw InvalidArgumentException on invalid values", function() {
+    it("Should throw InvalidArgumentException on invalid values", function () {
       let tag = cloudinary.image('sample.jpg', extend({}, commonTrans, {
         width: 500,
-        height: 500
+        height: 500,
       }, {
-        srcset: {breakpoints}
+        srcset: { breakpoints },
       }));
       let expected = getExpectedSrcsetTag('sample.jpg', 'e_sepia,h_500,w_500', '', breakpoints);
       expect(tag).to.eql(expected);
@@ -375,7 +378,7 @@ function getExpectedSrcsetTag(publicId, commonTrans, customTrans, breakpoints, a
   if (!customTrans) {
     customTrans = commonTrans;
   }
-  if (!utils.isEmpty(breakpoints)) {
+  if (!isEmpty(breakpoints)) {
     attributes.srcset = breakpoints.map(width => `${UPLOAD_PATH}/${customTrans}/c_scale,w_${width}/${publicId} ${width}w`).join(', ');
   }
   let tag = `<img src='${UPLOAD_PATH}/${commonTrans}/${publicId}'`;

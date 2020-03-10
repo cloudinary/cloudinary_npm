@@ -12,35 +12,40 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _require = require("./config"),
-    upload_prefix = _require.upload_prefix;
+var fs = require('fs');
+
+var _require = require('path'),
+    extname = _require.extname,
+    basename = _require.basename;
+
+var Q = require('q');
+var Writable = require("stream").Writable;
+var urlLib = require('url');
+
+// eslint-disable-next-line import/order
+
+var _require2 = require("./config"),
+    upload_prefix = _require2.upload_prefix;
 
 var isSecure = !(upload_prefix && upload_prefix.slice(0, 5) === 'http:');
 var https = isSecure ? require('https') : require('http');
 
-var fs = require('fs');
-var path = require('path');
-var Q = require('q');
-var Writable = require("stream").Writable;
-
-var defaultsDeep = require('lodash/defaultsDeep');
-
-var UploadStream = require('./upload_stream');
-var utils = require("./utils");
-var extend = utils.extend,
-    includes = utils.includes,
-    isArray = utils.isArray,
-    isObject = utils.isObject,
-    build_upload_params = utils.build_upload_params;
-
 var Cache = require('./cache');
-var entries = require('./utils/entries');
-var isRemoteUrl = utils.isRemoteUrl;
+var utils = require("./utils");
+var UploadStream = require('./upload_stream');
+
+var build_upload_params = utils.build_upload_params,
+    extend = utils.extend,
+    includes = utils.includes,
+    isObject = utils.isObject,
+    isRemoteUrl = utils.isRemoteUrl,
+    merge = utils.merge;
+
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  return exports.upload_stream(callback, utils.merge(options, {
+  return exports.upload_stream(callback, merge(options, {
     unsigned: true,
     upload_preset: upload_preset
   }));
@@ -57,7 +62,7 @@ exports.upload_stream = function upload_stream(callback) {
 exports.unsigned_upload = function unsigned_upload(file, upload_preset, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  return exports.upload(file, callback, utils.merge(options, {
+  return exports.upload(file, callback, merge(options, {
     unsigned: true,
     upload_preset: upload_preset
   }));
@@ -68,24 +73,23 @@ exports.upload = function upload(file, callback) {
 
   return call_api("upload", callback, options, function () {
     var params = build_upload_params(options);
-    if (file != null && isRemoteUrl(file)) {
-      return [params, { file: file }];
-    } else {
-      return [params, {}, file];
-    }
+    return isRemoteUrl(file) ? [params, { file: file }] : [params, {}, file];
   });
 };
 
 exports.upload_large = function upload_large(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  if (path != null && path.match(/^https?:/)) {
+  if (path != null && isRemoteUrl(path)) {
+    // upload a remote file
     return exports.upload(path, callback, options);
-  } else {
-    return exports.upload_chunked(path, callback, extend({
-      resource_type: 'raw'
-    }, options));
   }
+  if (path != null && !options.filename) {
+    options.filename = path.split(/(\\|\/)/g).pop().replace(/\.[^/.]+$/, "");
+  }
+  return exports.upload_chunked(path, callback, extend({
+    resource_type: 'raw'
+  }, options));
 };
 
 exports.upload_chunked = function upload_chunked(path, callback, options) {
@@ -103,11 +107,11 @@ var Chunkable = function (_Writable) {
     var _this = _possibleConstructorReturn(this, (Chunkable.__proto__ || Object.getPrototypeOf(Chunkable)).call(this, options));
 
     _this.chunk_size = options.chunk_size != null ? options.chunk_size : 20000000;
-    _this.buffer = new Buffer(0);
+    _this.buffer = Buffer.alloc(0);
     _this.active = true;
     _this.on('finish', function () {
       if (_this.active) {
-        return _this.emit('ready', _this.buffer, true, function () {});
+        _this.emit('ready', _this.buffer, true, function () {});
       }
     });
     return _this;
@@ -119,19 +123,19 @@ var Chunkable = function (_Writable) {
       var _this2 = this;
 
       if (!this.active) {
-        return done();
+        done();
       }
       if (this.buffer.length + data.length <= this.chunk_size) {
         this.buffer = Buffer.concat([this.buffer, data], this.buffer.length + data.length);
-        return done();
+        done();
       } else {
         var grab = this.chunk_size - this.buffer.length;
         this.buffer = Buffer.concat([this.buffer, data.slice(0, grab)], this.buffer.length + grab);
-        return this.emit('ready', this.buffer, false, function (active) {
+        this.emit('ready', this.buffer, false, function (active) {
           _this2.active = active;
           if (_this2.active) {
             _this2.buffer = data.slice(grab);
-            return done();
+            done();
           }
         });
       }
@@ -140,8 +144,6 @@ var Chunkable = function (_Writable) {
 
   return Chunkable;
 }(Writable);
-
-;
 
 exports.upload_large_stream = function upload_large_stream(_unused_, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -170,14 +172,11 @@ exports.upload_chunked_stream = function upload_chunked_stream(callback) {
     options.content_range = `bytes ${chunk_start}-${sent - 1}/${is_last ? sent : -1}`;
     params.timestamp = utils.timestamp();
     var finished_part = function finished_part(result) {
-      if (result.error != null || is_last) {
-        if (typeof callback === "function") {
-          callback(result);
-        }
-        return done(false);
-      } else {
-        return done(true);
+      var errorOrLast = result.error != null || is_last;
+      if (errorOrLast && typeof callback === "function") {
+        callback(result);
       }
+      return done(!errorOrLast);
     };
     var stream = call_api("upload", finished_part, options, function () {
       return [params, {}, buffer];
@@ -247,16 +246,16 @@ exports.rename = function rename(from_public_id, to_public_id, callback) {
   });
 };
 
-var TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style", "background", "opacity", "text_decoration"];
+var TEXT_PARAMS = ["public_id", "font_family", "font_size", "font_color", "text_align", "font_weight", "font_style", "background", "opacity", "text_decoration", "font_hinting", "font_antialiasing"];
 
-exports.text = function text(text, callback) {
+exports.text = function text(content, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("text", callback, options, function () {
-    var textParams = utils.only(options, TEXT_PARAMS);
+    var textParams = utils.only.apply(utils, [options].concat(TEXT_PARAMS));
     var params = _extends({
       timestamp: utils.timestamp(),
-      text: text
+      text: content
     }, textParams);
 
     return [params];
@@ -417,7 +416,7 @@ function cacheResults(result, _ref) {
       var transformation = _ref2.transformation,
           url = _ref2.url,
           breakpoints = _ref2.breakpoints;
-      return Cache.set(result.public_id, { type, resource_type, raw_transformation: transformation, format: path.extname(breakpoints[0].url).slice(1) }, breakpoints.map(function (i) {
+      return Cache.set(result.public_id, { type, resource_type, raw_transformation: transformation, format: extname(breakpoints[0].url).slice(1) }, breakpoints.map(function (i) {
         return i.width;
       }));
     });
@@ -428,10 +427,14 @@ function parseResult(buffer, res) {
   var result = '';
   try {
     result = JSON.parse(buffer);
+    if (result.error && !result.error.name) {
+      result.error.name = "Error";
+    }
   } catch (jsonError) {
     result = {
       error: {
-        message: `Server return invalid JSON response. Status Code ${res.statusCode}. ${jsonError}`
+        message: `Server return invalid JSON response. Status Code ${res.statusCode}. ${jsonError}`,
+        name: "Error"
       }
     };
   }
@@ -460,18 +463,19 @@ function call_api(action, callback, options, get_params) {
   var boundary = utils.random_public_id();
   var errorRaised = false;
   var handle_response = function handle_response(res) {
-    // var buffer;
+    // let buffer;
     if (errorRaised) {
 
       // Already reported
     } else if (res.error) {
       errorRaised = true;
       deferred.reject(res);
-      return callback(res);
+      callback(res);
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
       res.on("data", function (d) {
-        return buffer += d;
+        buffer += d;
+        return buffer;
       });
       res.on("end", function () {
         var result = void 0;
@@ -480,53 +484,39 @@ function call_api(action, callback, options, get_params) {
         }
         result = parseResult(buffer, res);
         if (result.error) {
-          result["error"]["http_code"] = res.statusCode;
+          result.error.http_code = res.statusCode;
           deferred.reject(result.error);
         } else {
           cacheResults(result, options);
           deferred.resolve(result);
         }
-        return callback(result);
+        callback(result);
       });
       res.on("error", function (error) {
         errorRaised = true;
         deferred.reject(error);
-        return callback({ error });
+        callback({ error });
       });
     } else {
       var error = {
         message: `Server returned unexpected status code - ${res.statusCode}`,
-        http_code: res.statusCode
+        http_code: res.statusCode,
+        name: "UnexpectedResponse"
       };
       deferred.reject(error);
-      return callback({ error });
+      callback({ error });
     }
   };
-  var post_data = entries(params).reduce(function (entries, _ref3) {
+  var post_data = utils.hashToParameters(params).filter(function (_ref3) {
     var _ref4 = _slicedToArray(_ref3, 2),
         key = _ref4[0],
         value = _ref4[1];
 
-    if (isArray(value)) {
-      key = key.endsWith('[]') ? key : key + '[]';
-      var items = value.map(function (v) {
-        return [key, v];
-      });
-      entries = entries.concat(items);
-    } else {
-      entries.push([key, value]);
-    }
-    return entries;
-  }, []).filter(function (_ref5) {
+    return value != null;
+  }).map(function (_ref5) {
     var _ref6 = _slicedToArray(_ref5, 2),
         key = _ref6[0],
         value = _ref6[1];
-
-    return value != null;
-  }).map(function (_ref7) {
-    var _ref8 = _slicedToArray(_ref7, 2),
-        key = _ref8[0],
-        value = _ref8[1];
 
     return Buffer.from(encodeFieldPart(boundary, key, value), 'utf8');
   });
@@ -534,19 +524,19 @@ function call_api(action, callback, options, get_params) {
   var result = post(api_url, post_data, boundary, file, handle_response, options);
   if (isObject(result)) {
     return result;
-  } else {
-    return deferred.promise;
   }
+  return deferred.promise;
 }
 
 function post(url, post_data, boundary, file, callback, options) {
-  var file_header;
+  var file_header = void 0;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
   if (file != null || options.stream) {
-    var filename = options.stream ? "file" : path.basename(file);
+    // eslint-disable-next-line no-nested-ternary
+    var filename = options.stream ? options.filename ? options.filename : "file" : basename(file);
     file_header = Buffer.from(encodeFilePart(boundary, 'application/octet-stream', 'file', filename), 'binary');
   }
-  var post_options = require('url').parse(url);
+  var post_options = urlLib.parse(url);
   var headers = {
     'Content-Type': `multipart/form-data; boundary=${boundary}`,
     'User-Agent': utils.getUserAgent()
@@ -572,7 +562,8 @@ function post(url, post_data, boundary, file, callback, options) {
     if (timeout) {
       error = {
         message: "Request Timeout",
-        http_code: 499
+        http_code: 499,
+        name: "TimeoutError"
       };
     }
     return callback({ error });
@@ -581,35 +572,14 @@ function post(url, post_data, boundary, file, callback, options) {
     timeout = true;
     return post_request.abort();
   });
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = post_data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var postDatum = _step.value;
-
-      post_request.write(postDatum);
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
-
+  post_data.forEach(function (postDatum) {
+    return post_request.write(postDatum);
+  });
   if (options.stream) {
     post_request.write(file_header);
     return upload_stream;
-  } else if (file != null) {
+  }
+  if (file != null) {
     post_request.write(file_header);
     fs.createReadStream(file).on('error', function (error) {
       callback({
@@ -678,7 +648,7 @@ exports.image_upload_tag = function image_upload_tag(field) {
     "data-form-data": exports.upload_tag_params(options),
     "data-cloudinary-field": field,
     "data-max-chunk-size": options.chunk_size,
-    "class": [html_options["class"], "cloudinary-fileupload"].join(" ")
+    "class": [html_options.class, "cloudinary-fileupload"].join(" ")
   }, html_options);
   return `<input ${utils.html_attrs(tag_options)}/>`;
 };
@@ -686,8 +656,32 @@ exports.image_upload_tag = function image_upload_tag(field) {
 exports.unsigned_image_upload_tag = function unsigned_image_upload_tag(field, upload_preset) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  return exports.image_upload_tag(field, utils.merge(options, {
+  return exports.image_upload_tag(field, merge(options, {
     unsigned: true,
     upload_preset: upload_preset
   }));
+};
+
+/**
+ * Populates metadata fields with the given values. Existing values will be overwritten.
+ *
+ * @param {Object}   metadata   A list of custom metadata fields (by external_id) and the values to assign to each
+ * @param {Array}    public_ids The public IDs of the resources to update
+ * @param {Function} callback   Callback function
+ * @param {Object}   options    Configuration options
+ *
+ * @return {Object}
+ */
+exports.update_metadata = function update_metadata(metadata, public_ids, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  return call_api("metadata", callback, options, function () {
+    var params = {
+      metadata: utils.encode_context(metadata),
+      public_ids: utils.build_array(public_ids),
+      timestamp: utils.timestamp(),
+      type: options.type
+    };
+    return [params];
+  });
 };

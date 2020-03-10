@@ -21,13 +21,13 @@ var FileKeyValueStorage = function () {
   _createClass(FileKeyValueStorage, [{
     key: 'init',
     value: function init(baseFolder) {
-      var _this = this;
-
       if (baseFolder) {
-        fs.access(baseFolder, function (err, result) {
-          if (err) throw err;
-          _this.baseFolder = baseFolder;
-        });
+        try {
+          fs.accessSync(baseFolder);
+          this.baseFolder = baseFolder;
+        } catch (err) {
+          throw err;
+        }
       } else {
         if (!fs.existsSync('test_cache')) {
           fs.mkdirSync('test_cache');
@@ -54,31 +54,12 @@ var FileKeyValueStorage = function () {
   }, {
     key: 'clear',
     value: function clear() {
+      var _this = this;
+
       var files = fs.readdirSync(this.baseFolder);
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var file = _step.value;
-
-          fs.unlinkSync(path.join(this.baseFolder, file));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      files.forEach(function (file) {
+        return fs.unlinkSync(path.join(_this.baseFolder, file));
+      });
     }
   }, {
     key: 'deleteBaseFolder',

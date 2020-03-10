@@ -25,15 +25,15 @@ var UploadStream = function (_Transform) {
   _createClass(UploadStream, [{
     key: "_transform",
     value: function _transform(data, encoding, next) {
-      var buffer = Buffer.isBuffer(data) ? data : new Buffer(data, encoding);
+      var buffer = Buffer.isBuffer(data) ? data : Buffer.from(data, encoding);
       this.push(buffer);
       next();
     }
   }, {
     key: "_flush",
     value: function _flush(next) {
-      this.push(new Buffer("\r\n", 'ascii'));
-      this.push(new Buffer("--" + this.boundary + "--", 'ascii'));
+      this.push(Buffer.from("\r\n", 'ascii'));
+      this.push(Buffer.from("--" + this.boundary + "--", 'ascii'));
       return next();
     }
   }]);

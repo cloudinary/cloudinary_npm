@@ -1,15 +1,15 @@
 "use strict";
 
 /**
- * Returns an ensureOption function that relies on the provided `defaults` argument
+ * Returns an ensureOption function that relies on the provided `defaultOptions` argument
  * for default values.
  * @private
- * @param {object} defaults
+ * @param {object} defaultOptions
  * @return {function(*, *, *=): *}
  */
-function defaults(defaults) {
+function defaults(defaultOptions) {
   return function ensureOption(options, name, defaultValue) {
-    var value = options[name] || defaults[name] || defaultValue;
+    var value = options[name] || defaultOptions[name] || defaultValue;
     if (value === undefined) {
       throw `Must supply ${name}`;
     }
