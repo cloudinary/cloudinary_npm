@@ -623,6 +623,25 @@ describe("uploader", function () {
         });
       });
     });
+    it("should not reach unhandledRejection", function (done) {
+      let fn = () => {
+        expect(true).to.be(false);
+      };
+      process.on('unhandledRejection', fn);
+      fs.stat(RAW_FILE, function (err, stat) {
+        cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
+          chunk_size: 7000,
+          timeout: helper.TIMEOUT_LONG,
+          tags: UPLOAD_TAGS,
+          upload_preset: 'fake_preset',
+        }, () => {
+          process.nextTick(() => {
+            process.off('unhandledRejection', fn);
+            done();
+          });
+        });
+      });
+    });
     it("should use file name", function (done) {
       fs.stat(LARGE_RAW_FILE, function (err, stat) {
         return cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
