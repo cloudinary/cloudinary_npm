@@ -338,7 +338,7 @@ describe("api", function () {
             crop: "scale",
           },
         ],
-      }).then(
+      }).then(wait(2000)).then(
         ({ public_id }) => cloudinary.v2.api.resource(public_id)
           .then(resource => [public_id, resource])
       ).then(([public_id, resource]) => {
