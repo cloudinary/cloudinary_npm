@@ -1,3 +1,25 @@
+1.20.0 / 2020-03-11
+==================
+
+New functionality and features
+------------------------------ 
+  * Add support for sources in video tag (#265)
+  * Add support multiple resource_types in ZIP generation (#348)
+  * Add API support for account/provisioning (#343)
+  * Add filename options (#273)
+  * Add use_filename option (#274)
+  * Support quality_override param for update and explicit api (#242)
+  
+  Other Changes
+  -------------
+  * Refactor out a duplicate test (#353)
+  * Refactor the order of the assertions in account_spec (#352)
+  * Fix type defs for stream upload methods (#336)
+  * Remove typings spec and config from npm package
+  * Add automation to delete the es5-lib dir when npm run compile is run
+  * Move typescript to devDependencies and update version
+  * Refactor out utils functions
+
 1.19.0 / 2020-01-20
 ==================
 
