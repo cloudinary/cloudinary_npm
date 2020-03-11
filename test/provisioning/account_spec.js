@@ -16,7 +16,7 @@ describe('account API - Provisioning', function () {
   let USER_ROLE = 'billing';
   let USER_ID;
   let GROUP_ID;
-  let CLOUD_NAME_PREFIX = 'justaname';
+  let CLOUD_NAME_PREFIX = `justaname${process.hrtime()[1] % 10000}`;
   this.timeout(helper.TIMEOUT_LONG);
 
   before("Setup the required test", async function () {
