@@ -673,13 +673,19 @@ describe("api", function () {
       });
     });
     it("should allow creating upload_presets", function () {
-      return helper.mockPromise(function (xhr, write) {
-        cloudinary.v2.api.create_upload_preset({
+      return helper.mockPromise(async function (xhr, write) {
+        let preset = await cloudinary.v2.api.create_upload_preset({
           folder: "upload_folder",
           unsigned: true,
           tags: UPLOAD_TAGS,
           live: true
         });
+
+        await cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
+          console.log(err);
+          // we don't fail the test if the delete fails
+        });
+
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
       });
