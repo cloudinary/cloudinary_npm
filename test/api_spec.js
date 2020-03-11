@@ -373,7 +373,7 @@ describe("api", function () {
           tags: UPLOAD_TAGS,
           eager: [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2],
         }),
-      ]).then(wait(2000)).then(() => cloudinary.v2.api.delete_derived_by_transformation(
+      ]).then(wait(4000)).then(() => cloudinary.v2.api.delete_derived_by_transformation(
         [PUBLIC_ID_1, PUBLIC_ID_3], [EXPLICIT_TRANSFORMATION, EXPLICIT_TRANSFORMATION2]
       )).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_1)
@@ -677,7 +677,7 @@ describe("api", function () {
         cloudinary.v2.api.create_upload_preset({
           folder: "upload_folder",
           unsigned: true,
-          tags: ['TESTRAYA', ...UPLOAD_TAGS],
+          tags: UPLOAD_TAGS,
           live: true
         }).then((preset) => {
           cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
