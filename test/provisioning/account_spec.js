@@ -25,8 +25,9 @@ describe('account API - Provisioning', function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_ACCOUNT_URL.");
     }
 
+    let CLOUD_TO_CREATE = CLOUD_NAME_PREFIX + Date.now();
     // Create a sub account(sub cloud)
-    let res = await cloudinary.provisioning.account.create_sub_account(CLOUD_NAME_PREFIX + Date.now(), CLOUD_NAME_PREFIX + Date.now(), {}, true).catch((err) => {
+    let res = await cloudinary.provisioning.account.create_sub_account(CLOUD_TO_CREATE, CLOUD_TO_CREATE, {}, true).catch((err) => {
       throw err;
     });
 
