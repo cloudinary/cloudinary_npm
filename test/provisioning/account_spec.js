@@ -16,6 +16,7 @@ describe('account API - Provisioning', function () {
   let USER_ROLE = 'billing';
   let USER_ID;
   let GROUP_ID;
+  let CLOUD_NAME_PREFIX = `justaname${process.hrtime()[1] % 10000}`;
   this.timeout(helper.TIMEOUT_LONG);
 
   before("Setup the required test", async function () {
@@ -24,14 +25,15 @@ describe('account API - Provisioning', function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_ACCOUNT_URL.");
     }
 
+    let CLOUD_TO_CREATE = CLOUD_NAME_PREFIX + Date.now();
     // Create a sub account(sub cloud)
-    let res = await cloudinary.provisioning.account.create_sub_account('jutaname' + Date.now(), 'jutaname' + Date.now(), {}, true).catch((err) => {
+    let res = await cloudinary.provisioning.account.create_sub_account(CLOUD_TO_CREATE, CLOUD_TO_CREATE, {}, true).catch((err) => {
       throw err;
     });
 
     CLOUD_API = res.api_access_keys[0].key;
     CLOUD_SECRET = res.api_access_keys[0].secret;
-    CLOUD_NAME = res.api_access_keys.cloud_name;
+    CLOUD_NAME = res.cloud_name;
     CLOUD_ID = res.id;
 
     let createUser = await cloudinary.provisioning.account.create_user(USER_NAME, USER_EMAIL, USER_ROLE, []).catch((err) => {
@@ -73,7 +75,7 @@ describe('account API - Provisioning', function () {
   });
 
   it('Updates a sub account', async () => {
-    let NEW_NAME = 'new-test-name';
+    let NEW_NAME = CLOUD_NAME_PREFIX + Date.now();
     await cloudinary.provisioning.account.update_sub_account(CLOUD_ID, NEW_NAME);
 
     let subAccRes = await cloudinary.provisioning.account.sub_account(CLOUD_ID);
@@ -88,6 +90,22 @@ describe('account API - Provisioning', function () {
       });
 
       expect(item.id).to.eql(CLOUD_ID);
+    }).catch((err) => {
+      throw err;
+    });
+  });
+
+  it('Get a specific subAccount', async function () {
+    return cloudinary.provisioning.account.sub_accounts(true, [CLOUD_ID]).then((res) => {
+      expect(res.sub_accounts.length).to.eql(1);
+    }).catch((err) => {
+      throw err;
+    });
+  });
+
+  it('Get sub-accounts by prefix', async function () {
+    return cloudinary.provisioning.account.sub_accounts(true, [], CLOUD_NAME_PREFIX).then((res) => {
+      expect(res.sub_accounts.length).to.eql(1);
     }).catch((err) => {
       throw err;
     });
