@@ -315,7 +315,17 @@ describe("api", function () {
           expect(resource.derived).to.have.length(1);
         });
     });
-    describe("derived pagination", function(){
+    it("should send the cinemagraph_analysis to the server", function () {
+      return helper.mockPromise((xhr, writeSpy, requestSpy) => {
+        cloudinary.v2.api.resource(PUBLIC_ID, { cinemagraph_analysis: true });
+        return sinon.assert.calledWith(
+          requestSpy, sinon.match(sinon.match({
+            query: sinon.match('cinemagraph_analysis=true'),
+          }, 'cinemagraph_analysis=true'))
+        );
+      });
+    });
+    describe("derived pagination", function () {
       it("should send the derived_next_cursor to the server", function() {
         return helper.mockPromise((xhr, writeSpy, requestSpy) => {
           cloudinary.v2.api.resource(PUBLIC_ID, {derived_next_cursor: 'aaa'});

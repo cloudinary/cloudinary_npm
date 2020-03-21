@@ -1028,4 +1028,20 @@ describe("uploader", function () {
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
     });
   });
+  
+  describe("cinemagraph_analysis", function () {
+    const mocked = helper.mockTest();
+    it("should support cinemagraph_analysis in upload", function () {
+      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        "cinemagraph_analysis": true,
+      });
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("cinemagraph_analysis", true));
+    });
+    it("should support cinemagraph_analysis in explicit", function () {
+      cloudinary.v2.uploader.explicit("sample", {
+        "cinemagraph_analysis": true,
+      });
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("cinemagraph_analysis", true));
+    });
+  });
 });

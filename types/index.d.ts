@@ -474,6 +474,7 @@ declare module 'cloudinary' {
         pages?: boolean;
         coordinates?: boolean;
         phash?: boolean;
+        cinemagraph_analysis?: boolean;
 
         [futureKey: string]: any;
     }

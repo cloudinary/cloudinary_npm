@@ -288,6 +288,7 @@ function build_upload_params(options) {
     async: utils.as_safe_bool(options.async),
     backup: utils.as_safe_bool(options.backup),
     callback: options.callback,
+    cinemagraph_analysis: utils.as_safe_bool(options.cinemagraph_analysis),
     colors: utils.as_safe_bool(options.colors),
     discard_original_filename: utils.as_safe_bool(options.discard_original_filename),
     eager: utils.build_eager(options.eager),
@@ -580,6 +581,9 @@ function updateable_resource_params(options) {
   }
   if (options.categorization != null) {
     params.categorization = options.categorization;
+  }
+  if (options.cinemagraph_analysis != null) {
+    params.cinemagraph_analysis = options.cinemagraph_analysis;
   }
   if (options.context != null) {
     params.context = utils.encode_context(options.context);
