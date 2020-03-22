@@ -555,6 +555,39 @@ declare module 'cloudinary' {
     class UploadStream extends Transform {
     }
 
+    export interface Delete {
+        message: string;
+        http_code: number;
+    }
+
+    export interface MetadataField {
+        external_id?: string;
+        type?: string;
+        label?: string;
+        mandatory?: boolean;
+        default_value?: number;
+        validation?: object;
+        datasource?: object;
+    }
+
+    export interface MetadataFields {
+        metadata_fields: [
+            {
+                external_id?: string;
+                type?: string;
+                label?: string;
+                mandatory?: boolean;
+                default_value?: number;
+                validation?: object;
+                datasource?: object;
+            }
+        ]
+    }
+
+    export interface datasourceChange {
+        values: Array<object>
+    }
+
     export namespace v2 {
 
         /****************************** Global Utils *************************************/
@@ -774,6 +807,40 @@ declare module 'cloudinary' {
             function usage(callback?: ResponseCallback, options?: AdminApiOptions): Promise<any>;
 
             function usage(options?: AdminApiOptions): Promise<any>;
+
+            /****************************** Structured Metadata API V2 Methods *************************************/
+
+            function add_metadata_field(field: MetadataField, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataField>;
+
+            function add_metadata_field(field: MetadataField, callback?: ResponseCallback): Promise<MetadataField>;
+
+            function list_metadata_fields(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataFields>;
+
+            function list_metadata_fields(options?: AdminApiOptions): Promise<MetadataFields>;
+
+            function delete_metadata_field(field_external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<Delete>;
+
+            function delete_metadata_field(field_external_id: string, callback?: ResponseCallback): Promise<Delete>;
+
+            function metadata_field_by_field_id(external_id:string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataField>;
+
+            function metadata_field_by_field_id(external_id:string, callback?: ResponseCallback): Promise<MetadataField>;
+
+            function update_metadata_field(external_id: string, field: MetadataField, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataField>;
+
+            function update_metadata_field(external_id: string, field: MetadataField, callback?: ResponseCallback): Promise<MetadataField>;
+
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
+
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, callback?: ResponseCallback): Promise<datasourceChange>;
+
+            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
+
+            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<datasourceChange>;
+
+            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
+
+            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<datasourceChange>;
         }
 
         /****************************** Upload API V2 Methods *************************************/
