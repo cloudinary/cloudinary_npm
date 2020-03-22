@@ -77,6 +77,10 @@ function execute_request(method, params, auth, api_url, callback) {
 
         if (result.error) {
           result.error.http_code = res.statusCode;
+        } else {
+          result.rate_limit_allowed = parseInt(res.headers["x-featureratelimit-limit"]);
+          result.rate_limit_reset_at = new Date(res.headers["x-featureratelimit-reset"]);
+          result.rate_limit_remaining = parseInt(res.headers["x-featureratelimit-remaining"]);
         }
 
         if (result.error) {
