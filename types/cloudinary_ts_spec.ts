@@ -433,7 +433,6 @@ cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     {resource_type: 'video'},);
 
-// $ExpectType Promise<Resources>
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"], {
     context: true,
     tags: true,
