@@ -555,6 +555,30 @@ declare module 'cloudinary' {
     class UploadStream extends Transform {
     }
 
+    export interface Resources {
+        resources: [
+            {
+                public_id: string;
+                format: string;
+                version: number;
+                resource_type: string;
+                type: string;
+                placeholder: boolean;
+                created_at: string;
+                bytes: number;
+                width: number;
+                height: number;
+                backup: boolean;
+                access_mode: string;
+                url: string;
+                secure_url: string;
+                tags: Array<string>;
+                context?: object;
+            }
+        ]
+    }
+
+
     export namespace v2 {
 
         /****************************** Global Utils *************************************/
@@ -685,25 +709,25 @@ declare module 'cloudinary' {
 
             function resources(options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
 
-            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions): Promise<any>;
+            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions): Promise<Resources>;
 
-            function resources_by_context(key: string, options?: AdminAndResourceOptions): Promise<any>;
+            function resources_by_context(key: string, options?: AdminAndResourceOptions): Promise<Resources>;
 
-            function resources_by_context(key: string, callback?: ResponseCallback): Promise<any>;
+            function resources_by_context(key: string, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_ids(public_ids: string[], options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_ids(public_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_ids(public_ids: string[], callback?: ResponseCallback): Promise<any>;
+            function resources_by_ids(public_ids: string[] | string, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ResponseCallback): Promise<any>;
+            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_tag(tag: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_tag(tag: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
 
-            function resources_by_tag(tag: string, callback?: ResponseCallback): Promise<any>;
+            function resources_by_tag(tag: string, callback?: ResponseCallback): Promise<Resources>;
 
             function restore(public_ids: string[], options?: AdminApiOptions | { resource_type: ResourceType, type: DeliveryType }, callback?: ResponseCallback): Promise<any>;
 
