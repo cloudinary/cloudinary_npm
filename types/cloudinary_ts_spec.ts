@@ -411,25 +411,25 @@ cloudinary.v2.api.resources(
     }
 );
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_context("mycontextkey", "mycontextvalue",
     {resource_type: 'video'}, function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_context("mycontextkey",
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     {resource_type: 'video'},);
 
@@ -440,26 +440,26 @@ cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"], {
     console.log(result.resources[0].public_id);
 })
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_moderation('webpurify', 'approved',
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_moderation('manual', 'pending',
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_tag("mytag",
     {resource_type: 'raw'},
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<Resources>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_tag("mytag",
     function (error, result) {
         console.log(result, error);

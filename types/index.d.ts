@@ -555,7 +555,7 @@ declare module 'cloudinary' {
     class UploadStream extends Transform {
     }
 
-    export interface Resources {
+    export interface ResourceApiResponse {
         resources: [
             {
                 public_id: string;
@@ -573,7 +573,23 @@ declare module 'cloudinary' {
                 url: string;
                 secure_url: string;
                 tags: Array<string>;
-                context?: object;
+                context: object;
+                next_cursor: string;
+                derived_next_cursor: string;
+                exif: object;
+                image_metadata: object;
+                faces: number[][];
+                quality_analysis: number;
+                colors: string[][];
+                derived: Array<string>;
+                moderation: object;
+                phash: string;
+                predominant: object;
+                coordinates: object;
+                access_control: Array<string>;
+                pages: number;
+
+                [futureKey: string]: any;
             }
         ]
     }
@@ -709,25 +725,25 @@ declare module 'cloudinary' {
 
             function resources(options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
 
-            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions): Promise<Resources>;
+            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions): Promise<ResourceApiResponse>;
 
-            function resources_by_context(key: string, options?: AdminAndResourceOptions): Promise<Resources>;
+            function resources_by_context(key: string, options?: AdminAndResourceOptions): Promise<ResourceApiResponse>;
 
-            function resources_by_context(key: string, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_context(key: string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_ids(public_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_ids(public_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_ids(public_ids: string[] | string, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_ids(public_ids: string[] | string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_tag(tag: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_tag(tag: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_tag(tag: string, callback?: ResponseCallback): Promise<Resources>;
+            function resources_by_tag(tag: string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
             function restore(public_ids: string[], options?: AdminApiOptions | { resource_type: ResourceType, type: DeliveryType }, callback?: ResponseCallback): Promise<any>;
 
