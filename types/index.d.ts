@@ -555,12 +555,12 @@ declare module 'cloudinary' {
     class UploadStream extends Transform {
     }
 
-    export interface Delete {
+    export interface DeleteApiResponse {
         message: string;
         http_code: number;
     }
 
-    export interface MetadataField {
+    export interface MetadataFieldApiOptions {
         external_id?: string;
         type?: string;
         label?: string;
@@ -568,20 +568,24 @@ declare module 'cloudinary' {
         default_value?: number;
         validation?: object;
         datasource?: object;
+
+        [futureKey: string]: any;
+    }
+
+    export interface MetadataFieldApiResponse {
+        external_id: string;
+        type: string;
+        label: string;
+        mandatory: boolean;
+        default_value: number;
+        validation: object;
+        datasource: object;
+
+        [futureKey: string]: any;
     }
 
     export interface MetadataFields {
-        metadata_fields: [
-            {
-                external_id?: string;
-                type?: string;
-                label?: string;
-                mandatory?: boolean;
-                default_value?: number;
-                validation?: object;
-                datasource?: object;
-            }
-        ]
+        metadata_fields: MetadataFieldApiResponse[]
     }
 
     export interface datasourceChange {
@@ -810,25 +814,25 @@ declare module 'cloudinary' {
 
             /****************************** Structured Metadata API V2 Methods *************************************/
 
-            function add_metadata_field(field: MetadataField, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataField>;
+            function add_metadata_field(field: MetadataFieldApiOptions, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function add_metadata_field(field: MetadataField, callback?: ResponseCallback): Promise<MetadataField>;
+            function add_metadata_field(field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
             function list_metadata_fields(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataFields>;
 
             function list_metadata_fields(options?: AdminApiOptions): Promise<MetadataFields>;
 
-            function delete_metadata_field(field_external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<Delete>;
+            function delete_metadata_field(field_external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteApiResponse>;
 
-            function delete_metadata_field(field_external_id: string, callback?: ResponseCallback): Promise<Delete>;
+            function delete_metadata_field(field_external_id: string, callback?: ResponseCallback): Promise<DeleteApiResponse>;
 
-            function metadata_field_by_field_id(external_id:string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataField>;
+            function metadata_field_by_field_id(external_id:string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function metadata_field_by_field_id(external_id:string, callback?: ResponseCallback): Promise<MetadataField>;
+            function metadata_field_by_field_id(external_id:string, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function update_metadata_field(external_id: string, field: MetadataField, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataField>;
+            function update_metadata_field(external_id: string, field: MetadataFieldApiOptions, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function update_metadata_field(external_id: string, field: MetadataField, callback?: ResponseCallback): Promise<MetadataField>;
+            function update_metadata_field(external_id: string, field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
             function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
 
