@@ -550,7 +550,44 @@ declare module 'cloudinary' {
     type TargetArchiveFormat = string | "zip" | "tgz";
 
     // err is kept for backwards compatibility, it currently will always be undefined
-    type ResponseCallback = (callResult: any, err?: any) => any;
+    type ResponseCallback = (err?: any, callResult?: any) => any;
+
+    type UploadResponseCallback = (err?: UploadApiErrorResponse, callResult?: UploadApiResponse) => void;
+
+    export interface UploadApiResponse {
+        public_id: string;
+        version: number;
+        signature: string;
+        width: number;
+        height: number;
+        format: string;
+        resource_type: string;
+        created_at: string;
+        tags: Array<string>;
+        pages: number;
+        bytes: number;
+        type: string;
+        etag: string;
+        placeholder: boolean;
+        url: string;
+        secure_url: string;
+        access_mode: string;
+        original_filename: string;
+        moderation: Array<string>;
+        access_control: Array<string>;
+        context: object;
+        metadata: object;
+
+        [futureKey: string]: any;
+    }
+
+    export interface UploadApiErrorResponse {
+        message: string;
+        name: string;
+        http_code: number;
+
+        [futureKey: string]: any;
+    }
 
     class UploadStream extends Transform {
     }
@@ -847,25 +884,25 @@ declare module 'cloudinary' {
 
             function unsigned_upload_stream(upload_preset: string, callback?: ResponseCallback): UploadStream;
 
-            function upload(file: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload(file: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload(file: string, callback?: ResponseCallback): Promise<any>;
+            function upload(file: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked(path: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked(path: string, callback?: ResponseCallback): Promise<any>;
+            function upload_chunked(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked_stream(options?: UploadApiOptions, callback?: ResponseCallback): UploadStream;
+            function upload_chunked_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_large(path: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload_large(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_large(path: string, callback?: ResponseCallback): Promise<any>;
+            function upload_large(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_stream(options?: UploadApiOptions, callback?: ResponseCallback): UploadStream;
+            function upload_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_stream(callback?: ResponseCallback): UploadStream;
+            function upload_stream(callback?: UploadResponseCallback): UploadStream;
 
-            function upload_tag_params(options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload_tag_params(options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<any>;
 
             function upload_url(options?: ConfigOptions): Promise<any>;
         }

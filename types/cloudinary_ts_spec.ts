@@ -681,13 +681,13 @@ cloudinary.v2.uploader.text("Sample text string",
         font_weight: "bold"
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload("http://www.example.com/sample.jpg",
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
     {
         eager: [
@@ -698,7 +698,7 @@ cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {
         resource_type: "video",
@@ -707,7 +707,7 @@ cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     function (error, result) {console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {resource_type: "video"},
     function (error, result) {
