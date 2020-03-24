@@ -180,44 +180,44 @@ describe("cloudinary", function () {
       })).to.eql(`${upload_path}/g_center,p_a,q_auto:good,r_3,x_1,y_2/test`);
     });
   });
-  describe(":radius", function() {
+  describe(":radius", function () {
     const upload_path = 'http://res.cloudinary.com/test123/image/upload';
-    it("should support a single value", function() {
+    it("should support a single value", function () {
       expect(cloudinary.utils.url("test", {
-        radius: 10
+        radius: 10,
       })).to.eql(`${upload_path}/r_10/test`);
       expect(cloudinary.utils.url("test", {
-        radius: '10'
+        radius: '10',
       })).to.eql(`${upload_path}/r_10/test`);
       expect(cloudinary.utils.url("test", {
         variables: [['$v', 10]],
         radius: '$v',
       })).to.eql(`${upload_path}/$v_10,r_$v/test`);
     });
-    it("should support an array of values", function() {
+    it("should support an array of values", function () {
       expect(cloudinary.utils.url("test", {
-        radius: [10,20,30]
+        radius: [10, 20, 30],
       })).to.eql(`${upload_path}/r_10:20:30/test`);
       expect(cloudinary.utils.url("test", {
         variables: [['$v', 10]],
-        radius: [10,20,'$v'],
+        radius: [10, 20, '$v'],
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v/test`);
       expect(cloudinary.utils.url("test", {
         variables: [['$v', 10]],
-        radius: [10,20,'$v',40],
+        radius: [10, 20, '$v', 40],
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v:40/test`);
-    })
-    it("should support colon separated values", function() {
+    });
+    it("should support colon separated values", function () {
       expect(cloudinary.utils.url("test", {
-        radius: "10:20"
+        radius: "10:20",
       })).to.eql(`${upload_path}/r_10:20/test`);
       expect(cloudinary.utils.url("test", {
         variables: [['$v', 10]],
-        radius: "10:20:$v:40"
+        radius: "10:20:$v:40",
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v:40/test`);
-    })
-  })
-  it("should support named transformation", function() {
+    });
+  });
+  it("should support named transformation", function () {
     var options, result;
     options = {
       transformation: "blip",
@@ -774,6 +774,23 @@ describe("cloudinary", function () {
     expect(options).to.eql({
       responsive: true,
     });
+  });
+  it("should generate urls with a 32 character signature when both sign_url and long_url_signature are true", function () {
+    var options, result;
+    options = {
+      sign_url: true,
+      long_url_signature: true,
+    };
+    result = cloudinary.utils.url("sample.jpg", options);
+    expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--2hbrSMPOjj5BJ4xV7SgFbRDevFaQNUFf--/sample.jpg');
+  });
+  it("should generate urls with a 8 character signature when sign_url is true", function () {
+    var options, result;
+    options = {
+      sign_url: true,
+    };
+    result = cloudinary.utils.url("sample.jpg", options);
+    expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--v2fTPYTu--/sample.jpg');
   });
   describe("getUserAgent", function () {
     var platform = "";

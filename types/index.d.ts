@@ -343,6 +343,7 @@ declare module 'cloudinary' {
         cname?: string;
         shorten?: boolean;
         sign_url?: boolean;
+        long_url_signature?: boolean;
         use_root_path?: boolean;
         auth_token?: object;
         account_id?: string;
