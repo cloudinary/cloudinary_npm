@@ -584,11 +584,11 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
-    export interface MetadataFields {
+    export interface MetadataFieldsApiResponse {
         metadata_fields: MetadataFieldApiResponse[]
     }
 
-    export interface datasourceChange {
+    export interface DatasourceChange {
         values: Array<object>
     }
 
@@ -818,9 +818,9 @@ declare module 'cloudinary' {
 
             function add_metadata_field(field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function list_metadata_fields(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataFields>;
+            function list_metadata_fields(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataFieldsApiResponse>;
 
-            function list_metadata_fields(options?: AdminApiOptions): Promise<MetadataFields>;
+            function list_metadata_fields(options?: AdminApiOptions): Promise<MetadataFieldsApiResponse>;
 
             function delete_metadata_field(field_external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteApiResponse>;
 
@@ -834,17 +834,17 @@ declare module 'cloudinary' {
 
             function update_metadata_field(external_id: string, field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, callback?: ResponseCallback): Promise<datasourceChange>;
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
+            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<datasourceChange>;
+            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<datasourceChange>;
+            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<datasourceChange>;
+            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
         }
 
         /****************************** Upload API V2 Methods *************************************/
