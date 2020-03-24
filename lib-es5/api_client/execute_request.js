@@ -13,10 +13,17 @@ var extend = utils.extend,
     includes = utils.includes;
 
 
+function handleError(callback, result, deferred, error) {
+  if (callback) {
+    callback(result);
+  } else {
+    deferred.reject(error);
+  }
+}
+
 function execute_request(method, params, auth, api_url, callback) {
   var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
 
-  var didUserPassCB = typeof callback === "function";
   method = method.toUpperCase();
   var deferred = Q.defer();
 
@@ -80,14 +87,14 @@ function execute_request(method, params, auth, api_url, callback) {
           result.error.http_code = res.statusCode;
         }
 
-        if (result.error && !didUserPassCB) {
+        if (result.error && !callback) {
           deferred.reject(Object.assign({
             request_options,
             query_params
           }, result));
         }
 
-        if (didUserPassCB) {
+        if (callback) {
           callback(result);
         } else {
           deferred.resolve(result);
@@ -103,11 +110,7 @@ function execute_request(method, params, auth, api_url, callback) {
             query_params
           }
         };
-        if (didUserPassCB) {
-          callback(err_obj);
-        } else {
-          deferred.reject(err_obj.error);
-        }
+        handleError(callback, err_obj, deferred, err_obj.error);
       });
     } else {
       var err_obj = {
@@ -118,11 +121,7 @@ function execute_request(method, params, auth, api_url, callback) {
           query_params
         }
       };
-      if (didUserPassCB) {
-        callback(err_obj);
-      } else {
-        deferred.reject(err_obj.error);
-      }
+      handleError(callback, err_obj, deferred, err_obj.error);
     }
   };
 

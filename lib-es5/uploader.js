@@ -441,8 +441,15 @@ function parseResult(buffer, res) {
   return result;
 }
 
+function handleError(callback, result, deferred, error) {
+  if (callback) {
+    callback(result);
+  } else {
+    deferred.reject(error);
+  }
+}
+
 function call_api(action, callback, options, get_params) {
-  var didUserPassCB = typeof callback === "function";
   var deferred = Q.defer();
   if (options == null) {
     options = {};
@@ -465,11 +472,7 @@ function call_api(action, callback, options, get_params) {
       // Already reported
     } else if (res.error) {
       errorRaised = true;
-      if (didUserPassCB) {
-        callback(res);
-      } else {
-        deferred.reject(res);
-      }
+      handleError(callback, res, deferred, res);
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
       res.on("data", function (d) {
@@ -484,14 +487,10 @@ function call_api(action, callback, options, get_params) {
         result = parseResult(buffer, res);
         if (result.error) {
           result.error.http_code = res.statusCode;
-          if (didUserPassCB) {
-            callback(result);
-          } else {
-            deferred.reject(result.error);
-          }
+          handleError(callback, result, deferred, result.error);
         } else {
           cacheResults(result, options);
-          if (didUserPassCB) {
+          if (callback) {
             callback(result);
           } else {
             deferred.resolve(result);
@@ -500,11 +499,7 @@ function call_api(action, callback, options, get_params) {
       });
       res.on("error", function (error) {
         errorRaised = true;
-        if (didUserPassCB) {
-          callback({ error });
-        } else {
-          deferred.reject(error);
-        }
+        handleError(callback, { error }, deferred, error);
       });
     } else {
       var error = {
@@ -512,11 +507,7 @@ function call_api(action, callback, options, get_params) {
         http_code: res.statusCode,
         name: "UnexpectedResponse"
       };
-      if (didUserPassCB) {
-        callback({ error });
-      } else {
-        deferred.reject(error);
-      }
+      handleError(callback, { error }, deferred, error);
     }
   };
   var post_data = utils.hashToParameters(params).filter(function (_ref3) {

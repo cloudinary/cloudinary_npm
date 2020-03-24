@@ -636,7 +636,7 @@ describe("uploader", function () {
           upload_preset: 'fake_preset',
         }, () => {
           process.nextTick(() => {
-            process.off('unhandledRejection', fn);
+            process.removeListener('unhandledRejection', fn);
             done();
           });
         });

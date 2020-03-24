@@ -994,8 +994,12 @@ describe("api", function () {
       let fn = () => {
         expect(true).to.be(false);
       };
-      process.once('unhandledRejection', fn);
-      cloudinary.api.delete_folder('fake_path');
+      process.on('unhandledRejection', fn);
+      cloudinary.api.delete_folder('fake_path', () => {
+        process.nextTick(() => {
+          process.removeListener('unhandledRejection', fn);
+          done();
+        });
       });
     });
   });
