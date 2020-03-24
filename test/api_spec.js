@@ -208,10 +208,10 @@ describe("api", function () {
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result])
           .then(([public_id, result]) => {
-            let resource = findByAttr(result.resources, "public_id", public_id);
-            expect(resource).to.be.an(Object);
-            expect(resource.type).to.eql("upload");
-          }));
+        let resource = findByAttr(result.resources, "public_id", public_id);
+        expect(resource).to.be.an(Object);
+        expect(resource.type).to.eql("upload");
+      }));
     });
     it("should allow listing resources by prefix", function () {
       this.timeout(helper.TIMEOUT_MEDIUM);
@@ -975,7 +975,7 @@ describe("api", function () {
             expect(folder).not.to.be(null);
             expect(folder["total_count"]).to.eql(0);
             expect(folder["folders"]).to.be.empty;
-          }));
+        }));
       });
     });
     it('should delete an empty folder', function () {
