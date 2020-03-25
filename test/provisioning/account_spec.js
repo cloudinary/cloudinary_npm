@@ -96,6 +96,7 @@ describe('account API - Provisioning', function () {
   });
 
   it('Get a specific sub_account', async function () {
+
     return cloudinary.provisioning.account.sub_accounts(true, [CLOUD_ID]).then((res) => {
       expect(res.sub_accounts.length).to.eql(1);
     }).catch((err) => {
