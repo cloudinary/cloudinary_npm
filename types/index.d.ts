@@ -68,7 +68,6 @@ declare module 'cloudinary' {
         | "blue"
         | "negate"
         | "brightness"
-        | "auto_brightness"
         | "brightness_hsb"
         | "sepia"
         | "grayscale"
@@ -80,10 +79,6 @@ declare module 'cloudinary' {
         | "assist_colorblind"
         | "recolor"
         | "tint"
-        | "contrast"
-        | "auto_contrast"
-        | "auto_color"
-        | "vibrance"
         | "noise"
         | "ordered_dither"
         | "pixelate_faces"
@@ -148,7 +143,6 @@ declare module 'cloudinary' {
         | "clip_evenodd"
         | "cutter"
         | "force_strip"
-        | "force_strip"
         | "getinfo"
         | "ignore_aspect_ratio"
         | "immutable_cache"
@@ -157,7 +151,6 @@ declare module 'cloudinary' {
         | "layer_apply"
         | "lossy"
         | "preserve_transparency"
-        | "png8"
         | "png8"
         | "png32"
         | "progressive"
@@ -550,7 +543,44 @@ declare module 'cloudinary' {
     type TargetArchiveFormat = string | "zip" | "tgz";
 
     // err is kept for backwards compatibility, it currently will always be undefined
-    type ResponseCallback = (callResult: any, err?: any) => any;
+    type ResponseCallback = (err?: any, callResult?: any) => any;
+
+    type UploadResponseCallback = (err?: UploadApiErrorResponse, callResult?: UploadApiResponse) => void;
+
+    export interface UploadApiResponse {
+        public_id: string;
+        version: number;
+        signature: string;
+        width: number;
+        height: number;
+        format: string;
+        resource_type: string;
+        created_at: string;
+        tags: Array<string>;
+        pages: number;
+        bytes: number;
+        type: string;
+        etag: string;
+        placeholder: boolean;
+        url: string;
+        secure_url: string;
+        access_mode: string;
+        original_filename: string;
+        moderation: Array<string>;
+        access_control: Array<string>;
+        context: object;
+        metadata: object;
+
+        [futureKey: string]: any;
+    }
+
+    export interface UploadApiErrorResponse {
+        message: string;
+        name: string;
+        http_code: number;
+
+        [futureKey: string]: any;
+    }
 
     class UploadStream extends Transform {
     }
@@ -591,6 +621,46 @@ declare module 'cloudinary' {
     export interface DatasourceChange {
         values: Array<object>
     }
+
+    export interface ResourceApiResponse {
+        resources: [
+            {
+                public_id: string;
+                format: string;
+                version: number;
+                resource_type: string;
+                type: string;
+                placeholder: boolean;
+                created_at: string;
+                bytes: number;
+                width: number;
+                height: number;
+                backup: boolean;
+                access_mode: string;
+                url: string;
+                secure_url: string;
+                tags: Array<string>;
+                context: object;
+                next_cursor: string;
+                derived_next_cursor: string;
+                exif: object;
+                image_metadata: object;
+                faces: number[][];
+                quality_analysis: number;
+                colors: string[][];
+                derived: Array<string>;
+                moderation: object;
+                phash: string;
+                predominant: object;
+                coordinates: object;
+                access_control: Array<string>;
+                pages: number;
+
+                [futureKey: string]: any;
+            }
+        ]
+    }
+
 
     export namespace v2 {
 
@@ -722,25 +792,25 @@ declare module 'cloudinary' {
 
             function resources(options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
 
-            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions): Promise<any>;
+            function resources_by_context(key: string, value?: string, options?: AdminAndResourceOptions): Promise<ResourceApiResponse>;
 
-            function resources_by_context(key: string, options?: AdminAndResourceOptions): Promise<any>;
+            function resources_by_context(key: string, options?: AdminAndResourceOptions): Promise<ResourceApiResponse>;
 
-            function resources_by_context(key: string, callback?: ResponseCallback): Promise<any>;
+            function resources_by_context(key: string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_ids(public_ids: string[], options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_ids(public_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_ids(public_ids: string[], callback?: ResponseCallback): Promise<any>;
+            function resources_by_ids(public_ids: string[] | string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ResponseCallback): Promise<any>;
+            function resources_by_moderation(moderation: ModerationKind, status: Status, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_tag(tag: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
+            function resources_by_tag(tag: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function resources_by_tag(tag: string, callback?: ResponseCallback): Promise<any>;
+            function resources_by_tag(tag: string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
             function restore(public_ids: string[], options?: AdminApiOptions | { resource_type: ResourceType, type: DeliveryType }, callback?: ResponseCallback): Promise<any>;
 
@@ -918,25 +988,25 @@ declare module 'cloudinary' {
 
             function unsigned_upload_stream(upload_preset: string, callback?: ResponseCallback): UploadStream;
 
-            function upload(file: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload(file: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload(file: string, callback?: ResponseCallback): Promise<any>;
+            function upload(file: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked(path: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked(path: string, callback?: ResponseCallback): Promise<any>;
+            function upload_chunked(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked_stream(options?: UploadApiOptions, callback?: ResponseCallback): UploadStream;
+            function upload_chunked_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_large(path: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload_large(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_large(path: string, callback?: ResponseCallback): Promise<any>;
+            function upload_large(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_stream(options?: UploadApiOptions, callback?: ResponseCallback): UploadStream;
+            function upload_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_stream(callback?: ResponseCallback): UploadStream;
+            function upload_stream(callback?: UploadResponseCallback): UploadStream;
 
-            function upload_tag_params(options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function upload_tag_params(options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<any>;
 
             function upload_url(options?: ConfigOptions): Promise<any>;
         }

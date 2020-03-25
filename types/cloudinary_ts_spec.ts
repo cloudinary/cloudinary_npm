@@ -411,48 +411,55 @@ cloudinary.v2.api.resources(
     }
 );
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_context("mycontextkey", "mycontextvalue",
     {resource_type: 'video'}, function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_context("mycontextkey",
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     {resource_type: 'video'},);
 
-// $ExpectType Promise<any>
+cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"], {
+    context: true,
+    tags: true,
+}).then((result) => {
+    console.log(result.resources[0].public_id);
+})
+
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_moderation('webpurify', 'approved',
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_moderation('manual', 'pending',
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_tag("mytag",
     {resource_type: 'raw'},
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_tag("mytag",
     function (error, result) {
         console.log(result, error);
@@ -717,13 +724,13 @@ cloudinary.v2.uploader.text("Sample text string",
         font_weight: "bold"
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload("http://www.example.com/sample.jpg",
     function (error, result) {
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
     {
         eager: [
@@ -734,7 +741,7 @@ cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
         console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {
         resource_type: "video",
@@ -743,7 +750,7 @@ cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     function (error, result) {console.log(result, error);
     });
 
-// $ExpectType Promise<any>
+// $ExpectType Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {resource_type: "video"},
     function (error, result) {

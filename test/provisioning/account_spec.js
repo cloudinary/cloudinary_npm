@@ -52,7 +52,7 @@ describe('account API - Provisioning', function () {
     return true;
   });
 
-  after('Destroy the sub account and user that was created', async () => {
+  after('Destroy the sub_account and user that was created', async () => {
     let delRes = await cloudinary.provisioning.account.delete_sub_account(CLOUD_ID);
     let delUserRes = await cloudinary.provisioning.account.delete_user(USER_ID);
     let delGroupRes = await cloudinary.provisioning.account.delete_user_group(GROUP_ID);
@@ -74,7 +74,7 @@ describe('account API - Provisioning', function () {
     });
   });
 
-  it('Updates a sub account', async () => {
+  it('Updates a sub_account', async () => {
     let NEW_NAME = CLOUD_NAME_PREFIX + Date.now();
     await cloudinary.provisioning.account.update_sub_account(CLOUD_ID, NEW_NAME);
 
@@ -82,7 +82,7 @@ describe('account API - Provisioning', function () {
     expect(subAccRes.name).to.eql(NEW_NAME);
   });
 
-  it('Get all sub accounts', async function () {
+  it('Get all sub_accounts', async function () {
     return cloudinary.provisioning.account.sub_accounts(true).then((res) => {
       // ensure the cloud we created exists (there might be other clouds there...
       let item = res.sub_accounts.find((subAccount) => {
@@ -95,7 +95,7 @@ describe('account API - Provisioning', function () {
     });
   });
 
-  it('Get a specific subAccount', async function () {
+  it('Get a specific sub_account', async function () {
     return cloudinary.provisioning.account.sub_accounts(true, [CLOUD_ID]).then((res) => {
       expect(res.sub_accounts.length).to.eql(1);
     }).catch((err) => {
@@ -103,7 +103,7 @@ describe('account API - Provisioning', function () {
     });
   });
 
-  it('Get sub-accounts by prefix', async function () {
+  it('Get sub_accounts by prefix', async function () {
     return cloudinary.provisioning.account.sub_accounts(true, [], CLOUD_NAME_PREFIX).then((res) => {
       expect(res.sub_accounts.length).to.eql(1);
     }).catch((err) => {
@@ -111,7 +111,7 @@ describe('account API - Provisioning', function () {
     });
   });
 
-  it('Gets a specific subAccount', async function () {
+  it('Gets a specific sub_account', async function () {
     return cloudinary.provisioning.account.sub_account(CLOUD_ID).then((res) => {
       expect(res.id).to.eql(CLOUD_ID);
     }).catch((err) => {
