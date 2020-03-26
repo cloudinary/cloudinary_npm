@@ -592,6 +592,43 @@ declare module 'cloudinary' {
     class UploadStream extends Transform {
     }
 
+    export interface DeleteApiResponse {
+        message: string;
+        http_code: number;
+    }
+
+    export interface MetadataFieldApiOptions {
+        external_id?: string;
+        type?: string;
+        label?: string;
+        mandatory?: boolean;
+        default_value?: number;
+        validation?: object;
+        datasource?: object;
+
+        [futureKey: string]: any;
+    }
+
+    export interface MetadataFieldApiResponse {
+        external_id: string;
+        type: string;
+        label: string;
+        mandatory: boolean;
+        default_value: number;
+        validation: object;
+        datasource: object;
+
+        [futureKey: string]: any;
+    }
+
+    export interface MetadataFieldsApiResponse {
+        metadata_fields: MetadataFieldApiResponse[]
+    }
+
+    export interface DatasourceChange {
+        values: Array<object>
+    }
+
     export interface ResourceApiResponse {
         resources: [
             {
@@ -851,6 +888,40 @@ declare module 'cloudinary' {
             function usage(callback?: ResponseCallback, options?: AdminApiOptions): Promise<any>;
 
             function usage(options?: AdminApiOptions): Promise<any>;
+
+            /****************************** Structured Metadata API V2 Methods *************************************/
+
+            function add_metadata_field(field: MetadataFieldApiOptions, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function add_metadata_field(field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function list_metadata_fields(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataFieldsApiResponse>;
+
+            function list_metadata_fields(options?: AdminApiOptions): Promise<MetadataFieldsApiResponse>;
+
+            function delete_metadata_field(field_external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteApiResponse>;
+
+            function delete_metadata_field(field_external_id: string, callback?: ResponseCallback): Promise<DeleteApiResponse>;
+
+            function metadata_field_by_field_id(external_id:string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function metadata_field_by_field_id(external_id:string, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function update_metadata_field(external_id: string, field: MetadataFieldApiOptions, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function update_metadata_field(external_id: string, field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            function delete_datasource_entries(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
         }
 
         /****************************** Upload API V2 Methods *************************************/

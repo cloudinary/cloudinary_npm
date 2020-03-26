@@ -568,6 +568,42 @@ cloudinary.v2.api.usage(function (error, result) {
 // $ExpectType Promise<any>
 cloudinary.v2.api.usage({public_id: 'demo'});
 
+cloudinary.v2.api.add_metadata_field({
+    external_id: 'EXTERNAL_ID_GET_LIST',
+    label: 'LABEL_INT_1',
+    type: "integer",
+    default_value: 10,
+}).then((result)=> {
+    console.log(result);
+});
+
+cloudinary.v2.api.list_metadata_fields().then((result)=> {
+    console.log(result.metadata_fields[0].datasource);
+});
+
+cloudinary.v2.api.delete_metadata_field('EXTERNAL_ID_GET_LIST').then((res) => {
+  console.log(res.message)
+}).catch((err)=> {console.log(err)})
+
+cloudinary.v2.api.update_metadata_field('EXTERNAL_ID_GET_LIST',{mandatory: true},
+    function (res) {
+    console.log(res);
+})
+
+const datasource_changes = {
+    values: [
+        { external_id: "color_1", value: "brown" },
+        { external_id: "color_2", value: "black" },
+    ],
+};
+
+cloudinary.v2.api.update_metadata_field_datasource('EXTERNAL_ID_GET_LIST1', datasource_changes)
+    .then((res)=> {console.log(res)})
+    .catch((err)=> {console.log(err)});
+
+cloudinary.v2.api.delete_datasource_entries('EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES', ['size_2'])
+    .then((res)=>{console.log(res)})
+
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.add_context('alt=Animal|class=Mammalia', ['dog', 'lion'],
     function (error, result) {
