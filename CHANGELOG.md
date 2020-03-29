@@ -1,3 +1,20 @@
+1.21.0 / 2020-03-29
+==================
+
+New functionality and features
+------------------------------ 
+  * Add types for Structured Metadata functions (#359)
+  * Added types for upload response callback (#360)
+  * Updated promise types for resources methods (#358)
+
+Other Changes
+-------------
+ * Add  back to responses sent from Admin API (#361)
+ * Align all structured metadata tests with reference implementation (#351)
+ * Improve provisioning api tests (#354)
+ * Refactor in a wait period for eager uploads (#355)
+
+
 1.20.0 / 2020-03-11
 ==================
 
