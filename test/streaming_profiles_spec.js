@@ -51,7 +51,7 @@ describe('Cloudinary::Api', function () {
         expect(result).not.to.be(void 0);
       });
     });
-    it('should create a streaming profile with an array of transformation', function () {
+    it('should create a streaming profile with an array of transformations', function () {
       return api.create_streaming_profile(test_id_1 + 'a', {
         representations: [
           {

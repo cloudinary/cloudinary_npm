@@ -468,6 +468,17 @@ describe("api", function () {
       }).then(result => expect(result.tags).to.be.empty());
     });
   });
+  describe("headers", function () {
+    it("should include rate limits", function () {
+      this.timeout(helper.TIMEOUT_MEDIUM);
+      return cloudinary.v2.api.resources().then(function (result) {
+        expect(result.rate_limit_allowed).to.be.a("number");
+        expect(result.rate_limit_reset_at).to.be.an("object");
+        expect(result.rate_limit_reset_at).to.have.property("getDate");
+        expect(result.rate_limit_remaining).to.be.a("number");
+      });
+    });
+  });
   describe("transformations", function () {
     var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
