@@ -16,7 +16,6 @@ const itBehavesLike = helper.itBehavesLike;
 const TEST_TAG = helper.TEST_TAG;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
-const TEST_ID = Date.now();
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
@@ -44,12 +43,6 @@ const EXPLICIT_TRANSFORMATION2 = {
   crop: "scale",
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
-const METADATA_EXTERNAL_ID_UPLOAD = "metadata_upload_" + TEST_ID;
-const METADATA_EXTERNAL_ID_UPDATE = "metadata_uploader_update_" + TEST_ID;
-const METADATA_EXTERNAL_ID_EXPLICIT = "metadata_explicit_" + TEST_ID;
-const LABEL_INT_1 = 'metadata_label_1_' + TEST_ID;
-const LABEL_INT_2 = 'metadata_label_2_' + TEST_ID;
-const LABEL_INT_3 = 'metadata_label_3_' + TEST_ID;
 
 function wait(ms = 0) {
   return new Promise((resolve) => {
@@ -825,85 +818,6 @@ describe("api", function () {
             writeSpy, sinon.match(arg => helper.apiParamMatcher('access_control', `[${acl_string}]`)(arg))
           );
         });
-      });
-    });
-  });
-  describe("structured metadata fields", function () {
-    this.timeout(helper.TIMEOUT_LONG);
-    const METADATA_VALUE = "123456";
-    before(function () {
-      return Q.allSettled(
-        [
-          cloudinary.v2.api.add_metadata_field({
-            external_id: METADATA_EXTERNAL_ID_UPDATE,
-            label: LABEL_INT_1,
-            type: "string",
-          }),
-          cloudinary.v2.api.add_metadata_field({
-            external_id: METADATA_EXTERNAL_ID_UPLOAD,
-            label: LABEL_INT_2,
-            type: "string",
-          }),
-          cloudinary.v2.api.add_metadata_field({
-            external_id: METADATA_EXTERNAL_ID_EXPLICIT,
-            label: LABEL_INT_3,
-            type: "string",
-          }),
-        ]
-      ).finally(function () {});
-    });
-    after(function () {
-      return Q.allSettled(
-        [
-          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_UPDATE),
-          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_UPLOAD),
-          cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID_EXPLICIT),
-        ]
-      ).finally(function () {});
-    });
-    it("should be updatable with uploader.update_metadata", function () {
-      let publicId;
-      return uploadImage({
-        tags: [TEST_TAG],
-      })
-        .then((result) => {
-          publicId = result.public_id;
-          return cloudinary.v2.uploader.update_metadata({ [METADATA_EXTERNAL_ID_UPDATE]: METADATA_VALUE }, [publicId]);
-        })
-        .then((result) => {
-          expect(result).not.to.be.empty();
-          expect(result.public_ids[0]).to.eql(publicId);
-          return cloudinary.v2.api.resource(publicId);
-        })
-        .then((result) => {
-          expect(result.metadata[METADATA_EXTERNAL_ID_UPDATE]).to.eql(METADATA_VALUE);
-        });
-    });
-    it("should be supported when uploading a resource with metadata", function () {
-      return uploadImage({
-        tags: [TEST_TAG],
-        metadata: { [METADATA_EXTERNAL_ID_UPLOAD]: METADATA_VALUE },
-      }).then((result) => {
-        expect(result).not.to.be.empty();
-        return cloudinary.v2.api.resource(result.public_id);
-      }).then((result) => {
-        expect(result.metadata[METADATA_EXTERNAL_ID_UPLOAD]).to.eql(METADATA_VALUE);
-      });
-    });
-    it("should be supported when calling explicit with metadata", function () {
-      return uploadImage({
-        tags: [TEST_TAG],
-      }).then((result) => {
-        return cloudinary.v2.uploader.explicit(result.public_id, {
-          type: "upload",
-          tags: [TEST_TAG],
-          metadata: { [METADATA_EXTERNAL_ID_EXPLICIT]: METADATA_VALUE },
-        });
-      }).then(function (result) {
-        expect(result).not.to.be.empty();
-        return cloudinary.v2.api.resource(result.public_id);
-      }).then((result) => {
-        expect(result.metadata[METADATA_EXTERNAL_ID_EXPLICIT]).to.eql(METADATA_VALUE);
       });
     });
   });

@@ -23,6 +23,12 @@ const EMPTY_IMAGE = helper.EMPTY_IMAGE;
 const RAW_FILE = helper.RAW_FILE;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
+const TEST_ID = Date.now();
+
+const METADATA_FIELD_UNIQUE_EXTERNAL_ID = 'metadata_field_external_id_' + TEST_ID;
+const METADATA_FIELD_VALUE = 'metadata_field_value_' + TEST_ID;
+const METADATA_SAMPLE_DATA = { metadata_color: "red", metadata_shape: "dodecahedron" };
+const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahedron";
 
 require('jsdom-global')();
 
@@ -61,6 +67,16 @@ describe("uploader", function () {
         version: result.version,
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
+    });
+  });
+  it("should successfully upload with metadata", function () {
+    return helper.mockPromise(function (xhr, write, request) {
+      const metadata_fields = METADATA_SAMPLE_DATA;
+      uploadImage({ metadata: metadata_fields });
+      sinon.assert.calledWith(request, sinon.match({
+        method: sinon.match("POST"),
+      }));
+      sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
   });
   it("should successfully upload url", function () {
@@ -916,6 +932,11 @@ describe("uploader", function () {
         sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('quality_analysis', 1)));
       });
     });
+    it("should support metadata", function () {
+      const metadata_fields = METADATA_SAMPLE_DATA;
+      cloudinary.v2.uploader.explicit("cloudinary", { metadata: metadata_fields });
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
+    });
     it("should support raw_convert", function () {
       cloudinary.v2.uploader.explicit("cloudinary", {
         raw_convert: "google_speech",
@@ -963,6 +984,21 @@ describe("uploader", function () {
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", "auto:best"));
     });
   });
+  describe("update_metadata", function () {
+    it("should update metadata of existing resources", function () {
+      const metadata_fields = { metadata_color: "red", metadata_shape: "" };
+      const public_ids = ["test_id_1", "test_id_2"];
+      return helper.mockPromise(function (xhr, write, request) {
+        cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids);
+        sinon.assert.calledWith(request, sinon.match({
+          method: sinon.match("POST"),
+        }));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("metadata", "metadata_color=red|metadata_shape=")));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[0])));
+        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[1])));
+      });
+    });
+  });
   describe("access_control", function () {
     var acl, acl_string, options, requestSpy, writeSpy;
     writeSpy = void 0;
@@ -998,6 +1034,80 @@ describe("uploader", function () {
         expect(Date.parse(response_acl[0].start)).to.be(Date.parse(acl.start));
         expect(Date.parse(response_acl[0].end)).to.be(Date.parse(acl.end));
       });
+    });
+  });
+
+  describe("structured metadata fields", function () {
+    const metadata_fields = { [METADATA_FIELD_UNIQUE_EXTERNAL_ID]: METADATA_FIELD_VALUE };
+    before(function () {
+      return cloudinary.v2.api.add_metadata_field({
+        external_id: METADATA_FIELD_UNIQUE_EXTERNAL_ID,
+        label: METADATA_FIELD_UNIQUE_EXTERNAL_ID,
+        type: "string",
+      }).finally(function () {});
+    });
+    after(function () {
+      return cloudinary.v2.api.delete_metadata_field(METADATA_FIELD_UNIQUE_EXTERNAL_ID)
+        .finally(function () {});
+    });
+    it("should be set when calling upload with metadata", function () {
+      return uploadImage({
+        tags: UPLOAD_TAGS,
+        metadata: metadata_fields,
+      }).then((result) => {
+        expect(result.metadata[METADATA_FIELD_UNIQUE_EXTERNAL_ID]).to.eql(METADATA_FIELD_VALUE);
+      });
+    });
+    it("should be set when calling explicit with metadata", function () {
+      return uploadImage({
+        tags: UPLOAD_TAGS,
+      })
+        .then(result => cloudinary.v2.uploader.explicit(result.public_id, {
+          type: "upload",
+          metadata: metadata_fields,
+        }))
+        .then((result) => {
+          expect(result.metadata[METADATA_FIELD_UNIQUE_EXTERNAL_ID]).to.eql(METADATA_FIELD_VALUE);
+        });
+    });
+    it("should be updatable with uploader.update_metadata on an existing resource", function () {
+      let publicId;
+      return uploadImage({
+        tags: UPLOAD_TAGS,
+      })
+        .then((result) => {
+          publicId = result.public_id;
+          return cloudinary.v2.uploader.update_metadata(metadata_fields, [publicId]);
+        })
+        .then((result) => {
+          expect(result).not.to.be.empty();
+          expect(result.public_ids.length).to.eql(1);
+          expect(result.public_ids).to.contain(publicId);
+        });
+    });
+    it("should be updatable with uploader.update_metadata on multiple existing resources", function () {
+      let resource_1;
+      let resource_2;
+
+      return Q.allSettled(
+        [
+          uploadImage({
+            tags: UPLOAD_TAGS,
+          }),
+          uploadImage({
+            tags: UPLOAD_TAGS,
+          }),
+        ]
+      ).then(function ([result_1, result_2]) {
+        resource_1 = result_1.value;
+        resource_2 = result_2.value;
+        return cloudinary.v2.uploader.update_metadata(metadata_fields, [resource_1.public_id, resource_2.public_id]);
+      })
+        .then((result) => {
+          expect(result.public_ids.length).to.eql(2);
+          expect(result.public_ids).to.contain(resource_1.public_id);
+          expect(result.public_ids).to.contain(resource_2.public_id);
+        });
     });
   });
 
