@@ -441,7 +441,7 @@ function parseResult(buffer, res) {
   return result;
 }
 
-function handleError(callback, result, deferred, error) {
+function handleUploadAPIError(callback, result, deferred, error) {
   if (callback) {
     callback(result);
   } else {
@@ -472,7 +472,7 @@ function call_api(action, callback, options, get_params) {
       // Already reported
     } else if (res.error) {
       errorRaised = true;
-      handleError(callback, res, deferred, res);
+      handleUploadAPIError(callback, res, deferred, res);
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
       res.on("data", function (d) {
@@ -487,7 +487,7 @@ function call_api(action, callback, options, get_params) {
         result = parseResult(buffer, res);
         if (result.error) {
           result.error.http_code = res.statusCode;
-          handleError(callback, result, deferred, result.error);
+          handleUploadAPIError(callback, result, deferred, result.error);
         } else {
           cacheResults(result, options);
           if (callback) {
@@ -499,7 +499,7 @@ function call_api(action, callback, options, get_params) {
       });
       res.on("error", function (error) {
         errorRaised = true;
-        handleError(callback, { error }, deferred, error);
+        handleUploadAPIError(callback, { error }, deferred, error);
       });
     } else {
       var error = {
@@ -507,7 +507,7 @@ function call_api(action, callback, options, get_params) {
         http_code: res.statusCode,
         name: "UnexpectedResponse"
       };
-      handleError(callback, { error }, deferred, error);
+      handleUploadAPIError(callback, { error }, deferred, error);
     }
   };
   var post_data = utils.hashToParameters(params).filter(function (_ref3) {
