@@ -13,7 +13,7 @@ var extend = utils.extend,
     includes = utils.includes;
 
 
-function handleAccountAPIError(callback, result, deferred, error) {
+function handleRequestError(callback, result, deferred, error) {
   if (callback) {
     callback(result);
   } else {
@@ -110,7 +110,7 @@ function execute_request(method, params, auth, api_url, callback) {
             query_params
           }
         };
-        handleAccountAPIError(callback, err_obj, deferred, err_obj.error);
+        handleRequestError(callback, err_obj, deferred, err_obj.error);
       });
     } else {
       var err_obj = {
@@ -121,7 +121,7 @@ function execute_request(method, params, auth, api_url, callback) {
           query_params
         }
       };
-      handleAccountAPIError(callback, err_obj, deferred, err_obj.error);
+      handleRequestError(callback, err_obj, deferred, err_obj.error);
     }
   };
 
