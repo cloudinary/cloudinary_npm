@@ -336,6 +336,22 @@ exports.sub_folders = function sub_folders(path, callback) {
   return call_api("get", uri, {}, callback, options);
 };
 
+/**
+ * Creates an empty folder
+ *
+ * @param {string}    path      The folder path to create
+ * @param {function}  callback  Callback function
+ * @param {object}    options   Configuration options
+ * @returns {*}
+ */
+exports.create_folder = function create_folder(path, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var uri = void 0;
+  uri = ["folders", path];
+  return call_api("post", uri, {}, callback, options);
+};
+
 exports.delete_folder = function delete_folder(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
