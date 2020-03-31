@@ -138,7 +138,7 @@ function normalize_expression(expression) {
     return expression;
   }
   var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*";
-  var pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  var pattern = "((" + operators + ")(?=[ _])|(?<!\\$)(" + Object.keys(PREDEFINED_VARS).join("|") + "))";
   var replaceRE = new RegExp(pattern, "g");
   expression = expression.replace(replaceRE, function (match) {
     return CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match];
