@@ -137,12 +137,20 @@ function normalize_expression(expression) {
   if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/)) {
     return expression;
   }
+
   var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*";
-  var pattern = "((" + operators + ")(?=[ _])|(?<!\\$)(" + Object.keys(PREDEFINED_VARS).join("|") + "))";
-  var replaceRE = new RegExp(pattern, "g");
-  expression = expression.replace(replaceRE, function (match) {
-    return CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match];
+  var operatorsPattern = "((" + operators + ")(?=[ _]))";
+  var operatorsReplaceRE = new RegExp(operatorsPattern, "g");
+  expression = expression.replace(operatorsReplaceRE, function (match) {
+    return CONDITIONAL_OPERATORS[match];
   });
+
+  var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  var predefinedVarsReplaceRE = new RegExp(predefinedVarsPattern, "g");
+  expression = expression.replace(predefinedVarsReplaceRE, function (match, p1, offset) {
+    return expression[offset - 1] === '$' ? match : PREDEFINED_VARS[match];
+  });
+
   return expression.replace(/[ _]+/g, '_');
 }
 

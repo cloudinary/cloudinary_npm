@@ -1052,7 +1052,7 @@ describe("utils", function () {
         t = cloudinary.utils.generate_transformation_string(options);
         expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
       });
-      it("should not change variable names that are named after keyword", function () {
+      it("should not change variable names even if they look like keywords", function () {
         var options, t;
         options = {
           transformation: [
