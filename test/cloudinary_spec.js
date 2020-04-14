@@ -215,8 +215,8 @@ describe("cloudinary", function () {
         variables: [['$v', 10]],
         radius: "10:20:$v:40"
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v:40/test`);
-    });
-  });
+    })
+  })
   it("should support named transformation", function() {
     var options, result;
     options = {
