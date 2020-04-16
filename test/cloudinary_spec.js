@@ -775,6 +775,23 @@ describe("cloudinary", function () {
       responsive: true,
     });
   });
+  it("should generate urls with a 32 character signature when both sign_url and long_url_signature are true", function () {
+    var options, result;
+    options = {
+      sign_url: true,
+      long_url_signature: true,
+    };
+    result = cloudinary.utils.url("sample.jpg", options);
+    expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--2hbrSMPOjj5BJ4xV7SgFbRDevFaQNUFf--/sample.jpg');
+  });
+  it("should generate urls with a 8 character signature when sign_url is true", function () {
+    var options, result;
+    options = {
+      sign_url: true,
+    };
+    result = cloudinary.utils.url("sample.jpg", options);
+    expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--v2fTPYTu--/sample.jpg');
+  });
   describe("getUserAgent", function () {
     var platform = "";
     before(function () {
