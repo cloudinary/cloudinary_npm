@@ -8,6 +8,7 @@ describe("cloudinary", function () {
       api_key: 'a',
       api_secret: 'b',
       responsive_width_transformation: null,
+      analytics: false,
     });
   });
   it("should use cloud_name from config", function () {

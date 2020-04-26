@@ -26,6 +26,7 @@ describe("Cloudinary::Utils for video", function () {
       cdn_subdomain: false,
       api_key: "1234",
       api_secret: "b",
+      analytics: false,
     });
   });
   root_path = "http://res.cloudinary.com/test123";
@@ -211,6 +212,7 @@ describe("Cloudinary::Utils for video", function () {
     source = "movie_id";
     options = {
       cloud_name: "test123",
+      analytics:false,
     };
     path = utils.video_thumbnail_url(source, options);
     it("should generate a cloudinary URI to the video thumbnail", function () {

@@ -55,6 +55,9 @@ describe("uploader", function () {
   });
   beforeEach(function () {
     cloudinary.config(true);
+    cloudinary.config({
+      analytics: false,
+    });
   });
   it("should successfully upload file", function () {
     this.timeout(helper.TIMEOUT_LONG);

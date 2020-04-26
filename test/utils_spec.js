@@ -33,6 +33,7 @@ describe("utils", function () {
   afterEach(function () {
     cloudinary.config(defaults({
       secure: null,
+      analytics: false,
     }, this.orig));
   });
   beforeEach(function () {
@@ -44,6 +45,7 @@ describe("utils", function () {
       secure: false,
       cname: null,
       cdn_subdomain: false,
+      analytics: false,
     });
     this.orig = clone(this.cfg);
     cloud_name = cloudinary.config("cloud_name");

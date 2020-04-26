@@ -27,6 +27,7 @@ describe('image helper', function () {
     cloudinary.config({
       cloud_name: "test123",
       api_secret: "1234",
+      analytics: false,
     });
   });
   it("should generate image", function () {

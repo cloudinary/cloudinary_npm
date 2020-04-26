@@ -15,6 +15,7 @@ describe("video tag helper", function () {
     cloudinary.config({
       cloud_name: "test123",
       api_secret: "1234",
+      analytics: false,
     });
   });
   it("should generate video tag", function () {

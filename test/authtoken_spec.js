@@ -21,6 +21,7 @@ describe("authToken", function () {
       key: KEY,
       duration: 300,
       start_time: 11111111,
+      analytics: false,
     };
   });
   after(function () {
@@ -39,6 +40,7 @@ describe("authToken", function () {
     beforeEach(function () {
       cloudinary.config({
         private_cdn: true,
+        analytics: false,
       });
     });
     it("should add token if authToken is globally set and signed = true", function () {
