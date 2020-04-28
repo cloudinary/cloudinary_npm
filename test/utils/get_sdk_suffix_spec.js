@@ -1,4 +1,3 @@
-let fs = require('fs');
 let path = require('path');
 const expect = require("expect.js");
 const mock = require('mock-fs');
@@ -11,12 +10,12 @@ describe('Tests for sdk suffix util', function () {
 
   it('creates the correct sdk signature', function () {
     // support x.y.z
-    expect(getSDKSuffix('1.24.0', '12.0.0')).to.equal('MAlhAAM');
+    expect(getSDKSuffix('1.24.0', '12.0.0')).to.equal('MAlhAM');
     // support x.y
     expect(getSDKSuffix('1.24.0', '12.0')).to.equal('MAlhAM');
-    expect(getSDKSuffix('26.21.43', '26.21.43')).to.equal('M0v/0v/');
-    expect(getSDKSuffix('43.21.26', '43.21.26')).to.equal('M//////');
-    expect(getSDKSuffix('0.0.0', '0.0.0')).to.equal('MAAAAAA');
+    expect(getSDKSuffix('26.21.43', '26.21.43')).to.equal('M0v/hO');
+    expect(getSDKSuffix('43.21.26', '43.21.26')).to.equal('M///hf');
+    expect(getSDKSuffix('0.0.0', '0.0.0')).to.equal('MAAAAA');
 
     /*
      * Version 0.0.1 -> 01.00.00 -> 10000
@@ -24,7 +23,7 @@ describe('Tests for sdk suffix util', function () {
      * add padding to 18, split to 3 6's -> 000010 011100 010000
      * ->extract base64 Characters -> padding 000010(C) 011100(c) 010000(Q) (CcQ)
      */
-    expect(getSDKSuffix('0.0.1', '0.0.0')).to.equal('MCcQAAA');
+    expect(getSDKSuffix('0.0.1', '0.0.0')).to.equal('MCcQAA');
 
     /*
      * Version 15.22.1 -> 01.22.15 -> 12215
@@ -32,7 +31,7 @@ describe('Tests for sdk suffix util', function () {
      * add padding to 18, split to 3 6's -> 000010 111110 110111
      * ->extract base64 Characters -> padding 000010(C) 111110(+) 110111(3) (C+3)
      */
-    expect(getSDKSuffix('15.22.1', '15.22.1')).to.equal('MC+3C+3');
+    expect(getSDKSuffix('15.22.1', '15.22.1')).to.equal('MC+3in');
   });
 
   it('reads correctly from process.versions if default is passed (Mocked)', () => {
@@ -43,7 +42,7 @@ describe('Tests for sdk suffix util', function () {
       node: '1.24.0',
     };
 
-    expect(getSDKSuffix('0.0.0')).to.equal('MAAAAlh');
+    expect(getSDKSuffix('0.0.0')).to.equal('MAAAlh');
     process.versions = processVersions;
   });
 
@@ -53,7 +52,7 @@ describe('Tests for sdk suffix util', function () {
       [file]: '{"version":"1.24.0"}',
     });
 
-    expect(getSDKSuffix('default', '0.0.0')).to.equal('MAlhAAA');
+    expect(getSDKSuffix('default', '0.0.0')).to.equal('MAlhAA');
     mock.restore();
   });
 
@@ -70,7 +69,7 @@ describe('Tests for sdk suffix util', function () {
       node: '1.24.0',
     };
 
-    expect(getSDKSuffix()).to.equal('MAlhAlh');
+    expect(getSDKSuffix()).to.equal('MAlhlh');
     process.versions = processVersions;
     mock.restore();
   });
