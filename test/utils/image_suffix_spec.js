@@ -31,7 +31,7 @@ describe('Tests for sdk suffix through image tag', function () {
       format: "png",
     });
 
-    expect(getSDKSuffix()).to.equal('MAlhAM'); // value is mocked through package.json and process.version
-    expect(imgStr).to.contain("src='http://res.cloudinary.com/sdk-test/image/upload/hello.png?a=MAlhAM'");
+    expect(getSDKSuffix()).to.equal('MAlhAM0'); // value is mocked through package.json and process.version
+    expect(imgStr).to.contain("src='http://res.cloudinary.com/sdk-test/image/upload/hello.png?a=MAlhAMA'");
   });
 });
