@@ -51,7 +51,7 @@
   "types": "types",
   "scripts": {
     "test": "tools/scripts/test.sh",
-    "test-with-temp-cloud": "./tools/scripts/tests-with-temp-cloud.sh",
+    "test-with-temp-cloud": "tools/scripts/tests-with-temp-cloud.sh",
     "dtslint": "tools/scripts/ditslint.sh",
     "lint": "eslint .",
     "compile": "tools/scripts/compile.sh",
