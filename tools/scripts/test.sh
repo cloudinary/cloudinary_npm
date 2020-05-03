@@ -1,6 +1,9 @@
 #!/bin/bash
-set -e node_v=$(node --version)
-if [[ "${node_v%%.*z}" == 'v4' || "${node_v%%.*z}" == 'v6' ]]
+set -e;
+
+node_v=$(node --version) ;
+
+if [[ "${node_v%%.*}" == 'v4' || "${node_v%%.*}" == 'v6' ]]
 then
   npm run test-es5
 else
