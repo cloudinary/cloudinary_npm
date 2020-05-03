@@ -447,7 +447,7 @@ describe("utils", function () {
       }, `http://res.cloudinary.com/${cloud_name}/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M`, {});
     });
   });
-  describe('transformation parameters', function () {
+  describe.skip('transformation parameters', function () {
     describe("gravity", function () {
       it("should support auto", function () {
         test_cloudinary_url("test", {

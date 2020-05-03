@@ -22,7 +22,8 @@ describe('account API - Provisioning', function () {
   before("Setup the required test", async function () {
     let config = cloudinary.config(true);
     if (!(config.provisioning_api_key && config.provisioning_api_secret && config.account_id)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_ACCOUNT_URL.");
+      // For external PRs the env variables are not availble, so we skip the provisioning API
+      this.skip();
     }
 
     let CLOUD_TO_CREATE = CLOUD_NAME_PREFIX + Date.now();
@@ -53,6 +54,12 @@ describe('account API - Provisioning', function () {
   });
 
   after('Destroy the sub_account and user that was created', async () => {
+    // Skip 'after' in case we don't have account configuration available
+    // This means that the beforeHook also didn't run
+    let config = cloudinary.config(true);
+    if (!(config.provisioning_api_key && config.provisioning_api_secret && config.account_id)) {
+      return;
+    }
     let delRes = await cloudinary.provisioning.account.delete_sub_account(CLOUD_ID);
     let delUserRes = await cloudinary.provisioning.account.delete_user(USER_ID);
     let delGroupRes = await cloudinary.provisioning.account.delete_user_group(GROUP_ID);

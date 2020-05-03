@@ -1,4 +1,3 @@
-
 require('dotenv').load({
   silent: true,
 });
@@ -743,7 +742,7 @@ describe("api", function () {
         });
       });
     });
-    describe("quality override", function() {
+    describe.skip("quality override", function() {
       const mocked = helper.mockTest();
       const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
       qualityValues.forEach(quality => {
@@ -753,7 +752,7 @@ describe("api", function () {
         });
       });
     });
-    it("should support setting manual moderation status", () => {
+    it.skip("should support setting manual moderation status", () => {
       this.timeout(helper.TIMEOUT_LONG);
       return uploadImage({
         moderation: "manual",
@@ -852,7 +851,7 @@ describe("api", function () {
   });
   // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   // Replace `it` with  `it.skip` below if you want to disable it.
-  it("should list folders in cloudinary", function () {
+  it.skip("should list folders in cloudinary", function () {
     this.timeout(helper.TIMEOUT_LONG);
     return Q.all([
       uploadImage({
@@ -1058,7 +1057,7 @@ describe("api", function () {
       });
     });
   });
-  describe("access_mode", function () {
+  describe.skip("access_mode", function () {
     var access_mode_tag, i, publicId;
     i = 0;
     this.timeout(helper.TIMEOUT_LONG);
