@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e node_v=$(node --version)
 if [[ "${node_v%%.*z}" == 'v4' || "${node_v%%.*z}" == 'v6' ]]
 then
