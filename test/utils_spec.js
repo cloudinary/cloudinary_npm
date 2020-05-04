@@ -8,6 +8,7 @@ const os = require('os');
 const defaults = require('lodash/defaults');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
@@ -51,7 +52,7 @@ describe("utils", function () {
   });
   sharedExamples("a signed url", function (specific_options = {}, specific_transformation = "") {
     var authenticated_image, authenticated_path, expected_transformation, options;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     expected_transformation = ((specific_transformation.blank != null) || specific_transformation.match(/\/$/)) ? specific_transformation : `${specific_transformation}/`;
     authenticated_path = '';
     authenticated_image = {};
