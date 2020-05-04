@@ -1,9 +1,9 @@
 const expect = require("expect.js");
 const fs = require('fs');
 const path = require('path');
-const helper = require("../spechelper");
+const helper = require("../../spechelper");
 
-const FileKeyValueStorage = require("../../" + helper.libPath + "/cache/FileKeyValueStorage");
+const FileKeyValueStorage = require("../../../" + helper.libPath + "/cache/FileKeyValueStorage");
 
 const KEY = "test_key";
 const VALUE = "test_value";

@@ -1,6 +1,6 @@
 const expect = require('expect.js');
-const cloudinary = require('../cloudinary');
-const { setupCache, sharedExamples, includeContext } = require("./spechelper");
+const cloudinary = require('../../../cloudinary');
+const { setupCache, sharedExamples, includeContext } = require("../../spechelper");
 
 const { extend, isEmpty } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];

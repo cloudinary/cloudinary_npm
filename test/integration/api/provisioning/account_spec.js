@@ -3,8 +3,8 @@ require('dotenv').load({
 });
 
 const expect = require("expect.js");
-const cloudinary = require("../../cloudinary");
-const helper = require("../spechelper");
+const cloudinary = require("../../../../cloudinary");
+const helper = require("../../../spechelper");
 
 describe('account API - Provisioning', function () {
   let CLOUD_SECRET;
