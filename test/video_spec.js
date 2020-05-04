@@ -6,17 +6,18 @@ cloudinary = require('../cloudinary');
 
 helper = require("./spechelper");
 
+const createTestConfig = require('./testUtils/createTestConfig');
+
 describe("video tag helper", function () {
   var DEFAULT_UPLOAD_PATH, VIDEO_UPLOAD_PATH;
   VIDEO_UPLOAD_PATH = "http://res.cloudinary.com/test123/video/upload/";
   DEFAULT_UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload/";
   beforeEach(function () {
     cloudinary.config(true); // Reset
-    cloudinary.config({
+    cloudinary.config(createTestConfig({
       cloud_name: "test123",
       api_secret: "1234",
-      analytics: false,
-    });
+    }));
   });
   it("should generate video tag", function () {
     var expected_url = VIDEO_UPLOAD_PATH + "movie";

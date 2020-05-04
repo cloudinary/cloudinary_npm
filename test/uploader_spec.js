@@ -29,6 +29,7 @@ const METADATA_FIELD_UNIQUE_EXTERNAL_ID = 'metadata_field_external_id_' + TEST_I
 const METADATA_FIELD_VALUE = 'metadata_field_value_' + TEST_ID;
 const METADATA_SAMPLE_DATA = { metadata_color: "red", metadata_shape: "dodecahedron" };
 const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahedron";
+const createTestConfig = require('./testUtils/createTestConfig');
 
 require('jsdom-global')();
 
@@ -55,9 +56,7 @@ describe("uploader", function () {
   });
   beforeEach(function () {
     cloudinary.config(true);
-    cloudinary.config({
-      analytics: false,
-    });
+    cloudinary.config(createTestConfig());
   });
   it("should successfully upload file", function () {
     this.timeout(helper.TIMEOUT_LONG);

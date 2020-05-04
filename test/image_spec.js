@@ -10,6 +10,8 @@ const srcRegExp = function (name, path) {
   return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "\/"));
 };
 
+const createTestConfig = require('./testUtils/createTestConfig');
+
 describe('image helper', function () {
   var commonTrans, commonTransformationStr, customAttributes;
   commonTrans = {
@@ -24,11 +26,10 @@ describe('image helper', function () {
   };
   beforeEach(function () {
     cloudinary.config(true); // Reset
-    cloudinary.config({
+    cloudinary.config(createTestConfig({
       cloud_name: "test123",
       api_secret: "1234",
-      analytics: false,
-    });
+    }));
   });
   it("should generate image", function () {
     expect(cloudinary.image("hello", {

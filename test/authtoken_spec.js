@@ -8,6 +8,7 @@ const cloudinary = require("../cloudinary.js");
 const utils = cloudinary.utils;
 const KEY = "00112233FF99";
 const ALT_KEY = "CCBB2233FF00";
+const createTestConfig = require('./testUtils/createTestConfig');
 
 describe("authToken", function () {
   var urlBackup = null;
@@ -21,7 +22,6 @@ describe("authToken", function () {
       key: KEY,
       duration: 300,
       start_time: 11111111,
-      analytics: false,
     };
   });
   after(function () {
@@ -38,10 +38,9 @@ describe("authToken", function () {
   });
   describe("authenticated url", function () {
     beforeEach(function () {
-      cloudinary.config({
+      cloudinary.config(createTestConfig({
         private_cdn: true,
-        analytics: false,
-      });
+      }));
     });
     it("should add token if authToken is globally set and signed = true", function () {
       let url = cloudinary.url("sample.jpg", {
