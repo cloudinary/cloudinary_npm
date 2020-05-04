@@ -13,7 +13,6 @@ describe('Tests for sdk suffix util', function () {
     expect(getSDKSuffix({}, '1.24.0', '12.0.0')).to.equal('MAlhAM0');
     // support x.y
     expect(getSDKSuffix({}, '1.24.0', '12.0')).to.equal('MAlhAM0');
-    expect(getSDKSuffix({}, '26.21.43', '26.21.43')).to.equal('M0v/hO0');
     expect(getSDKSuffix({}, '43.21.26', '43.21.26')).to.equal('M///hf0');
     expect(getSDKSuffix({}, '0.0.0', '0.0.0')).to.equal('MAAAAA0');
 
@@ -56,6 +55,11 @@ describe('Tests for sdk suffix util', function () {
 
     expect(getSDKSuffix({}, 'default', '0.0.0')).to.equal('MAlhAA0');
     mock.restore();
+  });
+
+  it('Handles invalid arguments gracefully', () => {
+    expect(getSDKSuffix({}, 'abcdefg', 'abcdefg')).to.equal('E');
+    expect(getSDKSuffix({}, '43.21.200', '43.21.26')).to.equal('E');
   });
 
   it('Reads from process.versions and package.json (Mocked)', () => {
