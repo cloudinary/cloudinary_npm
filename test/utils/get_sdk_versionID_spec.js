@@ -32,7 +32,7 @@ describe('Tests for sdk versionID util', function () {
      */
     expect(getSDKVersionID({}, '15.22.1', '15.22.1')).to.equal('MC+3in0');
 
-    expect(getSDKVersionID({ isResponsive: true }, '15.22.1', '15.22.1')).to.equal('MC+3inA');
+    expect(getSDKVersionID({ responsive: true }, '15.22.1', '15.22.1')).to.equal('MC+3inA');
   });
 
   it('reads correctly from process.versions if default is passed (Mocked)', () => {
