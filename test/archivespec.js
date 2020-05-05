@@ -88,6 +88,7 @@ describe("archive", function () {
           target_tags: ARCHIVE_TAG,
           expires_at: Date.now() / 1000 + 60, // expiration after 60 seconds
         });
+        console.log(this.archive_result)
       });
       describe('public_ids', function () {
         it('should generate a valid url', function () {
@@ -170,6 +171,34 @@ describe("archive", function () {
           expect(result.file_count).to.eql(2);
         });
       });
+    });
+  });
+
+  describe("download_backedup_resource", function () {
+    uploader.upload(IMAGE_URL,
+      {
+        public_id: PUBLIC_ID1,
+        backup: true,
+      }).then((uploadResponse) => {
+      expect(uploadResponse).not.to.be(null);
+    });
+    it("should return backedup resource url", function () {
+
+      return api.resource(PUBLIC_ID1, { versions: true })
+        .then((resource)=> {
+          console.log(resource)
+          return utils.download_backedup_resource({
+            asset_id: PUBLIC_ID1,
+            version_id: resource.versions[0].version_id,
+          });
+        }).then((res) => {console.log(res)})
+      // return utils.download_backedup_resource({
+      //   asset_id:
+      // })
+      //   .then((resource) => {
+      //     expect(resource.versions).not.to.be(undefined);
+      //     expect(resource.versions).to.be.an('array');
+      //   });
     });
   });
 });
