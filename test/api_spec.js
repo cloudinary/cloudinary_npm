@@ -17,6 +17,7 @@ const TEST_TAG = helper.TEST_TAG;
 const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
 const SUFFIX = helper.SUFFIX;
+const WAIT_TIME = 3000;
 const PUBLIC_ID_PREFIX = "npm_api_test";
 const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
 const PUBLIC_ID_1 = PUBLIC_ID + "_1";
@@ -25,6 +26,8 @@ const PUBLIC_ID_3 = PUBLIC_ID + "_3";
 const PUBLIC_ID_4 = PUBLIC_ID + "_4";
 const PUBLIC_ID_5 = PUBLIC_ID + "_5";
 const PUBLIC_ID_6 = PUBLIC_ID + "_6";
+const PUBLIC_ID_7 = PUBLIC_ID + "backup_7";
+const PUBLIC_ID_8 = PUBLIC_ID + "backup_8";
 const NAMED_TRANSFORMATION = "npm_api_test_transformation_" + SUFFIX;
 const NAMED_TRANSFORMATION2 = "npm_api_test_transformation_2_" + SUFFIX;
 const API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX;
@@ -318,6 +321,36 @@ describe("api", function () {
             }, 'derived_next_cursor=aaa')));
         });
       });
+    });
+  });
+  describe("backup", function () {
+    this.timeout(helper.TIMEOUT_MEDIUM);
+
+    const publicId = "api_test_backup_restore" + SUFFIX;
+    before(() => uploadImage({
+      public_id: publicId,
+      backup: true,
+    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+      expect(resource).not.to.be(null);
+    }));
+    after(function () {
+      return cloudinary.v2.api.delete_resources(publicId).then((response) => {
+        expect(response).to.have.property("deleted");
+      });
+    });
+    it("should return the asset details together with all of its backed up versions when versions is true", function () {
+      return cloudinary.v2.api.resource(publicId, { versions: true })
+        .then((resource) => {
+          expect(resource.versions).not.to.be(undefined);
+          expect(resource.versions).to.be.an('array');
+        });
+    });
+
+    it("should return the asset details together without backed up versions when versions is false", function () {
+      return cloudinary.v2.api.resource(publicId, { versions: false })
+        .then((resource) => {
+          expect(resource.versions).to.be(undefined);
+        });
     });
   });
   describe("delete", function () {
@@ -952,6 +985,40 @@ describe("api", function () {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
     }));
+    it('should restore a deleted resource by versions', function () {
+      this.timeout(helper.TIMEOUT_LARGE);
+      return Q.all([
+        uploadImage({
+          public_id: PUBLIC_ID_7,
+          backup: true,
+        }),
+        uploadImage({
+          public_id: PUBLIC_ID_8,
+          backup: true,
+        }),
+      ]).then((uploadResponse) => {
+        expect(uploadResponse).not.to.be(null);
+      })
+        .then(wait(WAIT_TIME))
+        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_7, PUBLIC_ID_8]))
+        .then((deleteResponse) => {
+          expect(deleteResponse).to.have.property("deleted");
+        })
+        .then(wait(WAIT_TIME))
+        .then(() => Q.all([
+          cloudinary.v2.api.resource(PUBLIC_ID_7, { versions: true }),
+          cloudinary.v2.api.resource(PUBLIC_ID_8, { versions: true })]))
+        .then((resources) => {
+          expect(resources.length).to.be(2);
+
+          const version_7 = resources[0].versions[0].version_id;
+          const version_8 = resources[1].versions[0].version_id;
+          return cloudinary.v2.api.restore([PUBLIC_ID_7, PUBLIC_ID_8], { versions: [version_7, version_8] });
+        }).then((restoreResponse) => {
+          expect(restoreResponse[PUBLIC_ID_7].bytes).to.eql(3381);
+          expect(restoreResponse[PUBLIC_ID_8].bytes).to.eql(3381);
+        });
+    });
   });
   describe('mapping', function () {
     before(function () {
