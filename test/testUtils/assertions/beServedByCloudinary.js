@@ -2,14 +2,14 @@ const expect = require('expect.js');
 const cloneDeep = require('lodash/cloneDeep');
 const http = require('http');
 const https = require('https');
-const utils = require('../../../cloudinary');
+const cloudinary = require('../../../cloudinary');
 
 
 expect.Assertion.prototype.beServedByCloudinary = function (done) {
   var actual, actualOptions, callHttp, options, public_id;
   [public_id, options] = this.obj;
   actualOptions = cloneDeep(options);
-  actual = utils.url(public_id, actualOptions);
+  actual = cloudinary.url(public_id, actualOptions);
   if (actual.startsWith("https")) {
     callHttp = https;
   } else {
