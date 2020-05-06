@@ -6,6 +6,7 @@ const expect = require('expect.js');
 const Q = require('q');
 const cloudinary = require('../cloudinary');
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const SUFFIX = helper.SUFFIX;
 const PUBLIC_ID_PREFIX = "npm_api_test";
@@ -77,7 +78,7 @@ describe("search_api", function () {
     });
   });
   describe("integration", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     before("Verify Configuration", function () {
       var config = cloudinary.config(true);
       if (!(config.api_key && config.api_secret)) {

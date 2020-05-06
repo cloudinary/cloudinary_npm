@@ -12,6 +12,7 @@ const fs = require('fs');
 const os = require('os');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const { utils, api, uploader } = cloudinary.v2;
 const TEST_TAG = helper.TEST_TAG;
@@ -35,7 +36,7 @@ sharedExamples('archive', function () {
     }
   });
   before(function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return Q.all([
       uploader.upload(IMAGE_URL,
         {
@@ -78,7 +79,7 @@ describe("archive", function () {
   includeContext('archive');
   describe("utils", function () {
     describe('.generate_zip_download_url', function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       this.archive_result = void 0;
       before(function () {
         this.archive_result = utils.download_zip_url({
@@ -124,7 +125,7 @@ describe("archive", function () {
   describe("uploader", function () {
     describe('.create_archive', function () {
       var archive_result;
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       before(function () {
         return uploader.create_archive({
           target_public_id: 'gem_archive_test',
@@ -145,7 +146,7 @@ describe("archive", function () {
       });
     });
     describe('.create_zip', function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       it('should call create_archive with "zip" format and ignore missing resources', function () {
         helper.mockPromise(function (xhr, write) {
           uploader.create_zip({
