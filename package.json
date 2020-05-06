@@ -31,6 +31,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
     "expect.js": "0.3.x",
+    "glob": "^7.1.6",
     "jsdoc": "^3.5.5",
     "jsdom": "^9.12.0",
     "jsdom-global": "2.1.1",
