@@ -111,12 +111,13 @@ exports.resource = function resource(public_id, callback) {
   resource_type = options.resource_type || "image";
   type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
-  return call_api("get", uri, only(options, "exif", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
+  return call_api("get", uri, only(options, "exif", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions"), callback, options);
 };
 
 exports.restore = function restore(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+  options.content_type = 'json';
   var resource_type = void 0,
       type = void 0,
       uri = void 0;
@@ -124,7 +125,8 @@ exports.restore = function restore(public_ids, callback) {
   type = options.type || "upload";
   uri = ["resources", resource_type, type, "restore"];
   return call_api("post", uri, {
-    public_ids: public_ids
+    public_ids: public_ids,
+    versions: options.versions
   }, callback, options);
 };
 
