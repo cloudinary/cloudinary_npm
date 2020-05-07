@@ -325,7 +325,7 @@ describe("api", function () {
     });
   });
   describe("backup resource", function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
 
     const publicId = "api_test_backup_restore" + SUFFIX;
     before(() => uploadImage({
@@ -987,7 +987,7 @@ describe("api", function () {
       expect(resource.bytes).to.eql(3381);
     }));
     it('should restore a deleted resource by versions', function () {
-      this.timeout(helper.TIMEOUT_LARGE);
+      this.timeout(TIMEOUT.LARGE);
       return Q.all([
         uploadImage({
           public_id: PUBLIC_ID_BACKUP_1,
