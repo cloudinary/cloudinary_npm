@@ -27,8 +27,8 @@ const PUBLIC_ID_3 = PUBLIC_ID + "_3";
 const PUBLIC_ID_4 = PUBLIC_ID + "_4";
 const PUBLIC_ID_5 = PUBLIC_ID + "_5";
 const PUBLIC_ID_6 = PUBLIC_ID + "_6";
-const PUBLIC_ID_7 = PUBLIC_ID + "backup_7";
-const PUBLIC_ID_8 = PUBLIC_ID + "backup_8";
+const PUBLIC_ID_BACKUP_1 = PUBLIC_ID + "backup_1";
+const PUBLIC_ID_BACKUP_2 = PUBLIC_ID + "backup_2";
 const NAMED_TRANSFORMATION = "npm_api_test_transformation_" + SUFFIX;
 const NAMED_TRANSFORMATION2 = "npm_api_test_transformation_2_" + SUFFIX;
 const API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX;
@@ -324,7 +324,7 @@ describe("api", function () {
       });
     });
   });
-  describe("backup", function () {
+  describe("backup resource", function () {
     this.timeout(helper.TIMEOUT_MEDIUM);
 
     const publicId = "api_test_backup_restore" + SUFFIX;
@@ -990,34 +990,34 @@ describe("api", function () {
       this.timeout(helper.TIMEOUT_LARGE);
       return Q.all([
         uploadImage({
-          public_id: PUBLIC_ID_7,
+          public_id: PUBLIC_ID_BACKUP_1,
           backup: true,
         }),
         uploadImage({
-          public_id: PUBLIC_ID_8,
+          public_id: PUBLIC_ID_BACKUP_2,
           backup: true,
         }),
       ]).then((uploadResponse) => {
         expect(uploadResponse).not.to.be(null);
       })
         .then(wait(WAIT_TIME))
-        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_7, PUBLIC_ID_8]))
+        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
         .then((deleteResponse) => {
           expect(deleteResponse).to.have.property("deleted");
         })
         .then(wait(WAIT_TIME))
         .then(() => Q.all([
-          cloudinary.v2.api.resource(PUBLIC_ID_7, { versions: true }),
-          cloudinary.v2.api.resource(PUBLIC_ID_8, { versions: true })]))
+          cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_1, { versions: true }),
+          cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_2, { versions: true })]))
         .then((resources) => {
           expect(resources.length).to.be(2);
 
-          const version_7 = resources[0].versions[0].version_id;
-          const version_8 = resources[1].versions[0].version_id;
-          return cloudinary.v2.api.restore([PUBLIC_ID_7, PUBLIC_ID_8], { versions: [version_7, version_8] });
+          const version_1 = resources[0].versions[0].version_id;
+          const version_2 = resources[1].versions[0].version_id;
+          return cloudinary.v2.api.restore([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2], { versions: [version_1, version_2] });
         }).then((restoreResponse) => {
-          expect(restoreResponse[PUBLIC_ID_7].bytes).to.eql(3381);
-          expect(restoreResponse[PUBLIC_ID_8].bytes).to.eql(3381);
+          expect(restoreResponse[PUBLIC_ID_BACKUP_1].bytes).to.eql(3381);
+          expect(restoreResponse[PUBLIC_ID_BACKUP_2].bytes).to.eql(3381);
         });
     });
   });
