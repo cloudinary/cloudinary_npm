@@ -223,8 +223,10 @@ describe("api", function () {
         max_results: 500,
       }).then(function (result) {
         let public_ids = result.resources.map(resource => resource.public_id);
-        expect(public_ids).to.contain(PUBLIC_ID);
-        expect(public_ids).to.contain(PUBLIC_ID_2);
+
+        public_ids.forEach((id) => {
+          expect(id.indexOf(PUBLIC_ID_PREFIX)).to.be(0)
+        });
       });
     });
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG);
