@@ -55,6 +55,7 @@ var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
+var getSDKVersionID = require('./encoding/sdkVersionID/getSDKVersionID');
 
 exports = module.exports;
 var utils = module.exports;
@@ -775,6 +776,22 @@ function url(public_id) {
     var token = generate_token(auth_token);
     resultUrl += `?${token}`;
   }
+
+  var analytics = ensureOption(options, 'analytics', true);
+  var responsive = ensureOption(options, 'responsive', false);
+
+  if (analytics === true) {
+    var sdkVersionID = getSDKVersionID({
+      responsive
+    });
+    // url might already have a '?' query param
+    var appender = '?';
+    if (resultUrl.indexOf('?') >= 0) {
+      appender = '&';
+    }
+    resultUrl = `${resultUrl}${appender}a=${sdkVersionID}`;
+  }
+
   return resultUrl;
 }
 
