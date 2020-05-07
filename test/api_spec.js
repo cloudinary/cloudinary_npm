@@ -159,7 +159,8 @@ describe("api", function () {
         context: `${contextKey}=alt-test`,
         eager: [EXPLICIT_TRANSFORMATION],
       }),
-    ]).finally(function () {});
+    ]).then(wait(2000))
+      .finally(function () {});
   });
   after(function () {
     var config = cloudinary.config();
