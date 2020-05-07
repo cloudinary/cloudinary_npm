@@ -14,6 +14,7 @@ const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const TEST_TAG = helper.TEST_TAG;
 const IMAGE_FILE = helper.IMAGE_FILE;
@@ -40,7 +41,7 @@ describe("uploader", function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
   });
-  this.timeout(helper.TIMEOUT_LONG);
+  this.timeout(TIMEOUT.LONG);
   after(function () {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -59,7 +60,7 @@ describe("uploader", function () {
     cloudinary.config(createTestConfig());
   });
   it("should successfully upload file", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return uploadImage().then(function (result) {
       var expected_signature;
       expect(result.width).to.eql(241);
@@ -135,7 +136,7 @@ describe("uploader", function () {
   });
 
   describe("rename", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     it("should successfully rename a file", function () {
       return uploadImage().then(function (result) {
         return cloudinary.v2.uploader.rename(result.public_id, result.public_id + "2").then(function () {
@@ -188,7 +189,7 @@ describe("uploader", function () {
     });
   });
   describe("destroy", function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
     it("should delete a resource", function () {
       var public_id;
       return uploadImage().then(function (result) {
@@ -242,7 +243,7 @@ describe("uploader", function () {
     });
   });
   it("should support eager in upload", function () {
-    this.timeout(helper.TIMEOUT_SHORT);
+    this.timeout(TIMEOUT.SHORT);
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       eager: [
         {
@@ -317,7 +318,7 @@ describe("uploader", function () {
     });
   });
   describe("tags", function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
     it("should add tags to existing resources", function () {
       return uploadImage().then(function (result) {
         return uploadImage().then(function (res) {
@@ -374,7 +375,7 @@ describe("uploader", function () {
     });
   });
   describe("context", function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
     before(function () {
       return Q.all([uploadImage(), uploadImage()]).spread((result1, result2) => {
         this.first_id = result1.public_id;
@@ -435,7 +436,7 @@ describe("uploader", function () {
     });
   });
   it("should upload a file and base public id on the filename if use_filename is set to true", function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       use_filename: true,
       tags: UPLOAD_TAGS,
@@ -483,7 +484,7 @@ describe("uploader", function () {
   });
   it("should allow sending face coordinates", function () {
     var coordinates, custom_coordinates, different_coordinates, out_coordinates;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     coordinates = [[120, 30, 109, 150], [121, 31, 110, 151]];
     out_coordinates = [
       [120,
@@ -526,7 +527,7 @@ describe("uploader", function () {
     });
   });
   it("should allow sending context", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       context: {
         caption: "some caption",
@@ -543,7 +544,7 @@ describe("uploader", function () {
     });
   });
   it("should support requesting manual moderation", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       moderation: "manual",
       tags: UPLOAD_TAGS,
@@ -613,12 +614,12 @@ describe("uploader", function () {
     });
   });
   describe("upload_chunked", function () {
-    this.timeout(helper.TIMEOUT_LONG * 10);
+    this.timeout(TIMEOUT.LONG * 10);
     it("should specify chunk size", function (done) {
       return fs.stat(LARGE_RAW_FILE, function (err, stat) {
         cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
           chunk_size: 7000000,
-          timeout: helper.TIMEOUT_LONG,
+          timeout: TIMEOUT.LONG,
           tags: UPLOAD_TAGS,
         }, function (error, result) {
           if (error != null) {
@@ -697,14 +698,14 @@ describe("uploader", function () {
     });
     it("should support uploading large video files", function () {
       var stat, writeSpy;
-      this.timeout(helper.TIMEOUT_LONG * 10);
+      this.timeout(TIMEOUT.LONG * 10);
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       stat = fs.statSync(LARGE_VIDEO);
       expect(stat).to.be.ok();
       return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
-        timeout: helper.TIMEOUT_LONG * 10,
+        timeout: TIMEOUT.LONG * 10,
         tags: UPLOAD_TAGS,
       }).then(function (result) {
         var timestamps;
@@ -728,7 +729,7 @@ describe("uploader", function () {
       return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
-        timeout: helper.TIMEOUT_LONG * 10,
+        timeout: TIMEOUT.LONG * 10,
         tags: UPLOAD_TAGS,
       }).then(function () {
         var timestamps = writeSpy.args.map(function (a) {
@@ -745,7 +746,7 @@ describe("uploader", function () {
       });
     });
     it("should support uploading based on a url", function (done) {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       cloudinary.v2.uploader.upload_large("http://cloudinary.com/images/old_logo.png", {
         tags: UPLOAD_TAGS,
       }, function (error, result) {
@@ -758,7 +759,7 @@ describe("uploader", function () {
     });
   });
   it("should support unsigned uploading using presets", async function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
 
     let preset = await cloudinary.v2.api.create_upload_preset({
       folder: "upload_folder",
@@ -795,7 +796,7 @@ describe("uploader", function () {
   });
   it("should successfully upload with pipes", function (done) {
     var file_reader, upload;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     upload = cloudinary.v2.uploader.upload_stream({
       tags: UPLOAD_TAGS,
     }, function (error, result) {
@@ -813,7 +814,7 @@ describe("uploader", function () {
     file_reader.pipe(upload);
   });
   it("should fail with http.Agent (non secure)", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     expect(cloudinary.v2.uploader.upload_stream).withArgs({
       agent: new http.Agent(),
     }, function (error, result) {}).to.throwError();
@@ -949,7 +950,7 @@ describe("uploader", function () {
   });
   it("should create an image upload tag with required properties", function () {
     var fakeDiv, input_element, tag;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     tag = cloudinary.v2.uploader.image_upload_tag("image_id", {
       chunk_size: "1234",
     });

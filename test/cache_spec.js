@@ -3,6 +3,7 @@ const { describe, before, it } = require('mocha');
 const expect = require("expect.js");
 const path = require('path');
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 const cloudinary = require('../cloudinary').v2;
 
 const FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
@@ -33,7 +34,7 @@ describe("Cache", function () {
     expect(Cache.get(PUBLIC_ID, {})).to.eql(BREAKPOINTS);
   });
   describe("Upload integration", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     before(function () {
       options = {
         tags: UPLOAD_TAGS,

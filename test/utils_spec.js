@@ -8,6 +8,7 @@ const os = require('os');
 const defaults = require('lodash/defaults');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
@@ -51,7 +52,7 @@ describe("utils", function () {
   });
   sharedExamples("a signed url", function (specific_options = {}, specific_transformation = "") {
     var authenticated_image, authenticated_path, expected_transformation, options;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     expected_transformation = ((specific_transformation.blank != null) || specific_transformation.match(/\/$/)) ? specific_transformation : `${specific_transformation}/`;
     authenticated_path = '';
     authenticated_image = {};
@@ -1051,6 +1052,21 @@ describe("utils", function () {
         };
         t = cloudinary.utils.generate_transformation_string(options);
         expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
+      });
+      it("should not change variable names even if they look like keywords", function () {
+        var options, t;
+        options = {
+          transformation: [
+            {
+              $width: 10,
+            },
+            {
+              width: "$width + 10 + width",
+            },
+          ],
+        };
+        t = cloudinary.utils.generate_transformation_string(options);
+        expect(t).to.eql("$width_10/w_$width_add_10_add_w");
       });
       it("should support text values", function () {
         test_cloudinary_url("sample", {
