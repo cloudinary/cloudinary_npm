@@ -12,7 +12,8 @@
   "main": "cloudinary.js",
   "dependencies": {
     "lodash": "^4.17.11",
-    "q": "^1.5.1"
+    "q": "^1.5.1",
+    "snyk": "^1.319.1"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.2",
@@ -58,10 +59,13 @@
     "coverage": "tools/scripts/test.es6.sh --coverage",
     "test-es6": "tools/scripts/test.es6.sh",
     "test-es5": "tools/scripts/test.es5.sh",
-    "docs": "tools/scripts/docs.sh"
+    "docs": "tools/scripts/docs.sh",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "optionalDependencies": {},
   "engines": {
     "node": ">=0.6"
-  }
+  },
+  "snyk": true
 }
