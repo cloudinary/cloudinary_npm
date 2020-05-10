@@ -343,7 +343,6 @@ describe("api", function () {
     it("should return the asset details together with all of its backed up versions when versions is true", function () {
       return cloudinary.v2.api.resource(publicId, { versions: true })
         .then((resource) => {
-          expect(resource.versions).not.to.be(undefined);
           expect(resource.versions).to.be.an('array');
         });
     });
@@ -1023,14 +1022,13 @@ describe("api", function () {
       return uploadImage({
         public_id: PUBLIC_ID_BACKUP_3,
         backup: true,
+      }).then(() => uploadImage({
+        public_id: PUBLIC_ID_BACKUP_3,
+        angle: '0',
+        backup: true,
+      }).then(wait(WAIT_TIME))).then((uploadResponse) => {
+        expect(uploadResponse).not.to.be(null);
       }).then(wait(WAIT_TIME))
-        .then(() => uploadImage({
-          public_id: PUBLIC_ID_BACKUP_3,
-          angle: '0',
-          backup: true,
-        }).then(wait(WAIT_TIME))).then((uploadResponse) => {
-          expect(uploadResponse).not.to.be(null);
-        }).then(wait(WAIT_TIME))
         .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
         .then((deleteResponse) => {
           expect(deleteResponse).to.have.property("deleted");
