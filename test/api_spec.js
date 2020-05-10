@@ -9,6 +9,7 @@ const http = require('http');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
@@ -131,7 +132,7 @@ describe("api", function () {
     }
   });
   before(function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return Q.allSettled([
       uploadImage({
         public_id: PUBLIC_ID,
@@ -161,7 +162,7 @@ describe("api", function () {
   });
   after(function () {
     var config = cloudinary.config();
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     if (config.keep_test_products) {
       return Promise.resolve();
     }
@@ -180,14 +181,14 @@ describe("api", function () {
   describe("resources", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources);
     it("should allow listing resource_types", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resource_types().then(function (result) {
         expect(result.resource_types).to.contain("image");
       });
     });
     it("should allow listing resources", function () {
       var publicId;
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       publicId = '';
       return uploadImage({
         tags: UPLOAD_TAGS,
@@ -201,7 +202,7 @@ describe("api", function () {
       });
     });
     it("should allow listing resources by type", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage({
         tags: UPLOAD_TAGS,
       }).then(
@@ -214,20 +215,22 @@ describe("api", function () {
       }));
     });
     it("should allow listing resources by prefix", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources({
         type: "upload",
         prefix: PUBLIC_ID_PREFIX,
         max_results: 500,
       }).then(function (result) {
         let public_ids = result.resources.map(resource => resource.public_id);
-        expect(public_ids).to.contain(PUBLIC_ID);
-        expect(public_ids).to.contain(PUBLIC_ID_2);
+
+        public_ids.forEach((id) => {
+          expect(id.indexOf(PUBLIC_ID_PREFIX)).to.be(0)
+        });
       });
     });
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG);
     it("should allow listing resources by tag", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_tag(TEST_TAG, {
         context: true,
         tags: true,
@@ -241,18 +244,18 @@ describe("api", function () {
       });
     });
     it("should allow listing resources by context only", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_context(contextKey, null)
         .then(result => expect(result.resources).to.have.length(2));
     });
     it("should allow listing resources by context key and value", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_context(contextKey, "test").then(function (result) {
         expect(result.resources).to.have.length(1);
       });
     });
     it("should allow listing resources by public ids", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_ids([PUBLIC_ID, PUBLIC_ID_2], {
         context: true,
         tags: true,
@@ -263,7 +266,7 @@ describe("api", function () {
       });
     });
     it("should allow listing resources specifying direction", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       Q.all(
         cloudinary.v2.api.resources_by_tag(TEST_TAG, {
           type: "upload",
@@ -294,7 +297,7 @@ describe("api", function () {
       });
     });
     it("should allow get resource metadata", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return uploadImage({
         tags: UPLOAD_TAGS,
         eager: [EXPLICIT_TRANSFORMATION],
@@ -321,7 +324,7 @@ describe("api", function () {
   });
   describe("delete", function () {
     it("should allow deleting derived resource", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage({
         tags: UPLOAD_TAGS,
         eager: [
@@ -348,7 +351,7 @@ describe("api", function () {
         });
     });
     it("should allow deleting derived resources by transformations", function () {
-      this.timeout(helper.TIMEOUT_LARGE);
+      this.timeout(TIMEOUT.LARGE);
       return Q.all([
         uploadImage({
           public_id: PUBLIC_ID_1,
@@ -381,7 +384,7 @@ describe("api", function () {
       });
     });
     it("should allow deleting resources", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage({
         public_id: PUBLIC_ID_3,
         tags: UPLOAD_TAGS,
@@ -402,7 +405,7 @@ describe("api", function () {
     describe("delete_resources_by_prefix", function () {
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
       return it("should allow deleting resources by prefix", function () {
-        this.timeout(helper.TIMEOUT_MEDIUM);
+        this.timeout(TIMEOUT.MEDIUM);
         return uploadImage({
           public_id: "api_test_by_prefix",
           tags: UPLOAD_TAGS,
@@ -425,7 +428,7 @@ describe("api", function () {
       let deleteTestTag = TEST_TAG + "_delete";
       itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
       it("should allow deleting resources by tags", function () {
-        this.timeout(helper.TIMEOUT_MEDIUM);
+        this.timeout(TIMEOUT.MEDIUM);
         return uploadImage({
           public_id: PUBLIC_ID_4,
           tags: UPLOAD_TAGS.concat([deleteTestTag])
@@ -448,20 +451,20 @@ describe("api", function () {
   describe("tags", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.tags);
     it("should allow listing tags", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.tags({
         max_results: 500,
       }).then(result => expect(result.tags).not.to.be.empty());
     });
     it("should allow listing tag by prefix ", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.tags({
         prefix: TEST_TAG.slice(0, -1),
         max_results: 500,
       }).then(result => expect(result.tags).to.contain(TEST_TAG));
     });
     it("should allow listing tag by prefix if not found", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.tags({
         prefix: "api_test_no_such_tag",
       }).then(result => expect(result.tags).to.be.empty());
@@ -469,7 +472,7 @@ describe("api", function () {
   });
   describe("headers", function () {
     it("should include rate limits", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources().then(function (result) {
         expect(result.rate_limit_allowed).to.be.a("number");
         expect(result.rate_limit_reset_at).to.be.an("object");
@@ -493,7 +496,7 @@ describe("api", function () {
       ).finally(function () {});
     });
     it("should allow listing transformations", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.transformations().then(function (result) {
         expect(result).to.have.key("transformations");
         expect(result.transformations).not.to.be.empty();
@@ -501,21 +504,21 @@ describe("api", function () {
       });
     });
     it("should allow getting transformation metadata", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then(function (transformation) {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
     it("should allow getting transformation metadata by info", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION).then(function (transformation) {
         expect(transformation).not.to.eql(void 0);
         expect(transformation.info).to.eql([EXPLICIT_TRANSFORMATION]);
       });
     });
     it("should allow updating transformation allowed_for_strict", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.update_transformation(EXPLICIT_TRANSFORMATION_NAME, {
         allowed_for_strict: true,
       }).then(
@@ -533,7 +536,7 @@ describe("api", function () {
     });
     describe("Named Transformations", function () {
       it("should allow creating named transformation", function () {
-        this.timeout(helper.TIMEOUT_MEDIUM);
+        this.timeout(TIMEOUT.MEDIUM);
         return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION, {
           crop: "scale",
           width: 102,
@@ -552,7 +555,7 @@ describe("api", function () {
         });
       });
       it("should allow creating named transformation with an empty format", function () {
-        this.timeout(helper.TIMEOUT_MEDIUM);
+        this.timeout(TIMEOUT.MEDIUM);
         return cloudinary.v2.api.create_transformation(NAMED_TRANSFORMATION2, {
           crop: "scale",
           width: 102,
@@ -583,7 +586,7 @@ describe("api", function () {
         });
       });
       it("should allow unsafe update of named transformation", function () {
-        this.timeout(helper.TIMEOUT_MEDIUM);
+        this.timeout(TIMEOUT.MEDIUM);
         return cloudinary.v2.api.create_transformation(transformationName, {
           crop: "scale",
           width: 102,
@@ -606,7 +609,7 @@ describe("api", function () {
         });
       });
       it("should allow deleting named transformation", function () {
-        this.timeout(helper.TIMEOUT_MEDIUM);
+        this.timeout(TIMEOUT.MEDIUM);
         return cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION)
           .then(() => cloudinary.v2.api.transformation(NAMED_TRANSFORMATION))
           .then(() => expect().fail())
@@ -614,7 +617,7 @@ describe("api", function () {
       });
     });
     it("should allow deleting implicit transformation", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.transformation(EXPLICIT_TRANSFORMATION_NAME).then(function (transformation) {
         expect(transformation).to.be.an(Object);
         return cloudinary.v2.api.delete_transformation(EXPLICIT_TRANSFORMATION_NAME);
@@ -695,7 +698,7 @@ describe("api", function () {
     });
   });
   it("should support the usage API call", function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
     return cloudinary.v2.api.usage()
       .then(usage => expect(usage.last_update).not.to.eql(null));
   });
@@ -728,7 +731,7 @@ describe("api", function () {
         xhr.restore();
       });
       it("should support changing moderation status with notification-url", function () {
-        this.timeout(helper.TIMEOUT_LONG);
+        this.timeout(TIMEOUT.LONG);
         return uploadImage({
           moderation: "manual",
         }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
@@ -753,7 +756,7 @@ describe("api", function () {
       });
     });
     it.skip("should support setting manual moderation status", () => {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return uploadImage({
         moderation: "manual",
       }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
@@ -761,7 +764,7 @@ describe("api", function () {
       })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
     });
     it("should support requesting ocr info", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           ocr: "illegal",
@@ -770,7 +773,7 @@ describe("api", function () {
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting raw conversion", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           raw_convert: "illegal",
@@ -779,7 +782,7 @@ describe("api", function () {
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting categorization", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage().then(function (upload_result) {
         return cloudinary.v2.api.update(upload_result.public_id, {
           categorization: "illegal",
@@ -791,7 +794,7 @@ describe("api", function () {
       });
     });
     it("should support requesting detection", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           detection: "illegal",
@@ -800,7 +803,7 @@ describe("api", function () {
         ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting background_removal", function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return uploadImage()
         .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           background_removal: "illegal",
@@ -852,7 +855,7 @@ describe("api", function () {
   // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   // Replace `it` with  `it.skip` below if you want to disable it.
   it.skip("should list folders in cloudinary", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return Q.all([
       uploadImage({
         public_id: 'test_folder1/item',
@@ -901,7 +904,7 @@ describe("api", function () {
     }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
   });
   describe("delete folders", function() {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
     const folderPath= "test_folder/delete_folder/"+TEST_TAG;
     before(function(){
       return uploadImage({
@@ -917,7 +920,7 @@ describe("api", function () {
       });
     });
     it('should delete an empty folder', function () {
-      this.timeout(helper.TIMEOUT_MEDIUM);
+      this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.delete_folder(
         folderPath
       ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
@@ -926,7 +929,7 @@ describe("api", function () {
     });
   });
   describe('.restore', function () {
-    this.timeout(helper.TIMEOUT_MEDIUM);
+    this.timeout(TIMEOUT.MEDIUM);
 
     const publicId = "api_test_restore" + SUFFIX;
     before(() => uploadImage({
@@ -962,7 +965,7 @@ describe("api", function () {
     });
     itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_mappings);
     it('should create mapping', function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api
         .create_upload_mapping(this.mapping, {
           template: "http://cloudinary.com",
@@ -993,7 +996,7 @@ describe("api", function () {
   });
   describe("publish", function () {
     var i, idsToDelete, publishTestId, publishTestTag;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     i = 0;
     publishTestId = "";
     publishTestTag = "";
@@ -1015,7 +1018,7 @@ describe("api", function () {
       });
     });
     it("should publish by public id", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "authenticated",
       }).then(function (result) {
@@ -1027,7 +1030,7 @@ describe("api", function () {
       });
     });
     it("should publish by prefix", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api.publish_by_prefix(publishTestId.slice(0, -1)).then((result) => {
         let published = result.published;
         expect(published).not.to.be(null);
@@ -1037,7 +1040,7 @@ describe("api", function () {
       });
     });
     it("should publish by tag", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api.publish_by_tag(publishTestTag).then((result) => {
         let published = result.published;
         expect(published).not.to.be(null);
@@ -1047,7 +1050,7 @@ describe("api", function () {
       });
     });
     it("should return empty when explicit given type doesn't match resource", function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api.publish_by_ids([publishTestId], {
         type: "private",
       }).then(function (result) {
@@ -1060,7 +1063,7 @@ describe("api", function () {
   describe.skip("access_mode", function () {
     var access_mode_tag, i, publicId;
     i = 0;
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     publicId = "";
     access_mode_tag = '';
     beforeEach(function () {

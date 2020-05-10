@@ -3,6 +3,7 @@ const Q = require('q');
 const sinon = require('sinon');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const TEST_ID = Date.now();
 
@@ -89,7 +90,7 @@ function createMetadataFieldForTest(field) {
 }
 
 describe("structured metadata api", function () {
-  this.timeout(helper.TIMEOUT_LARGE);
+  this.timeout(TIMEOUT.LARGE);
 
   before(function () {
     // Create the metadata fields required for the tests

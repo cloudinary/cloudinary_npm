@@ -4,7 +4,7 @@ require('dotenv').load({
 
 const expect = require("expect.js");
 const cloudinary = require("../../../../cloudinary");
-const helper = require("../../../spechelper");
+const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 
 describe('account API - Provisioning', function () {
   let CLOUD_SECRET;
@@ -17,7 +17,7 @@ describe('account API - Provisioning', function () {
   let USER_ID;
   let GROUP_ID;
   let CLOUD_NAME_PREFIX = `justaname${process.hrtime()[1] % 10000}`;
-  this.timeout(helper.TIMEOUT_LONG);
+  this.timeout(TIMEOUT.LONG);
 
   before("Setup the required test", async function () {
     let config = cloudinary.config(true);
