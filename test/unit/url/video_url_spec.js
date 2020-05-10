@@ -14,7 +14,7 @@ function test_cloudinary_url(public_id, options, expected_url, expected_options)
   expect(result).to.eql(expected_url);
 }
 
-const createTestConfig = require('./testUtils/createTestConfig');
+const createTestConfig = require('../../testUtils/createTestConfig');
 
 describe("Cloudinary::Utils for video", function () {
   var root_path, upload_path;

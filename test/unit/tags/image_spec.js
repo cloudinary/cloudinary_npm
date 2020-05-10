@@ -10,7 +10,7 @@ const srcRegExp = function (name, path) {
   return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "\/"));
 };
 
-const createTestConfig = require('./testUtils/createTestConfig');
+const createTestConfig = require('../../testUtils/createTestConfig');
 
 describe('image helper', function () {
   var commonTrans, commonTransformationStr, customAttributes;

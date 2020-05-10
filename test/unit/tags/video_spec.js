@@ -6,7 +6,7 @@ cloudinary = require('../../../cloudinary');
 
 helper = require("../../spechelper");
 
-const createTestConfig = require('./testUtils/createTestConfig');
+const createTestConfig = require('../../testUtils/createTestConfig');
 
 describe("video tag helper", function () {
   var DEFAULT_UPLOAD_PATH, VIDEO_UPLOAD_PATH;
