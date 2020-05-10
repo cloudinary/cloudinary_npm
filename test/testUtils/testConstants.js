@@ -46,4 +46,8 @@ module.exports = {
     TEST_TAG,
     SDK_TAG,
   },
+  URLS: {
+    VIDEO_URL: "http://res.cloudinary.com/demo/video/upload/dog.mp4",
+    IMAGE_URL: "http://res.cloudinary.com/demo/image/upload/sample",
+  }
 };
