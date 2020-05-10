@@ -59,6 +59,7 @@ describe('Tests for sdk versionID util', function () {
 
   it('Handles invalid arguments gracefully', () => {
     expect(getSDKVersionID({}, 'abcdefg', 'abcdefg')).to.equal('E');
+    expect(getSDKVersionID({}, '123456', '123456')).to.equal('E');
     expect(getSDKVersionID({}, '43.21.200', '43.21.26')).to.equal('E');
   });
 
