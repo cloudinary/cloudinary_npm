@@ -641,7 +641,7 @@ var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cnam
  */
 
 function extractUrlParams(options) {
-  return utils.only.apply(utils, [options].concat(URL_KEYS));
+  return pickOnlyExistingValues.apply(undefined, [options].concat(URL_KEYS));
 }
 
 /**
@@ -651,7 +651,7 @@ function extractUrlParams(options) {
  */
 
 function extractTransformationParams(options) {
-  return utils.only.apply(utils, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
+  return pickOnlyExistingValues.apply(undefined, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
 }
 
 /**
@@ -1136,7 +1136,7 @@ exports.html_attrs = function html_attrs(attrs) {
 var CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain'];
 
 function cloudinary_js_config() {
-  var params = utils.only.apply(utils, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
+  var params = pickOnlyExistingValues.apply(undefined, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
   return `<script type='text/javascript'>\n$.cloudinary.config(${JSON.stringify(params)});\n</script>`;
 }
 
@@ -1328,7 +1328,7 @@ function generate_responsive_breakpoints_string(breakpoints) {
 function build_streaming_profiles_param() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var params = utils.only(options, "display_name", "representations");
+  var params = pickOnlyExistingValues(options, "display_name", "representations");
   if (isArray(params.representations)) {
     params.representations = JSON.stringify(params.representations.map(function (r) {
       return {
@@ -1395,7 +1395,7 @@ function present(value) {
  * @return {object} A new object with the required keys and values.
  */
 
-function only(source) {
+function pickOnlyExistingValues(source) {
   var result = {};
   if (source) {
     for (var _len2 = arguments.length, keys = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -1486,7 +1486,8 @@ exports.generate_responsive_breakpoints_string = generate_responsive_breakpoints
 exports.build_streaming_profiles_param = build_streaming_profiles_param;
 exports.hashToParameters = hashToParameters;
 exports.present = present;
-exports.only = only;
+exports.only = pickOnlyExistingValues; // for backwards compatibility
+exports.pickOnlyExistingValues = pickOnlyExistingValues;
 exports.jsonArrayParam = jsonArrayParam;
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
