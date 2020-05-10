@@ -1020,6 +1020,36 @@ describe("api", function () {
           expect(restoreResponse[PUBLIC_ID_BACKUP_2].bytes).to.eql(3381);
         });
     });
+    it('should restore an old deleted resource by versions', function () {
+      return Q.all([
+        uploadImage({
+          public_id: PUBLIC_ID_BACKUP_1,
+          backup: true,
+        }),
+        uploadImage({
+          public_id: PUBLIC_ID_BACKUP_1,
+          angle: '0',
+          backup: true,
+        }).then(wait(4000)),
+      ]).then((uploadResponse) => {
+        expect(uploadResponse).not.to.be(null);
+      })
+        .then(wait(WAIT_TIME))
+        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1]))
+        .then((deleteResponse) => {
+          expect(deleteResponse).to.have.property("deleted");
+        })
+        .then(wait(WAIT_TIME))
+        .then(() => cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_1, { versions: true }))
+        .then((resources) => {
+          expect(resources.versions.length).to.be(2);
+
+          const old_version = resources.versions[0].version_id;
+          return cloudinary.v2.api.restore(PUBLIC_ID_BACKUP_1, { versions: old_version });
+        }).then((restoreResponse) => {
+          expect(restoreResponse[PUBLIC_ID_BACKUP_1].bytes).to.eql(3381);
+        });
+    });
   });
   describe('mapping', function () {
     before(function () {
