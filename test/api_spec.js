@@ -346,7 +346,7 @@ describe("api", function () {
   describe("backup resource", function () {
     this.timeout(TIMEOUT.MEDIUM);
 
-    const publicId = "api_test_backup_restore" + UNIQUE_JOB_SUFFIX_ID;
+    const publicId = "api_test_backup" + UNIQUE_JOB_SUFFIX_ID;
     before(() => uploadImage({
       public_id: publicId,
       backup: true,
