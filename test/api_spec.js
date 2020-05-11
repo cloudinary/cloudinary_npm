@@ -29,6 +29,9 @@ const {
   PUBLIC_ID_4,
   PUBLIC_ID_5,
   PUBLIC_ID_6,
+  PUBLIC_ID_BACKUP_1,
+  PUBLIC_ID_BACKUP_2,
+  PUBLIC_ID_BACKUP_3,
 } = PUBLIC_IDS;
 
 const {
@@ -338,6 +341,35 @@ describe("api", function () {
             }, 'derived_next_cursor=aaa')));
         });
       });
+    });
+  });
+  describe("backup resource", function () {
+    this.timeout(TIMEOUT.MEDIUM);
+
+    const publicId = "api_test_backup" + UNIQUE_JOB_SUFFIX_ID;
+    before(() => uploadImage({
+      public_id: publicId,
+      backup: true,
+    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+      expect(resource).not.to.be(null);
+    }));
+    after(function () {
+      return cloudinary.v2.api.delete_resources(publicId).then((response) => {
+        expect(response).to.have.property("deleted");
+      });
+    });
+    it("should return the asset details together with all of its backed up versions when versions is true", function () {
+      return cloudinary.v2.api.resource(publicId, { versions: true })
+        .then((resource) => {
+          expect(resource.versions).to.be.an('array');
+        });
+    });
+
+    it("should return the asset details together without backed up versions when versions is false", function () {
+      return cloudinary.v2.api.resource(publicId, { versions: false })
+        .then((resource) => {
+          expect(resource.versions).to.be(undefined);
+        });
     });
   });
   describe("delete", function () {
@@ -972,6 +1004,68 @@ describe("api", function () {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
     }));
+    it('should restore a deleted resource by versions', function () {
+      return uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true,
+      }).then(() => uploadImage({
+        public_id: PUBLIC_ID_BACKUP_2,
+        backup: true,
+      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
+        expect(uploadResponse).not.to.be(null);
+      }).then(wait(TIMEOUT.SHORT))
+        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
+        .then((deleteResponse) => {
+          expect(deleteResponse).to.have.property("deleted");
+        })
+        .then(wait(TIMEOUT.SHORT))
+        .then(() => Q.all([
+          cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_1, { versions: true }),
+          cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_2, { versions: true })]))
+        .then((resources) => {
+          expect(resources.length).to.be(2);
+
+          const version_1 = resources[0].versions[0].version_id;
+          const version_2 = resources[1].versions[0].version_id;
+          return cloudinary.v2.api.restore([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2], { versions: [version_1, version_2] });
+        }).then((restoreResponse) => {
+          expect(restoreResponse[PUBLIC_ID_BACKUP_1].bytes).to.eql(3381);
+          expect(restoreResponse[PUBLIC_ID_BACKUP_2].bytes).to.eql(3381);
+        }).then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
+        .then((deleteResponse) => {
+          expect(deleteResponse).to.have.property("deleted");
+        });
+    });
+    it('should restore an old deleted resource by versions', function () {
+      return uploadImage({
+        public_id: PUBLIC_ID_BACKUP_3,
+        backup: true,
+      }).then(() => uploadImage({
+        public_id: PUBLIC_ID_BACKUP_3,
+        angle: '0',
+        backup: true,
+      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
+        expect(uploadResponse).not.to.be(null);
+      }).then(wait(TIMEOUT.SHORT))
+        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
+        .then((deleteResponse) => {
+          expect(deleteResponse).to.have.property("deleted");
+        })
+        .then(wait(TIMEOUT.SHORT))
+        .then(() => cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_3, { versions: true }))
+        .then((resources) => {
+          expect(resources.versions.length).to.be(2);
+
+          const old_version = resources.versions[0].version_id;
+          return cloudinary.v2.api.restore(PUBLIC_ID_BACKUP_3, { versions: old_version });
+        }).then((restoreResponse) => {
+          expect(restoreResponse[PUBLIC_ID_BACKUP_3].bytes).to.eql(2353);
+        })
+        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
+        .then((deleteResponse) => {
+          expect(deleteResponse).to.have.property("deleted");
+        });
+    });
   });
   describe('mapping', function () {
     before(function () {
