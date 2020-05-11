@@ -29,6 +29,9 @@ const {
   PUBLIC_ID_4,
   PUBLIC_ID_5,
   PUBLIC_ID_6,
+  PUBLIC_ID_BACKUP_1,
+  PUBLIC_ID_BACKUP_2,
+  PUBLIC_ID_BACKUP_3,
 } = PUBLIC_IDS;
 
 const {
@@ -343,7 +346,7 @@ describe("api", function () {
   describe("backup resource", function () {
     this.timeout(TIMEOUT.MEDIUM);
 
-    const publicId = "api_test_backup_restore" + SUFFIX;
+    const publicId = "api_test_backup_restore" + UNIQUE_JOB_SUFFIX_ID;
     before(() => uploadImage({
       public_id: publicId,
       backup: true,
@@ -1008,14 +1011,14 @@ describe("api", function () {
       }).then(() => uploadImage({
         public_id: PUBLIC_ID_BACKUP_2,
         backup: true,
-      }).then(wait(WAIT_TIME))).then((uploadResponse) => {
+      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
         expect(uploadResponse).not.to.be(null);
-      }).then(wait(WAIT_TIME))
+      }).then(wait(TIMEOUT.SHORT))
         .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
         .then((deleteResponse) => {
           expect(deleteResponse).to.have.property("deleted");
         })
-        .then(wait(WAIT_TIME))
+        .then(wait(TIMEOUT.SHORT))
         .then(() => Q.all([
           cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_1, { versions: true }),
           cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_2, { versions: true })]))
@@ -1041,14 +1044,14 @@ describe("api", function () {
         public_id: PUBLIC_ID_BACKUP_3,
         angle: '0',
         backup: true,
-      }).then(wait(WAIT_TIME))).then((uploadResponse) => {
+      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
         expect(uploadResponse).not.to.be(null);
-      }).then(wait(WAIT_TIME))
+      }).then(wait(TIMEOUT.SHORT))
         .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
         .then((deleteResponse) => {
           expect(deleteResponse).to.have.property("deleted");
         })
-        .then(wait(WAIT_TIME))
+        .then(wait(TIMEOUT.SHORT))
         .then(() => cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_3, { versions: true }))
         .then((resources) => {
           expect(resources.versions.length).to.be(2);
