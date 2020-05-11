@@ -14,15 +14,12 @@ const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
-const TEST_TAG = helper.TEST_TAG;
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
 const LARGE_VIDEO = helper.LARGE_VIDEO;
 const EMPTY_IMAGE = helper.EMPTY_IMAGE;
 const RAW_FILE = helper.RAW_FILE;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
 const TEST_ID = Date.now();
 
@@ -30,6 +27,18 @@ const METADATA_FIELD_UNIQUE_EXTERNAL_ID = 'metadata_field_external_id_' + TEST_I
 const METADATA_FIELD_VALUE = 'metadata_field_value_' + TEST_ID;
 const METADATA_SAMPLE_DATA = { metadata_color: "red", metadata_shape: "dodecahedron" };
 const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahedron";
+
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+} = testConstants;
+
+const {
+  TEST_TAG,
+  UPLOAD_TAGS,
+} = TAGS;
 
 require('jsdom-global')();
 
@@ -47,8 +56,8 @@ describe("uploader", function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
     return Q.allSettled([
-      !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG) : void 0,
-      !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(helper.TEST_TAG,
+      !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG) : void 0,
+      !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG,
         {
           resource_type: "video",
         }) : void 0,
@@ -1009,8 +1018,8 @@ describe("uploader", function () {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       requestSpy = sinon.spy(http, 'request');
       options = {
-        public_id: helper.TEST_TAG,
-        tags: [...helper.UPLOAD_TAGS, 'access_control_test'],
+        public_id: TEST_TAG,
+        tags: [...UPLOAD_TAGS, 'access_control_test'],
       };
     });
     afterEach(function () {

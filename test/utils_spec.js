@@ -14,7 +14,7 @@ const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoi
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
 
 const utils = cloudinary.utils;
-const { clone, isString, merge, only } = utils;
+const { clone, isString, merge, pickOnlyExistingValues } = utils;
 const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
 
 const TEST_TAG = helper.TEST_TAG;
@@ -1315,7 +1315,7 @@ describe("utils", function () {
       eager_async: "1",
     };
     params = utils.build_upload_params(options);
-    expected = only(params, ...Object.keys(options));
+    expected = pickOnlyExistingValues(params, ...Object.keys(options));
     actual = {
       backup: 1,
       use_filename: 0,

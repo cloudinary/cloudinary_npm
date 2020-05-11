@@ -12,12 +12,26 @@ const fs = require('fs');
 const os = require('os');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
+
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+  URLS,
+} = testConstants;
+
+const {
+  TEST_TAG,
+  UPLOAD_TAGS,
+} = TAGS;
+
+const {
+  VIDEO_URL,
+  IMAGE_URL,
+} = URLS;
 
 const { utils, api, uploader } = cloudinary.v2;
-const TEST_TAG = helper.TEST_TAG;
-const IMAGE_URL = helper.IMAGE_URL;
-const VIDEO_URL = helper.VIDEO_URL;
 const sharedExamples = helper.sharedExamples;
 const includeContext = helper.includeContext;
 const ARCHIVE_TAG = TEST_TAG + "_archive";
@@ -41,7 +55,7 @@ sharedExamples('archive', function () {
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID1,
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
             effect: "blackwhite",
           },
@@ -49,7 +63,7 @@ sharedExamples('archive', function () {
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID2,
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
             effect: "blackwhite",
           },
@@ -58,13 +72,13 @@ sharedExamples('archive', function () {
         {
           public_id: PUBLIC_ID_RAW,
           resource_type: "raw",
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
         }),
       uploader.upload(VIDEO_URL,
         {
           public_id: "dog",
           resource_type: "video",
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
         }),
     ]);
   });
