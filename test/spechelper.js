@@ -20,12 +20,6 @@ exports.libPath = libPath;
 
 const api_http = String(config().upload_prefix).startsWith('http:') ? http : https;
 
-exports.SUFFIX = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
-exports.SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
-exports.TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDK's tests
-exports.TEST_TAG = exports.TEST_TAG_PREFIX + "_" + exports.SUFFIX; // identifies resources created in the current test run with a unique tag
-exports.TEST_ID = exports.TEST_TAG; // identifies resources created in the current test run with a unique id
-exports.UPLOAD_TAGS = [exports.TEST_TAG, exports.TEST_TAG_PREFIX, exports.SDK_TAG];
 exports.IMAGE_FILE = "test/.resources/logo.png";
 exports.LARGE_RAW_FILE = "test/.resources/TheCompleteWorksOfShakespeare.mobi";
 exports.LARGE_VIDEO = "test/.resources/CloudBookStudy-HD.mp4";
