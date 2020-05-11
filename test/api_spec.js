@@ -1,8 +1,3 @@
-
-require('dotenv').load({
-  silent: true,
-});
-
 const expect = require("expect.js");
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
@@ -10,34 +5,52 @@ const http = require('http');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
-
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
-const TEST_TAG = helper.TEST_TAG;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
-const SUFFIX = helper.SUFFIX;
-const WAIT_TIME = 3000;
-const PUBLIC_ID_PREFIX = "npm_api_test";
-const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
-const PUBLIC_ID_1 = PUBLIC_ID + "_1";
-const PUBLIC_ID_2 = PUBLIC_ID + "_2";
-const PUBLIC_ID_3 = PUBLIC_ID + "_3";
-const PUBLIC_ID_4 = PUBLIC_ID + "_4";
-const PUBLIC_ID_5 = PUBLIC_ID + "_5";
-const PUBLIC_ID_6 = PUBLIC_ID + "_6";
-const PUBLIC_ID_BACKUP_1 = PUBLIC_ID_PREFIX + "backup_1" + Date.now();
-const PUBLIC_ID_BACKUP_2 = PUBLIC_ID_PREFIX + "backup_2" + Date.now();
-const PUBLIC_ID_BACKUP_3 = PUBLIC_ID_PREFIX + "backup_3" + Date.now();
-const NAMED_TRANSFORMATION = "npm_api_test_transformation_" + SUFFIX;
-const NAMED_TRANSFORMATION2 = "npm_api_test_transformation_2_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET2 = "npm_api_test_upload_preset_2_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET3 = "npm_api_test_upload_preset_3_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET4 = "npm_api_test_upload_preset_4_" + SUFFIX;
-const EXPLICIT_TRANSFORMATION_NAME = `c_scale,l_text:Arial_60:${TEST_TAG},w_100`;
-const EXPLICIT_TRANSFORMATION_NAME2 = `c_scale,l_text:Arial_60:${TEST_TAG},w_200`;
+
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+  PUBLIC_IDS,
+  UNIQUE_JOB_SUFFIX_ID,
+  PRESETS,
+  TRANSFORMATIONS,
+  PUBLIC_ID_PREFIX
+} = testConstants;
+
+const {
+  PUBLIC_ID,
+  PUBLIC_ID_1,
+  PUBLIC_ID_2,
+  PUBLIC_ID_3,
+  PUBLIC_ID_4,
+  PUBLIC_ID_5,
+  PUBLIC_ID_6,
+} = PUBLIC_IDS;
+
+const {
+  TEST_TAG,
+  SDK_TAG,
+  UPLOAD_TAGS,
+} = TAGS;
+
+const {
+  NAMED_TRANSFORMATION,
+  NAMED_TRANSFORMATION2,
+  EXPLICIT_TRANSFORMATION_NAME,
+  EXPLICIT_TRANSFORMATION_NAME2,
+} = TRANSFORMATIONS;
+
+const {
+  API_TEST_UPLOAD_PRESET1,
+  API_TEST_UPLOAD_PRESET2,
+  API_TEST_UPLOAD_PRESET3,
+  API_TEST_UPLOAD_PRESET4,
+} = PRESETS;
+
 const EXPLICIT_TRANSFORMATION = {
   width: 100,
   crop: "scale",
@@ -129,7 +142,7 @@ function findByAttr(elements, attr, value) {
 
 
 describe("api", function () {
-  var contextKey = `test-key${helper.SUFFIX}`;
+  var contextKey = `test-key${UNIQUE_JOB_SUFFIX_ID}`;
   before("Verify Configuration", function () {
     let config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -227,8 +240,10 @@ describe("api", function () {
         max_results: 500,
       }).then(function (result) {
         let public_ids = result.resources.map(resource => resource.public_id);
-        expect(public_ids).to.contain(PUBLIC_ID);
-        expect(public_ids).to.contain(PUBLIC_ID_2);
+
+        public_ids.forEach((id) => {
+          expect(id.indexOf(PUBLIC_ID_PREFIX)).to.be(0)
+        });
       });
     });
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG);
@@ -517,7 +532,7 @@ describe("api", function () {
     var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
-    transformationName = "api_test_transformation3" + SUFFIX;
+    transformationName = "api_test_transformation3" + UNIQUE_JOB_SUFFIX_ID;
     after(function () {
       return Q.allSettled(
         [
@@ -852,8 +867,8 @@ describe("api", function () {
       };
       acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
       options = {
-        public_id: helper.TEST_TAG,
-        tags: [...helper.UPLOAD_TAGS, 'access_control_test'],
+        public_id: TEST_TAG,
+        tags: [...UPLOAD_TAGS, 'access_control_test'],
       };
       it("should allow the user to define ACL in the update parameters2", function () {
         return helper.mockPromise((xhr, writeSpy, requestSpy) => {
@@ -963,7 +978,7 @@ describe("api", function () {
   describe('.restore', function () {
     this.timeout(TIMEOUT.MEDIUM);
 
-    const publicId = "api_test_restore" + SUFFIX;
+    const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
     before(() => uploadImage({
       public_id: publicId,
       backup: true,
