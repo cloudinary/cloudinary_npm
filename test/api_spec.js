@@ -15,7 +15,7 @@ const {
   TIMEOUT,
   TAGS,
   PUBLIC_IDS,
-  UNIQUE_JOB_ID,
+  UNIQUE_JOB_SUFFIX_ID,
   PRESETS,
   TRANSFORMATIONS,
   PUBLIC_ID_PREFIX
@@ -142,7 +142,7 @@ function findByAttr(elements, attr, value) {
 
 
 describe("api", function () {
-  var contextKey = `test-key${UNIQUE_JOB_ID}`;
+  var contextKey = `test-key${UNIQUE_JOB_SUFFIX_ID}`;
   before("Verify Configuration", function () {
     let config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -503,7 +503,7 @@ describe("api", function () {
     var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
-    transformationName = "api_test_transformation3" + UNIQUE_JOB_ID;
+    transformationName = "api_test_transformation3" + UNIQUE_JOB_SUFFIX_ID;
     after(function () {
       return Q.allSettled(
         [
@@ -949,7 +949,7 @@ describe("api", function () {
   describe('.restore', function () {
     this.timeout(TIMEOUT.MEDIUM);
 
-    const publicId = "api_test_restore" + UNIQUE_JOB_ID;
+    const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
     before(() => uploadImage({
       public_id: publicId,
       backup: true,

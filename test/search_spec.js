@@ -15,7 +15,7 @@ const {
   TIMEOUT,
   TAGS,
   PUBLIC_IDS,
-  UNIQUE_JOB_ID,
+  UNIQUE_JOB_SUFFIX_ID,
 } = testConstants;
 
 const {
@@ -28,7 +28,7 @@ const {
   UPLOAD_TAGS,
 } = TAGS;
 
-const SEARCH_TAG = 'npm_advanced_search_' + UNIQUE_JOB_ID;
+const SEARCH_TAG = 'npm_advanced_search_' + UNIQUE_JOB_SUFFIX_ID;
 
 
 describe("search_api", function () {
