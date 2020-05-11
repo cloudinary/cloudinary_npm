@@ -28,6 +28,10 @@ module.exports = {
     PUBLIC_ID_4: `${PUBLIC_ID}_4`,
     PUBLIC_ID_5: `${PUBLIC_ID}_5`,
     PUBLIC_ID_6: `${PUBLIC_ID}_6`,
+    PUBLIC_ID_BACKUP_1: `${PUBLIC_ID_PREFIX}backup_1${Date.now()}`,
+    PUBLIC_ID_BACKUP_2: `${PUBLIC_ID_PREFIX}backup_2${Date.now()}`,
+    PUBLIC_ID_BACKUP_3: `${PUBLIC_ID_PREFIX}backup_3${Date.now()}`,
+
   },
   PRESETS: {
     API_TEST_UPLOAD_PRESET1: `npm_api_test_upload_preset_1_${UNIQUE_JOB_SUFFIX_ID}`,
