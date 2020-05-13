@@ -1084,6 +1084,19 @@ describe("utils", function () {
           },
         }, `http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample`, {});
       });
+      it("should support power operator", function () {
+        var options, t;
+        options = {
+          transformation: [
+            {
+              $small: 150,
+              $big: "$small ^ 1.5",
+            },
+          ],
+        };
+        t = cloudinary.utils.generate_transformation_string(options);
+        expect(t).to.eql("$big_$small_pow_1.5,$small_150");
+      });
     });
     describe("text", function () {
       var text_encoded, text_layer;

@@ -138,7 +138,7 @@ function normalize_expression(expression) {
     return expression;
   }
 
-  var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*";
+  var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\^|\\+|\\*";
   var operatorsPattern = "((" + operators + ")(?=[ _]))";
   var operatorsReplaceRE = new RegExp(operatorsPattern, "g");
   expression = expression.replace(operatorsReplaceRE, function (match) {
