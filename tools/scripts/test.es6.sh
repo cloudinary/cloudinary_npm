@@ -1,3 +1,4 @@
+#!/bin/bash
 COLLECT_COVERAGE=0;
 
 for arg in "$@"

@@ -176,7 +176,7 @@ describe("archive", function () {
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
         });
       });
-      it('should create archive with "zip" format and include multiple resource types', function () {
+      it.skip('should create archive with "zip" format and include multiple resource types', function () {
         return uploader.create_zip({
           fully_qualified_public_ids: [FULLY_QUALIFIED_IMAGE, FULLY_QUALIFIED_VIDEO],
           resource_type: "auto",
