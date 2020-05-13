@@ -954,7 +954,6 @@ describe("api", function () {
       console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
       expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
     }).catch((err) => {
-      console.log(err);
       let error = err.error;
       return expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists');
     });
