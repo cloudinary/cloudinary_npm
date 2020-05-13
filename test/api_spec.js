@@ -908,7 +908,6 @@ describe("api", function () {
   // Replace `it` with  `it.skip` below if you want to disable it.
   it("should list folders in cloudinary", function () {
     this.timeout(TIMEOUT.LONG);
-    console.log(cloudinary.config());
     return Q.all([
       uploadImage({
         public_id: 'test_folder1/item',
