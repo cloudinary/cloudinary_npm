@@ -4,9 +4,12 @@
  * To use a fresh cloud in your tests, source ./cloudinary_url.sh before running the tests
  * Example: node tools/createTestCloud && source tools/cloudinary_url.sh && npm run test
  */
-
 const fs = require('fs');
-let https = require('https');
+const path = require('path');
+const https = require('https');
+const ENV_FILE_PATH = path.resolve(__dirname, '../.env');
+const cloudinary = require('../cloudinary');
+
 
 let req = https.request({
   method: 'POST',
@@ -24,7 +27,16 @@ let req = https.request({
     let { payload: { cloudApiKey, cloudApiSecret, cloudName, id } } = cloudData;
     let URL = `CLOUDINARY_URL=cloudinary://${cloudApiKey}:${cloudApiSecret}@${cloudName}`;
 
-    fs.writeFileSync(`tools/cloudinary_url.sh`, URL);
+    fs.writeFileSync(`tools/cloudinary_url.sh`, URL); // This is needed for Travis
+    fs.writeFileSync(ENV_FILE_PATH, URL); // This is needed for local develoepr tests
+
+    require('dotenv').load();
+
+    cloudinary.config(true);
+
+    cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
+      public_id: 'sample'
+    });
   });
 });
 

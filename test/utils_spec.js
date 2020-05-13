@@ -9,7 +9,7 @@ const defaults = require('lodash/defaults');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
-
+const wait = require('./testUtils/helpers/wait');
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
 
@@ -448,7 +448,7 @@ describe("utils", function () {
       }, `http://res.cloudinary.com/${cloud_name}/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M`, {});
     });
   });
-  describe.skip('transformation parameters', function () {
+  describe('transformation parameters', function () {
     describe("gravity", function () {
       it("should support auto", function () {
         test_cloudinary_url("test", {
@@ -1099,6 +1099,7 @@ describe("utils", function () {
       });
     });
     describe("text", function () {
+      this.timeout(TIMEOUT.MEDIUM);
       var text_encoded, text_layer;
       text_layer = "Hello World, /Nice to meet you?";
       text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
@@ -1110,24 +1111,25 @@ describe("utils", function () {
           font_family: "Arial",
           font_size: "18",
           tags: TEST_TAG,
-        });
-        fileName = `${os.tmpdir()}/test_subtitles.srt`;
-        srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
-        fs.writeFile(fileName, srt, function (error) {
-          if (error != null) {
-            done(new Error(error.message));
-          }
-          cloudinary.v2.config(true);
-          cloudinary.v2.uploader.upload(fileName, {
-            public_id: 'subtitles.srt',
-            resource_type: 'raw',
-            overwrite: true,
-            tags: TEST_TAG,
-          }, function (error2, result) {
-            if (error2 != null) {
-              done(new Error(error2.message));
+        }).then(wait(500)).then(() => {
+          fileName = `${os.tmpdir()}/test_subtitles.srt`;
+          srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
+          fs.writeFile(fileName, srt, function (error) {
+            if (error != null) {
+              done(new Error(error.message));
             }
-            done();
+            cloudinary.v2.config(true);
+            cloudinary.v2.uploader.upload(fileName, {
+              public_id: 'subtitles.srt',
+              resource_type: 'raw',
+              overwrite: true,
+              tags: TEST_TAG,
+            }, function (error2, result) {
+              if (error2 != null) {
+                done(new Error(error2.message));
+              }
+              done();
+            });
           });
         });
       });

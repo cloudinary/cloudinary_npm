@@ -229,7 +229,7 @@ describe("uploader", function () {
       expect(result.public_id).to.eql('sample');
     });
   });
-  it.skip("should successfully call explicit api", function () {
+  it("should successfully call explicit api", function () {
     return cloudinary.v2.uploader.explicit("sample", {
       type: "upload",
       eager: [
@@ -560,7 +560,7 @@ describe("uploader", function () {
       expect(result.moderation[0].kind).to.eql("manual");
     });
   });
-  it.skip("should support requesting ocr analysis", function () {
+  it("should support requesting ocr analysis", function () {
     return cloudinary.v2.uploader.upload(IMAGE_FILE, {
       ocr: "adv_ocr",
       tags: UPLOAD_TAGS,

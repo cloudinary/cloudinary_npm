@@ -1,3 +1,7 @@
+require('dotenv').load({
+  silent: true,
+});
+
 const expect = require("expect.js");
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
@@ -5,6 +9,7 @@ const http = require('http');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const wait = require('./testUtils/helpers/wait');
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
 const uploadImage = helper.uploadImage;
@@ -65,13 +70,7 @@ const EXPLICIT_TRANSFORMATION2 = {
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
 
-function wait(ms = 0) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
-}
+
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
@@ -795,7 +794,7 @@ describe("api", function () {
         });
       });
     });
-    describe.skip("quality override", function() {
+    describe("quality override", function() {
       const mocked = helper.mockTest();
       const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
       qualityValues.forEach(quality => {
@@ -805,13 +804,16 @@ describe("api", function () {
         });
       });
     });
-    it.skip("should support setting manual moderation status", () => {
+    it("should support setting manual moderation status", () => {
       this.timeout(TIMEOUT.LONG);
       return uploadImage({
         moderation: "manual",
       }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
         moderation_status: "approved",
-      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
+      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"))
+        .catch((err) => {
+          console.og(err);
+        });
     });
     it("should support requesting ocr info", function () {
       this.timeout(TIMEOUT.MEDIUM);
@@ -904,8 +906,9 @@ describe("api", function () {
   });
   // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
   // Replace `it` with  `it.skip` below if you want to disable it.
-  it.skip("should list folders in cloudinary", function () {
+  it("should list folders in cloudinary", function () {
     this.timeout(TIMEOUT.LONG);
+    console.log(cloudinary.config());
     return Q.all([
       uploadImage({
         public_id: 'test_folder1/item',
@@ -927,7 +930,7 @@ describe("api", function () {
         public_id: 'test_folder1/test_subfolder2/item',
         tags: UPLOAD_TAGS,
       }),
-    ]).then(function (results) {
+    ]).then(wait(3000)).then(function (results) {
       return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
     }).then(function (results) {
       var folder, root, root_folders, sub_1;
@@ -951,7 +954,11 @@ describe("api", function () {
     }).then((result) => {
       console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
       expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
-    }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
+    }).catch((err) => {
+      console.log(err);
+      let error = err.error;
+      return expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists');
+    });
   });
   describe("delete folders", function() {
     this.timeout(TIMEOUT.MEDIUM);
@@ -986,7 +993,7 @@ describe("api", function () {
       public_id: publicId,
       backup: true,
       tags: UPLOAD_TAGS,
-    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+    }).then(wait(2000)).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
       return cloudinary.v2.api.delete_resources(publicId);
@@ -1008,17 +1015,16 @@ describe("api", function () {
       return uploadImage({
         public_id: PUBLIC_ID_BACKUP_1,
         backup: true,
-      }).then(() => uploadImage({
+      }).then(wait(1000)).then(() => uploadImage({
         public_id: PUBLIC_ID_BACKUP_2,
         backup: true,
-      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
+      }).then(wait(1000))).then((uploadResponse) => {
         expect(uploadResponse).not.to.be(null);
-      }).then(wait(TIMEOUT.SHORT))
-        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
+      }).then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
+        .then(wait(1000))
         .then((deleteResponse) => {
           expect(deleteResponse).to.have.property("deleted");
         })
-        .then(wait(TIMEOUT.SHORT))
         .then(() => Q.all([
           cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_1, { versions: true }),
           cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_2, { versions: true })]))
@@ -1044,14 +1050,14 @@ describe("api", function () {
         public_id: PUBLIC_ID_BACKUP_3,
         angle: '0',
         backup: true,
-      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
+      }).then(wait(1000))).then((uploadResponse) => {
         expect(uploadResponse).not.to.be(null);
-      }).then(wait(TIMEOUT.SHORT))
+      }).then(wait(2000))
         .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
         .then((deleteResponse) => {
           expect(deleteResponse).to.have.property("deleted");
         })
-        .then(wait(TIMEOUT.SHORT))
+        .then(wait(1000))
         .then(() => cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_3, { versions: true }))
         .then((resources) => {
           expect(resources.versions.length).to.be(2);
@@ -1172,7 +1178,7 @@ describe("api", function () {
       });
     });
   });
-  describe.skip("access_mode", function () {
+  describe("access_mode", function () {
     var access_mode_tag, i, publicId;
     i = 0;
     this.timeout(TIMEOUT.LONG);
@@ -1183,10 +1189,10 @@ describe("api", function () {
       return uploadImage({
         access_mode: "authenticated",
         tags: UPLOAD_TAGS.concat([access_mode_tag]),
-      }).then((result) => {
+      }).then(wait(2000)).then((result) => {
         publicId = result.public_id;
         expect(result.access_mode).to.be("authenticated");
-      });
+      })
     });
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
       var resource;
