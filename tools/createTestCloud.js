@@ -11,37 +11,41 @@ const ENV_FILE_PATH = path.resolve(__dirname, '../.env');
 const cloudinary = require('../cloudinary');
 
 
-let req = https.request({
-  method: 'POST',
-  hostname: 'sub-account-testing.cloudinary.com',
-  path: '/create_sub_account',
-  port: 443,
-}, (res) => {
-  let data = '';
-  res.on('data', (d) => {
-    data += d;
-  });
+function setup() {
+  let req = https.request({
+    method: 'POST',
+    hostname: 'sub-account-testing.cloudinary.com',
+    path: '/create_sub_account',
+    port: 443,
+  }, (res) => {
+    let data = '';
+    res.on('data', (d) => {
+      data += d;
+    });
 
-  res.on('end', () => {
-    let cloudData = JSON.parse(data);
-    let { payload: { cloudApiKey, cloudApiSecret, cloudName, id } } = cloudData;
-    let URL = `CLOUDINARY_URL=cloudinary://${cloudApiKey}:${cloudApiSecret}@${cloudName}`;
+    res.on('end', async () => {
+      let cloudData = JSON.parse(data);
+      let { payload: { cloudApiKey, cloudApiSecret, cloudName, id } } = cloudData;
+      let URL = `CLOUDINARY_URL=cloudinary://${cloudApiKey}:${cloudApiSecret}@${cloudName}`;
 
-    fs.writeFileSync(`tools/cloudinary_url.sh`, URL); // This is needed for Travis
-    fs.writeFileSync(ENV_FILE_PATH, URL); // This is needed for local develoepr tests
+      fs.writeFileSync(`tools/cloudinary_url.sh`, URL); // This is needed for Travis
+      fs.writeFileSync(ENV_FILE_PATH, URL); // This is needed for local develoepr tests
 
-    require('dotenv').load();
+      require('dotenv').load();
 
-    cloudinary.config(true);
+      cloudinary.config(true);
 
-    cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
-      public_id: 'sample'
+      await cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
+        public_id: 'sample'
+      });
     });
   });
-});
 
-req.on('error', (e) => {
-  console.error(e);
-});
+  req.on('error', (e) => {
+    console.error(e);
+  });
 
-req.end();
+  req.end();
+}
+
+setup();
