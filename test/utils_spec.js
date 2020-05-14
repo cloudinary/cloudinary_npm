@@ -1103,37 +1103,32 @@ describe("utils", function () {
       var text_encoded, text_layer;
       text_layer = "Hello World, /Nice to meet you?";
       text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
-      before(function (done) {
+      before(async function () {
         var fileName, srt;
-        cloudinary.v2.uploader.text(text_layer, {
+        // Reset, in case some other test mutated the config (which happens...)
+        cloudinary.config(true);
+        // This is used by all tests
+        await cloudinary.v2.uploader.text(text_layer, {
           public_id: "test_text",
           overwrite: true,
           font_family: "Arial",
           font_size: "18",
           tags: TEST_TAG,
-        }).then(wait(500)).then(() => {
-          fileName = `${os.tmpdir()}/test_subtitles.srt`;
-          srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
-          fs.writeFile(fileName, srt, function (error) {
-            if (error != null) {
-              done(new Error(error.message));
-            }
-            cloudinary.v2.config(true);
-            cloudinary.v2.uploader.upload(fileName, {
-              public_id: 'subtitles.srt',
-              resource_type: 'raw',
-              overwrite: true,
-              tags: TEST_TAG,
-            }, function (error2, result) {
-              if (error2 != null) {
-                done(new Error(error2.message));
-              }
-              done();
-            });
-          });
+        });
+
+        fileName = `${os.tmpdir()}/test_subtitles.srt`;
+        srt = "1\n00:00:10,500 --> 00:00:13,000\nHello World, Nice to meet you?\n";
+
+        fs.writeFileSync(fileName, srt);
+
+        // Why do we need this?
+        await cloudinary.v2.uploader.upload(fileName, {
+          public_id: 'subtitles.srt',
+          resource_type: 'raw',
+          overwrite: true,
+          tags: TEST_TAG,
         });
       });
-      //    include_context "cleanup"
 
       // Overlay and underlay have the same code, so we test overlay only
       describe('overlay', function () {
