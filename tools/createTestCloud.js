@@ -23,7 +23,7 @@ function setup() {
       data += d;
     });
 
-    res.on('end', async () => {
+    res.on('end',() => {
       let cloudData = JSON.parse(data);
       let { payload: { cloudApiKey, cloudApiSecret, cloudName, id } } = cloudData;
       let URL = `CLOUDINARY_URL=cloudinary://${cloudApiKey}:${cloudApiSecret}@${cloudName}`;
@@ -35,7 +35,7 @@ function setup() {
 
       cloudinary.config(true);
 
-      await cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
+      cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
         public_id: 'sample'
       });
     });
