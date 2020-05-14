@@ -1012,6 +1012,7 @@ describe("api", function () {
     }));
 
     it('should restore different versions of a deleted asset', async function () {
+      this.timeout(TIMEOUT.LARGE);
       // Upload the same file twice (upload->delete->upload->delete)
 
       // Upload and delete a file
