@@ -36,11 +36,14 @@ function setup() {
       cloudinary.config(true);
 
       cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
+        cloud_name: cloudName,
+        api_key: cloudApiKey,
+        api_secret: cloudApiSecret,
         public_id: 'sample',
       }).then((res) => {
         console.log('Successfully created a temporary cloud');
         console.log('Cloudname: ', cloudName);
-        console.log(res);
+        console.log('Sample image uploaded to: ', res.url);
       }).catch(() => {
         throw 'FATAL - Could not create sample asset';
       });
