@@ -37,6 +37,8 @@ function setup() {
 
       cloudinary.v2.uploader.upload('./test/.resources/sample.jpg', {
         public_id: 'sample',
+      }).then(() => {
+        console.log('Uploaded');
       }).catch(() => {
         throw 'FATAL - Could not create sample asset';
       });
