@@ -1206,6 +1206,7 @@ describe("api", function () {
         tags: UPLOAD_TAGS.concat([access_mode_tag]),
       });
 
+      await wait(5000)();
       publicId = result.public_id;
       expect(result.access_mode).to.be("authenticated");
     });
