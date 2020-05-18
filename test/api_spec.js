@@ -929,31 +929,32 @@ describe("api", function () {
           public_id: 'test_folder1/test_subfolder2/item',
           tags: UPLOAD_TAGS,
         }),
-      ]).then(function (results) {
-        return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
-      }).then(function (results) {
-        var folder, root, root_folders, sub_1;
-        root = results[0];
-        root_folders = (() => {
-          var j, len, ref, results1;
-          ref = root.folders;
-          results1 = [];
-          for (j = 0, len = ref.length; j < len; j++) {
-            folder = ref[j];
-            results1.push(folder.name);
-          }
-          return results1;
-        })();
-        sub_1 = results[1];
-        expect(root_folders).to.contain('test_folder1');
-        expect(root_folders).to.contain('test_folder2');
-        expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
-        expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
-        return cloudinary.v2.api.sub_folders('test_folder_not_exists');
-      }).then((result) => {
-        console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
-        expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
-      }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
+      ]).then(wait(TIMEOUT.LONG))
+        .then(function (results) {
+          return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
+        }).then(function (results) {
+          var folder, root, root_folders, sub_1;
+          root = results[0];
+          root_folders = (() => {
+            var j, len, ref, results1;
+            ref = root.folders;
+            results1 = [];
+            for (j = 0, len = ref.length; j < len; j++) {
+              folder = ref[j];
+              results1.push(folder.name);
+            }
+            return results1;
+          })();
+          sub_1 = results[1];
+          expect(root_folders).to.contain('test_folder1');
+          expect(root_folders).to.contain('test_folder2');
+          expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
+          expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
+          return cloudinary.v2.api.sub_folders('test_folder_not_exists');
+        }).then((result) => {
+          console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
+          expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
+        }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
     });
     describe("create_folder", function () {
       it("should create a new folder", function () {
