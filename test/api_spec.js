@@ -1017,11 +1017,17 @@ describe("api", function () {
 
       // Upload and delete a file
       const firstUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true });
+      await wait(1000)();
+
       const firstDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+
 
       // Upload and delete it again, this time add angle to create a different 'version'
       const secondUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true, angle: '0'});
+      await wait(1000)();
+
       const secondDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+
 
       // Sanity, ensure these uploads are different before we continue
       expect(firstUpload.bytes).not.to.equal(secondUpload.bytes);
@@ -1041,6 +1047,7 @@ describe("api", function () {
       const secondAssetVersion = getVersionsResp.versions[1].version_id;
 
       // Restore first version, ensure it's equal to the upload size
+      await wait(1000)();
       const firstVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], { versions: [firstAssetVersion] });
       expect(firstVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(firstUpload.bytes);
 
