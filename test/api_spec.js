@@ -1193,21 +1193,23 @@ describe("api", function () {
     });
   });
   describe("access_mode", function () {
-    var access_mode_tag, i, publicId;
+    let access_mode_tag, i, publicId;
     i = 0;
     this.timeout(TIMEOUT.LONG);
     publicId = "";
     access_mode_tag = '';
-    beforeEach(function () {
+
+    beforeEach(async function () {
       access_mode_tag = TEST_TAG + "access_mode" + i++;
-      return uploadImage({
+      const result = await uploadImage({
         access_mode: "authenticated",
         tags: UPLOAD_TAGS.concat([access_mode_tag]),
-      }).then(wait(2000)).then((result) => {
-        publicId = result.public_id;
-        expect(result.access_mode).to.be("authenticated");
-      })
+      });
+
+      publicId = result.public_id;
+      expect(result.access_mode).to.be("authenticated");
     });
+
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
       var resource;
       expect(result.updated).to.be.an('array');
