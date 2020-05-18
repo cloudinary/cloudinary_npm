@@ -951,7 +951,7 @@ describe("api", function () {
           expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
           expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
           return cloudinary.v2.api.sub_folders('test_folder_not_exists');
-        }).then((result) => {
+        }).then(wait(TIMEOUT.LONG)).then((result) => {
           console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
           expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
         }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
