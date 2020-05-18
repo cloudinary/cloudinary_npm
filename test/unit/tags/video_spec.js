@@ -2,9 +2,9 @@ var cloudinary, expect, helper;
 
 expect = require('expect.js');
 
-cloudinary = require('../cloudinary');
+cloudinary = require('../../../cloudinary');
 
-helper = require("./spechelper");
+helper = require("../../spechelper");
 
 describe("video tag helper", function () {
   var DEFAULT_UPLOAD_PATH, VIDEO_UPLOAD_PATH;

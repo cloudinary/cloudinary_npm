@@ -137,12 +137,20 @@ function normalize_expression(expression) {
   if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/)) {
     return expression;
   }
-  var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*";
-  var pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")";
-  var replaceRE = new RegExp(pattern, "g");
-  expression = expression.replace(replaceRE, function (match) {
-    return CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match];
+
+  var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\^|\\+|\\*";
+  var operatorsPattern = "((" + operators + ")(?=[ _]))";
+  var operatorsReplaceRE = new RegExp(operatorsPattern, "g");
+  expression = expression.replace(operatorsReplaceRE, function (match) {
+    return CONDITIONAL_OPERATORS[match];
   });
+
+  var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  var predefinedVarsReplaceRE = new RegExp(predefinedVarsPattern, "g");
+  expression = expression.replace(predefinedVarsReplaceRE, function (match, p1, offset) {
+    return expression[offset - 1] === '$' ? match : PREDEFINED_VARS[match];
+  });
+
   return expression.replace(/[ _]+/g, '_');
 }
 
@@ -624,7 +632,7 @@ function updateable_resource_params(options) {
  * A list of keys used by the url() function.
  * @private
  */
-var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cname', 'format', 'private_cdn', 'resource_type', 'secure', 'secure_cdn_subdomain', 'secure_distribution', 'shorten', 'sign_url', 'ssl_detected', 'type', 'url_suffix', 'use_root_path', 'version'];
+var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cname', 'format', 'long_url_signature', 'private_cdn', 'resource_type', 'secure', 'secure_cdn_subdomain', 'secure_distribution', 'shorten', 'sign_url', 'ssl_detected', 'type', 'url_suffix', 'use_root_path', 'version'];
 
 /**
  * Create a new object with only URL parameters
@@ -633,7 +641,7 @@ var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cnam
  */
 
 function extractUrlParams(options) {
-  return utils.only.apply(utils, [options].concat(URL_KEYS));
+  return pickOnlyExistingValues.apply(undefined, [options].concat(URL_KEYS));
 }
 
 /**
@@ -643,7 +651,7 @@ function extractUrlParams(options) {
  */
 
 function extractTransformationParams(options) {
-  return utils.only.apply(utils, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
+  return pickOnlyExistingValues.apply(undefined, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
 }
 
 /**
@@ -677,6 +685,7 @@ function url(public_id) {
   if (force_version == null) {
     force_version = true;
   }
+  var long_url_signature = !!consumeOption(options, "long_url_signature", config().long_url_signature);
   var format = consumeOption(options, "format");
   var cloud_name = consumeOption(options, "cloud_name", config().cloud_name);
   if (!cloud_name) {
@@ -752,9 +761,9 @@ function url(public_id) {
       }
       // eslint-disable-next-line no-empty
     } catch (error) {}
-    var shasum = crypto.createHash('sha1');
+    var shasum = crypto.createHash(long_url_signature ? 'sha256' : 'sha1');
     shasum.update(utf8_encode(to_sign + api_secret), 'binary');
-    signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, 8);
+    signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
     signature = `s--${signature}--`;
   }
   var prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
@@ -1127,7 +1136,7 @@ exports.html_attrs = function html_attrs(attrs) {
 var CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain'];
 
 function cloudinary_js_config() {
-  var params = utils.only.apply(utils, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
+  var params = pickOnlyExistingValues.apply(undefined, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
   return `<script type='text/javascript'>\n$.cloudinary.config(${JSON.stringify(params)});\n</script>`;
 }
 
@@ -1319,7 +1328,7 @@ function generate_responsive_breakpoints_string(breakpoints) {
 function build_streaming_profiles_param() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var params = utils.only(options, "display_name", "representations");
+  var params = pickOnlyExistingValues(options, "display_name", "representations");
   if (isArray(params.representations)) {
     params.representations = JSON.stringify(params.representations.map(function (r) {
       return {
@@ -1386,7 +1395,7 @@ function present(value) {
  * @return {object} A new object with the required keys and values.
  */
 
-function only(source) {
+function pickOnlyExistingValues(source) {
   var result = {};
   if (source) {
     for (var _len2 = arguments.length, keys = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -1477,7 +1486,8 @@ exports.generate_responsive_breakpoints_string = generate_responsive_breakpoints
 exports.build_streaming_profiles_param = build_streaming_profiles_param;
 exports.hashToParameters = hashToParameters;
 exports.present = present;
-exports.only = only;
+exports.only = pickOnlyExistingValues; // for backwards compatibility
+exports.pickOnlyExistingValues = pickOnlyExistingValues;
 exports.jsonArrayParam = jsonArrayParam;
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;

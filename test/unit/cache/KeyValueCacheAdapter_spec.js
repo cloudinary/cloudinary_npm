@@ -1,9 +1,9 @@
 const expect = require("expect.js");
-const helper = require("../spechelper");
+const helper = require("../../spechelper");
 
 const DummyCacheStorage = require('./DummyCacheStorage');
 
-const KeyValueCacheAdapter = require(`../../${helper.libPath}/cache/KeyValueCacheAdapter`);
+const KeyValueCacheAdapter = require(`../../../${helper.libPath}/cache/KeyValueCacheAdapter`);
 
 var cache;
 var parameters = ["public_id", "upload", "image", "w_100", "jpg"];

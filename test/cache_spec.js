@@ -10,9 +10,16 @@ const KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAd
 
 const Cache = cloudinary.Cache;
 const IMAGE_FILE = helper.IMAGE_FILE;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const PUBLIC_ID = "dummy";
 const BREAKPOINTS = [5, 3, 7, 5];
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+} = testConstants;
+
+const UPLOAD_TAGS = TAGS.UPLOAD_TAGS;
 
 const TRANSFORMATION_1 = {
   angle: 45,
@@ -33,7 +40,7 @@ describe("Cache", function () {
     expect(Cache.get(PUBLIC_ID, {})).to.eql(BREAKPOINTS);
   });
   describe("Upload integration", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     before(function () {
       options = {
         tags: UPLOAD_TAGS,

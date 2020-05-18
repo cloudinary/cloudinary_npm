@@ -7,13 +7,29 @@ const Q = require('q');
 const cloudinary = require('../cloudinary');
 const helper = require("./spechelper");
 
-const SUFFIX = helper.SUFFIX;
-const PUBLIC_ID_PREFIX = "npm_api_test";
-const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
-const PUBLIC_ID_1 = PUBLIC_ID + "_1";
-const PUBLIC_ID_2 = PUBLIC_ID + "_2";
-const PUBLIC_ID_3 = PUBLIC_ID + "_3";
-const SEARCH_TAG = 'npm_advanced_search_' + SUFFIX;
+
+
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+  PUBLIC_IDS,
+  UNIQUE_JOB_SUFFIX_ID,
+} = testConstants;
+
+const {
+  PUBLIC_ID_1,
+  PUBLIC_ID_2,
+  PUBLIC_ID_3,
+} = PUBLIC_IDS;
+
+const {
+  UPLOAD_TAGS,
+} = TAGS;
+
+const SEARCH_TAG = 'npm_advanced_search_' + UNIQUE_JOB_SUFFIX_ID;
+
 
 describe("search_api", function () {
   describe("unit", function () {
@@ -77,7 +93,7 @@ describe("search_api", function () {
     });
   });
   describe("integration", function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     before("Verify Configuration", function () {
       var config = cloudinary.config(true);
       if (!(config.api_key && config.api_secret)) {
@@ -89,21 +105,21 @@ describe("search_api", function () {
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_1,
-            tags: [...helper.UPLOAD_TAGS,
+            tags: [...UPLOAD_TAGS,
               SEARCH_TAG],
             context: "stage=in_review",
           }),
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_2,
-            tags: [...helper.UPLOAD_TAGS,
+            tags: [...UPLOAD_TAGS,
               SEARCH_TAG],
             context: "stage=new",
           }),
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_3,
-            tags: [...helper.UPLOAD_TAGS,
+            tags: [...UPLOAD_TAGS,
               SEARCH_TAG],
             context: "stage=validated",
           }),

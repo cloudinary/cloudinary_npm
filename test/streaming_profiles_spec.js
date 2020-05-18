@@ -7,6 +7,7 @@ const keys = require('lodash/keys');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 
 const api = cloudinary.v2.api;
 
@@ -116,7 +117,7 @@ describe('Cloudinary::Api', function () {
   });
   describe('update_streaming_profile', function () {
     it('should create a streaming profile with representations', function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       return api.create_streaming_profile(test_id_3, {
         representations: [
           {

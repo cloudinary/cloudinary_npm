@@ -13,10 +13,25 @@ const os = require('os');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+  URLS,
+} = testConstants;
+
+const {
+  TEST_TAG,
+  UPLOAD_TAGS,
+} = TAGS;
+
+const {
+  VIDEO_URL,
+  IMAGE_URL,
+} = URLS;
+
 const { utils, api, uploader } = cloudinary.v2;
-const TEST_TAG = helper.TEST_TAG;
-const IMAGE_URL = helper.IMAGE_URL;
-const VIDEO_URL = helper.VIDEO_URL;
 const sharedExamples = helper.sharedExamples;
 const includeContext = helper.includeContext;
 const ARCHIVE_TAG = TEST_TAG + "_archive";
@@ -35,12 +50,12 @@ sharedExamples('archive', function () {
     }
   });
   before(function () {
-    this.timeout(helper.TIMEOUT_LONG);
+    this.timeout(TIMEOUT.LONG);
     return Q.all([
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID1,
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
             effect: "blackwhite",
           },
@@ -48,7 +63,7 @@ sharedExamples('archive', function () {
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID2,
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
             effect: "blackwhite",
           },
@@ -57,13 +72,13 @@ sharedExamples('archive', function () {
         {
           public_id: PUBLIC_ID_RAW,
           resource_type: "raw",
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
         }),
       uploader.upload(VIDEO_URL,
         {
           public_id: "dog",
           resource_type: "video",
-          tags: helper.UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
         }),
     ]);
   });
@@ -78,7 +93,7 @@ describe("archive", function () {
   includeContext('archive');
   describe("utils", function () {
     describe('.generate_zip_download_url', function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       this.archive_result = void 0;
       before(function () {
         this.archive_result = utils.download_zip_url({
@@ -124,7 +139,7 @@ describe("archive", function () {
   describe("uploader", function () {
     describe('.create_archive', function () {
       var archive_result;
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       before(function () {
         return uploader.create_archive({
           target_public_id: 'gem_archive_test',
@@ -145,7 +160,7 @@ describe("archive", function () {
       });
     });
     describe('.create_zip', function () {
-      this.timeout(helper.TIMEOUT_LONG);
+      this.timeout(TIMEOUT.LONG);
       it('should call create_archive with "zip" format and ignore missing resources', function () {
         helper.mockPromise(function (xhr, write) {
           uploader.create_zip({
@@ -161,7 +176,7 @@ describe("archive", function () {
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
         });
       });
-      it('should create archive with "zip" format and include multiple resource types', function () {
+      it.skip('should create archive with "zip" format and include multiple resource types', function () {
         return uploader.create_zip({
           fully_qualified_public_ids: [FULLY_QUALIFIED_IMAGE, FULLY_QUALIFIED_VIDEO],
           resource_type: "auto",
