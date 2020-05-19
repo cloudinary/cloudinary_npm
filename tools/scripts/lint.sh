@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e;
+
+node_v=$(node --version) ;
+if [[ "${node_v%%.*}" == 'v4' || "${node_v%%.*}" == 'v6' ]]
+then
+  npm echo 'Old node version - Skipping eslint'
+else
+  eslint .
+fi
+

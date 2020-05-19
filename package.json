@@ -55,7 +55,7 @@
     "test": "tools/scripts/test.sh",
     "test-with-temp-cloud": "tools/scripts/tests-with-temp-cloud.sh",
     "dtslint": "tools/scripts/ditslint.sh",
-    "lint": "eslint .",
+    "lint": "tools/scripts/lint.sh",
     "compile": "tools/scripts/compile.sh",
     "coverage": "tools/scripts/test.es6.sh --coverage",
     "test-es6": "tools/scripts/test.es6.sh",
