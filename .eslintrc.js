@@ -27,6 +27,7 @@ module.exports = {
         "global-require": "off",
         "guard-for-in": "off",
         "indent": "off",
+        "import/no-extraneous-dependencies": "off",
         "import/no-unresolved": "off",
         "import/newline-after-import": "off",
         "import/no-dynamic-require": "off",
