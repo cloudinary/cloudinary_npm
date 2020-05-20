@@ -1,3 +1,7 @@
+require('dotenv').load({
+  silent: true,
+});
+
 const expect = require("expect.js");
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
@@ -5,11 +9,13 @@ const http = require('http');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
+const wait = require('./testUtils/helpers/wait');
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
 const uploadImage = helper.uploadImage;
 
 const testConstants = require('./testUtils/testConstants');
+const API_V2 = cloudinary.v2.api;
 
 const {
   TIMEOUT,
@@ -66,13 +72,7 @@ const EXPLICIT_TRANSFORMATION2 = {
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
 
-function wait(ms = 0) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
-}
+
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
@@ -796,7 +796,7 @@ describe("api", function () {
         });
       });
     });
-    describe.skip("quality override", function() {
+    describe("quality override", function() {
       const mocked = helper.mockTest();
       const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
       qualityValues.forEach(quality => {
@@ -806,13 +806,16 @@ describe("api", function () {
         });
       });
     });
-    it.skip("should support setting manual moderation status", () => {
+    it("should support setting manual moderation status", function() {
       this.timeout(TIMEOUT.LONG);
       return uploadImage({
         moderation: "manual",
       }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
         moderation_status: "approved",
-      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
+      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"))
+        .catch((err) => {
+          console.og(err);
+        });
     });
     it("should support requesting ocr info", function () {
       this.timeout(TIMEOUT.MEDIUM);
@@ -929,7 +932,7 @@ describe("api", function () {
           public_id: 'test_folder1/test_subfolder2/item',
           tags: UPLOAD_TAGS,
         }),
-      ]).then(wait(TIMEOUT.LONG))
+      ]).then(wait(TIMEOUT.SHORT))
         .then(function (results) {
           return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
         }).then(function (results) {
@@ -981,7 +984,7 @@ describe("api", function () {
             .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
               expect(folder).not.to.be(null);
               expect(folder["total_count"]).to.eql(0);
-              expect(folder["folders" ]).to.be.empty;
+              expect(folder["folders"]).to.be.empty;
             }));
         });
       });
@@ -1003,7 +1006,7 @@ describe("api", function () {
       public_id: publicId,
       backup: true,
       tags: UPLOAD_TAGS,
-    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+    }).then(wait(2000)).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
       return cloudinary.v2.api.delete_resources(publicId);
@@ -1021,67 +1024,88 @@ describe("api", function () {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
     }));
-    it('should restore a deleted resource by versions', function () {
-      return uploadImage({
-        public_id: PUBLIC_ID_BACKUP_1,
-        backup: true,
-      }).then(() => uploadImage({
-        public_id: PUBLIC_ID_BACKUP_2,
-        backup: true,
-      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
-        expect(uploadResponse).not.to.be(null);
-      }).then(wait(TIMEOUT.SHORT))
-        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
-        .then((deleteResponse) => {
-          expect(deleteResponse).to.have.property("deleted");
-        })
-        .then(wait(TIMEOUT.SHORT))
-        .then(() => Q.all([
-          cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_1, { versions: true }),
-          cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_2, { versions: true })]))
-        .then((resources) => {
-          expect(resources.length).to.be(2);
 
-          const version_1 = resources[0].versions[0].version_id;
-          const version_2 = resources[1].versions[0].version_id;
-          return cloudinary.v2.api.restore([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2], { versions: [version_1, version_2] });
-        }).then((restoreResponse) => {
-          expect(restoreResponse[PUBLIC_ID_BACKUP_1].bytes).to.eql(3381);
-          expect(restoreResponse[PUBLIC_ID_BACKUP_2].bytes).to.eql(3381);
-        }).then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]))
-        .then((deleteResponse) => {
-          expect(deleteResponse).to.have.property("deleted");
-        });
+    it('should restore different versions of a deleted asset', async function () {
+      this.timeout(TIMEOUT.LARGE);
+      // Upload the same file twice (upload->delete->upload->delete)
+
+      // Upload and delete a file
+      const firstUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true });
+      await wait(1000)();
+
+      const firstDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+
+
+      // Upload and delete it again, this time add angle to create a different 'version'
+      const secondUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true, angle: '0'});
+      await wait(1000)();
+
+      const secondDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+
+
+      // Sanity, ensure these uploads are different before we continue
+      expect(firstUpload.bytes).not.to.equal(secondUpload.bytes);
+
+      // Ensure all files were uploaded correctly
+      expect(firstUpload).not.to.be(null);
+      expect(secondUpload).not.to.be(null);
+
+      // Ensure all files were deleted correctly
+      expect(firstDelete).to.have.property("deleted");
+      expect(secondDelete).to.have.property("deleted");
+
+      // Get the versions versions of the deleted asset
+      const getVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, { versions: true });
+
+      const firstAssetVersion = getVersionsResp.versions[0].version_id;
+      const secondAssetVersion = getVersionsResp.versions[1].version_id;
+
+      // Restore first version, ensure it's equal to the upload size
+      await wait(1000)();
+      const firstVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], { versions: [firstAssetVersion] });
+      expect(firstVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(firstUpload.bytes);
+
+      // Restore second version, ensure it's equal to the upload size
+      const secondVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], { versions: [secondAssetVersion] });
+      expect(secondVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(secondUpload.bytes);
+
+      // Cleanup,
+      const finalDeleteResp = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+      expect(finalDeleteResp).to.have.property("deleted");
     });
-    it('should restore an old deleted resource by versions', function () {
-      return uploadImage({
-        public_id: PUBLIC_ID_BACKUP_3,
-        backup: true,
-      }).then(() => uploadImage({
-        public_id: PUBLIC_ID_BACKUP_3,
-        angle: '0',
-        backup: true,
-      }).then(wait(TIMEOUT.SHORT))).then((uploadResponse) => {
-        expect(uploadResponse).not.to.be(null);
-      }).then(wait(TIMEOUT.SHORT))
-        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
-        .then((deleteResponse) => {
-          expect(deleteResponse).to.have.property("deleted");
-        })
-        .then(wait(TIMEOUT.SHORT))
-        .then(() => cloudinary.v2.api.resource(PUBLIC_ID_BACKUP_3, { versions: true }))
-        .then((resources) => {
-          expect(resources.versions.length).to.be(2);
 
-          const old_version = resources.versions[0].version_id;
-          return cloudinary.v2.api.restore(PUBLIC_ID_BACKUP_3, { versions: old_version });
-        }).then((restoreResponse) => {
-          expect(restoreResponse[PUBLIC_ID_BACKUP_3].bytes).to.eql(2353);
-        })
-        .then(() => cloudinary.v2.api.delete_resources([PUBLIC_ID_BACKUP_3]))
-        .then((deleteResponse) => {
-          expect(deleteResponse).to.have.property("deleted");
-        });
+    it('should restore two different deleted assets', async () => {
+      // Upload two different files
+      const firstUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true });
+      const secondUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_2, backup: true, angle: '0' });
+
+      // delete both resources
+      const deleteAll = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]);
+
+      // Expect correct deletion of the assets
+      expect(deleteAll.deleted[PUBLIC_ID_BACKUP_1]).to.be("deleted");
+      expect(deleteAll.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
+
+      const getFirstAssetVersion = await API_V2.resource(PUBLIC_ID_BACKUP_1, { versions: true });
+      const getSecondAssetVersion = await API_V2.resource(PUBLIC_ID_BACKUP_2, { versions: true });
+
+      const firstAssetVersion = getFirstAssetVersion.versions[0].version_id;
+      const secondAssetVersion = getSecondAssetVersion.versions[0].version_id;
+
+      const IDS_TO_RESTORE = [PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2];
+      const VERSIONS_TO_RESTORE = [firstAssetVersion, secondAssetVersion];
+
+      const restore = await API_V2.restore(IDS_TO_RESTORE, { versions: VERSIONS_TO_RESTORE });
+
+      // Expect correct restorations
+      expect(restore[PUBLIC_ID_BACKUP_1].bytes).to.equal(firstUpload.bytes);
+      expect(restore[PUBLIC_ID_BACKUP_2].bytes).to.equal(secondUpload.bytes);
+
+      // Cleanup
+      const finalDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]);
+      // Expect correct deletion of the assets
+      expect(finalDelete.deleted[PUBLIC_ID_BACKUP_1]).to.be("deleted");
+      expect(finalDelete.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
     });
   });
   describe('mapping', function () {
@@ -1189,22 +1213,25 @@ describe("api", function () {
       });
     });
   });
-  describe.skip("access_mode", function () {
-    var access_mode_tag, i, publicId;
+  describe("access_mode", function () {
+    let access_mode_tag, i, publicId;
     i = 0;
     this.timeout(TIMEOUT.LONG);
     publicId = "";
     access_mode_tag = '';
-    beforeEach(function () {
+
+    beforeEach(async function () {
       access_mode_tag = TEST_TAG + "access_mode" + i++;
-      return uploadImage({
+      const result = await uploadImage({
         access_mode: "authenticated",
         tags: UPLOAD_TAGS.concat([access_mode_tag]),
-      }).then((result) => {
-        publicId = result.public_id;
-        expect(result.access_mode).to.be("authenticated");
       });
+
+      await wait(5000)();
+      publicId = result.public_id;
+      expect(result.access_mode).to.be("authenticated");
     });
+
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
       var resource;
       expect(result.updated).to.be.an('array');
