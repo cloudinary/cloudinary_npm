@@ -9,10 +9,12 @@ const SDK_TAG = "SDK_TEST"; // identifies resources created by all SDKs tests
 const TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created by this SDKs tests
 const TEST_TAG = `${TEST_TAG_PREFIX}_${UNIQUE_JOB_SUFFIX_ID}`;
 const UPLOAD_TAGS = [TEST_TAG, TEST_TAG_PREFIX, SDK_TAG];
+const UNIQUE_TEST_FOLDER = `${TEST_TAG}_${UNIQUE_JOB_SUFFIX_ID}_folder`;
 
 module.exports = {
   TEST_TAG_PREFIX,
   PUBLIC_ID_PREFIX,
+  UNIQUE_TEST_FOLDER,
   TIMEOUT: {
     SHORT: 5000,
     MEDIUM: 20000,

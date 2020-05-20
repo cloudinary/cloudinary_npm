@@ -24,7 +24,8 @@ const {
   UNIQUE_JOB_SUFFIX_ID,
   PRESETS,
   TRANSFORMATIONS,
-  PUBLIC_ID_PREFIX
+  PUBLIC_ID_PREFIX,
+  UNIQUE_TEST_FOLDER,
 } = testConstants;
 
 const {
@@ -905,83 +906,96 @@ describe("api", function () {
       ));
     }));
   });
-  // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
-  // Replace `it` with  `it.skip` below if you want to disable it.
-  it("should list folders in cloudinary", function () {
-    this.timeout(TIMEOUT.LONG);
-    return Q.all([
-      uploadImage({
-        public_id: 'test_folder1/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder2/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder2/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder1/test_subfolder1/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder1/test_subfolder2/item',
-        tags: UPLOAD_TAGS,
-      }),
-    ]).then(wait(3000)).then(function (results) {
-      return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
-    }).then(function (results) {
-      var folder, root, root_folders, sub_1;
-      root = results[0];
-      root_folders = (() => {
-        var j, len, ref, results1;
-        ref = root.folders;
-        results1 = [];
-        for (j = 0, len = ref.length; j < len; j++) {
-          folder = ref[j];
-          results1.push(folder.name);
-        }
-        return results1;
-      })();
-      sub_1 = results[1];
-      expect(root_folders).to.contain('test_folder1');
-      expect(root_folders).to.contain('test_folder2');
-      expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
-      expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
-      return cloudinary.v2.api.sub_folders('test_folder_not_exists');
-    }).then((result) => {
-      console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
-      expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
-    }).catch((err) => {
-      let error = err.error;
-      return expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists');
+  describe("folders", function () {
+    // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
+    // Replace `it` with  `it.skip` below if you want to disable it.
+    it("should list folders in cloudinary", function () {
+      this.timeout(TIMEOUT.LONG);
+      return Q.all([
+        uploadImage({
+          public_id: 'test_folder1/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder2/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder2/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder1/test_subfolder1/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder1/test_subfolder2/item',
+          tags: UPLOAD_TAGS,
+        }),
+      ]).then(wait(TIMEOUT.SHORT))
+        .then(function (results) {
+          return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
+        }).then(function (results) {
+          var folder, root, root_folders, sub_1;
+          root = results[0];
+          root_folders = (() => {
+            var j, len, ref, results1;
+            ref = root.folders;
+            results1 = [];
+            for (j = 0, len = ref.length; j < len; j++) {
+              folder = ref[j];
+              results1.push(folder.name);
+            }
+            return results1;
+          })();
+          sub_1 = results[1];
+          expect(root_folders).to.contain('test_folder1');
+          expect(root_folders).to.contain('test_folder2');
+          expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
+          expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
+          return cloudinary.v2.api.sub_folders('test_folder_not_exists');
+        }).then(wait(TIMEOUT.LONG)).then((result) => {
+          console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
+          expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
+        }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
     });
-  });
-  describe("delete folders", function() {
-    this.timeout(TIMEOUT.MEDIUM);
-    const folderPath= "test_folder/delete_folder/"+TEST_TAG;
-    before(function(){
-      return uploadImage({
-        folder: folderPath,
-        tags: UPLOAD_TAGS
-      }).delay(2 * 1000).then(function() {
-        return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
-          .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
-            expect(folder).not.to.be(null);
-            expect(folder["total_count"]).to.eql(0);
-            expect(folder["folders"]).to.be.empty;
-        }));
+    describe("create_folder", function () {
+      it("should create a new folder", function () {
+        const folderPath = `${UNIQUE_TEST_FOLDER}`;
+        const expectedPath = `folders/${folderPath}`;
+        return helper.mockPromise(function (xhr, write, request) {
+          cloudinary.v2.api.create_folder(folderPath);
+          sinon.assert.calledWith(request, sinon.match({
+            pathname: sinon.match(expectedPath),
+            method: sinon.match("POST"),
+          }));
+        });
       });
     });
-    it('should delete an empty folder', function () {
+    describe("delete_folder", function () {
       this.timeout(TIMEOUT.MEDIUM);
-      return cloudinary.v2.api.delete_folder(
-        folderPath
-      ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
-      ).then(()=> expect().fail()
-      ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
+      const folderPath = "test_folder/delete_folder/" + TEST_TAG;
+      before(function () {
+        return uploadImage({
+          folder: folderPath,
+          tags: UPLOAD_TAGS,
+        }).delay(2 * 1000).then(function () {
+          return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
+            .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
+              expect(folder).not.to.be(null);
+              expect(folder["total_count"]).to.eql(0);
+              expect(folder["folders"]).to.be.empty;
+            }));
+        });
+      });
+      it('should delete an empty folder', function () {
+        this.timeout(TIMEOUT.MEDIUM);
+        return cloudinary.v2.api.delete_folder(
+          folderPath
+        ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
+        ).then(()=> expect().fail()
+        ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
+      });
     });
   });
   describe('.restore', function () {
