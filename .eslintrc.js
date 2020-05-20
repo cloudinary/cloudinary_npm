@@ -26,7 +26,7 @@ module.exports = {
         "func-names": "off",
         "global-require": "off",
         "guard-for-in": "off",
-        "indent": "off",
+        "indent": ["error", 2],
         "import/no-extraneous-dependencies": "off",
         "import/no-unresolved": "off",
         "import/newline-after-import": "off",

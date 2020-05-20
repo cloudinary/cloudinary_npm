@@ -63,15 +63,15 @@ const allExamples = {};
 
 function sharedExamples(name, examples) {
   switch (true) {
-    case isFunction(examples):
-      allExamples[name] = examples;
-      return examples;
-    case allExamples.hasOwnProperty(name):
-      return allExamples[name];
-    default:
-      return function () {
-        console.log(`Shared example ${name} was not found!`);
-      };
+  case isFunction(examples):
+    allExamples[name] = examples;
+    return examples;
+  case allExamples.hasOwnProperty(name):
+    return allExamples[name];
+  default:
+    return function () {
+      console.log(`Shared example ${name} was not found!`);
+    };
   }
 }
 

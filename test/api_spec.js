@@ -231,10 +231,10 @@ describe("api", function () {
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result])
           .then(([public_id, result]) => {
-        let resource = findByAttr(result.resources, "public_id", public_id);
-        expect(resource).to.be.an(Object);
-        expect(resource.type).to.eql("upload");
-      }));
+            let resource = findByAttr(result.resources, "public_id", public_id);
+            expect(resource).to.be.an(Object);
+            expect(resource.type).to.eql("upload");
+          }));
     });
     it("should allow listing resources by prefix", function () {
       this.timeout(TIMEOUT.MEDIUM);
