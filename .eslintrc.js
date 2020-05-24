@@ -21,7 +21,7 @@ module.exports = {
         "comma-dangle": "off",
         "comma-spacing": "off",
         "consistent-return": "off",
-        "dot-notation": "off",
+        "dot-notation": "error",
         "function-paren-newline": "off",
         "func-names": "off",
         "global-require": "off",

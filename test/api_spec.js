@@ -970,8 +970,8 @@ describe("api", function () {
         return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
           .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
             expect(folder).not.to.be(null);
-            expect(folder["total_count"]).to.eql(0);
-            expect(folder["folders"]).to.be.empty;
+            expect(folder.total_count).to.eql(0);
+            expect(folder.folders).to.be.empty;
         }));
       });
     });
