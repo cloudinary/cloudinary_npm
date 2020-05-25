@@ -789,7 +789,7 @@ function url(public_id) {
     if (resultUrl.indexOf('?') >= 0) {
       appender = '&';
     }
-    resultUrl = `${resultUrl}${appender}a=${sdkVersionID}`;
+    resultUrl = `${resultUrl}${appender}_s=${sdkVersionID}`;
   }
 
   return resultUrl;

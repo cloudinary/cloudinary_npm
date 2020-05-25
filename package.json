@@ -11,6 +11,7 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
+    "core-js": "^3.6.5",
     "lodash": "^4.17.11",
     "q": "^1.5.1"
   },
