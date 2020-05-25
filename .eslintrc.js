@@ -58,7 +58,7 @@ module.exports = {
         "no-return-assign": "off",
         "no-shadow": "off",
         "no-throw-literal": "off",
-        "no-unreachable": "off",
+        "no-unreachable": "error",
         "no-unused-vars": "off",
         "no-trailing-spaces": ['error',{
             "skipBlankLines" : true
