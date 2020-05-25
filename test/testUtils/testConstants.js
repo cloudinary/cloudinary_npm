@@ -10,9 +10,11 @@ const TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created b
 const TEST_TAG = `${TEST_TAG_PREFIX}_${UNIQUE_JOB_SUFFIX_ID}`;
 const UPLOAD_TAGS = [TEST_TAG, TEST_TAG_PREFIX, SDK_TAG];
 const UNIQUE_TEST_FOLDER = `${TEST_TAG}_${UNIQUE_JOB_SUFFIX_ID}_folder`;
+const TEST_CLOUD_NAME = process.env.CLOUDINARY_URL.split('@')[1];
 
 module.exports = {
   TEST_TAG_PREFIX,
+  TEST_CLOUD_NAME,
   PUBLIC_ID_PREFIX,
   UNIQUE_TEST_FOLDER,
   TIMEOUT: {

@@ -1,8 +1,13 @@
-let path = require('path');
+require('dotenv').load({
+  silent: true,
+});
+
+const path = require('path');
 const expect = require("expect.js");
 const mock = require('mock-fs');
 const getSDKVersionID = require('../../lib/utils/encoding/sdkVersionID/getSDKVersionID');
 const cloudinary = require('../../cloudinary');
+const TEST_CLOUD_NAME = require('../testUtils/testConstants').TEST_CLOUD_NAME
 
 describe('Tests for sdk versionID through image tag', function () {
   let processVersions = {};
@@ -32,7 +37,7 @@ describe('Tests for sdk versionID through image tag', function () {
     });
 
     expect(getSDKVersionID()).to.equal('MAlhAM0'); // value is mocked through package.json and process.version
-    expect(imgStr).to.contain("src='http://res.cloudinary.com/sdk-test/image/upload/hello.png?a=MAlhAM0'");
+    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=MAlhAM0`);
   });
 
   it('Reads from process.versions and package.json (Mocked) - Responsive', () => {
@@ -45,7 +50,8 @@ describe('Tests for sdk versionID through image tag', function () {
       responsive: true,
     });
 
+    console.log(process.env);
     expect(getSDKVersionID()).to.equal('MAlhAM0'); // value is mocked through package.json and process.version
-    expect(imgStr).to.contain("src='http://res.cloudinary.com/sdk-test/image/upload/hello.png?a=MAlhAMA'");
+    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=MAlhAMA`);
   });
 });
