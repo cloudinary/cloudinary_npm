@@ -10,6 +10,7 @@ const itBehavesLike = helper.itBehavesLike;
 const uploadImage = helper.uploadImage;
 
 const testConstants = require('./testUtils/testConstants');
+const API_V2 = cloudinary.v2.api;
 
 const {
   TIMEOUT,
@@ -331,15 +332,14 @@ describe("api", function () {
           expect(resource.derived).to.have.length(1);
         });
     });
-    it("should send the cinemagraph_analysis to the server", function () {
-      return helper.mockPromise((xhr, writeSpy, requestSpy) => {
-        cloudinary.v2.api.resource(PUBLIC_ID, { cinemagraph_analysis: true });
-        return sinon.assert.calledWith(
-          requestSpy, sinon.match(sinon.match({
-            query: sinon.match('cinemagraph_analysis=true'),
-          }, 'cinemagraph_analysis=true'))
-        );
-      });
+    it("should allow getting the cinemagraph_analysis of a resource", async function () {
+      // Get a resource and include a cinemagraph analysis value in the response
+      const result = await API_V2.resource(PUBLIC_ID, { cinemagraph_analysis: true });
+
+      // Ensure result includes a cinemagraph_analysis with a cinemagraph_score
+      expect(result).not.to.be.empty();
+      expect(result.cinemagraph_analysis).to.be.an("object");
+      expect(result.cinemagraph_analysis).to.have.property("cinemagraph_score");
     });
     describe("derived pagination", function(){
       it("should send the derived_next_cursor to the server", function() {
