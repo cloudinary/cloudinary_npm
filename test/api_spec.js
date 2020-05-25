@@ -1,4 +1,3 @@
-
 require('dotenv').load({
   silent: true,
 });
@@ -10,30 +9,58 @@ const http = require('http');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
-
+const wait = require('./testUtils/helpers/wait');
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
-const TEST_TAG = helper.TEST_TAG;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const uploadImage = helper.uploadImage;
-const SUFFIX = helper.SUFFIX;
-const PUBLIC_ID_PREFIX = "npm_api_test";
-const PUBLIC_ID = PUBLIC_ID_PREFIX + SUFFIX;
-const PUBLIC_ID_1 = PUBLIC_ID + "_1";
-const PUBLIC_ID_2 = PUBLIC_ID + "_2";
-const PUBLIC_ID_3 = PUBLIC_ID + "_3";
-const PUBLIC_ID_4 = PUBLIC_ID + "_4";
-const PUBLIC_ID_5 = PUBLIC_ID + "_5";
-const PUBLIC_ID_6 = PUBLIC_ID + "_6";
-const NAMED_TRANSFORMATION = "npm_api_test_transformation_" + SUFFIX;
-const NAMED_TRANSFORMATION2 = "npm_api_test_transformation_2_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET1 = "npm_api_test_upload_preset_1_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET2 = "npm_api_test_upload_preset_2_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET3 = "npm_api_test_upload_preset_3_" + SUFFIX;
-const API_TEST_UPLOAD_PRESET4 = "npm_api_test_upload_preset_4_" + SUFFIX;
-const EXPLICIT_TRANSFORMATION_NAME = `c_scale,l_text:Arial_60:${TEST_TAG},w_100`;
-const EXPLICIT_TRANSFORMATION_NAME2 = `c_scale,l_text:Arial_60:${TEST_TAG},w_200`;
+
+const testConstants = require('./testUtils/testConstants');
+const API_V2 = cloudinary.v2.api;
+
+const {
+  TIMEOUT,
+  TAGS,
+  PUBLIC_IDS,
+  UNIQUE_JOB_SUFFIX_ID,
+  PRESETS,
+  TRANSFORMATIONS,
+  PUBLIC_ID_PREFIX,
+  UNIQUE_TEST_FOLDER,
+} = testConstants;
+
+const {
+  PUBLIC_ID,
+  PUBLIC_ID_1,
+  PUBLIC_ID_2,
+  PUBLIC_ID_3,
+  PUBLIC_ID_4,
+  PUBLIC_ID_5,
+  PUBLIC_ID_6,
+  PUBLIC_ID_BACKUP_1,
+  PUBLIC_ID_BACKUP_2,
+  PUBLIC_ID_BACKUP_3,
+} = PUBLIC_IDS;
+
+const {
+  TEST_TAG,
+  SDK_TAG,
+  UPLOAD_TAGS,
+} = TAGS;
+
+const {
+  NAMED_TRANSFORMATION,
+  NAMED_TRANSFORMATION2,
+  EXPLICIT_TRANSFORMATION_NAME,
+  EXPLICIT_TRANSFORMATION_NAME2,
+} = TRANSFORMATIONS;
+
+const {
+  API_TEST_UPLOAD_PRESET1,
+  API_TEST_UPLOAD_PRESET2,
+  API_TEST_UPLOAD_PRESET3,
+  API_TEST_UPLOAD_PRESET4,
+} = PRESETS;
+
 const EXPLICIT_TRANSFORMATION = {
   width: 100,
   crop: "scale",
@@ -45,13 +72,7 @@ const EXPLICIT_TRANSFORMATION2 = {
   overlay: `text:Arial_60:${TEST_TAG}`,
 };
 
-function wait(ms = 0) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
-}
+
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
@@ -125,7 +146,7 @@ function findByAttr(elements, attr, value) {
 
 
 describe("api", function () {
-  var contextKey = `test-key${helper.SUFFIX}`;
+  var contextKey = `test-key${UNIQUE_JOB_SUFFIX_ID}`;
   before("Verify Configuration", function () {
     let config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -210,10 +231,10 @@ describe("api", function () {
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result])
           .then(([public_id, result]) => {
-        let resource = findByAttr(result.resources, "public_id", public_id);
-        expect(resource).to.be.an(Object);
-        expect(resource.type).to.eql("upload");
-      }));
+            let resource = findByAttr(result.resources, "public_id", public_id);
+            expect(resource).to.be.an(Object);
+            expect(resource.type).to.eql("upload");
+          }));
     });
     it("should allow listing resources by prefix", function () {
       this.timeout(TIMEOUT.MEDIUM);
@@ -321,6 +342,35 @@ describe("api", function () {
             }, 'derived_next_cursor=aaa')));
         });
       });
+    });
+  });
+  describe("backup resource", function () {
+    this.timeout(TIMEOUT.MEDIUM);
+
+    const publicId = "api_test_backup" + UNIQUE_JOB_SUFFIX_ID;
+    before(() => uploadImage({
+      public_id: publicId,
+      backup: true,
+    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+      expect(resource).not.to.be(null);
+    }));
+    after(function () {
+      return cloudinary.v2.api.delete_resources(publicId).then((response) => {
+        expect(response).to.have.property("deleted");
+      });
+    });
+    it("should return the asset details together with all of its backed up versions when versions is true", function () {
+      return cloudinary.v2.api.resource(publicId, { versions: true })
+        .then((resource) => {
+          expect(resource.versions).to.be.an('array');
+        });
+    });
+
+    it("should return the asset details together without backed up versions when versions is false", function () {
+      return cloudinary.v2.api.resource(publicId, { versions: false })
+        .then((resource) => {
+          expect(resource.versions).to.be(undefined);
+        });
     });
   });
   describe("delete", function () {
@@ -486,7 +536,7 @@ describe("api", function () {
     var transformationName;
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
     itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
-    transformationName = "api_test_transformation3" + SUFFIX;
+    transformationName = "api_test_transformation3" + UNIQUE_JOB_SUFFIX_ID;
     after(function () {
       return Q.allSettled(
         [
@@ -756,13 +806,16 @@ describe("api", function () {
         });
       });
     });
-    it("should support setting manual moderation status", () => {
+    it("should support setting manual moderation status", function() {
       this.timeout(TIMEOUT.LONG);
       return uploadImage({
         moderation: "manual",
       }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
         moderation_status: "approved",
-      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"));
+      })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"))
+        .catch((err) => {
+          console.og(err);
+        });
     });
     it("should support requesting ocr info", function () {
       this.timeout(TIMEOUT.MEDIUM);
@@ -821,8 +874,8 @@ describe("api", function () {
       };
       acl_string = '{"access_type":"anonymous","start":"2019-02-22T16:20:57.000Z","end":"2019-03-22 00:00 +0200"}';
       options = {
-        public_id: helper.TEST_TAG,
-        tags: [...helper.UPLOAD_TAGS, 'access_control_test'],
+        public_id: TEST_TAG,
+        tags: [...UPLOAD_TAGS, 'access_control_test'],
       };
       it("should allow the user to define ACL in the update parameters2", function () {
         return helper.mockPromise((xhr, writeSpy, requestSpy) => {
@@ -853,91 +906,107 @@ describe("api", function () {
       ));
     }));
   });
-  // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
-  // Replace `it` with  `it.skip` below if you want to disable it.
-  it("should list folders in cloudinary", function () {
-    this.timeout(TIMEOUT.LONG);
-    return Q.all([
-      uploadImage({
-        public_id: 'test_folder1/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder2/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder2/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder1/test_subfolder1/item',
-        tags: UPLOAD_TAGS,
-      }),
-      uploadImage({
-        public_id: 'test_folder1/test_subfolder2/item',
-        tags: UPLOAD_TAGS,
-      }),
-    ]).then(function (results) {
-      return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
-    }).then(function (results) {
-      var folder, root, root_folders, sub_1;
-      root = results[0];
-      root_folders = (() => {
-        var j, len, ref, results1;
-        ref = root.folders;
-        results1 = [];
-        for (j = 0, len = ref.length; j < len; j++) {
-          folder = ref[j];
-          results1.push(folder.name);
-        }
-        return results1;
-      })();
-      sub_1 = results[1];
-      expect(root_folders).to.contain('test_folder1');
-      expect(root_folders).to.contain('test_folder2');
-      expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
-      expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
-      return cloudinary.v2.api.sub_folders('test_folder_not_exists');
-    }).then((result) => {
-      console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
-      expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
-    }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
-  });
-  describe("delete folders", function() {
-    this.timeout(TIMEOUT.MEDIUM);
-    const folderPath= "test_folder/delete_folder/"+TEST_TAG;
-    before(function(){
-      return uploadImage({
-        folder: folderPath,
-        tags: UPLOAD_TAGS
-      }).delay(2 * 1000).then(function() {
-        return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
-          .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
-            expect(folder).not.to.be(null);
-            expect(folder["total_count"]).to.eql(0);
-            expect(folder["folders"]).to.be.empty;
-        }));
+  describe("folders", function () {
+    // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
+    // Replace `it` with  `it.skip` below if you want to disable it.
+    it("should list folders in cloudinary", function () {
+      this.timeout(TIMEOUT.LONG);
+      return Q.all([
+        uploadImage({
+          public_id: 'test_folder1/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder2/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder2/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder1/test_subfolder1/item',
+          tags: UPLOAD_TAGS,
+        }),
+        uploadImage({
+          public_id: 'test_folder1/test_subfolder2/item',
+          tags: UPLOAD_TAGS,
+        }),
+      ]).then(wait(TIMEOUT.SHORT))
+        .then(function (results) {
+          return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
+        }).then(function (results) {
+          var folder, root, root_folders, sub_1;
+          root = results[0];
+          root_folders = (() => {
+            var j, len, ref, results1;
+            ref = root.folders;
+            results1 = [];
+            for (j = 0, len = ref.length; j < len; j++) {
+              folder = ref[j];
+              results1.push(folder.name);
+            }
+            return results1;
+          })();
+          sub_1 = results[1];
+          expect(root_folders).to.contain('test_folder1');
+          expect(root_folders).to.contain('test_folder2');
+          expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
+          expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
+          return cloudinary.v2.api.sub_folders('test_folder_not_exists');
+        }).then(wait(TIMEOUT.LONG)).then((result) => {
+          console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
+          expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
+        }).catch(({ error }) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
+    });
+    describe("create_folder", function () {
+      it("should create a new folder", function () {
+        const folderPath = `${UNIQUE_TEST_FOLDER}`;
+        const expectedPath = `folders/${folderPath}`;
+        return helper.mockPromise(function (xhr, write, request) {
+          cloudinary.v2.api.create_folder(folderPath);
+          sinon.assert.calledWith(request, sinon.match({
+            pathname: sinon.match(expectedPath),
+            method: sinon.match("POST"),
+          }));
+        });
       });
     });
-    it('should delete an empty folder', function () {
+    describe("delete_folder", function () {
       this.timeout(TIMEOUT.MEDIUM);
-      return cloudinary.v2.api.delete_folder(
-        folderPath
-      ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
-      ).then(()=> expect().fail()
-      ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
+      const folderPath = "test_folder/delete_folder/" + TEST_TAG;
+      before(function () {
+        return uploadImage({
+          folder: folderPath,
+          tags: UPLOAD_TAGS,
+        }).delay(2 * 1000).then(function () {
+          return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
+            .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
+              expect(folder).not.to.be(null);
+              expect(folder["total_count"]).to.eql(0);
+              expect(folder["folders"]).to.be.empty;
+            }));
+        });
+      });
+      it('should delete an empty folder', function () {
+        this.timeout(TIMEOUT.MEDIUM);
+        return cloudinary.v2.api.delete_folder(
+          folderPath
+        ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
+        ).then(()=> expect().fail()
+        ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
+      });
     });
   });
   describe('.restore', function () {
     this.timeout(TIMEOUT.MEDIUM);
 
-    const publicId = "api_test_restore" + SUFFIX;
+    const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
     before(() => uploadImage({
       public_id: publicId,
       backup: true,
       tags: UPLOAD_TAGS,
-    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
+    }).then(wait(2000)).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
       return cloudinary.v2.api.delete_resources(publicId);
@@ -955,6 +1024,89 @@ describe("api", function () {
       expect(resource).not.to.be(null);
       expect(resource.bytes).to.eql(3381);
     }));
+
+    it('should restore different versions of a deleted asset', async function () {
+      this.timeout(TIMEOUT.LARGE);
+      // Upload the same file twice (upload->delete->upload->delete)
+
+      // Upload and delete a file
+      const firstUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true });
+      await wait(1000)();
+
+      const firstDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+
+
+      // Upload and delete it again, this time add angle to create a different 'version'
+      const secondUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true, angle: '0'});
+      await wait(1000)();
+
+      const secondDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+
+
+      // Sanity, ensure these uploads are different before we continue
+      expect(firstUpload.bytes).not.to.equal(secondUpload.bytes);
+
+      // Ensure all files were uploaded correctly
+      expect(firstUpload).not.to.be(null);
+      expect(secondUpload).not.to.be(null);
+
+      // Ensure all files were deleted correctly
+      expect(firstDelete).to.have.property("deleted");
+      expect(secondDelete).to.have.property("deleted");
+
+      // Get the versions versions of the deleted asset
+      const getVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, { versions: true });
+
+      const firstAssetVersion = getVersionsResp.versions[0].version_id;
+      const secondAssetVersion = getVersionsResp.versions[1].version_id;
+
+      // Restore first version, ensure it's equal to the upload size
+      await wait(1000)();
+      const firstVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], { versions: [firstAssetVersion] });
+      expect(firstVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(firstUpload.bytes);
+
+      // Restore second version, ensure it's equal to the upload size
+      const secondVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], { versions: [secondAssetVersion] });
+      expect(secondVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(secondUpload.bytes);
+
+      // Cleanup,
+      const finalDeleteResp = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+      expect(finalDeleteResp).to.have.property("deleted");
+    });
+
+    it('should restore two different deleted assets', async () => {
+      // Upload two different files
+      const firstUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_1, backup: true });
+      const secondUpload = await uploadImage({ public_id: PUBLIC_ID_BACKUP_2, backup: true, angle: '0' });
+
+      // delete both resources
+      const deleteAll = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]);
+
+      // Expect correct deletion of the assets
+      expect(deleteAll.deleted[PUBLIC_ID_BACKUP_1]).to.be("deleted");
+      expect(deleteAll.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
+
+      const getFirstAssetVersion = await API_V2.resource(PUBLIC_ID_BACKUP_1, { versions: true });
+      const getSecondAssetVersion = await API_V2.resource(PUBLIC_ID_BACKUP_2, { versions: true });
+
+      const firstAssetVersion = getFirstAssetVersion.versions[0].version_id;
+      const secondAssetVersion = getSecondAssetVersion.versions[0].version_id;
+
+      const IDS_TO_RESTORE = [PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2];
+      const VERSIONS_TO_RESTORE = [firstAssetVersion, secondAssetVersion];
+
+      const restore = await API_V2.restore(IDS_TO_RESTORE, { versions: VERSIONS_TO_RESTORE });
+
+      // Expect correct restorations
+      expect(restore[PUBLIC_ID_BACKUP_1].bytes).to.equal(firstUpload.bytes);
+      expect(restore[PUBLIC_ID_BACKUP_2].bytes).to.equal(secondUpload.bytes);
+
+      // Cleanup
+      const finalDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1, PUBLIC_ID_BACKUP_2]);
+      // Expect correct deletion of the assets
+      expect(finalDelete.deleted[PUBLIC_ID_BACKUP_1]).to.be("deleted");
+      expect(finalDelete.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
+    });
   });
   describe('mapping', function () {
     before(function () {
@@ -1062,21 +1214,24 @@ describe("api", function () {
     });
   });
   describe("access_mode", function () {
-    var access_mode_tag, i, publicId;
+    let access_mode_tag, i, publicId;
     i = 0;
     this.timeout(TIMEOUT.LONG);
     publicId = "";
     access_mode_tag = '';
-    beforeEach(function () {
+
+    beforeEach(async function () {
       access_mode_tag = TEST_TAG + "access_mode" + i++;
-      return uploadImage({
+      const result = await uploadImage({
         access_mode: "authenticated",
         tags: UPLOAD_TAGS.concat([access_mode_tag]),
-      }).then((result) => {
-        publicId = result.public_id;
-        expect(result.access_mode).to.be("authenticated");
       });
+
+      await wait(5000)();
+      publicId = result.public_id;
+      expect(result.access_mode).to.be("authenticated");
     });
+
     it("should update access mode by ids", () => cloudinary.v2.api.update_resources_access_mode_by_ids("public", [publicId]).then((result) => {
       var resource;
       expect(result.updated).to.be.an('array');

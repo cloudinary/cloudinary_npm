@@ -3,7 +3,6 @@ const { describe, before, it } = require('mocha');
 const expect = require("expect.js");
 const path = require('path');
 const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
 const cloudinary = require('../cloudinary').v2;
 
 const FileKeyValueStorage = require(`../${helper.libPath}/cache/FileKeyValueStorage`);
@@ -11,9 +10,16 @@ const KeyValueCacheAdapter = require(`../${helper.libPath}/cache/KeyValueCacheAd
 
 const Cache = cloudinary.Cache;
 const IMAGE_FILE = helper.IMAGE_FILE;
-const UPLOAD_TAGS = helper.UPLOAD_TAGS;
 const PUBLIC_ID = "dummy";
 const BREAKPOINTS = [5, 3, 7, 5];
+const testConstants = require('./testUtils/testConstants');
+
+const {
+  TIMEOUT,
+  TAGS,
+} = testConstants;
+
+const UPLOAD_TAGS = TAGS.UPLOAD_TAGS;
 
 const TRANSFORMATION_1 = {
   angle: 45,

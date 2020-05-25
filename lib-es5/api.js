@@ -4,7 +4,7 @@ var utils = require("./utils");
 var call_api = require("./api_client/call_api");
 
 var extend = utils.extend,
-    only = utils.only;
+    pickOnlyExistingValues = utils.pickOnlyExistingValues;
 
 
 var TRANSFORMATIONS_URI = "transformations";
@@ -12,7 +12,7 @@ var TRANSFORMATIONS_URI = "transformations";
 function deleteResourcesParams(options) {
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return extend(params, only(options, "keep_original", "invalidate", "next_cursor", "transformations"));
+  return extend(params, pickOnlyExistingValues(options, "keep_original", "invalidate", "next_cursor", "transformations"));
 }
 
 exports.ping = function ping(callback) {
@@ -48,7 +48,7 @@ exports.resources = function resources(callback) {
   if (options.start_at != null && Object.prototype.toString.call(options.start_at) === '[object Date]') {
     options.start_at = options.start_at.toUTCString();
   }
-  return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options);
 };
 
 exports.resources_by_tag = function resources_by_tag(tag, callback) {
@@ -58,7 +58,7 @@ exports.resources_by_tag = function resources_by_tag(tag, callback) {
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
-  return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
 
 exports.resources_by_context = function resources_by_context(key, value, callback) {
@@ -69,7 +69,7 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "context"];
-  params = only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
+  params = pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
   params.key = key;
   if (value != null) {
     params.value = value;
@@ -84,7 +84,7 @@ exports.resources_by_moderation = function resources_by_moderation(kind, status,
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "moderations", kind, status];
-  return call_api("get", uri, only(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
 };
 
 exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
@@ -97,7 +97,7 @@ exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
   resource_type = options.resource_type || "image";
   type = options.type || "upload";
   uri = ["resources", resource_type, type];
-  params = only(options, "tags", "context", "moderations");
+  params = pickOnlyExistingValues(options, "tags", "context", "moderations");
   params["public_ids[]"] = public_ids;
   return call_api("get", uri, params, callback, options);
 };
@@ -111,12 +111,13 @@ exports.resource = function resource(public_id, callback) {
   resource_type = options.resource_type || "image";
   type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
-  return call_api("get", uri, only(options, "exif", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "exif", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions"), callback, options);
 };
 
 exports.restore = function restore(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+  options.content_type = 'json';
   var resource_type = void 0,
       type = void 0,
       uri = void 0;
@@ -124,7 +125,8 @@ exports.restore = function restore(public_ids, callback) {
   type = options.type || "upload";
   uri = ["resources", resource_type, type, "restore"];
   return call_api("post", uri, {
-    public_ids: public_ids
+    public_ids: public_ids,
+    versions: options.versions
   }, callback, options);
 };
 
@@ -220,7 +222,7 @@ exports.delete_derived_by_transformation = function delete_derived_by_transforma
   uri = "resources/" + resource_type + "/" + type;
   params = extend({
     "public_ids[]": public_ids
-  }, only(options, "invalidate"));
+  }, pickOnlyExistingValues(options, "invalidate"));
   params.keep_original = true;
   params.transformations = utils.build_eager(transformations);
   return call_api("delete", uri, params, callback, options);
@@ -233,20 +235,20 @@ exports.tags = function tags(callback) {
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["tags", resource_type];
-  return call_api("get", uri, only(options, "next_cursor", "max_results", "prefix"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "prefix"), callback, options);
 };
 
 exports.transformations = function transformations(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var params = only(options, "next_cursor", "max_results", "named");
+  var params = pickOnlyExistingValues(options, "next_cursor", "max_results", "named");
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
 
 exports.transformation = function transformation(transformationName, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var params = only(options, "next_cursor", "max_results");
+  var params = pickOnlyExistingValues(options, "next_cursor", "max_results");
   params.transformation = utils.build_eager(transformationName);
   return call_api("get", TRANSFORMATIONS_URI, params, callback, options);
 };
@@ -262,7 +264,7 @@ exports.delete_transformation = function delete_transformation(transformationNam
 exports.update_transformation = function update_transformation(transformationName, updates, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(updates, "allowed_for_strict");
+  var params = pickOnlyExistingValues(updates, "allowed_for_strict");
   params.transformation = utils.build_eager(transformationName);
   if (updates.unsafe_update != null) {
     params.unsafe_update = utils.build_eager(updates.unsafe_update);
@@ -281,7 +283,7 @@ exports.create_transformation = function create_transformation(name, definition,
 exports.upload_presets = function upload_presets(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return call_api("get", ["upload_presets"], only(options, "next_cursor", "max_results"), callback, options);
+  return call_api("get", ["upload_presets"], pickOnlyExistingValues(options, "next_cursor", "max_results"), callback, options);
 };
 
 exports.upload_preset = function upload_preset(name, callback) {
@@ -306,7 +308,7 @@ exports.update_upload_preset = function update_upload_preset(name, callback) {
   var params = void 0,
       uri = void 0;
   uri = ["upload_presets", name];
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "unsigned", "disallow_public_id", "live"));
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), pickOnlyExistingValues(options, "unsigned", "disallow_public_id", "live"));
   return call_api("put", uri, params, callback, options);
 };
 
@@ -316,7 +318,7 @@ exports.create_upload_preset = function create_upload_preset(callback) {
   var params = void 0,
       uri = void 0;
   uri = ["upload_presets"];
-  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), only(options, "name", "unsigned", "disallow_public_id", "live"));
+  params = utils.merge(utils.clear_blank(utils.build_upload_params(options)), pickOnlyExistingValues(options, "name", "unsigned", "disallow_public_id", "live"));
   return call_api("post", uri, params, callback, options);
 };
 
@@ -336,6 +338,22 @@ exports.sub_folders = function sub_folders(path, callback) {
   return call_api("get", uri, {}, callback, options);
 };
 
+/**
+ * Creates an empty folder
+ *
+ * @param {string}    path      The folder path to create
+ * @param {function}  callback  Callback function
+ * @param {object}    options   Configuration options
+ * @returns {*}
+ */
+exports.create_folder = function create_folder(path, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var uri = void 0;
+  uri = ["folders", path];
+  return call_api("post", uri, {}, callback, options);
+};
+
 exports.delete_folder = function delete_folder(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -348,7 +366,7 @@ exports.upload_mappings = function upload_mappings(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var params = void 0;
-  params = only(options, "next_cursor", "max_results");
+  params = pickOnlyExistingValues(options, "next_cursor", "max_results");
   return call_api("get", "upload_mappings", params, callback, options);
 };
 
@@ -375,7 +393,7 @@ exports.update_upload_mapping = function update_upload_mapping(name, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0;
-  params = only(options, "template");
+  params = pickOnlyExistingValues(options, "template");
   params.folder = name;
   return call_api("put", 'upload_mappings', params, callback, options);
 };
@@ -384,7 +402,7 @@ exports.create_upload_mapping = function create_upload_mapping(name, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var params = void 0;
-  params = only(options, "template");
+  params = pickOnlyExistingValues(options, "template");
   params.folder = name;
   return call_api("post", 'upload_mappings', params, callback, options);
 };
@@ -395,7 +413,7 @@ function publishResource(byKey, value, callback) {
   var params = void 0,
       resource_type = void 0,
       uri = void 0;
-  params = only(options, "type", "invalidate", "overwrite");
+  params = pickOnlyExistingValues(options, "type", "invalidate", "overwrite");
   params[byKey] = value;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "publish_resources"];
@@ -512,7 +530,7 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
 exports.add_metadata_field = function add_metadata_field(field, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  var params = pickOnlyExistingValues(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
   return call_api("post", ["metadata_fields"], params, callback, options);
 };
@@ -587,7 +605,7 @@ exports.metadata_field_by_field_id = function metadata_field_by_field_id(externa
 exports.update_metadata_field = function update_metadata_field(external_id, field, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  var params = pickOnlyExistingValues(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
   options.content_type = "json";
   return call_api("put", ["metadata_fields", external_id], params, callback, options);
 };
@@ -611,7 +629,7 @@ exports.update_metadata_field = function update_metadata_field(external_id, fiel
 exports.update_metadata_field_datasource = function update_metadata_field_datasource(field_external_id, entries_external_id, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = only(entries_external_id, "values");
+  var params = pickOnlyExistingValues(entries_external_id, "values");
   options.content_type = "json";
   return call_api("put", ["metadata_fields", field_external_id, "datasource"], params, callback, options);
 };

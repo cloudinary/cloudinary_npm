@@ -24,7 +24,8 @@ var CONDITIONAL_OPERATORS = {
   "*": "mul",
   "/": "div",
   "+": "add",
-  "-": "sub"
+  "-": "sub",
+  "^": "pow"
 };
 
 var SIMPLE_PARAMS = [["audio_codec", "ac"], ["audio_frequency", "af"], ["bit_rate", 'br'], ["color_space", "cs"], ["default_image", "d"], ["delay", "dl"], ["density", "dn"], ["duration", "du"], ["end_offset", "eo"], ["fetch_format", "f"], ["gravity", "g"], ["page", "pg"], ["prefix", "p"], ["start_offset", "so"], ["streaming_profile", "sp"], ["video_codec", "vc"], ["video_sampling", "vs"]];

@@ -39,7 +39,8 @@ var build_upload_params = utils.build_upload_params,
     includes = utils.includes,
     isObject = utils.isObject,
     isRemoteUrl = utils.isRemoteUrl,
-    merge = utils.merge;
+    merge = utils.merge,
+    pickOnlyExistingValues = utils.pickOnlyExistingValues;
 
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback) {
@@ -252,7 +253,7 @@ exports.text = function text(content, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("text", callback, options, function () {
-    var textParams = utils.only.apply(utils, [options].concat(TEXT_PARAMS));
+    var textParams = pickOnlyExistingValues.apply(undefined, [options].concat(TEXT_PARAMS));
     var params = _extends({
       timestamp: utils.timestamp(),
       text: content

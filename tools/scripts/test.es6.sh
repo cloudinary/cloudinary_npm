@@ -1,3 +1,4 @@
+#!/bin/bash
 COLLECT_COVERAGE=0;
 
 for arg in "$@"
@@ -17,4 +18,3 @@ else
   echo 'Running tests on ES6 Code'
   mocha --ui bdd -R spec --recursive test/
 fi
-
