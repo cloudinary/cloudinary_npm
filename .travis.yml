@@ -11,3 +11,5 @@ matrix:
     script: npm run test-with-temp-cloud
   - node_js: "12"
     script: npm run test-with-temp-cloud
+  - node_js: "14"
+    script: npm run test-with-temp-cloud

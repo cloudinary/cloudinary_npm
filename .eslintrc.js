@@ -26,7 +26,7 @@ module.exports = {
         "func-names": "off",
         "global-require": "off",
         "guard-for-in": "off",
-        "indent": "off",
+        "indent": ["error", 2],
         "import/no-extraneous-dependencies": "off",
         "import/no-unresolved": "off",
         "import/newline-after-import": "off",
@@ -58,7 +58,7 @@ module.exports = {
         "no-return-assign": "off",
         "no-shadow": "off",
         "no-throw-literal": "off",
-        "no-unreachable": "off",
+        "no-unreachable": "error",
         "no-unused-vars": "off",
         "no-trailing-spaces": ['error',{
             "skipBlankLines" : true
