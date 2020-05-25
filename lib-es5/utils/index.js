@@ -590,9 +590,6 @@ function updateable_resource_params(options) {
   if (options.categorization != null) {
     params.categorization = options.categorization;
   }
-  if (options.cinemagraph_analysis != null) {
-    params.cinemagraph_analysis = options.cinemagraph_analysis;
-  }
   if (options.context != null) {
     params.context = utils.encode_context(options.context);
   }
