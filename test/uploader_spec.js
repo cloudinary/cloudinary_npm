@@ -29,6 +29,7 @@ const METADATA_SAMPLE_DATA = { metadata_color: "red", metadata_shape: "dodecahed
 const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahedron";
 
 const testConstants = require('./testUtils/testConstants');
+const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
   TIMEOUT,
@@ -1146,6 +1147,40 @@ describe("uploader", function () {
       });
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
+    });
+  });
+
+  describe(":cinemagraph_analysis", function () {
+    it("should support requesting a cinemagraph_analysis when uploading", async function () {
+      // Upload an image and request a cinemagraph analysis value in the response
+      const result = await UPLOADER_V2.upload(IMAGE_FILE, {
+        "cinemagraph_analysis": true,
+        "tags": [TEST_TAG],
+      });
+
+      // Ensure result includes a cinemagraph_analysis with a cinemagraph_score
+      expect(result).not.to.be.empty();
+      expect(result.cinemagraph_analysis).to.be.an("object");
+      expect(result.cinemagraph_analysis).to.have.property("cinemagraph_score");
+    });
+
+    it("should support requesting a cinemagraph_analysis when calling explicit", async function () {
+      // Upload an image
+      const uploadResult = await UPLOADER_V2.upload(IMAGE_FILE, {
+        "tags": [TEST_TAG],
+      });
+
+      // Call explicit on the uploaded image and request a cinemagraph analysis value in the response
+      const explicitResult = await UPLOADER_V2.explicit(uploadResult.public_id, {
+        "cinemagraph_analysis": true,
+        "tags": [TEST_TAG],
+        type: "upload",
+      });
+
+      // Ensure result includes a cinemagraph_analysis with a cinemagraph_score
+      expect(explicitResult).not.to.be.empty();
+      expect(explicitResult.cinemagraph_analysis).to.be.an("object");
+      expect(explicitResult.cinemagraph_analysis).to.have.property("cinemagraph_score");
     });
   });
 });
