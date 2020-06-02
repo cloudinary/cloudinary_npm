@@ -42,7 +42,7 @@ const FULLY_QUALIFIED_IMAGE = "image/upload/sample";
 const FULLY_QUALIFIED_VIDEO = "video/upload/dog";
 
 sharedExamples('archive', function () {
-  this.retries(3);
+
   before("Verify Configuration", function () {
     var config;
     config = cloudinary.config(true);
@@ -91,6 +91,7 @@ sharedExamples('archive', function () {
 });
 
 describe("archive", function () {
+  this.retries(3);
   includeContext('archive');
   describe("utils", function () {
     describe('.generate_zip_download_url', function () {
