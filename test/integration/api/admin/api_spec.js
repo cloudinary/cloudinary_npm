@@ -1007,6 +1007,12 @@ describe("api", function () {
         ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
       });
     });
+    describe("root_folders", function () {
+      itBehavesLike("a list with a cursor", cloudinary.v2.api.root_folders);
+    })
+    describe("sub_folders", function () {
+      itBehavesLike("a list with a cursor", cloudinary.v2.api.sub_folders, '/');
+    });
   });
   describe('.restore', function () {
     this.timeout(TIMEOUT.MEDIUM);
