@@ -42,7 +42,6 @@ const FULLY_QUALIFIED_IMAGE = "image/upload/sample";
 const FULLY_QUALIFIED_VIDEO = "video/upload/dog";
 
 sharedExamples('archive', function () {
-
   before("Verify Configuration", function () {
     var config;
     config = cloudinary.config(true);
