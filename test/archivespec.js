@@ -90,6 +90,7 @@ sharedExamples('archive', function () {
 });
 
 describe("archive", function () {
+  this.retries(3);
   includeContext('archive');
   describe("utils", function () {
     describe('.generate_zip_download_url', function () {
