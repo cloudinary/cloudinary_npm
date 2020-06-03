@@ -18,7 +18,7 @@ const { clone, isString, merge, pickOnlyExistingValues } = utils;
 const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
 
 const TEST_TAG = helper.TEST_TAG;
-
+const createTestConfig = require('./testUtils/createTestConfig');
 // Defined globals
 var cloud_name = '';
 
@@ -33,19 +33,19 @@ describe("utils", function () {
   });
   afterEach(function () {
     cloudinary.config(defaults({
-      secure: null,
+      secure: null
     }, this.orig));
   });
   beforeEach(function () {
     // eslint-disable-next-line max-len
     // @cfg= cloudinary.config( {cloud_name:"test123", secure_distribution : null, private_cdn : false, secure : false, cname : null ,cdn_subdomain : false, api_key : "1234", api_secret: "b" })
-    this.cfg = cloudinary.config({
+    this.cfg = cloudinary.config(createTestConfig({
       secure_distribution: null,
       private_cdn: false,
       secure: false,
       cname: null,
       cdn_subdomain: false,
-    });
+    }));
     this.orig = clone(this.cfg);
     cloud_name = cloudinary.config("cloud_name");
     root_path = `http://res.cloudinary.com/${cloud_name}`;

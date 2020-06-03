@@ -1,14 +1,15 @@
 const expect = require("expect.js");
 const cloudinary = require("../cloudinary.js");
+const createTestConfig = require('./testUtils/createTestConfig');
 
 describe("cloudinary", function () {
   beforeEach(function () {
-    cloudinary.config({
+    cloudinary.config(createTestConfig({
       cloud_name: "test123",
       api_key: 'a',
       api_secret: 'b',
       responsive_width_transformation: null,
-    });
+    }));
   });
   it("should use cloud_name from config", function () {
     var result = cloudinary.utils.url("test");

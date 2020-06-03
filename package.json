@@ -11,6 +11,7 @@
   },
   "main": "cloudinary.js",
   "dependencies": {
+    "core-js": "^3.6.5",
     "lodash": "^4.17.11",
     "q": "^1.5.1"
   },
@@ -37,6 +38,7 @@
     "jsdom": "^9.12.0",
     "jsdom-global": "2.1.1",
     "mocha": "^6.2.3",
+    "mock-fs": "^4.12.0",
     "nyc": "^13.3.0",
     "rimraf": "^3.0.0",
     "sinon": "^6.1.4",

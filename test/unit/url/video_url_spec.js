@@ -14,10 +14,12 @@ function test_cloudinary_url(public_id, options, expected_url, expected_options)
   expect(result).to.eql(expected_url);
 }
 
+const createTestConfig = require('../../testUtils/createTestConfig');
+
 describe("Cloudinary::Utils for video", function () {
   var root_path, upload_path;
   beforeEach(function () {
-    cloudinary.config({
+    cloudinary.config(createTestConfig({
       cloud_name: "test123",
       secure_distribution: null,
       private_cdn: false,
@@ -26,7 +28,7 @@ describe("Cloudinary::Utils for video", function () {
       cdn_subdomain: false,
       api_key: "1234",
       api_secret: "b",
-    });
+    }));
   });
   root_path = "http://res.cloudinary.com/test123";
   upload_path = `${root_path}/video/upload`;
@@ -209,9 +211,9 @@ describe("Cloudinary::Utils for video", function () {
   describe('cloudinary.video_thumbnail_url', function () {
     var options, path, source;
     source = "movie_id";
-    options = {
+    options = createTestConfig({
       cloud_name: "test123",
-    };
+    });
     path = utils.video_thumbnail_url(source, options);
     it("should generate a cloudinary URI to the video thumbnail", function () {
       expect(path).to.eql(`${upload_path}/movie_id.jpg`);

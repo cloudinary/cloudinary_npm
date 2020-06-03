@@ -3,6 +3,7 @@ const cloudinary = require('../cloudinary');
 
 const extend = cloudinary.utils.extend;
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
+const createTestConfig = require('./testUtils/createTestConfig');
 
 describe('source helper', function () {
   const public_id = "sample";
@@ -26,10 +27,10 @@ describe('source helper', function () {
       "crop": "fill",
     };
     cloudinary.config(true); // Reset
-    cloudinary.config({
+    cloudinary.config(createTestConfig({
       cloud_name: "test123",
       api_secret: "1234",
-    });
+    }));
   });
   it("should generate a source tag", function () {
     expect(cloudinary.source("sample.jpg")).to.eql(`<source srcset='${UPLOAD_PATH}/sample.jpg'>`);

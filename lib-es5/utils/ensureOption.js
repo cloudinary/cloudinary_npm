@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Returns an ensureOption function that relies on the provided `defaultOptions` argument
@@ -9,10 +9,18 @@
  */
 function defaults(defaultOptions) {
   return function ensureOption(options, name, defaultValue) {
-    var value = options[name] || defaultOptions[name] || defaultValue;
-    if (value === undefined) {
+    var value = void 0;
+
+    if (typeof options[name] !== 'undefined') {
+      value = options[name];
+    } else if (typeof defaultOptions[name] !== 'undefined') {
+      value = defaultOptions[name];
+    } else if (typeof defaultValue !== 'undefined') {
+      value = defaultValue;
+    } else {
       throw `Must supply ${name}`;
     }
+
     return value;
   };
 }
