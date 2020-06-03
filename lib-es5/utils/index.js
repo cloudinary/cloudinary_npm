@@ -778,7 +778,7 @@ function url(public_id) {
     resultUrl += `?${token}`;
   }
 
-  var analytics = ensureOption(options, 'analytics', true);
+  var analytics = ensureOption(options, 'analytics', false);
   var responsive = ensureOption(options, 'responsive', false);
 
   if (analytics === true) {
