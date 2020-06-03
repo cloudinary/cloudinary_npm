@@ -32,6 +32,7 @@ const SEARCH_TAG = 'npm_advanced_search_' + UNIQUE_JOB_SUFFIX_ID;
 
 
 describe("search_api", function () {
+  this.retries(3);
   describe("unit", function () {
     it('should create empty json', function () {
       var query_hash = cloudinary.v2.search.instance().to_query();

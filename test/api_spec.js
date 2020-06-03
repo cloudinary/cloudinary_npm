@@ -146,6 +146,7 @@ function findByAttr(elements, attr, value) {
 
 
 describe("api", function () {
+  this.retries(3);
   var contextKey = `test-key${UNIQUE_JOB_SUFFIX_ID}`;
   before("Verify Configuration", function () {
     let config = cloudinary.config(true);
@@ -331,6 +332,15 @@ describe("api", function () {
           expect(resource.bytes).to.eql(3381);
           expect(resource.derived).to.have.length(1);
         });
+    });
+    it("should allow getting the cinemagraph_analysis of a resource", async function () {
+      // Get a resource and include a cinemagraph analysis value in the response
+      const result = await API_V2.resource(PUBLIC_ID, { cinemagraph_analysis: true });
+
+      // Ensure result includes a cinemagraph_analysis with a cinemagraph_score
+      expect(result).not.to.be.empty();
+      expect(result.cinemagraph_analysis).to.be.an("object");
+      expect(result.cinemagraph_analysis).to.have.property("cinemagraph_score");
     });
     describe("derived pagination", function(){
       it("should send the derived_next_cursor to the server", function() {
@@ -983,8 +993,8 @@ describe("api", function () {
           return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
             .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
               expect(folder).not.to.be(null);
-              expect(folder["total_count"]).to.eql(0);
-              expect(folder["folders"]).to.be.empty;
+              expect(folder.total_count).to.eql(0);
+              expect(folder.folders).to.be.empty;
             }));
         });
       });

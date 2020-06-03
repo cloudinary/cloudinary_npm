@@ -30,6 +30,7 @@ const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahe
 const createTestConfig = require('./testUtils/createTestConfig');
 
 const testConstants = require('./testUtils/testConstants');
+const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
   TIMEOUT,
@@ -44,6 +45,7 @@ const {
 require('jsdom-global')();
 
 describe("uploader", function () {
+  this.retries(3);
   before("Verify Configuration", function () {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -116,31 +118,24 @@ describe("uploader", function () {
   });
 
   describe("remote urls ", function () {
-    var writeSpy;
-    writeSpy = void 0;
-    beforeEach(function () {
-      writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-    });
-    afterEach(function () {
-      writeSpy.restore();
-    });
+    const mocked = helper.mockTest();
     it("should send s3:// URLs to server", function () {
       cloudinary.v2.uploader.upload("s3://test/1.jpg", {
         tags: UPLOAD_TAGS,
       });
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('file', "s3://test/1.jpg")));
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "s3://test/1.jpg")));
     });
     it("should send gs:// URLs to server", function () {
       cloudinary.v2.uploader.upload("gs://test/1.jpg", {
         tags: UPLOAD_TAGS,
       });
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('file', "gs://test/1.jpg")));
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "gs://test/1.jpg")));
     });
     it("should send ftp:// URLs to server", function () {
       cloudinary.v2.uploader.upload("ftp://example.com/1.jpg", {
         tags: UPLOAD_TAGS,
       });
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('file', "ftp://example.com/1.jpg")));
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "ftp://example.com/1.jpg")));
     });
   });
 
@@ -1148,6 +1143,40 @@ describe("uploader", function () {
       });
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
+    });
+  });
+
+  describe(":cinemagraph_analysis", function () {
+    it("should support requesting a cinemagraph_analysis when uploading", async function () {
+      // Upload an image and request a cinemagraph analysis value in the response
+      const result = await UPLOADER_V2.upload(IMAGE_FILE, {
+        "cinemagraph_analysis": true,
+        "tags": [TEST_TAG],
+      });
+
+      // Ensure result includes a cinemagraph_analysis with a cinemagraph_score
+      expect(result).not.to.be.empty();
+      expect(result.cinemagraph_analysis).to.be.an("object");
+      expect(result.cinemagraph_analysis).to.have.property("cinemagraph_score");
+    });
+
+    it("should support requesting a cinemagraph_analysis when calling explicit", async function () {
+      // Upload an image
+      const uploadResult = await UPLOADER_V2.upload(IMAGE_FILE, {
+        "tags": [TEST_TAG],
+      });
+
+      // Call explicit on the uploaded image and request a cinemagraph analysis value in the response
+      const explicitResult = await UPLOADER_V2.explicit(uploadResult.public_id, {
+        "cinemagraph_analysis": true,
+        "tags": [TEST_TAG],
+        type: "upload",
+      });
+
+      // Ensure result includes a cinemagraph_analysis with a cinemagraph_score
+      expect(explicitResult).not.to.be.empty();
+      expect(explicitResult.cinemagraph_analysis).to.be.an("object");
+      expect(explicitResult.cinemagraph_analysis).to.have.property("cinemagraph_score");
     });
   });
 });
