@@ -12,8 +12,8 @@ const path = require('path');
 const at = require('lodash/at');
 const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
-const cloudinary = require("../cloudinary");
-const helper = require("./spechelper");
+const cloudinary = require("../../../../cloudinary");
+const helper = require("../../../spechelper");
 
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
@@ -27,9 +27,9 @@ const METADATA_FIELD_UNIQUE_EXTERNAL_ID = 'metadata_field_external_id_' + TEST_I
 const METADATA_FIELD_VALUE = 'metadata_field_value_' + TEST_ID;
 const METADATA_SAMPLE_DATA = { metadata_color: "red", metadata_shape: "dodecahedron" };
 const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahedron";
-const createTestConfig = require('./testUtils/createTestConfig');
+const createTestConfig = require('../../../testUtils/createTestConfig');
 
-const testConstants = require('./testUtils/testConstants');
+const testConstants = require('../../../testUtils/testConstants');
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {

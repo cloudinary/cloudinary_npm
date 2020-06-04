@@ -6,10 +6,10 @@ const expect = require("expect.js");
 const fs = require('fs');
 const os = require('os');
 const defaults = require('lodash/defaults');
-const cloudinary = require("../cloudinary");
-const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
-const wait = require('./testUtils/helpers/wait');
+const cloudinary = require("../../cloudinary");
+const helper = require("../spechelper");
+const TIMEOUT = require('../testUtils/testConstants').TIMEOUT;
+const wait = require('../testUtils/helpers/wait');
 const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
 
@@ -18,7 +18,7 @@ const { clone, isString, merge, pickOnlyExistingValues } = utils;
 const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
 
 const TEST_TAG = helper.TEST_TAG;
-const createTestConfig = require('./testUtils/createTestConfig');
+const createTestConfig = require('../testUtils/createTestConfig');
 // Defined globals
 var cloud_name = '';
 
