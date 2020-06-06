@@ -29,6 +29,8 @@ exports.ICON_FILE = "test/.resources/favicon.ico";
 exports.VIDEO_URL = "http://res.cloudinary.com/demo/video/upload/dog.mp4";
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
+const { TEST_TAG } = require('./testUtils/testConstants').TAGS;
+
 exports.SAMPLE_VIDEO_SOURCES = [
   {
     type: 'mp4',
@@ -234,7 +236,11 @@ exports.setupCache = function () {
  * @param {object} options Optional options to use when uploading the test image
  * @returns {object} A response object returned from the upload API
  */
-exports.uploadImage = function (options) {
+exports.uploadImage = function (options = {}) {
+  // Ensure that options at the very least contains the TEST_TAG
+  options.tags = options.tags || [];
+  if (!options.tags.includes(TEST_TAG)) options.tags.push(TEST_TAG);
+
   return cloudinary.v2.uploader.upload(exports.IMAGE_FILE, options);
 };
 
