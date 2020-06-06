@@ -229,9 +229,11 @@ exports.setupCache = function () {
 };
 
 /**
-  Upload an image to be tested on.
-  @callback the callback receives the public_id of the uploaded image
-*/
+ * Upload an image to be tested on.
+ *
+ * @param {object} options Optional options to use when uploading the test image
+ * @returns {object} A response object returned from the upload API
+ */
 exports.uploadImage = function (options) {
   return cloudinary.v2.uploader.upload(exports.IMAGE_FILE, options);
 };
