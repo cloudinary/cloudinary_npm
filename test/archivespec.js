@@ -152,7 +152,7 @@ describe("archive", function () {
           archive_result = result;
         });
       });
-      it('should a Hash', function () {
+      it('should return an object', function () {
         expect(archive_result).to.be.an(Object);
       });
       const EXPECTED_KEYS = ["resource_type", "type", "public_id", "version", "url", "secure_url", "created_at", "tags", "signature", "bytes", "etag", "resource_count", "file_count"];
