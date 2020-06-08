@@ -765,6 +765,12 @@ cloudinary.v2.utils.download_zip_url(
     }
 );
 
+// $ExpectType { [key: string]: any; signature: string; api_key: string; }
+cloudinary.v2.utils.sign_request(
+    {
+    }
+);
+
 // $ExpectType Promise<void>
 cloudinary.v2.search
     .expression('cat -tags:kitten')

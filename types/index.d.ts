@@ -697,6 +697,8 @@ declare module 'cloudinary' {
 
         namespace utils {
 
+            function sign_request(params_to_sign: object, options?: ConfigAndUrlOptions): { signature: string; api_key: string; [key:string]:any};
+
             function api_sign_request(params_to_sign: object, api_secret: string): string;
 
             function api_url(action?: string, options?: ConfigAndUrlOptions): Promise<any>;
