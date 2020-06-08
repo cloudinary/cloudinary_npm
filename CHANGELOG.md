@@ -1,3 +1,30 @@
+1.22.0 / 2020-06-08
+==================
+
+
+New functionality and features
+------------------------------ 
+  * Feature encode sdk version (#371)
+  * Add support for cinemagraph_analysis parameter in upload, explicit, and resource (#391)
+  * Support for creating folders using Admin API (#370)
+  * Add support for pow operator in expressions (#386)
+  * Feature/support download backup version api (#380)
+  * Fix normalize_expression when variable is named like a keyword (e.g., ) (#367)
+  * Add support for 32 char SHA-256 signatures (#368)
+
+  Other Changes
+  -------------
+  * Add missing types for sign-request (#398)
+  * Add deprecation warning for node 6, add tests for node 14 (#389)
+  * Add linter (#388)
+  * Fix incorrect text implementation for list resources(#382)
+  * Update issue templates (#365)
+
+
+
+
+
+
 1.21.0 / 2020-03-29
 ==================
 
