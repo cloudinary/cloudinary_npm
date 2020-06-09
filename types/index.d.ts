@@ -943,7 +943,7 @@ declare module 'cloudinary' {
 
             function create_zip(options?: ArchiveApiOptions, callback?: ResponseCallback): Promise<any>;
 
-            function destroy(public_id: string, options?: { resource_types?: ResourceType, type?: DeliveryType, invalidate?: boolean }, callback?: ResponseCallback,): Promise<any>;
+            function destroy(public_id: string, options?: { resource_type?: ResourceType, type?: DeliveryType, invalidate?: boolean }, callback?: ResponseCallback,): Promise<any>;
 
             function destroy(public_id: string, callback?: ResponseCallback,): Promise<any>;
 
