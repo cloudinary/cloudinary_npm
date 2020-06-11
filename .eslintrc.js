@@ -19,7 +19,7 @@ module.exports = {
         "camelcase": "off",
         "class-methods-use-this": "off",
         "comma-dangle": "off",
-        "comma-spacing": "off",
+        "comma-spacing": [1, {"before": false, "after": true}],
         "consistent-return": "off",
         "dot-notation": "error",
         "function-paren-newline": "off",

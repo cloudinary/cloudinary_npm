@@ -197,15 +197,15 @@ describe("cloudinary", function () {
     });
     it("should support an array of values", function() {
       expect(cloudinary.utils.url("test", {
-        radius: [10,20,30]
+        radius: [10, 20, 30]
       })).to.eql(`${upload_path}/r_10:20:30/test`);
       expect(cloudinary.utils.url("test", {
         variables: [['$v', 10]],
-        radius: [10,20,'$v'],
+        radius: [10, 20, '$v'],
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v/test`);
       expect(cloudinary.utils.url("test", {
         variables: [['$v', 10]],
-        radius: [10,20,'$v',40],
+        radius: [10, 20, '$v', 40],
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v:40/test`);
     })
     it("should support colon separated values", function() {
