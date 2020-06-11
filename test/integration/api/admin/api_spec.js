@@ -733,9 +733,9 @@ describe("api", function () {
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("PUT")
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1 , "colors=1")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true , "unsigned=true")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true , "disallow_public_id=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1, "colors=1")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
+        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true, "disallow_public_id=true")));
         sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
       });
     });
