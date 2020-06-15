@@ -1117,6 +1117,20 @@ function download_zip_url() {
 }
 
 /**
+ * Returns a URL that when invokes creates an archive of a folder
+ */
+function download_folder(folder_path) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  options.resource_type = "all";
+  options.prefixes = folder_path;
+  var cloudinary_params = exports.sign_request(exports.archive_params(merge(options, {
+    mode: "download"
+  })), options);
+  return exports.api_url("generate_archive", options) + "?" + hashToQuery(cloudinary_params);
+}
+
+/**
  * Render the key/value pair as an HTML tag attribute
  * @private
  * @param {string} key
@@ -1302,7 +1316,8 @@ function archive_params() {
     timestamp: options.timestamp || exports.timestamp(),
     transformations: utils.build_eager(options.transformations),
     type: options.type,
-    use_original_filename: exports.as_safe_bool(options.use_original_filename)
+    use_original_filename: exports.as_safe_bool(options.use_original_filename),
+    folder_path: options.folder_path
   };
 }
 
@@ -1507,6 +1522,7 @@ exports.present = present;
 exports.only = pickOnlyExistingValues; // for backwards compatibility
 exports.pickOnlyExistingValues = pickOnlyExistingValues;
 exports.jsonArrayParam = jsonArrayParam;
+exports.download_folder = download_folder;
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
 exports.DEFAULT_VIDEO_SOURCE_TYPES = DEFAULT_VIDEO_SOURCE_TYPES;
