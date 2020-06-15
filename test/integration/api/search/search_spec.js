@@ -4,12 +4,12 @@ require('dotenv').load({
 
 const expect = require('expect.js');
 const Q = require('q');
-const cloudinary = require('../cloudinary');
-const helper = require("./spechelper");
+const cloudinary = require('../../../../cloudinary');
+const helper = require("../../../spechelper");
 
 
 
-const testConstants = require('./testUtils/testConstants');
+const testConstants = require('../../../testUtils/testConstants');
 
 const {
   TIMEOUT,

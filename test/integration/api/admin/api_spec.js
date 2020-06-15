@@ -7,14 +7,14 @@ const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
 const http = require('http');
 const Q = require('q');
-const cloudinary = require("../cloudinary");
-const helper = require("./spechelper");
-const wait = require('./testUtils/helpers/wait');
+const cloudinary = require("../../../../cloudinary");
+const helper = require("../../../spechelper");
+const wait = require('../../../testUtils/helpers/wait');
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
 const uploadImage = helper.uploadImage;
 
-const testConstants = require('./testUtils/testConstants');
+const testConstants = require('../../../testUtils/testConstants');
 const API_V2 = cloudinary.v2.api;
 
 const {
