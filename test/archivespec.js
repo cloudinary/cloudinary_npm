@@ -203,7 +203,7 @@ describe("archive", function () {
     it('should return valid url', function(){
       let download_folder_url = utils.download_folder('folder/');
       expect(download_folder_url).not.to.be.empty();
-      expect(download_folder_url).to.contain('https://api.cloudinary.com/v1_1/sdk-test/all/generate_archive?mode=download&prefixes%5B%5D=folder');
+      expect(download_folder_url).to.contain('generate_archive');
     });
 
     it('should flatten folder', function(){
