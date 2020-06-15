@@ -816,7 +816,7 @@ describe("cloudinary", function () {
     });
     describe("CLOUDINARY_URL", function () {
       after(function () {
-        process.env.CLOUDINARY_URL = cloudinaryUrlBackup;
+        process.env.CLOUDINARY_URL = cloudinaryUrlBackup || '';
         cloudinary.config(true);
       });
       it("should allow nested values in CLOUDINARY_URL", function () {
@@ -849,7 +849,7 @@ describe("cloudinary", function () {
     });
     describe("CLOUDINARY_ACCOUNT_URL", function () {
       after(function () {
-        process.env.CLOUDINARY_ACCOUNT_URL = accountUrlBackup;
+        process.env.CLOUDINARY_ACCOUNT_URL = accountUrlBackup || '';
         cloudinary.config(true);
       });
       it("should allow nested values in CLOUDINARY_ACCOUNT_URL", function () {
