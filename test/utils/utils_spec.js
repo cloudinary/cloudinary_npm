@@ -18,7 +18,6 @@ const { clone, isString, merge, pickOnlyExistingValues } = utils;
 const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
 
 const TEST_TAG = helper.TEST_TAG;
-const CONTEXT_PUBLIC_ID = helper.IMAGE_URL
 const createTestConfig = require('../testUtils/createTestConfig');
 // Defined globals
 var cloud_name = '';
@@ -1021,20 +1020,6 @@ describe("utils", function () {
       });
     });
     describe('Context metadata to user variables', function (){
-      this.timeout(TIMEOUT.MEDIUM);
-      before(function() {
-        return cloudinary.v2.uploader.upload(CONTEXT_PUBLIC_ID,
-          {public_id: 'CONTEXT_PUBLIC_ID', context: 'x=50|y=500'})
-          .then((uploadResponse) => {
-            expect(uploadResponse).not.to.be(null);
-          });
-      });
-      after(function(){
-        return cloudinary.v2.api.delete_resources('CONTEXT_PUBLIC_ID')
-          .then((deleteResponse) => {
-            expect(deleteResponse).not.to.be(null);
-          });
-      });
       it('should use context value as user variables', function(){
         const options = {
           variables: [["$xpos", "ctx:!x_pos!_to_f"], ["$ypos", "ctx:!y_pos!_to_f"]],
@@ -1042,8 +1027,8 @@ describe("utils", function () {
           x: "$xpos * w",
           y: "$ypos * h"
         }
-        expect(cloudinary.image('CONTEXT_PUBLIC_ID', options))
-          .to.contain('$xpos_ctx:!x_pos!_to_f,$ypos_ctx:!y_pos!_to_f,c_crop,x_$xpos_mul_w,y_$ypos_mul_h/CONTEXT_PUBLIC_ID')
+        expect(cloudinary.utils.generate_transformation_string(options))
+          .to.contain('$xpos_ctx:!x_pos!_to_f,$ypos_ctx:!y_pos!_to_f,c_crop,x_$xpos_mul_w,y_$ypos_mul_h')
       });
     });
     describe('User Define Variables', function () {
