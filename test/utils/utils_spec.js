@@ -10,8 +10,8 @@ const cloudinary = require("../../cloudinary");
 const helper = require("../spechelper");
 const TIMEOUT = require('../testUtils/testConstants').TIMEOUT;
 const wait = require('../testUtils/helpers/wait');
-const generateBreakpoints = require(`../${helper.libPath}/utils/generateBreakpoints`);
-const { srcsetUrl, generateSrcsetAttribute } = require(`../${helper.libPath}/utils/srcsetUtils`);
+const generateBreakpoints = require(`../../${helper.libPath}/utils/generateBreakpoints`);
+const { srcsetUrl, generateSrcsetAttribute } = require(`../../${helper.libPath}/utils/srcsetUtils`);
 
 const utils = cloudinary.utils;
 const { clone, isString, merge, pickOnlyExistingValues } = utils;

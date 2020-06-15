@@ -7,11 +7,13 @@ const expect = require("expect.js");
 const mock = require('mock-fs');
 const getSDKVersionID = require('../../lib/utils/encoding/sdkVersionID/getSDKVersionID');
 const cloudinary = require('../../cloudinary');
-const TEST_CLOUD_NAME = require('../testUtils/testConstants').TEST_CLOUD_NAME
+const TEST_CLOUD_NAME = require('../testUtils/testConstants').TEST_CLOUD_NAME;
 
 describe('Tests for sdk versionID through image tag', function () {
   let processVersions = {};
   beforeEach(() => {
+    cloudinary.config(true); // reset
+
     processVersions = process.versions;
     delete process.versions;
 
