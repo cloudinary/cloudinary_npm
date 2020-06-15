@@ -187,4 +187,38 @@ describe("archive", function () {
       });
     });
   });
+  describe('download_folder', function(){
+    this.timeout(TIMEOUT.LONG);
+    uploader.upload(`folder/${PUBLIC_ID1}`)
+      .then((uploadResult)=> {
+        expect(uploadResult).not.to.be(null);
+      });
+
+    after(function () {
+      return cloudinary.api.delete_resources_by_prefix('folder/')
+        .then((deleteResult)=> {
+          expect(deleteResult).not.to.be(null);
+        });
+    });
+    it('should return valid url', function(){
+      let download_folder_url = utils.download_folder('folder/');
+      expect(download_folder_url).not.to.be.empty();
+      expect(download_folder_url).to.contain('https://api.cloudinary.com/v1_1/sdk-test/all/generate_archive?mode=download&prefixes%5B%5D=folder');
+    });
+
+    it('should flatten folder', function(){
+      let download_folder_url = utils.download_folder('folder/', {flatten_folders: true});
+      expect(download_folder_url).to.contain('flatten_folders');
+    });
+
+    it('should expire_at folder', function(){
+      let download_folder_url = utils.download_folder('folder/', {expires_at: Date.now() / 1000 + 60});
+      expect(download_folder_url).to.contain('expires_at');
+    });
+
+    it('should use original file_name of folder', function(){
+      let download_folder_url = utils.download_folder('folder/', {use_original_filename: true});
+      expect(download_folder_url).to.contain('use_original_filename');
+    });
+  });
 });
