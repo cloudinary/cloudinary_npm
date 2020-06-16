@@ -1117,7 +1117,7 @@ function download_zip_url() {
 }
 
 /**
- * Returns a URL that when invokes creates an archive of a folder
+ * Creates and downloads a URL that when invokes creates an archive of a folder
  */
 function download_folder(folder_path) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};

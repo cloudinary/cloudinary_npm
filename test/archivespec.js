@@ -188,18 +188,6 @@ describe("archive", function () {
     });
   });
   describe('download_folder', function(){
-    this.timeout(TIMEOUT.LONG);
-    uploader.upload(`folder/${PUBLIC_ID1}`)
-      .then((uploadResult)=> {
-        expect(uploadResult).not.to.be(null);
-      });
-
-    after(function () {
-      return cloudinary.api.delete_resources_by_prefix('folder/')
-        .then((deleteResult)=> {
-          expect(deleteResult).not.to.be(null);
-        });
-    });
     it('should return valid url', function(){
       let download_folder_url = utils.download_folder('folder/');
       expect(download_folder_url).not.to.be.empty();
