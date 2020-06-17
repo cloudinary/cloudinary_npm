@@ -188,6 +188,10 @@ describe("archive", function () {
     });
   });
   describe('download_folder', function(){
+    it('should return url with resource_type image', function(){
+      let download_folder_url = utils.download_folder('samples/', {resource_type: 'image'});
+      expect(download_folder_url).to.contain('image');
+    });
     it('should return valid url', function(){
       let download_folder_url = utils.download_folder('folder/');
       expect(download_folder_url).not.to.be.empty();

@@ -1122,7 +1122,7 @@ function download_zip_url() {
 function download_folder(folder_path) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  options.resource_type = "all";
+  options.resource_type = options.resource_type || "all";
   options.prefixes = folder_path;
   var cloudinary_params = exports.sign_request(exports.archive_params(merge(options, {
     mode: "download"
