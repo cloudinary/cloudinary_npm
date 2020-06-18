@@ -6,7 +6,10 @@ const expect = require("expect.js");
 const cloudinary = require("../../../../cloudinary");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 
-describe('account API - Provisioning', function () {
+let runOnlyForInternalPRs = process.env.TRAVIS_SECURE_ENV_VARS ? describe : describe.skip;
+
+
+runOnlyForInternalPRs('account API - Provisioning', function () {
   let CLOUD_SECRET;
   let CLOUD_API;
   let CLOUD_NAME;
