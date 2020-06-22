@@ -3,11 +3,11 @@ const presets = [
     [
       "env",
       {
-        targets: { node: "4" },
-      },
+        targets: { node: "4" }
+      }
     ],
-    "stage-0",
-  ],
+    "stage-0"
+  ]
 ];
 const plugins = ["transform-object-rest-spread"];
 

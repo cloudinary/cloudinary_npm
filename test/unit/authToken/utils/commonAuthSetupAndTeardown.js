@@ -27,7 +27,7 @@ function commonAuthSetupAndTeardown(config = {}) {
       auth_token: {
         key: AUTH_KEY_1,
         duration: 300,
-        start_time: 11111111,
+        start_time: 11111111
       }
     }, config)));
   });

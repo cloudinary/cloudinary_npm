@@ -1,5 +1,5 @@
 require('dotenv').load({
-  silent: true,
+  silent: true
 });
 
 const path = require('path');
@@ -20,7 +20,7 @@ describe('Tests for sdk versionID through image tag', function () {
     let file = path.join(__dirname, '../../package.json');
 
     mock({
-      [file]: '{"version":"1.24.0"}',
+      [file]: '{"version":"1.24.0"}'
     });
   });
 
@@ -31,11 +31,11 @@ describe('Tests for sdk versionID through image tag', function () {
 
   it('Defaults to false if analytics is not passed as an option', () => {
     process.versions = {
-      node: '12.0.0',
+      node: '12.0.0'
     };
 
     let imgStr = cloudinary.image("hello", {
-      format: "png",
+      format: "png"
     });
 
     expect(getSDKVersionID()).to.equal('MAlhAM0'); // value is mocked through package.json and process.version
@@ -44,7 +44,7 @@ describe('Tests for sdk versionID through image tag', function () {
 
   it('Reads from process.versions and package.json (Mocked)', () => {
     process.versions = {
-      node: '12.0.0',
+      node: '12.0.0'
     };
 
     let imgStr = cloudinary.image("hello", {
@@ -58,7 +58,7 @@ describe('Tests for sdk versionID through image tag', function () {
 
   it('Reads from process.versions and package.json (Mocked) - Responsive', () => {
     process.versions = {
-      node: '12.0.0',
+      node: '12.0.0'
     };
 
     let imgStr = cloudinary.image("hello", {

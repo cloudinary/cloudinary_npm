@@ -1,5 +1,5 @@
 require('dotenv').load({
-  silent: true,
+  silent: true
 });
 
 const expect = require("expect.js");
@@ -32,7 +32,7 @@ describe('Cloudinary::Api', function () {
     return Q.allSettled([
       cloudinary.v2.api.delete_streaming_profile(test_id_1),
       cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'),
-      cloudinary.v2.api.delete_streaming_profile(test_id_3),
+      cloudinary.v2.api.delete_streaming_profile(test_id_3)
     ]);
   });
   describe('create_streaming_profile', function () {
@@ -44,10 +44,10 @@ describe('Cloudinary::Api', function () {
               crop: 'scale',
               width: '1200',
               height: '1200',
-              bit_rate: '5m',
-            },
-          },
-        ],
+              bit_rate: '5m'
+            }
+          }
+        ]
       }).then(function (result) {
         expect(result).not.to.be(void 0);
       });
@@ -61,11 +61,11 @@ describe('Cloudinary::Api', function () {
                 crop: 'scale',
                 width: '1200',
                 height: '1200',
-                bit_rate: '5m',
-              },
-            ],
-          },
-        ],
+                bit_rate: '5m'
+              }
+            ]
+          }
+        ]
       }).then(function (result) {
         expect(result).not.to.be(void 0);
       });
@@ -89,10 +89,10 @@ describe('Cloudinary::Api', function () {
               crop: 'scale',
               width: '1200',
               height: '1200',
-              bit_rate: '5m',
-            },
-          },
-        ],
+              bit_rate: '5m'
+            }
+          }
+        ]
       }).then(function (result) {
         expect(result).not.to.be(void 0);
         return api.delete_streaming_profile(test_id_2);
@@ -125,10 +125,10 @@ describe('Cloudinary::Api', function () {
               crop: 'scale',
               width: '1200',
               height: '1200',
-              bit_rate: '5m',
-            },
-          },
-        ],
+              bit_rate: '5m'
+            }
+          }
+        ]
       }).then(function (result) {
         expect(result).to.be.ok();
         return api.update_streaming_profile(test_id_3, {
@@ -138,10 +138,10 @@ describe('Cloudinary::Api', function () {
                 crop: 'scale',
                 width: '1000',
                 height: '1000',
-                bit_rate: '4m',
-              },
-            },
-          ],
+                bit_rate: '4m'
+              }
+            }
+          ]
         });
       }).then(function (result) {
         expect(result).to.be.ok();
@@ -156,9 +156,9 @@ describe('Cloudinary::Api', function () {
               crop: 'scale',
               width: 1000,
               height: 1000,
-              bit_rate: '4m',
-            },
-          ],
+              bit_rate: '4m'
+            }
+          ]
         });
       });
     });

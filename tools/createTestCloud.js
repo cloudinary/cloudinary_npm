@@ -16,7 +16,7 @@ function setup() {
     method: 'POST',
     hostname: 'sub-account-testing.cloudinary.com',
     path: '/create_sub_account',
-    port: 443,
+    port: 443
   }, (res) => {
     let data = '';
     res.on('data', (d) => {
@@ -39,7 +39,7 @@ function setup() {
         cloud_name: cloudName,
         api_key: cloudApiKey,
         api_secret: cloudApiSecret,
-        public_id: 'sample',
+        public_id: 'sample'
       }).then((res) => {
         console.log('Successfully created a temporary cloud');
         console.log('Cloudname: ', cloudName);

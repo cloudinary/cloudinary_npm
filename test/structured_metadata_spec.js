@@ -27,57 +27,57 @@ const DATASOURCE_ENTRY_EXTERNAL_ID = 'metadata_datasource_entry_external_id' + T
 const datasource_single = [
   {
     value: 'v1',
-    external_id: DATASOURCE_ENTRY_EXTERNAL_ID,
-  },
+    external_id: DATASOURCE_ENTRY_EXTERNAL_ID
+  }
 ];
 const datasource_multiple = [
   {
     value: 'v2',
-    external_id: DATASOURCE_ENTRY_EXTERNAL_ID,
+    external_id: DATASOURCE_ENTRY_EXTERNAL_ID
   },
   {
-    value: 'v3',
+    value: 'v3'
   },
   {
-    value: 'v4',
-  },
+    value: 'v4'
+  }
 ];
 
 const metadata_fields_external_ids = [
   EXTERNAL_ID_GENERAL, EXTERNAL_ID_DATE, EXTERNAL_ID_ENUM_2, EXTERNAL_ID_SET, EXTERNAL_ID_INT_VALIDATION,
-  EXTERNAL_ID_INT_VALIDATION_2, EXTERNAL_ID_DATE_VALIDATION, EXTERNAL_ID_DATE_VALIDATION_2,
+  EXTERNAL_ID_INT_VALIDATION_2, EXTERNAL_ID_DATE_VALIDATION, EXTERNAL_ID_DATE_VALIDATION_2
 ];
 
 const metadata_fields_to_create = [
   {
     external_id: EXTERNAL_ID_GENERAL,
-    type: 'string',
+    type: 'string'
   },
   {
     external_id: EXTERNAL_ID_ENUM_2,
     type: 'enum',
     datasource: {
-      values: datasource_multiple,
-    },
+      values: datasource_multiple
+    }
   },
   {
     external_id: EXTERNAL_ID_DELETE_2,
-    type: 'integer',
+    type: 'integer'
   },
   {
     external_id: EXTERNAL_ID_SET_2,
     type: 'set',
     datasource: {
-      values: datasource_multiple,
-    },
+      values: datasource_multiple
+    }
   },
   {
     external_id: EXTERNAL_ID_SET_3,
     type: 'set',
     datasource: {
-      values: datasource_multiple,
-    },
-  },
+      values: datasource_multiple
+    }
+  }
 ];
 
 const api = cloudinary.v2.api;
@@ -113,7 +113,7 @@ describe("structured metadata api", function () {
         api.list_metadata_fields();
         sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("GET"),
+          method: sinon.match("GET")
         }));
       });
     });
@@ -135,12 +135,12 @@ describe("structured metadata api", function () {
         const metadata = {
           external_id: EXTERNAL_ID_STRING,
           label: EXTERNAL_ID_STRING,
-          type: 'string',
+          type: 'string'
         };
         api.add_metadata_field(metadata);
         sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("POST"),
+          method: sinon.match("POST")
         }));
         sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_STRING)));
         sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('type', 'string')));
@@ -152,12 +152,12 @@ describe("structured metadata api", function () {
         const metadata = {
           external_id: EXTERNAL_ID_INT,
           label: EXTERNAL_ID_INT,
-          type: 'integer',
+          type: 'integer'
         };
         api.add_metadata_field(metadata);
         sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("POST"),
+          method: sinon.match("POST")
         }));
         sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_INT)));
         sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('type', 'integer')));
@@ -168,7 +168,7 @@ describe("structured metadata api", function () {
       const metadata = {
         external_id: EXTERNAL_ID_DATE,
         label: EXTERNAL_ID_DATE,
-        type: 'date',
+        type: 'date'
       };
       return api.add_metadata_field(metadata).then((result) => {
         expect(result).to.beAMetadataField();
@@ -181,16 +181,16 @@ describe("structured metadata api", function () {
       return helper.mockPromise(function (xhr, write, request) {
         const metadata = {
           datasource: {
-            values: datasource_single,
+            values: datasource_single
           },
           external_id: EXTERNAL_ID_ENUM,
           label: EXTERNAL_ID_ENUM,
-          type: 'enum',
+          type: 'enum'
         };
         api.add_metadata_field(metadata);
         sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("POST"),
+          method: sinon.match("POST")
         }));
         sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_ENUM)));
         sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('type', 'enum')));
@@ -201,11 +201,11 @@ describe("structured metadata api", function () {
     it("should create set metadata field", function () {
       const metadata = {
         datasource: {
-          values: datasource_multiple,
+          values: datasource_multiple
         },
         external_id: EXTERNAL_ID_SET,
         label: EXTERNAL_ID_SET,
-        type: 'set',
+        type: 'set'
       };
       return api.add_metadata_field(metadata).then((result) => {
         expect(result).to.beAMetadataField();
@@ -215,7 +215,7 @@ describe("structured metadata api", function () {
           external_id: EXTERNAL_ID_SET,
           label: EXTERNAL_ID_SET,
           type: 'set',
-          mandatory: false,
+          mandatory: false
         }]).to.beAMetadataField();
       });
     });
@@ -230,7 +230,7 @@ describe("structured metadata api", function () {
         label: newLabel,
         type: 'integer',
         mandatory: true,
-        default_value: newDefaultValue,
+        default_value: newDefaultValue
       };
       return api.update_metadata_field(EXTERNAL_ID_GENERAL, updatedMetadata)
         .then((result) => {
@@ -243,7 +243,7 @@ describe("structured metadata api", function () {
             label: newLabel,
             type: 'string',
             mandatory: true,
-            default_value: newDefaultValue,
+            default_value: newDefaultValue
           }]).to.beAMetadataField();
         });
     });
@@ -267,7 +267,7 @@ describe("structured metadata api", function () {
         api.delete_metadata_field(EXTERNAL_ID_DELETE);
         sinon.assert.calledWith(request, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
-          method: sinon.match("DELETE"),
+          method: sinon.match("DELETE")
         }));
       });
     });
@@ -275,7 +275,7 @@ describe("structured metadata api", function () {
       const metadata = {
         external_id: EXTERNAL_ID_DELETE_2,
         label: EXTERNAL_ID_DELETE_2,
-        type: 'integer',
+        type: 'integer'
       };
       return api.delete_metadata_field(EXTERNAL_ID_DELETE_2)
         .then((result) => {
@@ -315,25 +315,25 @@ describe("structured metadata api", function () {
         {
           type: "greater_than",
           equals: false,
-          value: pastDate,
+          value: pastDate
         }, {
           type: "less_than",
           equals: false,
-          value: todayDate,
-        },
-      ],
+          value: todayDate
+        }
+      ]
     };
     const validMetadata = {
       external_id: EXTERNAL_ID_DATE_VALIDATION,
       label: EXTERNAL_ID_DATE_VALIDATION,
       type: 'date',
       default_value: yesterdayDate,
-      validation: lastThreeDaysValidation,
+      validation: lastThreeDaysValidation
     };
     const invalidMetadata = {
       ...validMetadata,
       external_id: EXTERNAL_ID_DATE_VALIDATION_2,
-      default_value: futureDate,
+      default_value: futureDate
     };
     it("should create date field when default value validation passes", function () {
       return api.add_metadata_field(validMetadata)
@@ -361,7 +361,7 @@ describe("structured metadata api", function () {
     const validation = {
       type: 'less_than',
       equals: true,
-      value: 5,
+      value: 5
     };
     it("should create integer metadata with valid default value", function () {
       const metadata = {
@@ -369,7 +369,7 @@ describe("structured metadata api", function () {
         label: EXTERNAL_ID_INT_VALIDATION,
         type: 'integer',
         default_value: 5,
-        validation,
+        validation
       };
       return api.add_metadata_field(metadata)
         .then((result) => {
@@ -387,7 +387,7 @@ describe("structured metadata api", function () {
         label: EXTERNAL_ID_INT_VALIDATION_2,
         type: 'integer',
         default_value: 6,
-        validation,
+        validation
       };
       return api.add_metadata_field(metadata)
         .then((result) => {
