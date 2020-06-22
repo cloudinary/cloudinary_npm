@@ -1003,7 +1003,7 @@ describe("api", function () {
         return cloudinary.v2.api.delete_folder(
           folderPath
         ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
-        ).then(()=> expect().fail()
+        ).then(() => expect().fail()
         ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
       });
     });
