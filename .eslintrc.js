@@ -14,7 +14,7 @@ module.exports = {
     },
     "rules": {
         "arrow-body-style": "off",
-        "arrow-spacing": "off",
+        "arrow-spacing": ["error", { "before": true, "after": true }],
         "arrow-parens": "off",
         "camelcase": "off",
         "class-methods-use-this": "off",
