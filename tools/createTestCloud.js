@@ -23,7 +23,7 @@ function setup() {
       data += d;
     });
 
-    res.on('end',() => {
+    res.on('end', () => {
       let cloudData = JSON.parse(data);
       let { payload: { cloudApiKey, cloudApiSecret, cloudName, id } } = cloudData;
       let URL = `CLOUDINARY_URL=cloudinary://${cloudApiKey}:${cloudApiSecret}@${cloudName}`;
