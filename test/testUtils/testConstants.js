@@ -21,7 +21,7 @@ module.exports = {
     SHORT: 5000,
     MEDIUM: 20000,
     LONG: 50000,
-    LARGE: 70000,
+    LARGE: 70000
   },
   UNIQUE_JOB_SUFFIX_ID,
   PUBLIC_IDS: {
@@ -34,28 +34,28 @@ module.exports = {
     PUBLIC_ID_6: `${PUBLIC_ID}_6`,
     PUBLIC_ID_BACKUP_1: `${PUBLIC_ID_PREFIX}backup_1${Date.now()}`,
     PUBLIC_ID_BACKUP_2: `${PUBLIC_ID_PREFIX}backup_2${Date.now()}`,
-    PUBLIC_ID_BACKUP_3: `${PUBLIC_ID_PREFIX}backup_3${Date.now()}`,
+    PUBLIC_ID_BACKUP_3: `${PUBLIC_ID_PREFIX}backup_3${Date.now()}`
 
   },
   PRESETS: {
     API_TEST_UPLOAD_PRESET1: `npm_api_test_upload_preset_1_${UNIQUE_JOB_SUFFIX_ID}`,
     API_TEST_UPLOAD_PRESET2: `npm_api_test_upload_preset_2_${UNIQUE_JOB_SUFFIX_ID}`,
     API_TEST_UPLOAD_PRESET3: `npm_api_test_upload_preset_3_${UNIQUE_JOB_SUFFIX_ID}`,
-    API_TEST_UPLOAD_PRESET4: `npm_api_test_upload_preset_4_${UNIQUE_JOB_SUFFIX_ID}`,
+    API_TEST_UPLOAD_PRESET4: `npm_api_test_upload_preset_4_${UNIQUE_JOB_SUFFIX_ID}`
   },
   TRANSFORMATIONS: {
     NAMED_TRANSFORMATION: `npm_api_test_transformation_${UNIQUE_JOB_SUFFIX_ID}`,
     NAMED_TRANSFORMATION2: `npm_api_test_transformation_2_${UNIQUE_JOB_SUFFIX_ID}`,
     EXPLICIT_TRANSFORMATION_NAME: `c_scale,l_text:Arial_60:${TEST_TAG},w_100`,
-    EXPLICIT_TRANSFORMATION_NAME2: `c_scale,l_text:Arial_60:${TEST_TAG},w_200`,
+    EXPLICIT_TRANSFORMATION_NAME2: `c_scale,l_text:Arial_60:${TEST_TAG},w_200`
   },
   TAGS: {
     UPLOAD_TAGS,
     TEST_TAG,
-    SDK_TAG,
+    SDK_TAG
   },
   URLS: {
     VIDEO_URL: "http://res.cloudinary.com/demo/video/upload/dog.mp4",
-    IMAGE_URL: "http://res.cloudinary.com/demo/image/upload/sample",
+    IMAGE_URL: "http://res.cloudinary.com/demo/image/upload/sample"
   }
 };

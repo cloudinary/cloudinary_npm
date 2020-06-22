@@ -18,7 +18,7 @@ module.exports = {
         "arrow-parens": "off",
         "camelcase": "off",
         "class-methods-use-this": "off",
-        "comma-dangle": "off",
+        "comma-dangle": ["error", "never"],
         "comma-spacing":["error", {"before": false, "after": true}],
         "consistent-return": "off",
         "dot-notation": "error",

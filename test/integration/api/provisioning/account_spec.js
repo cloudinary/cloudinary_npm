@@ -1,5 +1,5 @@
 require('dotenv').load({
-  silent: true,
+  silent: true
 });
 
 const expect = require("expect.js");
@@ -76,7 +76,7 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
     let NEW_NAME = 'This wont be created';
     let options = {
       provisioning_api_key: 'abc',
-      provisioning_api_secret: 'abc',
+      provisioning_api_secret: 'abc'
     };
 
     await cloudinary.provisioning.account.create_sub_account(CLOUD_ID, NEW_NAME, {}, null, null, options).catch((errRes) => {

@@ -16,7 +16,7 @@ describe("video tag helper", function () {
     cloudinary.config(true); // Reset
     cloudinary.config(createTestConfig({
       cloud_name: "test123",
-      api_secret: "1234",
+      api_secret: "1234"
     }));
   });
   it("should generate video tag", function () {
@@ -31,7 +31,7 @@ describe("video tag helper", function () {
       loop: true,
       muted: "true",
       preload: true,
-      style: "border: 1px",
+      style: "border: 1px"
     })).to.eql(`<video autoplay='1' controls loop muted='true' poster='${expected_url}.jpg' preload style='border: 1px'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + "</video>");
   });
   it("should generate video tag with various attributes", function () {
@@ -41,11 +41,11 @@ describe("video tag helper", function () {
       html_height: "100",
       html_width: "200",
       video_codec: {
-        codec: "h264",
+        codec: "h264"
       },
       audio_codec: "acc",
       start_offset: 3,
-      keyframe_interval: "2.0",
+      keyframe_interval: "2.0"
     };
     expected_url = VIDEO_UPLOAD_PATH + "ac_acc,ki_2.0,so_3,vc_h264/movie";
     expect(cloudinary.video("movie", options)).to.eql(`<video height='100' poster='${expected_url}.jpg' src='${expected_url}.mp4' width='200'></video>`);
@@ -66,17 +66,17 @@ describe("video tag helper", function () {
     expected_url = VIDEO_UPLOAD_PATH + "movie";
     fallback = "<span id='spanid'>Cannot display video</span>";
     expect(cloudinary.video("movie", {
-      fallback_content: fallback,
+      fallback_content: fallback
     }), `<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + fallback + "</video>");
     expect(cloudinary.video("movie", {
       fallback_content: fallback,
-      source_types: "mp4",
+      source_types: "mp4"
     })).to.eql(`<video poster='${expected_url}.jpg' src='${expected_url}.mp4'>` + fallback + "</video>");
   });
   it("should generate video tag with source types", function () {
     var expected_url = VIDEO_UPLOAD_PATH + "movie";
     expect(cloudinary.video("movie", {
-      source_types: ['ogv', 'mp4'],
+      source_types: ['ogv', 'mp4']
     })).to.eql(`<video poster='${expected_url}.jpg'>` + `<source src='${expected_url}.ogv' type='video/ogg'>` + `<source src='${expected_url}.mp4' type='video/mp4'>` + "</video>");
   });
   it("should generate video tag with source transformation", function () {
@@ -88,32 +88,32 @@ describe("video tag helper", function () {
       width: 100,
       crop: "scale",
       transformation: {
-        'quality': 50,
+        'quality': 50
       },
       source_transformation: {
         'ogv': {
-          'quality': 70,
+          'quality': 70
         },
         'mp4': {
-          'quality': 30,
-        },
-      },
+          'quality': 30
+        }
+      }
     })).to.eql(`<video poster='${expected_url}.jpg' width='100'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_mp4_url}.mp4' type='video/mp4'>` + `<source src='${expected_ogv_url}.ogv' type='video/ogg'>` + "</video>");
     expect(cloudinary.video("movie", {
       width: 100,
       crop: "scale",
       transformation: {
-        'quality': 50,
+        'quality': 50
       },
       source_transformation: {
         'ogv': {
-          'quality': 70,
+          'quality': 70
         },
         'mp4': {
-          'quality': 30,
-        },
+          'quality': 30
+        }
       },
-      source_types: ['webm', 'mp4'],
+      source_types: ['webm', 'mp4']
     })).to.eql(`<video poster='${expected_url}.jpg' width='100'>` + `<source src='${expected_url}.webm' type='video/webm'>` + `<source src='${expected_mp4_url}.mp4' type='video/mp4'>` + "</video>");
   });
   it("should generate video tag with configurable poster", function () {
@@ -122,37 +122,37 @@ describe("video tag helper", function () {
     expected_poster_url = 'http://image/somewhere.jpg';
     expect(cloudinary.video("movie", {
       poster: expected_poster_url,
-      source_types: "mp4",
+      source_types: "mp4"
     })).to.eql(`<video poster='${expected_poster_url}' src='${expected_url}.mp4'></video>`);
     expected_poster_url = VIDEO_UPLOAD_PATH + "g_north/movie.jpg";
     expect(cloudinary.video("movie", {
       poster: {
-        'gravity': 'north',
+        'gravity': 'north'
       },
-      source_types: "mp4",
+      source_types: "mp4"
     })).to.eql(`<video poster='${expected_poster_url}' src='${expected_url}.mp4'></video>`);
     expected_poster_url = DEFAULT_UPLOAD_PATH + "g_north/my_poster.jpg";
     expect(cloudinary.video("movie", {
       poster: {
         'gravity': 'north',
         'public_id': 'my_poster',
-        'format': 'jpg',
+        'format': 'jpg'
       },
-      source_types: "mp4",
+      source_types: "mp4"
     })).to.eql(`<video poster='${expected_poster_url}' src='${expected_url}.mp4'></video>`);
     expect(cloudinary.video("movie", {
       poster: "",
-      source_types: "mp4",
+      source_types: "mp4"
     })).to.eql(`<video src='${expected_url}.mp4'></video>`);
     expect(cloudinary.video("movie", {
       poster: false,
-      source_types: "mp4",
+      source_types: "mp4"
     })).to.eql(`<video src='${expected_url}.mp4'></video>`);
   });
   it("should not mutate the options argument", function () {
     var options = {
       video_codec: 'auto',
-      autoplay: true,
+      autoplay: true
     };
     cloudinary.video('hello', options);
     expect(options.video_codec).to.eql('auto');
@@ -175,15 +175,15 @@ describe("video tag helper", function () {
     it('should generate video tag with given custom sources', function() {
       var custom_sources = [
         {
-          type: 'mp4',
+          type: 'mp4'
         },
         {
-          type: 'webm',
-        },
+          type: 'webm'
+        }
       ];
       expect(
         cloudinary.video('movie', {
-          sources: custom_sources,
+          sources: custom_sources
         })
       ).to.eql(
         `<video poster='${expected_url}.jpg'>` +
@@ -197,13 +197,13 @@ describe("video tag helper", function () {
     it('should generate video tag overriding source_types with sources if both are given', function() {
       var custom_sources = [
         {
-          type: 'mp4',
-        },
+          type: 'mp4'
+        }
       ];
       expect(
         cloudinary.video('movie', {
           sources: custom_sources,
-          source_types: ['ogv', 'mp4', 'webm'],
+          source_types: ['ogv', 'mp4', 'webm']
         })
       ).to.eql(
         `<video poster='${expected_url}.jpg'>` +
@@ -214,7 +214,7 @@ describe("video tag helper", function () {
     it('should correctly handle ogg/ogv', function() {
       expect(
         cloudinary.video('movie', {
-          sources: [{ type: 'ogv' }],
+          sources: [{ type: 'ogv' }]
         })
       ).to.eql(
         `<video poster='${expected_url}.jpg'>` +
@@ -228,17 +228,17 @@ describe("video tag helper", function () {
         {
           type: 'mp4',
           codecs: 'vp8, vorbis',
-          transformations: { video_codec: 'auto' },
+          transformations: { video_codec: 'auto' }
         },
         {
           type: 'webm',
           codecs: 'avc1.4D401E, mp4a.40.2',
-          transformations: { video_codec: 'auto' },
-        },
+          transformations: { video_codec: 'auto' }
+        }
       ];
       expect(
         cloudinary.video('movie', {
-          sources: custom_sources,
+          sources: custom_sources
         })
       ).to.eql(
         `<video poster='${expected_url}.jpg'>` +
@@ -252,17 +252,17 @@ describe("video tag helper", function () {
         {
           type: 'mp4',
           codecs: ['vp8', 'vorbis'],
-          transformations: { video_codec: 'auto' },
+          transformations: { video_codec: 'auto' }
         },
         {
           type: 'webm',
           codecs: ['avc1.4D401E', 'mp4a.40.2'],
-          transformations: { video_codec: 'auto' },
-        },
+          transformations: { video_codec: 'auto' }
+        }
       ];
       expect(
         cloudinary.video('movie', {
-          sources: custom_sources,
+          sources: custom_sources
         })
       ).to.eql(
         `<video poster='${expected_url}.jpg'>` +
@@ -279,7 +279,7 @@ describe("video tag helper", function () {
         video_codec: { codec: 'h264' },
         audio_codec: 'acc',
         start_offset: 3,
-        sources: helper.SAMPLE_VIDEO_SOURCES,
+        sources: helper.SAMPLE_VIDEO_SOURCES
       };
       const expected_poster_url =
         VIDEO_UPLOAD_PATH + 'ac_acc,so_3,vc_h264/movie.jpg';

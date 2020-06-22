@@ -40,7 +40,7 @@ describe('Tests for sdk versionID util', function () {
     delete process.versions;
 
     process.versions = {
-      node: '1.24.0',
+      node: '1.24.0'
     };
 
     expect(getSDKVersionID({}, '0.0.0')).to.equal('MAAAlh0');
@@ -50,7 +50,7 @@ describe('Tests for sdk versionID util', function () {
   it('Reads from the package.json file if default is passed (Mocked)', () => {
     let file = path.join(__dirname, '../../package.json');
     mock({
-      [file]: '{"version":"1.24.0"}',
+      [file]: '{"version":"1.24.0"}'
     });
 
     expect(getSDKVersionID({}, 'default', '0.0.0')).to.equal('MAlhAA0');
@@ -70,10 +70,10 @@ describe('Tests for sdk versionID util', function () {
     let file = path.join(__dirname, '../../package.json');
 
     mock({
-      [file]: '{"version":"1.24.0"}',
+      [file]: '{"version":"1.24.0"}'
     });
     process.versions = {
-      node: '1.24.0',
+      node: '1.24.0'
     };
 
     expect(getSDKVersionID()).to.equal('MAlhlh0');

@@ -1,5 +1,5 @@
 require('dotenv').load({
-  silent: true,
+  silent: true
 });
 
 const https = require('https');
@@ -18,17 +18,17 @@ const testConstants = require('./testUtils/testConstants');
 const {
   TIMEOUT,
   TAGS,
-  URLS,
+  URLS
 } = testConstants;
 
 const {
   TEST_TAG,
-  UPLOAD_TAGS,
+  UPLOAD_TAGS
 } = TAGS;
 
 const {
   VIDEO_URL,
-  IMAGE_URL,
+  IMAGE_URL
 } = URLS;
 
 const { utils, api, uploader } = cloudinary.v2;
@@ -57,29 +57,29 @@ sharedExamples('archive', function () {
           public_id: PUBLIC_ID1,
           tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
-            effect: "blackwhite",
-          },
+            effect: "blackwhite"
+          }
         }),
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID2,
           tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
           transformation: {
-            effect: "blackwhite",
-          },
+            effect: "blackwhite"
+          }
         }),
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID_RAW,
           resource_type: "raw",
-          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG])
         }),
       uploader.upload(VIDEO_URL,
         {
           public_id: "dog",
           resource_type: "video",
-          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG]),
-        }),
+          tags: UPLOAD_TAGS.concat([ARCHIVE_TAG])
+        })
     ]);
   });
   after(function () {
@@ -101,7 +101,7 @@ describe("archive", function () {
           target_public_id: 'gem_archive_test',
           public_ids: [PUBLIC_ID2, PUBLIC_ID1],
           target_tags: ARCHIVE_TAG,
-          expires_at: Date.now() / 1000 + 60, // expiration after 60 seconds
+          expires_at: Date.now() / 1000 + 60 // expiration after 60 seconds
         });
       });
       describe('public_ids', function () {
@@ -147,7 +147,7 @@ describe("archive", function () {
           public_ids: [PUBLIC_ID2, PUBLIC_ID1],
           target_tags: [TEST_TAG, ARCHIVE_TAG],
           mode: 'create',
-          skip_transformation_name: true,
+          skip_transformation_name: true
         }).then((result) => {
           archive_result = result;
         });
@@ -168,7 +168,7 @@ describe("archive", function () {
             tags: TEST_TAG,
             public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],
             resource_type: "raw",
-            allow_missing: true,
+            allow_missing: true
           });
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
           sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));
@@ -180,7 +180,7 @@ describe("archive", function () {
       it('should create archive with "zip" format and include multiple resource types', function () {
         return uploader.create_zip({
           fully_qualified_public_ids: [FULLY_QUALIFIED_IMAGE, FULLY_QUALIFIED_VIDEO],
-          resource_type: "auto",
+          resource_type: "auto"
         }).then((result) => {
           expect(result.file_count).to.eql(2);
         });

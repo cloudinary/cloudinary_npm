@@ -1,5 +1,5 @@
 require('dotenv').load({
-  silent: true,
+  silent: true
 });
 
 const expect = require('expect.js');
@@ -15,17 +15,17 @@ const {
   TIMEOUT,
   TAGS,
   PUBLIC_IDS,
-  UNIQUE_JOB_SUFFIX_ID,
+  UNIQUE_JOB_SUFFIX_ID
 } = testConstants;
 
 const {
   PUBLIC_ID_1,
   PUBLIC_ID_2,
-  PUBLIC_ID_3,
+  PUBLIC_ID_3
 } = PUBLIC_IDS;
 
 const {
-  UPLOAD_TAGS,
+  UPLOAD_TAGS
 } = TAGS;
 
 const SEARCH_TAG = 'npm_advanced_search_' + UNIQUE_JOB_SUFFIX_ID;
@@ -46,13 +46,13 @@ describe("search_api", function () {
         'max_results',
         'next_cursor',
         'aggregate',
-        'with_field',
+        'with_field'
       ].forEach(method => expect(instance).to.eql(instance[method]('emptyarg')));
     });
     it('should add expression to query', function () {
       var query = cloudinary.v2.search.expression('format:jpg').to_query();
       expect(query).to.eql({
-        expression: 'format:jpg',
+        expression: 'format:jpg'
       });
     });
     it('should add sort_by to query', function () {
@@ -60,36 +60,36 @@ describe("search_api", function () {
       expect(query).to.eql({
         sort_by: [
           {
-            created_at: 'asc',
+            created_at: 'asc'
           },
           {
-            updated_at: 'desc',
-          },
-        ],
+            updated_at: 'desc'
+          }
+        ]
       });
     });
     it('should add max_results to query', function () {
       var query = cloudinary.v2.search.max_results('format:jpg').to_query();
       expect(query).to.eql({
-        max_results: 'format:jpg',
+        max_results: 'format:jpg'
       });
     });
     it('should add next_cursor to query', function () {
       var query = cloudinary.v2.search.next_cursor('format:jpg').to_query();
       expect(query).to.eql({
-        next_cursor: 'format:jpg',
+        next_cursor: 'format:jpg'
       });
     });
     it('should add aggregate arguments as array to query', function () {
       var query = cloudinary.v2.search.aggregate('format').aggregate('size_category').to_query();
       expect(query).to.eql({
-        aggregate: ['format', 'size_category'],
+        aggregate: ['format', 'size_category']
       });
     });
     it('should add with_field to query', function () {
       var query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
       expect(query).to.eql({
-        with_field: ['context', 'tags'],
+        with_field: ['context', 'tags']
       });
     });
   });
@@ -108,22 +108,22 @@ describe("search_api", function () {
             public_id: PUBLIC_ID_1,
             tags: [...UPLOAD_TAGS,
               SEARCH_TAG],
-            context: "stage=in_review",
+            context: "stage=in_review"
           }),
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_2,
             tags: [...UPLOAD_TAGS,
               SEARCH_TAG],
-            context: "stage=new",
+            context: "stage=new"
           }),
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_3,
             tags: [...UPLOAD_TAGS,
               SEARCH_TAG],
-            context: "stage=validated",
-          }),
+            context: "stage=validated"
+          })
       ]).delay(3000); // wait for the server to update
     });
     after(function () {

@@ -1,5 +1,5 @@
 const defaultConfigOptions = {
-  analytics: false,
+  analytics: false
 };
 
 /**
