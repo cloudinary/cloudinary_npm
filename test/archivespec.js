@@ -187,4 +187,30 @@ describe("archive", function () {
       });
     });
   });
+  describe('download_folder', function(){
+    it('should return url with resource_type image', function(){
+      let download_folder_url = utils.download_folder('samples/', {resource_type: 'image'});
+      expect(download_folder_url).to.contain('image');
+    });
+    it('should return valid url', function(){
+      let download_folder_url = utils.download_folder('folder/');
+      expect(download_folder_url).not.to.be.empty();
+      expect(download_folder_url).to.contain('generate_archive');
+    });
+
+    it('should flatten folder', function(){
+      let download_folder_url = utils.download_folder('folder/', {flatten_folders: true});
+      expect(download_folder_url).to.contain('flatten_folders');
+    });
+
+    it('should expire_at folder', function(){
+      let download_folder_url = utils.download_folder('folder/', {expires_at: Date.now() / 1000 + 60});
+      expect(download_folder_url).to.contain('expires_at');
+    });
+
+    it('should use original file_name of folder', function(){
+      let download_folder_url = utils.download_folder('folder/', {use_original_filename: true});
+      expect(download_folder_url).to.contain('use_original_filename');
+    });
+  });
 });
