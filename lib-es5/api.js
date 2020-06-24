@@ -325,17 +325,21 @@ exports.create_upload_preset = function create_upload_preset(callback) {
 exports.root_folders = function root_folders(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var uri = void 0;
+  var uri = void 0,
+      params = void 0;
   uri = ["folders"];
-  return call_api("get", uri, {}, callback, options);
+  params = pickOnlyExistingValues(options, "next_cursor", "max_results");
+  return call_api("get", uri, params, callback, options);
 };
 
 exports.sub_folders = function sub_folders(path, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var uri = void 0;
+  var uri = void 0,
+      params = void 0;
   uri = ["folders", path];
-  return call_api("get", uri, {}, callback, options);
+  params = pickOnlyExistingValues(options, "next_cursor", "max_results");
+  return call_api("get", uri, params, callback, options);
 };
 
 /**
