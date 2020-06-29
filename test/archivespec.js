@@ -213,4 +213,12 @@ describe("archive", function () {
       expect(download_folder_url).to.contain('use_original_filename');
     });
   });
+
+  describe('download_backedup_asset', function(){
+    it('should return url with asset and version id', function(){
+      let download_backedup_asset_url = utils.download_backedup_asset('b71b23d9c89a81a254b88a91a9dad8cd', '0e493356d8a40b856c4863c026891a4e');
+      expect(download_backedup_asset_url).to.contain('asset_id');
+      expect(download_backedup_asset_url).to.contain('version_id');
+    });
+  });
 });

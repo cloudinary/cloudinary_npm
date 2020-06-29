@@ -56,6 +56,7 @@ var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
 var getSDKVersionID = require('./encoding/sdkVersionID/getSDKVersionID');
+var UPLOAD_PREFIX = require('./consts');
 
 exports = module.exports;
 var utils = module.exports;
@@ -916,14 +917,21 @@ function unsigned_url_prefix(source, cloud_name, private_cdn, cdn_subdomain, sec
   return prefix;
 }
 
+function base_api_url() {
+  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var cloudinary = ensureOption(options, "upload_prefix", UPLOAD_PREFIX);
+  var cloud_name = ensureOption(options, "cloud_name");
+  return [cloudinary, "v1_1", cloud_name].concat(path).join("/");
+}
+
 function api_url() {
   var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'upload';
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var cloudinary = ensureOption(options, "upload_prefix", "https://api.cloudinary.com");
-  var cloud_name = ensureOption(options, "cloud_name");
   var resource_type = options.resource_type || "image";
-  return [cloudinary, "v1_1", cloud_name, resource_type, action].join("/");
+  return base_api_url([resource_type, action]);
 }
 
 function random_public_id() {
@@ -1058,6 +1066,24 @@ function zip_download_url(tag) {
     transformation: utils.generate_transformation_string(options)
   }, options);
   return exports.api_url("download_tag.zip", options) + "?" + hashToQuery(params);
+}
+
+/**
+ * The returned url should allow downloading the backedup asset
+ * @param asset_id
+ * @param version_id
+ * @param options
+ * @returns {string }
+ */
+function download_backedup_asset(asset_id, version_id) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = exports.sign_request({
+    timestamp: options.timestamp || exports.timestamp(),
+    asset_id: asset_id,
+    version_id: version_id
+  }, options);
+  return exports.base_api_url(['download_backup'], options) + "?" + hashToQuery(params);
 }
 
 /**
@@ -1523,6 +1549,9 @@ exports.only = pickOnlyExistingValues; // for backwards compatibility
 exports.pickOnlyExistingValues = pickOnlyExistingValues;
 exports.jsonArrayParam = jsonArrayParam;
 exports.download_folder = download_folder;
+exports.base_api_url = base_api_url;
+exports.download_backedup_asset = download_backedup_asset;
+
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
 exports.DEFAULT_VIDEO_SOURCE_TYPES = DEFAULT_VIDEO_SOURCE_TYPES;
