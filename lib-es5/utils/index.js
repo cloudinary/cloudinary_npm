@@ -56,7 +56,6 @@ var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
 var getSDKVersionID = require('./encoding/sdkVersionID/getSDKVersionID');
-var UPLOAD_PREFIX = require('./consts');
 
 exports = module.exports;
 var utils = module.exports;
@@ -95,7 +94,8 @@ var _require2 = require('./consts'),
     PREDEFINED_VARS = _require2.PREDEFINED_VARS,
     LAYER_KEYWORD_PARAMS = _require2.LAYER_KEYWORD_PARAMS,
     TRANSFORMATION_PARAMS = _require2.TRANSFORMATION_PARAMS,
-    SIMPLE_PARAMS = _require2.SIMPLE_PARAMS;
+    SIMPLE_PARAMS = _require2.SIMPLE_PARAMS,
+    UPLOAD_PREFIX = _require2.UPLOAD_PREFIX;
 
 function textStyle(layer) {
   var keywords = [];
