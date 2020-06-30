@@ -46,6 +46,7 @@ function setup() {
         console.log('Sample image uploaded to: ', res.url);
       }).catch((e) => {
         console.log('FATAL - Could not create sample asset', e);
+        console.log(cloudData);
         throw 'FATAL - Could not create sample asset';
       });
     });
