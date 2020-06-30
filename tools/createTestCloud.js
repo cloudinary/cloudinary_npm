@@ -44,9 +44,7 @@ function setup() {
         console.log('Successfully created a temporary cloud');
         console.log('Cloudname: ', cloudName);
         console.log('Sample image uploaded to: ', res.url);
-      }).catch((e) => {
-        console.log('FATAL - Could not create sample asset', e);
-        console.log(cloudData);
+      }).catch(() => {
         throw 'FATAL - Could not create sample asset';
       });
     });
