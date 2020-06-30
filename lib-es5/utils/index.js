@@ -931,7 +931,7 @@ function api_url() {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var resource_type = options.resource_type || "image";
-  return base_api_url([resource_type, action]);
+  return base_api_url([resource_type, action], options);
 }
 
 function random_public_id() {

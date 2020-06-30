@@ -11,7 +11,7 @@ var ensurePresenceOf = utils.ensurePresenceOf;
 
 function call_api(method, uri, params, callback, options) {
   ensurePresenceOf({ method, uri });
-  var api_url = utils.base_api_url(uri);
+  var api_url = utils.base_api_url(uri, options);
   var auth = {
     key: ensureOption(options, "api_key"),
     secret: ensureOption(options, "api_secret")
