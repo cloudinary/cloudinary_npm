@@ -62,6 +62,18 @@ describe('image helper', function () {
       dpr: "auto"
     })).to.eql(`<img class='cld-hidpi' data-src='${UPLOAD_PATH}/dpr_auto/hello.png'/>`);
   });
+  it("should support 'blur_region' value for effect parameter", function () {
+    expect(cloudinary.image("hello", {
+      effect: ["blur_region", 5000],
+      gravity: "ocr_text"
+    })).to.eql(`<img src='${UPLOAD_PATH}/e_blur_region:5000,g_ocr_text/hello' />`);
+  });
+  it("should support 'pixelate_region' value for effect parameter", function () {
+    expect(cloudinary.image("hello", {
+      effect: "pixelate_region",
+      gravity: "ocr_text"
+    })).to.eql(`<img src='${UPLOAD_PATH}/e_pixelate_region,g_ocr_text/hello' />`);
+  });
   it("should support e_art:incognito transformation", function () {
     expect(cloudinary.image("hello", {
       format: "png",

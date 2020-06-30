@@ -34,7 +34,8 @@ module.exports = {
     PUBLIC_ID_6: `${PUBLIC_ID}_6`,
     PUBLIC_ID_BACKUP_1: `${PUBLIC_ID_PREFIX}backup_1${Date.now()}`,
     PUBLIC_ID_BACKUP_2: `${PUBLIC_ID_PREFIX}backup_2${Date.now()}`,
-    PUBLIC_ID_BACKUP_3: `${PUBLIC_ID_PREFIX}backup_3${Date.now()}`
+    PUBLIC_ID_BACKUP_3: `${PUBLIC_ID_PREFIX}backup_3${Date.now()}`,
+    PUBLIC_ID_OCR_1: `${PUBLIC_ID_PREFIX}ocr_1${Date.now()}`
 
   },
   PRESETS: {
