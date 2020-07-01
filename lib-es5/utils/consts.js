@@ -57,7 +57,8 @@ var PREDEFINED_VARS = {
   "width": "w"
 };
 
-var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom'];
+var TRANSFORMATION_PARAMS = ['angle', 'aspect_ratio', 'audio_codec', 'audio_frequency', 'background', 'bit_rate', 'border', 'color', 'color_space', 'crop', 'default_image', 'delay', 'density', 'dpr', 'duration', 'effect', 'end_offset', 'fetch_format', 'flags', 'fps', 'gravity', 'height', 'if', 'keyframe_interval', 'offset', 'opacity', 'overlay', 'page', 'prefix', 'quality', 'radius', 'raw_transformation', 'responsive_width', 'size', 'start_offset', 'streaming_profile', 'transformation', 'underlay', 'variables', 'video_codec', 'video_sampling', 'width', 'x', 'y', 'zoom' // + any key that starts with '$'
+];
 
 var LAYER_KEYWORD_PARAMS = {
   font_weight: "normal",
@@ -67,6 +68,8 @@ var LAYER_KEYWORD_PARAMS = {
   stroke: "none"
 };
 
+var UPLOAD_PREFIX = "https://api.cloudinary.com";
+
 module.exports = {
   DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION,
   DEFAULT_POSTER_OPTIONS,
@@ -75,5 +78,6 @@ module.exports = {
   PREDEFINED_VARS,
   LAYER_KEYWORD_PARAMS,
   TRANSFORMATION_PARAMS,
-  SIMPLE_PARAMS
+  SIMPLE_PARAMS,
+  UPLOAD_PREFIX
 };
