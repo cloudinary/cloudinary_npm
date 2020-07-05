@@ -124,14 +124,13 @@ describe("search_api", function () {
               SEARCH_TAG],
             context: "stage=validated"
           })
-      ]).delay(3000); // wait for the server to update
+      ]).delay(10000)
     });
+
     after(function () {
       if (!cloudinary.config().keep_test_products) {
         let config = cloudinary.config();
-        if (!(config.api_key && config.api_secret)) {
-          expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-        }
+
         cloudinary.v2.api.delete_resources_by_tag(SEARCH_TAG);
       }
     });
