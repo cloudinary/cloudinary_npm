@@ -1653,6 +1653,7 @@ describe("utils", function () {
         "data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
         "data:image/gif;param1=value1;param2=value2;base64,"
         + "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPg",
         cloudinary.BLANK
       ].forEach(src => expect(utils.isRemoteUrl(src) || src).to.eql(true));
     });
