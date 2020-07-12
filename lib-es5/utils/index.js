@@ -55,7 +55,11 @@ var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
-var getSDKVersionID = require('./encoding/sdkVersionID/getSDKVersionID');
+var getSDKVersions = require('./encoding/sdkAnalytics/getSDKVersions');
+
+var _require$Util = require('cloudinary-core').Util,
+    getAnalyticsOptions = _require$Util.getAnalyticsOptions,
+    getSDKAnalyticsSignature = _require$Util.getSDKAnalyticsSignature;
 
 exports = module.exports;
 var utils = module.exports;
@@ -779,19 +783,20 @@ function url(public_id) {
     resultUrl += `?${token}`;
   }
 
-  var analytics = ensureOption(options, 'analytics', false);
-  var responsive = ensureOption(options, 'responsive', false);
+  var urlAnalytics = ensureOption(options, 'urlAnalytics', false);
 
-  if (analytics === true) {
-    var sdkVersionID = getSDKVersionID({
-      responsive
-    });
+  if (urlAnalytics === true) {
+    var sdkVersions = getSDKVersions();
+    var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));
+
+    var sdkAnalyticsSignature = getSDKAnalyticsSignature(analyticsOptions);
+
     // url might already have a '?' query param
     var appender = '?';
     if (resultUrl.indexOf('?') >= 0) {
       appender = '&';
     }
-    resultUrl = `${resultUrl}${appender}_s=${sdkVersionID}`;
+    resultUrl = `${resultUrl}${appender}_s=${sdkAnalyticsSignature}`;
   }
 
   return resultUrl;
