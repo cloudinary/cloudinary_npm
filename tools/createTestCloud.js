@@ -40,10 +40,10 @@ function setup() {
         api_key: cloudApiKey,
         api_secret: cloudApiSecret,
         public_id: 'sample'
-      }).then((res) => {
+      }).then((result) => {
         console.log('Successfully created a temporary cloud');
         console.log('Cloudname: ', cloudName);
-        console.log('Sample image uploaded to: ', res.url);
+        console.log('Sample image uploaded to: ', result.url);
       }).catch(() => {
         throw 'FATAL - Could not create sample asset';
       });

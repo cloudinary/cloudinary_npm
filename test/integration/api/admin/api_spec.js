@@ -231,8 +231,8 @@ describe("api", function () {
       }).then(
         ({ public_id }) => cloudinary.v2.api.resources({ type: "upload" })
           .then(result => [public_id, result])
-          .then(([public_id, result]) => {
-            let resource = findByAttr(result.resources, "public_id", public_id);
+          .then(([resources_public_id, result]) => {
+            let resource = findByAttr(result.resources, "public_id", resources_public_id);
             expect(resource).to.be.an(Object);
             expect(resource.type).to.eql("upload");
           }));
