@@ -1,2 +1,2 @@
 #!/bin/bash
-mocha -R spec --recursive --require 'babel-register' --require 'babel-polyfill' test/
+mocha --recursive --require 'babel-register' --require 'babel-polyfill' test/

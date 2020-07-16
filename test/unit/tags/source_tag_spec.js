@@ -1,9 +1,9 @@
-const expect = require('expect.js');
-const cloudinary = require('../cloudinary');
+
+const cloudinary = require('../../../cloudinary');
 
 const extend = cloudinary.utils.extend;
 const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
-const createTestConfig = require('./testUtils/createTestConfig');
+const createTestConfig = require('../../testUtils/createTestConfig');
 
 describe('source helper', function () {
   const public_id = "sample";

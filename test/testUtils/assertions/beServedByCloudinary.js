@@ -1,4 +1,3 @@
-const expect = require('expect.js');
 const cloneDeep = require('lodash/cloneDeep');
 const http = require('http');
 const https = require('https');

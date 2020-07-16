@@ -1,9 +1,4 @@
-require('dotenv').load({
-  silent: true
-});
-
 const path = require('path');
-const expect = require("expect.js");
 const mock = require('mock-fs');
 const getSDKVersionID = require('../../lib/utils/encoding/sdkVersionID/getSDKVersionID');
 const cloudinary = require('../../cloudinary');

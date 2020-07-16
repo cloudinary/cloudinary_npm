@@ -1,8 +1,3 @@
-require('dotenv').load({
-  silent: true
-});
-
-const expect = require("expect.js");
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
 const http = require('http');
