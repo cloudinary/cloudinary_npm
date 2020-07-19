@@ -1043,7 +1043,6 @@ describe("api", function () {
 
     it('should restore different versions of a deleted asset', async function () {
       this.timeout(TIMEOUT.LARGE);
-      this.retries(3);
 
       // Upload the same file twice (upload->delete->upload->delete)
 
@@ -1059,7 +1058,7 @@ describe("api", function () {
       await wait(1000)();
 
       const secondDelete = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
-
+      await wait(1000)();
 
       // Sanity, ensure these uploads are different before we continue
       expect(firstUpload.bytes).not.to.equal(secondUpload.bytes);
@@ -1084,6 +1083,7 @@ describe("api", function () {
       expect(firstVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(firstUpload.bytes);
 
       // Restore second version, ensure it's equal to the upload size
+      await wait(1000)();
       const secondVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], { versions: [secondAssetVersion] });
       expect(secondVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(secondUpload.bytes);
 
