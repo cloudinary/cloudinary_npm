@@ -1,4 +1,3 @@
-const expect = require('expect.js');
 const isEmpty = require("lodash/isEmpty");
 const includes = require('lodash/includes');
 

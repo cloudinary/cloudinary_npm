@@ -1,8 +1,5 @@
-const expect = require("expect.js");
 const helper = require("../../spechelper");
-
 const DummyCacheStorage = require('./DummyCacheStorage');
-
 const KeyValueCacheAdapter = require(`../../../${helper.libPath}/cache/KeyValueCacheAdapter`);
 
 var cache;

@@ -1,10 +1,5 @@
-require('dotenv').load({
-  silent: true
-});
-
 const https = require('https');
 const http = require('http');
-const expect = require("expect.js");
 const sinon = require('sinon');
 const fs = require('fs');
 const Q = require('q');

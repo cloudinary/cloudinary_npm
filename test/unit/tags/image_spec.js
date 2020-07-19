@@ -1,4 +1,3 @@
-const expect = require('expect.js');
 const cloudinary = require('../../../cloudinary');
 const { setupCache, sharedExamples, includeContext } = require("../../spechelper");
 

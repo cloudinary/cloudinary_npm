@@ -1,4 +1,3 @@
-const expect = require('expect.js');
 const isEmpty = require("lodash/isEmpty");
 const cloneDeep = require('lodash/cloneDeep');
 const utils = require('../../../cloudinary').utils;

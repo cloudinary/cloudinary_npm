@@ -1,11 +1,5 @@
-require('dotenv').load({
-  silent: true
-});
-
-const expect = require("expect.js");
 const cloudinary = require("../../../../cloudinary");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
-
 let runOnlyForInternalPRs = process.env.TRAVIS_SECURE_ENV_VARS ? describe : describe.skip;
 
 

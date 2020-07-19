@@ -1,4 +1,3 @@
-const expect = require('expect.js');
 const includes = require('lodash/includes');
 
 /**

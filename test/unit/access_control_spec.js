@@ -1,11 +1,5 @@
-require('dotenv').load({
-  silent: true
-});
-
-const expect = require("expect.js");
 const isString = require('lodash/isString');
-const cloudinary = require("../cloudinary");
-
+const cloudinary = require("../../cloudinary");
 const build_upload_params = cloudinary.utils.build_upload_params;
 
 const ACL = {

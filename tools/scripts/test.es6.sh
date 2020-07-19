@@ -12,9 +12,9 @@ done
 
 if [ "$COLLECT_COVERAGE" -eq "1" ]; then
   echo 'Running code coverage test on ES6 code'
-  nyc --reporter=html mocha --ui bdd -R spec --recursive test/
+  nyc --reporter=html mocha --recursive test/
   exit;
 else
   echo 'Running tests on ES6 Code'
-  mocha --ui bdd -R spec --recursive test/
+  mocha --recursive test/
 fi

@@ -1,14 +1,8 @@
-require('dotenv').load({
-  silent: true
-});
-
-const expect = require("expect.js");
 const keys = require('lodash/keys');
 const Q = require('q');
 const cloudinary = require("../cloudinary");
 const helper = require("./spechelper");
 const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
-
 const api = cloudinary.v2.api;
 
 describe('Cloudinary::Api', function () {

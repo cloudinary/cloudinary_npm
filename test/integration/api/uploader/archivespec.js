@@ -1,19 +1,14 @@
-require('dotenv').load({
-  silent: true
-});
-
 const https = require('https');
-const expect = require("expect.js");
 const last = require('lodash/last');
 const sinon = require("sinon");
 const execSync = require('child_process').execSync;
 const Q = require('q');
 const fs = require('fs');
 const os = require('os');
-const cloudinary = require("../cloudinary");
-const helper = require("./spechelper");
+const cloudinary = require("../../../../cloudinary");
+const helper = require("../../../spechelper");
 
-const testConstants = require('./testUtils/testConstants');
+const testConstants = require('../../../testUtils/testConstants');
 
 const {
   TIMEOUT,

@@ -1,9 +1,8 @@
-const expect = require("expect.js");
 const Q = require('q');
 const sinon = require('sinon');
-const cloudinary = require("../cloudinary");
-const helper = require("./spechelper");
-const TIMEOUT = require('./testUtils/testConstants').TIMEOUT;
+const cloudinary = require("../../../../cloudinary");
+const helper = require("../../../spechelper");
+const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 
 const TEST_ID = Date.now();
 

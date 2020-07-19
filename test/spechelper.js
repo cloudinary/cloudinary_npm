@@ -1,4 +1,3 @@
-const expect = require('expect.js');
 const isFunction = require('lodash/isFunction');
 const querystring = require('querystring');
 const sinon = require('sinon');
@@ -7,7 +6,6 @@ const Q = require('q');
 const http = require('http');
 const https = require('https');
 // Load all our custom assertions
-require('./testUtils/testBootstrap');
 
 const cloudinary = require("../cloudinary");
 

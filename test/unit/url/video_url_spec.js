@@ -1,10 +1,4 @@
-require('dotenv').load({
-  silent: true
-});
-
-const expect = require("expect.js");
 const cloudinary = require("../../../cloudinary");
-
 const utils = cloudinary.utils;
 
 
