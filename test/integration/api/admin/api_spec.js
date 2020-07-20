@@ -141,7 +141,6 @@ function findByAttr(elements, attr, value) {
 
 
 describe("api", function () {
-  this.retries(3);
   var contextKey = `test-key${UNIQUE_JOB_SUFFIX_ID}`;
   before("Verify Configuration", function () {
     let config = cloudinary.config(true);

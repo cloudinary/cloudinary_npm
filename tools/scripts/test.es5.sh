@@ -1,2 +1,2 @@
 #!/bin/bash
-mocha --recursive --require 'babel-register' --require 'babel-polyfill' test/
+mocha --require 'babel-register' --require 'babel-polyfill' "./test/**/*spec.js"
