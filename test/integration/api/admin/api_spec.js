@@ -818,9 +818,7 @@ describe("api", function () {
       }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
         moderation_status: "approved"
       })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"))
-        .catch((err) => {
-          console.og(err);
-        });
+        .catch((err) => expect().fail(err));
     });
     it("should support requesting ocr info", function () {
       this.timeout(TIMEOUT.MEDIUM);
