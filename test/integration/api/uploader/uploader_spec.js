@@ -40,7 +40,6 @@ const {
 require('jsdom-global')();
 
 describe("uploader", function () {
-  this.retries(3);
   before("Verify Configuration", function () {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {

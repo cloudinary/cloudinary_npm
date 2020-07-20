@@ -1,3 +1,6 @@
+require('dotenv').load({
+  silent: true
+});
 const UNIQUE_JOB_SUFFIX_ID = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);
 
 // create public ID string for tests
