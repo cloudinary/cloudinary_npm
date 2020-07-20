@@ -1,3 +1,4 @@
+let describe = require('../testUtils/suite');
 const keys = require('lodash/keys');
 const Q = require('q');
 const cloudinary = require("../../cloudinary");
@@ -12,12 +13,7 @@ describe('Cloudinary::Api', function () {
   test_id_1 = `${prefix}_1`;
   test_id_2 = `${prefix}_2`;
   test_id_3 = `${prefix}_3`;
-  before("Verify configuration", function () {
-    var config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-  });
+
   after(function () {
     cloudinary.config(true);
     if (cloudinary.config().keep_test_products) {

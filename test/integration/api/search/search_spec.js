@@ -2,7 +2,7 @@ const Q = require('q');
 const cloudinary = require('../../../../cloudinary');
 const helper = require("../../../spechelper");
 const testConstants = require('../../../testUtils/testConstants');
-
+const describe = require('../../../testUtils/suite');
 const {
   TIMEOUT,
   TAGS,
@@ -86,12 +86,6 @@ describe("search_api", function () {
   });
   describe("integration", function () {
     this.timeout(TIMEOUT.LONG);
-    before("Verify Configuration", function () {
-      var config = cloudinary.config(true);
-      if (!(config.api_key && config.api_secret)) {
-        expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-      }
-    });
     before(function () {
       return Q.allSettled([
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,

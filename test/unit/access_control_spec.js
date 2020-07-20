@@ -1,3 +1,4 @@
+const describe = require('../testUtils/suite');
 const isString = require('lodash/isString');
 const cloudinary = require("../../cloudinary");
 const build_upload_params = cloudinary.utils.build_upload_params;
@@ -15,12 +16,6 @@ const ACL_2 = {
 const ACL_STRING = '{"access_type":"anonymous","start":"2019-02-22 16:20:57 +0200","end":"2019-03-22 00:00 +0200"}';
 
 describe("Access Control", function () {
-  before("Verify Configuration", function () {
-    let config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-  });
   describe("build_upload_params", function () {
     it("should accept a Hash value", function () {
       let params = build_upload_params({
