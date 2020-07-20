@@ -1,4 +1,3 @@
-console.log('Running');
 require('dotenv').load({
   silent: true
 });
