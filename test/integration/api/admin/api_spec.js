@@ -71,7 +71,7 @@ const EXPLICIT_TRANSFORMATION2 = {
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
   specify(":max_results", function () {
-    return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
+    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
       testFunc(...args, {
         max_results: 10
       });
@@ -85,7 +85,7 @@ sharedExamples("a list with a cursor", function (testFunc, ...args) {
     });
   });
   specify(":next_cursor", function () {
-    return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
+    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
       testFunc(...args, {
         next_cursor: 23452342
       });
@@ -302,7 +302,7 @@ describe("api", function () {
     });
     it("should allow listing resources by start_at", function () {
       let start_at = new Date().toString();
-      helper.mockPromise((xhr, writeSpy, requestSpy) => {
+      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
         cloudinary.v2.api.resources({
           type: "upload",
           start_at: start_at,
@@ -338,7 +338,7 @@ describe("api", function () {
     });
     describe("derived pagination", function(){
       it("should send the derived_next_cursor to the server", function() {
-        return helper.mockPromise((xhr, writeSpy, requestSpy) => {
+        return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
           cloudinary.v2.api.resource(PUBLIC_ID, {derived_next_cursor: 'aaa'});
           return sinon.assert.calledWith(
             requestSpy, sinon.match(sinon.match({
@@ -631,11 +631,11 @@ describe("api", function () {
         });
       });
       it("should allow listing of named transformations", function () {
-        return helper.mockPromise(function (xhr, write, request) {
+        return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
           cloudinary.v2.api.transformations({
             named: true
           });
-          return sinon.assert.calledWith(request, sinon.match({
+          return sinon.assert.calledWith(requestSpy, sinon.match({
             query: sinon.match('named=true')
           }, "named=true"));
         });
@@ -686,35 +686,35 @@ describe("api", function () {
   describe("upload_preset", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_presets);
     it("should allow listing upload_presets", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.api.upload_presets();
-        return sinon.assert.calledWith(request, sinon.match({
+        return sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(/.*\/upload_presets$/)
         }, "upload_presets"));
       });
     });
     it("should allow getting a single upload_preset", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET1);
         var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET1+"$";
-        return sinon.assert.calledWith(request, sinon.match({
+        return sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("GET")
         }));
       });
     });
     it("should allow deleting upload_presets", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2);
         var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET2+"$";
-        return sinon.assert.calledWith(request, sinon.match({
+        return sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("DELETE")
         }))
       });
     });
     it("should allow updating upload_presets", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.api.update_upload_preset(API_TEST_UPLOAD_PRESET3,
           {
             colors: true,
@@ -723,18 +723,18 @@ describe("api", function () {
             live: true
           });
         var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET3+"$";
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("PUT")
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('colors', 1, "colors=1")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('disallow_public_id', true, "disallow_public_id=true")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('colors', 1, "colors=1")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('disallow_public_id', true, "disallow_public_id=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
       });
     });
     it("should allow creating upload_presets", function () {
-      return helper.mockPromise(function (xhr, write) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.api.create_upload_preset({
           folder: "upload_folder",
           unsigned: true,
@@ -747,8 +747,8 @@ describe("api", function () {
           });
         });
 
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
-        sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
       });
     });
   });
@@ -761,15 +761,15 @@ describe("api", function () {
     itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
     describe("keep_original: yes", function () {
       it("should allow deleting all derived resources", function () {
-        return helper.mockPromise(function (xhr, write, request) {
+        return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
           let options = {
             keep_original: true
           };
           cloudinary.v2.api.delete_all_resources(options);
-          sinon.assert.calledWith(request, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
-          sinon.assert.calledWith(request, sinon.match(arg => arg.method === "DELETE", "DELETE"));
-          sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
-          sinon.assert.calledWith(write, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
+          sinon.assert.calledWith(requestSpy, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
+          sinon.assert.calledWith(requestSpy, sinon.match(arg => arg.method === "DELETE", "DELETE"));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('all', 'true'), "all=true"));
         });
       });
     });
@@ -880,7 +880,7 @@ describe("api", function () {
         tags: [...UPLOAD_TAGS, 'access_control_test']
       };
       it("should allow the user to define ACL in the update parameters2", function () {
-        return helper.mockPromise((xhr, writeSpy, requestSpy) => {
+        return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
           options.access_control = [acl];
           cloudinary.v2.api.update("id", options);
           return sinon.assert.calledWith(
@@ -892,18 +892,18 @@ describe("api", function () {
   });
   it("should support listing by moderation kind and value", function () {
     itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
-    return helper.mockPromise((xhr, write, request) => ["approved", "pending", "rejected"].forEach((stat) => {
+    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => ["approved", "pending", "rejected"].forEach((stat) => {
       var status, status2;
       status = stat;
       status2 = status;
-      request.resetHistory();
+      requestSpy.resetHistory();
       cloudinary.v2.api.resources_by_moderation("manual", status2, {
         moderations: true
       });
-      sinon.assert.calledWith(request, sinon.match(
+      sinon.assert.calledWith(requestSpy, sinon.match(
         arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : void 0), `/resources/image/moderations/manual/${status}`
       ));
-      sinon.assert.calledWith(request, sinon.match(
+      sinon.assert.calledWith(requestSpy, sinon.match(
         arg => (arg != null ? arg.query : void 0) === "moderations=true", "moderations=true"
       ));
     }));
@@ -965,9 +965,9 @@ describe("api", function () {
       it("should create a new folder", function () {
         const folderPath = `${UNIQUE_TEST_FOLDER}`;
         const expectedPath = `folders/${folderPath}`;
-        return helper.mockPromise(function (xhr, write, request) {
+        return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
           cloudinary.v2.api.create_folder(folderPath);
-          sinon.assert.calledWith(request, sinon.match({
+          sinon.assert.calledWith(requestSpy, sinon.match({
             pathname: sinon.match(expectedPath),
             method: sinon.match("POST")
           }));

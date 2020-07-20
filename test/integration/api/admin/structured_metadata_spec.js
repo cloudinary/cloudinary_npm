@@ -108,9 +108,9 @@ describe("structured metadata api", function () {
   describe("list_metadata_fields", function () {
     it("should return all metadata field definitions", function () {
       const expectedPath = `/metadata_fields$`;
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         api.list_metadata_fields();
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("GET")
         }));
@@ -130,37 +130,37 @@ describe("structured metadata api", function () {
   describe("add_metadata_field", function () {
     const expectedPath = "/metadata_fields$";
     it("should create string metadata field", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         const metadata = {
           external_id: EXTERNAL_ID_STRING,
           label: EXTERNAL_ID_STRING,
           type: 'string'
         };
         api.add_metadata_field(metadata);
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("POST")
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_STRING)));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('type', 'string')));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_STRING)));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_STRING)));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('type', 'string')));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_STRING)));
       });
     });
     it("should create integer metadata field", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         const metadata = {
           external_id: EXTERNAL_ID_INT,
           label: EXTERNAL_ID_INT,
           type: 'integer'
         };
         api.add_metadata_field(metadata);
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("POST")
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_INT)));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('type', 'integer')));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_INT)));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_INT)));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('type', 'integer')));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_INT)));
       });
     });
     it("should create date metadata field", function () {
@@ -177,7 +177,7 @@ describe("structured metadata api", function () {
       });
     });
     it("should create enum metadata field", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         const metadata = {
           datasource: {
             values: datasource_single
@@ -187,14 +187,14 @@ describe("structured metadata api", function () {
           type: 'enum'
         };
         api.add_metadata_field(metadata);
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("POST")
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_ENUM)));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('type', 'enum')));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_ENUM)));
-        sinon.assert.calledWith(write, sinon.match(helper.apiJsonParamMatcher('datasource', { values: datasource_single })));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_ENUM)));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('type', 'enum')));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_ENUM)));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', { values: datasource_single })));
       });
     });
     it("should create set metadata field", function () {
@@ -261,10 +261,10 @@ describe("structured metadata api", function () {
 
   describe("delete_metadata_field", function () {
     it("should delete metadata field by external id", function () {
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         const expectedPath = `/metadata_fields/${EXTERNAL_ID_DELETE}$`;
         api.delete_metadata_field(EXTERNAL_ID_DELETE);
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("DELETE")
         }));

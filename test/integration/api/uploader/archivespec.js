@@ -157,18 +157,18 @@ describe("archive", function () {
     describe('.create_zip', function () {
       this.timeout(TIMEOUT.LONG);
       it('should call create_archive with "zip" format and ignore missing resources', function () {
-        helper.mockPromise(function (xhr, write) {
+        helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
           uploader.create_zip({
             tags: TEST_TAG,
             public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],
             resource_type: "raw",
             allow_missing: true
           });
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
-          sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
         });
       });
       it('should create archive with "zip" format and include multiple resource types', function () {
