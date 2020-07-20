@@ -71,7 +71,7 @@ const EXPLICIT_TRANSFORMATION2 = {
 
 
 sharedExamples("a list with a cursor", function (testFunc, ...args) {
-  describe(":max_results", function () {
+  specify(":max_results", function () {
     return helper.mockPromise(function (xhr, writeSpy, requestSpy) {
       testFunc(...args, {
         max_results: 10
