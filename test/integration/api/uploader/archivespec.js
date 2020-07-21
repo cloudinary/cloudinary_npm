@@ -10,6 +10,9 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 
 const testConstants = require('../../../testUtils/testConstants');
+const callReusableTest = require('../../../testUtils/reusableTests/reusableTests').callReusableTest;
+const registerReusableTest = require('../../../testUtils/reusableTests/reusableTests').registerReusableTest;
+
 
 const {
   TIMEOUT,
@@ -28,8 +31,6 @@ const {
 } = URLS;
 
 const { utils, api, uploader } = cloudinary.v2;
-const sharedExamples = helper.sharedExamples;
-const includeContext = helper.includeContext;
 const ARCHIVE_TAG = TEST_TAG + "_archive";
 const PUBLIC_ID1 = ARCHIVE_TAG + "_1";
 const PUBLIC_ID2 = ARCHIVE_TAG + "_2";
@@ -37,9 +38,11 @@ const PUBLIC_ID_RAW = ARCHIVE_TAG + "_3";
 const FULLY_QUALIFIED_IMAGE = "image/upload/sample";
 const FULLY_QUALIFIED_VIDEO = "video/upload/dog";
 
-sharedExamples('archive', function () {
+
+describe("archive", function () {
+  this.timeout(TIMEOUT.LONG);
+
   before(function () {
-    this.timeout(TIMEOUT.LONG);
     return Q.all([
       uploader.upload(IMAGE_URL,
         {
@@ -76,13 +79,9 @@ sharedExamples('archive', function () {
       api.delete_resources_by_tag(ARCHIVE_TAG);
     }
   });
-});
 
-describe("archive", function () {
-  includeContext('archive');
   describe("utils", function () {
     describe('.generate_zip_download_url', function () {
-      this.timeout(TIMEOUT.LONG);
       this.archive_result = void 0;
       before(function () {
         this.archive_result = utils.download_zip_url({

@@ -5,3 +5,8 @@ const path = require('path');
 glob.sync(`${__dirname}/assertions/*.js`).forEach(function (file) {
   require(path.resolve(file));
 });
+
+// Import all reusable tests so they can be used with a name
+glob.sync(`${__dirname}/reusableTests/**/*.js`).forEach(function (file) {
+  require(path.resolve(file));
+});

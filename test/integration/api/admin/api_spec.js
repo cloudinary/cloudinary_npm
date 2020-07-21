@@ -1,15 +1,12 @@
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
-const http = require('http');
 const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const wait = require('../../../testUtils/helpers/wait');
-const sharedExamples = helper.sharedExamples;
-const itBehavesLike = helper.itBehavesLike;
 const uploadImage = helper.uploadImage;
-
+const callReusableTest = require('../../../testUtils/reusableTests/reusableTests').callReusableTest;
 const testConstants = require('../../../testUtils/testConstants');
 const API_V2 = cloudinary.v2.api;
 
@@ -69,66 +66,6 @@ const EXPLICIT_TRANSFORMATION2 = {
 };
 
 
-
-sharedExamples("a list with a cursor", function (testFunc, ...args) {
-  specify(":max_results", function () {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      testFunc(...args, {
-        max_results: 10
-      });
-      if (writeSpy.called) {
-        sinon.assert.calledWith(writeSpy, sinon.match(/max_results=10/));
-      } else {
-        sinon.assert.calledWith(requestSpy, sinon.match({
-          query: sinon.match(/max_results=10/)
-        }));
-      }
-    });
-  });
-  specify(":next_cursor", function () {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      testFunc(...args, {
-        next_cursor: 23452342
-      });
-      if (writeSpy.called) {
-        sinon.assert.calledWith(writeSpy, sinon.match(/next_cursor=23452342/));
-      } else {
-        sinon.assert.calledWith(requestSpy, sinon.match({
-          query: sinon.match(/next_cursor=23452342/)
-        }));
-      }
-    });
-  });
-});
-
-sharedExamples("accepts next_cursor", function (testFunc, ...args) {
-  var requestSpy;
-  var writeSpy;
-  var xhr;
-
-  before(function () {
-    xhr = sinon.useFakeXMLHttpRequest();
-    writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-    requestSpy = sinon.spy(http, 'request');
-  });
-  after(function () {
-    writeSpy.restore();
-    requestSpy.restore();
-    xhr.restore();
-  });
-  specify(":next_cursor", function () {
-    testFunc(...args, {
-      next_cursor: 23452342
-    });
-    if (writeSpy.called) {
-      sinon.assert.calledWith(writeSpy, sinon.match(/next_cursor=23452342/));
-    } else {
-      sinon.assert.calledWith(requestSpy, sinon.match({
-        query: sinon.match(/next_cursor=23452342/)
-      }));
-    }
-  });
-});
 
 function getAllTags({ resources }) {
   return resources
@@ -191,7 +128,10 @@ describe("api", function () {
   });
 
   describe("resources", function () {
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.resources);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.resources);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG);
+
+
     it("should allow listing resource_types", function () {
       this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resource_types().then(function (result) {
@@ -240,7 +180,7 @@ describe("api", function () {
         });
       });
     });
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_tag, TEST_TAG);
+
     it("should allow listing resources by tag", function () {
       this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_tag(TEST_TAG, {
@@ -453,7 +393,7 @@ describe("api", function () {
       });
     });
     describe("delete_resources_by_prefix", function () {
-      itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
+      callReusableTest("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
       return it("should allow deleting resources by prefix", function () {
         this.timeout(TIMEOUT.MEDIUM);
         return uploadImage({
@@ -476,7 +416,7 @@ describe("api", function () {
     });
     describe("delete_resources_by_tag", function () {
       let deleteTestTag = TEST_TAG + "_delete";
-      itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
+      callReusableTest("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, deleteTestTag);
       it("should allow deleting resources by tags", function () {
         this.timeout(TIMEOUT.MEDIUM);
         return uploadImage({
@@ -499,7 +439,7 @@ describe("api", function () {
     });
   });
   describe("tags", function () {
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.tags);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.tags);
     it("should allow listing tags", function () {
       this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.tags({
@@ -533,8 +473,8 @@ describe("api", function () {
   });
   describe("transformations", function () {
     var transformationName;
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.transformations);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.transformation, EXPLICIT_TRANSFORMATION_NAME);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.transformations);
     transformationName = "api_test_transformation3" + UNIQUE_JOB_SUFFIX_ID;
     after(function () {
       return Q.allSettled(
@@ -679,7 +619,7 @@ describe("api", function () {
     });
   });
   describe("upload_preset", function () {
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_presets);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.upload_presets);
     it("should allow listing upload_presets", function () {
       return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.api.upload_presets();
@@ -753,7 +693,7 @@ describe("api", function () {
       .then(usage => expect(usage.last_update).not.to.eql(null));
   });
   describe("delete_all_resources", function () {
-    itBehavesLike("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
+    callReusableTest("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
     describe("keep_original: yes", function () {
       it("should allow deleting all derived resources", function () {
         return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
@@ -886,7 +826,7 @@ describe("api", function () {
     });
   });
   it("should support listing by moderation kind and value", function () {
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
+    callReusableTest("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
     return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => ["approved", "pending", "rejected"].forEach((stat) => {
       var status, status2;
       status = stat;
@@ -995,10 +935,10 @@ describe("api", function () {
       });
     });
     describe("root_folders", function () {
-      itBehavesLike("a list with a cursor", cloudinary.v2.api.root_folders);
+      callReusableTest("a list with a cursor", cloudinary.v2.api.root_folders);
     })
     describe("sub_folders", function () {
-      itBehavesLike("a list with a cursor", cloudinary.v2.api.sub_folders, '/');
+      callReusableTest("a list with a cursor", cloudinary.v2.api.sub_folders, '/');
     });
   });
   describe('.restore', function () {
@@ -1119,7 +1059,7 @@ describe("api", function () {
     after(function () {
       return this.deleteMapping ? cloudinary.v2.api.delete_upload_mapping(this.mapping) : null;
     });
-    itBehavesLike("a list with a cursor", cloudinary.v2.api.upload_mappings);
+    callReusableTest("a list with a cursor", cloudinary.v2.api.upload_mappings);
     it('should create mapping', function () {
       this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api
