@@ -78,13 +78,13 @@ describe("uploader", function () {
     });
   });
   it("should successfully upload with metadata", function () {
-    return helper.mockPromise(function (xhr, write, request) {
+    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
       const metadata_fields = METADATA_SAMPLE_DATA;
       uploadImage({ metadata: metadata_fields });
-      sinon.assert.calledWith(request, sinon.match({
+      sinon.assert.calledWith(requestSpy, sinon.match({
         method: sinon.match("POST")
       }));
-      sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
   });
   it("should successfully upload url", function () {
@@ -989,14 +989,14 @@ describe("uploader", function () {
     it("should update metadata of existing resources", function () {
       const metadata_fields = { metadata_color: "red", metadata_shape: "" };
       const public_ids = ["test_id_1", "test_id_2"];
-      return helper.mockPromise(function (xhr, write, request) {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
         cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids);
-        sinon.assert.calledWith(request, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           method: sinon.match("POST")
         }));
-        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("metadata", "metadata_color=red|metadata_shape=")));
-        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[0])));
-        sinon.assert.calledWith(write, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[1])));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("metadata", "metadata_color=red|metadata_shape=")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[0])));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[1])));
       });
     });
   });

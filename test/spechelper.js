@@ -193,32 +193,36 @@ A test block
 @param requestSpy
 @return {*} a promise or a value
 */
+
+
 /**
-@function mockPromise
-Wraps the test to be mocked using a promise.
-Can be called inside `it` functions
-@param {mockBlock} the test function, accepting (xhr, write, request)
-@return {Promise}
+  @function provideMockObjects
+            Wraps the function to be mocked using a promise.
+  @param {function} providedFunction  test function, accepting (mockXHR, writeSpy, requestSpy)
+  @return {Promise}
 */
-exports.mockPromise = function (mockBlock) {
-  var requestSpy, writeSpy, xhr;
-  xhr = void 0;
-  writeSpy = void 0;
-  requestSpy = void 0;
+exports.provideMockObjects = function (providedFunction) {
+  let requestSpy, writeSpy, mockXHR;
+
   return Q.Promise(function (resolve, reject, notify) {
     var result;
-    xhr = sinon.useFakeXMLHttpRequest();
+
+    mockXHR = sinon.useFakeXMLHttpRequest();
     writeSpy = sinon.spy(ClientRequest.prototype, 'write');
     requestSpy = sinon.spy(api_http, 'request');
-    result = mockBlock(xhr, writeSpy, requestSpy);
-    if (result != null && isFunction(result.then)) {
+
+    result = providedFunction(mockXHR, writeSpy, requestSpy);
+
+
+    if (result && isFunction(result.then)) {
       return result.then(resolve);
+    } else {
+      return resolve(result);
     }
-    return resolve(result);
   }).finally(function () {
     requestSpy.restore();
     writeSpy.restore();
-    xhr.restore();
+    mockXHR.restore();
   }).done();
 };
 
