@@ -5,6 +5,7 @@ const execSync = require('child_process').execSync;
 const Q = require('q');
 const fs = require('fs');
 const os = require('os');
+const describe = require('../../../testUtils/suite');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 
@@ -37,13 +38,6 @@ const FULLY_QUALIFIED_IMAGE = "image/upload/sample";
 const FULLY_QUALIFIED_VIDEO = "video/upload/dog";
 
 sharedExamples('archive', function () {
-  before("Verify Configuration", function () {
-    var config;
-    config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-  });
   before(function () {
     this.timeout(TIMEOUT.LONG);
     return Q.all([

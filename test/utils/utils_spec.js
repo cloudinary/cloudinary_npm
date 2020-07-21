@@ -4,6 +4,7 @@ const defaults = require('lodash/defaults');
 const cloudinary = require("../../cloudinary");
 const helper = require("../spechelper");
 const TIMEOUT = require('../testUtils/testConstants').TIMEOUT;
+const describe = require('../testUtils/suite');
 const wait = require('../testUtils/helpers/wait');
 const generateBreakpoints = require(`../../${helper.libPath}/utils/generateBreakpoints`);
 const { srcsetUrl, generateSrcsetAttribute } = require(`../../${helper.libPath}/utils/srcsetUtils`);
@@ -20,12 +21,6 @@ var cloud_name = '';
 var root_path = '';
 
 describe("utils", function () {
-  before("Verify Configuration", function () {
-    var config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-  });
   afterEach(function () {
     cloudinary.config(defaults({
       secure: null
@@ -823,6 +818,7 @@ describe("utils", function () {
         expect(cloudinary.utils.generate_transformation_string(option)).to.eql(expected);
       });
     });
+
     describe('Conditional Transformation', function () {
       var configBck = null;
       before(function () {
@@ -834,186 +830,185 @@ describe("utils", function () {
         });
         cloud_name = 'test123';
       });
+
       after(function () {
         cloudinary.config(configBck);
       });
-      describe('with literal condition string', function () {
-        it("should include the if parameter as the first component in the transformation string", function () {
-          var url = utils.url("sample", {
-            if: "w_lt_200",
-            crop: "fill",
-            height: 120,
-            width: 80
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
-          url = utils.url("sample", {
-            crop: "fill",
-            height: 120,
-            if: "w_lt_200",
-            width: 80
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
+
+      it("should include the if parameter as the first component in the transformation string", function () {
+        var url = utils.url("sample", {
+          if: "w_lt_200",
+          crop: "fill",
+          height: 120,
+          width: 80
         });
-        describe('conditional duration video', function () {
-          it("should include conditional transformation", function () {
-            var url = utils.url("test", {
-              resource_type: 'video',
-              if: "duration > 30",
-              width: 100
-            });
-            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_du_gt_30,w_100/test");
-            url = utils.url("test", {
-              resource_type: 'video',
-              if: "initialDuration > 30",
-              width: 100
-            });
-            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_30,w_100/test");
-            url = utils.url("test", {
-              resource_type: 'video',
-              if: "initial_duration > 30",
-              width: 100
-            });
-            expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_30,w_100/test");
-          });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
+        url = utils.url("sample", {
+          crop: "fill",
+          height: 120,
+          if: "w_lt_200",
+          width: 80
         });
-        it("should allow multiple conditions when chaining transformations ", function () {
-          var url = utils.url("sample", {
-            transformation: [
-              {
-                if: "w_lt_200",
-                crop: "fill",
-                height: 120,
-                width: 80
-              },
-              {
-                if: "w_gt_400",
-                crop: "fit",
-                width: 150,
-                height: 150
-              },
-              {
-                effect: "sepia"
-              }
-            ]
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_w_gt_400,c_fit,h_150,w_150/e_sepia/sample");
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
+      });
+
+      it("should include conditional transformation", function () {
+        var url = utils.url("test", {
+          resource_type: 'video',
+          if: "duration > 30",
+          width: 100
         });
-        describe("including spaces and operators", function () {
-          it("should translate operators", function () {
-            var url = utils.url("sample", {
-              if: "w < 200",
+        expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_du_gt_30,w_100/test");
+        url = utils.url("test", {
+          resource_type: 'video',
+          if: "initialDuration > 30",
+          width: 100
+        });
+        expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_30,w_100/test");
+        url = utils.url("test", {
+          resource_type: 'video',
+          if: "initial_duration > 30",
+          width: 100
+        });
+        expect(url).to.eql("http://res.cloudinary.com/test123/video/upload/if_idu_gt_30,w_100/test");
+      });
+
+
+      it("should allow multiple conditions when chaining transformations ", function () {
+        var url = utils.url("sample", {
+          transformation: [
+            {
+              if: "w_lt_200",
               crop: "fill",
               height: 120,
               width: 80
-            });
-            expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
-          });
+            },
+            {
+              if: "w_gt_400",
+              crop: "fit",
+              width: 150,
+              height: 150
+            },
+            {
+              effect: "sepia"
+            }
+          ]
         });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_w_gt_400,c_fit,h_150,w_150/e_sepia/sample");
       });
-      describe('with tags', () => {
-        it("should allow multiple tags condition", function () {
-          var url = utils.url("sample", {
-            transformation: [
-              {
-                if: "!tag1:tag2:tag3!_in_tags",
-                crop: "fill",
-                height: 120,
-                width: 80
-              },
-              {
-                if: "else",
-                crop: "fit",
-                width: 150,
-                height: 150
-              },
-              {
-                effect: "sepia"
-              }
-            ]
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_!tag1:tag2:tag3!_in_tags,c_fill,h_120,w_80/if_else,c_fit,h_150,w_150/e_sepia/sample");
+
+
+      it("should translate operators", function () {
+        var url = utils.url("sample", {
+          if: "w < 200",
+          crop: "fill",
+          height: 120,
+          width: 80
         });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/sample");
       });
-      describe('if end', function () {
-        it("should include the if_end as the last parameter in its component", function () {
-          var url = utils.url("sample", {
-            transformation: [
-              {
-                if: "w_lt_200"
-              },
-              {
-                crop: "fill",
-                height: 120,
-                width: 80,
-                effect: "sharpen"
-              },
-              {
-                effect: "brightness:50"
-              },
-              {
-                effect: "shadow",
-                color: "red"
-              },
-              {
-                if: "end"
-              }
-            ]
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200/c_fill,e_sharpen,h_120,w_80/e_brightness:50/co_red,e_shadow/if_end/sample");
+
+      it("should allow multiple tags condition", function () {
+        var url = utils.url("sample", {
+          transformation: [
+            {
+              if: "!tag1:tag2:tag3!_in_tags",
+              crop: "fill",
+              height: 120,
+              width: 80
+            },
+            {
+              if: "else",
+              crop: "fit",
+              width: 150,
+              height: 150
+            },
+            {
+              effect: "sepia"
+            }
+          ]
         });
-        it("should support if_else with transformation parameters", function () {
-          var url = utils.url("sample", {
-            transformation: [
-              {
-                if: "w_lt_200",
-                crop: "fill",
-                height: 120,
-                width: 80
-              },
-              {
-                if: "else",
-                crop: "fill",
-                height: 90,
-                width: 100
-              }
-            ]
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_else,c_fill,h_90,w_100/sample");
-        });
-        it("if_else should be without any transformation parameters", function () {
-          var url = utils.url("sample", {
-            transformation: [
-              {
-                if: "aspect_ratio_lt_0.7"
-              },
-              {
-                crop: "fill",
-                height: 120,
-                width: 80
-              },
-              {
-                if: "else"
-              },
-              {
-                crop: "fill",
-                height: 90,
-                width: 100
-              }
-            ]
-          });
-          expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_ar_lt_0.7/c_fill,h_120,w_80/if_else/c_fill,h_90,w_100/sample");
-        });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_!tag1:tag2:tag3!_in_tags,c_fill,h_120,w_80/if_else,c_fit,h_150,w_150/e_sepia/sample");
       });
-      describe('chaining conditions', function () {
-        it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", function () {
-          var allOperators = 'if_' + 'w_eq_0_and' + '_h_ne_0_or' + '_ar_lt_0_and' + '_pc_gt_0_and' + '_fc_lte_0_and' + '_w_gte_0' + ',e_grayscale';
-          expect(utils.url("sample", {
-            "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
-            "effect": "grayscale"
-          })).to.match(new RegExp(allOperators));
+
+      it("should include the if_end as the last parameter in its component", function () {
+        var url = utils.url("sample", {
+          transformation: [
+            {
+              if: "w_lt_200"
+            },
+            {
+              crop: "fill",
+              height: 120,
+              width: 80,
+              effect: "sharpen"
+            },
+            {
+              effect: "brightness:50"
+            },
+            {
+              effect: "shadow",
+              color: "red"
+            },
+            {
+              if: "end"
+            }
+          ]
         });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200/c_fill,e_sharpen,h_120,w_80/e_brightness:50/co_red,e_shadow/if_end/sample");
+      });
+      it("should support if_else with transformation parameters", function () {
+        var url = utils.url("sample", {
+          transformation: [
+            {
+              if: "w_lt_200",
+              crop: "fill",
+              height: 120,
+              width: 80
+            },
+            {
+              if: "else",
+              crop: "fill",
+              height: 90,
+              width: 100
+            }
+          ]
+        });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_w_lt_200,c_fill,h_120,w_80/if_else,c_fill,h_90,w_100/sample");
+      });
+      it("if_else should be without any transformation parameters", function () {
+        var url = utils.url("sample", {
+          transformation: [
+            {
+              if: "aspect_ratio_lt_0.7"
+            },
+            {
+              crop: "fill",
+              height: 120,
+              width: 80
+            },
+            {
+              if: "else"
+            },
+            {
+              crop: "fill",
+              height: 90,
+              width: 100
+            }
+          ]
+        });
+        expect(url).to.eql("http://res.cloudinary.com/test123/image/upload/if_ar_lt_0.7/c_fill,h_120,w_80/if_else/c_fill,h_90,w_100/sample");
+      });
+
+      it("should support and translate operators:  '=', '!=', '<', '>', '<=', '>=', '&&', '||'", function () {
+        var allOperators = 'if_' + 'w_eq_0_and' + '_h_ne_0_or' + '_ar_lt_0_and' + '_pc_gt_0_and' + '_fc_lte_0_and' + '_w_gte_0' + ',e_grayscale';
+        expect(utils.url("sample", {
+          "if": "w = 0 && height != 0 || aspectRatio < 0 and pageCount > 0 and faceCount <= 0 and width >= 0",
+          "effect": "grayscale"
+        })).to.match(new RegExp(allOperators));
       });
     });
+
     describe('Context metadata to user variables', function (){
       it('should use context value as user variables', function(){
         const options = {

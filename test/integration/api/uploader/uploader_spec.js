@@ -9,6 +9,7 @@ const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
+const describe = require('../../../testUtils/suite');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
@@ -40,12 +41,6 @@ const {
 require('jsdom-global')();
 
 describe("uploader", function () {
-  before("Verify Configuration", function () {
-    var config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-  });
   this.timeout(TIMEOUT.LONG);
   after(function () {
     var config = cloudinary.config(true);

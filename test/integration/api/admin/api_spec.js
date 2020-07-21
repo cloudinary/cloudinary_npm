@@ -4,6 +4,7 @@ const http = require('http');
 const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
+const describe = require('../../../testUtils/suite');
 const wait = require('../../../testUtils/helpers/wait');
 const sharedExamples = helper.sharedExamples;
 const itBehavesLike = helper.itBehavesLike;
@@ -142,12 +143,6 @@ function findByAttr(elements, attr, value) {
 
 describe("api", function () {
   var contextKey = `test-key${UNIQUE_JOB_SUFFIX_ID}`;
-  before("Verify Configuration", function () {
-    let config = cloudinary.config(true);
-    if (!(config.api_key && config.api_secret)) {
-      expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
-    }
-  });
   before(function () {
     this.timeout(TIMEOUT.LONG);
     return Q.allSettled([
