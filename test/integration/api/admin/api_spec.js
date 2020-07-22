@@ -34,7 +34,8 @@ const {
   PUBLIC_ID_6,
   PUBLIC_ID_BACKUP_1,
   PUBLIC_ID_BACKUP_2,
-  PUBLIC_ID_BACKUP_3
+  PUBLIC_ID_BACKUP_3,
+  PUBLIC_ID_OCR_1
 } = PUBLIC_IDS;
 
 const {
@@ -805,6 +806,32 @@ describe("api", function () {
         });
       });
     });
+    describe(":ocr", function () {
+      before(async function () {
+        await uploadImage({
+          public_id: PUBLIC_ID_OCR_1,
+          tags: [TEST_TAG]
+        })
+      });
+      it("should support requesting ocr when updating", async function () {
+        // Update an image with ocr parameter
+        const ocrType = "adv_ocr";
+        const updateResult = await API_V2.update(PUBLIC_ID_OCR_1, { ocr: ocrType });
+
+        // Ensure result includes a ocr with correct value
+        expect(updateResult).not.to.be.empty();
+        expect(updateResult.info).to.be.an("object");
+        expect(updateResult.info.ocr).to.be.an("object");
+        expect(updateResult.info.ocr).to.have.property(ocrType);
+      });
+      it("should return 'Illegal value' errors for unknown ocr types", function () {
+        this.timeout(TIMEOUT.MEDIUM);
+        return API_V2.update(PUBLIC_ID_OCR_1, {ocr: 'illegal'})
+          .then(
+            () => expect().fail()
+          ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
+      });
+    });
     it("should support setting manual moderation status", function() {
       this.timeout(TIMEOUT.LONG);
       return uploadImage({
@@ -813,15 +840,6 @@ describe("api", function () {
         moderation_status: "approved"
       })).then(api_result => expect(api_result.moderation[0].status).to.eql("approved"))
         .catch((err) => expect().fail(err));
-    });
-    it("should support requesting ocr info", function () {
-      this.timeout(TIMEOUT.MEDIUM);
-      return uploadImage()
-        .then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
-          ocr: "illegal"
-        })).then(
-          () => expect().fail()
-        ).catch(({ error }) => expect(error.message).to.contain("Illegal value"));
     });
     it("should support requesting raw conversion", function () {
       this.timeout(TIMEOUT.MEDIUM);

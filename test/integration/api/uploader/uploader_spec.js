@@ -546,14 +546,6 @@ describe("uploader", function () {
       expect(result.moderation[0].kind).to.eql("manual");
     });
   });
-  it("should support requesting ocr analysis", function () {
-    return cloudinary.v2.uploader.upload(IMAGE_FILE, {
-      ocr: "adv_ocr",
-      tags: UPLOAD_TAGS
-    }).then(function (result) {
-      expect(result.info.ocr).to.have.key("adv_ocr");
-    });
-  });
   it("should support requesting raw conversion", function () {
     return cloudinary.v2.uploader.upload(RAW_FILE, {
       raw_convert: "illegal",
@@ -1030,6 +1022,40 @@ describe("uploader", function () {
         expect(Date.parse(response_acl[0].start)).to.be(Date.parse(acl.start));
         expect(Date.parse(response_acl[0].end)).to.be(Date.parse(acl.end));
       });
+    });
+  });
+  describe(":ocr", function () {
+    const ocrType = "adv_ocr";
+
+    it("should support requesting ocr when uploading", async function () {
+      // Upload an image and request ocr details in the response
+      const result = await UPLOADER_V2.upload(IMAGE_FILE, {ocr: ocrType, tags: [TEST_TAG]});
+
+      // Ensure result includes properly structured ocr details
+      expect(result).not.to.be.empty();
+      expect(result.info).to.be.an("object");
+      expect(result.info.ocr).to.be.an("object");
+      expect(result.info.ocr).to.have.key(ocrType);
+      expect(result.info.ocr[ocrType]).to.have.key("status");
+      expect(result.info.ocr[ocrType]).to.have.key("data");
+    });
+
+    it("should support ocr parameter in explicit", async function () {
+      // Upload an image
+      const uploadResult = await UPLOADER_V2.upload(IMAGE_FILE, {
+        tags: [TEST_TAG]
+      });
+
+      // Call explicit on the uploaded image with ocr parameter
+      const explicitResult = await UPLOADER_V2.explicit(uploadResult.public_id, {
+        ocr: ocrType,
+        "tags": [TEST_TAG],
+        type: "upload"
+      });
+
+      // Ensure result isn't an error
+      expect(explicitResult).not.to.be.empty();
+      expect(explicitResult.public_id).to.eql(uploadResult.public_id);
     });
   });
 

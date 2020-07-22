@@ -141,6 +141,28 @@ describe("cloudinary", function () {
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/g_center,o_20,p_a,q_0.4,r_3,x_1,y_2/test");
   });
+  describe(":gravity", function () {
+    it("should support 'ocr_text' as a value for gravity parameter", function () {
+      const options = {
+        gravity: "ocr_text",
+        crop: "crop",
+        width: 0.5
+      };
+      const result = cloudinary.utils.url("test", options);
+      expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,g_ocr_text,w_0.5/test");
+      expect(options).to.eql({});
+    });
+    it("should support 'auto:ocr_text' as a value for gravity parameter", function () {
+      const options = {
+        gravity: "auto:ocr_text",
+        crop: "crop",
+        width: 0.5
+      };
+      const result = cloudinary.utils.url("test", options);
+      expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/c_crop,g_auto:ocr_text,w_0.5/test");
+      expect(options).to.eql({});
+    });
+  });
   describe(":quality", function () {
     var upload_path = "http://res.cloudinary.com/test123/image/upload";
     it("support a percent value", function () {
