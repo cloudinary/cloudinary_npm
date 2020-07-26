@@ -1,5 +1,5 @@
 const cloudinary = require('../../../cloudinary');
-const { setupCache, sharedExamples, includeContext } = require("../../spechelper");
+const { setupCache } = require("../../spechelper");
 
 const { extend, isEmpty } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];
@@ -10,6 +10,9 @@ const srcRegExp = function (name, path) {
 };
 
 const createTestConfig = require('../../testUtils/createTestConfig');
+const callReusableTest = require('../../testUtils/reusableTests/reusableTests').callReusableTest;
+
+
 
 describe('image helper', function () {
   var commonTrans, commonTransformationStr, customAttributes;
@@ -121,29 +124,10 @@ describe('image helper', function () {
       alt: "asdfg\"'asdf"
     })).to.eql(`<img src='${UPLOAD_PATH}/sample.jpg' alt='asdfg&#34;&#39;asdf'/>`);
   });
-  sharedExamples("client_hints", function(options) {
-    it("should not use data-src or set responsive class", function() {
-      var tag = cloudinary.image('sample.jpg', options);
-      expect(tag).to.match(/<img.*>/);
-      expect(tag).not.to.match(/<.*class.*>/);
-      expect(tag).not.to.match(/\bdata-src\b/);
-      expect(tag).to.match(srcRegExp("src", "c_scale,dpr_auto,w_auto/sample.jpg"));
-    });
-    it("should override responsive", function () {
-      var tag;
-      cloudinary.config({
-        responsive: true
-      });
-      tag = cloudinary.image('sample.jpg', options);
-      expect(tag).to.match(/<img.*>/);
-      expect(tag).not.to.match(/<.*class.*>/);
-      expect(tag).not.to.match(/\bdata-src\b/);
-      expect(tag).to.match(srcRegExp("src", "c_scale,dpr_auto,w_auto/sample.jpg"));
-    });
-  });
+
   describe(":client_hints", function () {
     describe("as option", function () {
-      includeContext("client_hints", {
+      callReusableTest("Expects correct image tag attributes when client hints are used", {
         dpr: "auto",
         cloud_name: "test123",
         width: "auto",
@@ -155,7 +139,7 @@ describe('image helper', function () {
       beforeEach(function () {
         cloudinary.config().client_hints = true;
       });
-      includeContext("client_hints", {
+      callReusableTest("Expects correct image tag attributes when client hints are used", {
         dpr: "auto",
         cloud_name: "test123",
         width: "auto",

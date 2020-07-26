@@ -61,6 +61,12 @@ exports.test_cloudinary_url = function(public_id, options, expected_url, expecte
 
 const allExamples = {};
 
+/**
+ * @Deprecated, please use testUtils/reusableTests/reusableTests.js
+ * @param name
+ * @param examples
+ * @return {(function(...[*]=))|*}
+ */
 function sharedExamples(name, examples) {
   switch (true) {
   case isFunction(examples):
@@ -75,17 +81,12 @@ function sharedExamples(name, examples) {
   }
 }
 
-exports.sharedContext = sharedExamples;
-exports.sharedExamples = exports.sharedContext;
+exports.sharedExamples = sharedExamples;
 
 exports.itBehavesLike = function (name, ...args) {
-  return context(`behaves like ${name}`, function () {
+  return it(`behaves like ${name}`, function () {
     return sharedExamples(name).apply(this, args);
   });
-};
-
-exports.includeContext = function (name, ...args) {
-  return sharedExamples(name).apply(this, args);
 };
 
 /**
