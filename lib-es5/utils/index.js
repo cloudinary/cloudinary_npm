@@ -1468,12 +1468,11 @@ function pickOnlyExistingValues(source) {
       keys[_key2 - 1] = arguments[_key2];
     }
 
-    for (var j = 0; j < keys.length; j++) {
-      var key = keys[j];
+    keys.forEach(function (key) {
       if (source[key] != null) {
         result[key] = source[key];
       }
-    }
+    });
   }
   return result;
 }
