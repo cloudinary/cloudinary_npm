@@ -347,16 +347,53 @@ function encode_key_value(arg) {
   }).join('|');
 }
 
-function encode_context(arg) {
-  if (!isObject(arg)) {
-    return arg;
-  }
-  return entries(arg).map(function (_ref3) {
-    var _ref4 = _slicedToArray(_ref3, 2),
-        k = _ref4[0],
-        v = _ref4[1];
+/**
+ * @description Escape = and | with two backslashes \\
+ * @param {string|number} value
+ * @return {string}
+ */
+function escapeMetadataValue(value) {
+  return value.toString().replace(/([=|])/g, '\\$&');
+}
 
-    return `${k}=${v.replace(/([=|])/g, '\\$&')}`;
+/**
+ *
+ * @description Encode metadata fields based on incoming value.
+ *              If array, escape as color_id=[\"green\",\"red\"]
+ *              If string/number, escape as in_stock_id=50
+ *
+ *              Joins resulting values with a pipe:
+ *              in_stock_id=50|color_id=[\"green\",\"red\"]
+ *
+ *              = and | and escaped by default (this can't be turned off)
+ *
+ * @param metadataObj
+ * @return {string}
+ */
+function encode_context(metadataObj) {
+  if (!isObject(metadataObj)) {
+    return metadataObj;
+  }
+
+  return entries(metadataObj).map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        key = _ref4[0],
+        value = _ref4[1];
+
+    // if string, simply parse the value and move on
+    if (isString(value)) {
+      return `${key}=${escapeMetadataValue(value)}`;
+
+      // If array, parse each item individually
+    } else if (isArray(value)) {
+      var values = value.map(function (innerVal) {
+        return `\"${escapeMetadataValue(innerVal)}\"`;
+      }).join(',');
+      return `${key}=[${values}]`;
+      // if unknown, return the value as string
+    } else {
+      return value.toString();
+    }
   }).join('|');
 }
 
