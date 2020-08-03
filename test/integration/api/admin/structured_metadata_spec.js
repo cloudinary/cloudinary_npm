@@ -15,6 +15,7 @@ const EXTERNAL_ID_ENUM_2 = 'metadata_external_id_enum_2_' + TEST_ID;
 const EXTERNAL_ID_SET = 'metadata_external_id_set_' + TEST_ID;
 const EXTERNAL_ID_SET_2 = 'metadata_external_id_set_2_' + TEST_ID;
 const EXTERNAL_ID_SET_3 = 'metadata_external_id_set_3_' + TEST_ID;
+const EXTERNAL_ID_SET_4 = 'metadata_external_id_set_4_' + TEST_ID;
 const EXTERNAL_ID_DELETE = 'metadata_deletion_' + TEST_ID;
 const EXTERNAL_ID_DELETE_2 = 'metadata_deletion_2_' + TEST_ID;
 const EXTERNAL_ID_DATE_VALIDATION = 'metadata_date_validation_' + TEST_ID;
@@ -412,6 +413,31 @@ describe("structured metadata api", function () {
           expect(result).to.beADatasource();
           expect(result.values.length).to.eql(datasource_multiple.length);
         });
+    });
+  });
+
+  it('Should update an metadata field that is an array', (done) => {
+    let metadata = {
+      "external_id": EXTERNAL_ID_SET_4,
+      "label": EXTERNAL_ID_SET_4,
+      "type": "set",
+      "datasource": {
+        "values": [
+          {
+            "external_id": "1",
+            "value": "Email",
+            "state": "active"
+          }
+        ]
+      }
+    };
+
+    api.add_metadata_field(metadata, (res, res2) => {
+      cloudinary.v2.uploader.update_metadata({[EXTERNAL_ID_SET_4]: [1]}, ['sample'], (err, res) => {
+        expect(typeof err).to.be('undefined');
+        expect(res.public_ids[0]).to.equal('sample');
+        done();
+      })
     });
   });
 });
