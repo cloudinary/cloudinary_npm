@@ -14,10 +14,13 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
   let CLOUD_API;
   let CLOUD_NAME;
   let CLOUD_ID;
-  let USER_NAME = `SDK TEST ${Date.now()}`;
-  let USER_EMAIL = `sdk-test+${Date.now()}@cloudinary.com`;
+  let USER_NAME_1 = `SDK TEST ${Date.now()}`;
+  let USER_NAME_2 = `SDK TEST 2 ${Date.now()}`;
+  let USER_EMAIL_1 = `sdk-test+${Date.now()}@cloudinary.com`;
+  let USER_EMAIL_2 = `sdk-test2+${Date.now()}@cloudinary.com`;
   let USER_ROLE = 'billing';
-  let USER_ID;
+  let USER_ID_1;
+  let USER_ID_2;
   let GROUP_ID;
   let CLOUD_NAME_PREFIX = `justaname${process.hrtime()[1] % 10000}`;
   this.timeout(TIMEOUT.LONG);
@@ -40,11 +43,17 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
     CLOUD_NAME = res.cloud_name;
     CLOUD_ID = res.id;
 
-    let createUser = await cloudinary.provisioning.account.create_user(USER_NAME, USER_EMAIL, USER_ROLE, []).catch((err) => {
-      throw err;
-    });
+    let createdUsers = await Promise.all([
+      cloudinary.provisioning.account.create_user(USER_NAME_1, USER_EMAIL_1, USER_ROLE, []).catch((err) => {
+        throw err;
+      }),
+      cloudinary.provisioning.account.create_user(USER_NAME_2, USER_EMAIL_2, USER_ROLE, []).catch((err) => {
+        throw err;
+      })
+    ]);
 
-    USER_ID = createUser.id;
+    USER_ID_1 = createdUsers[0].id;
+    USER_ID_2 = createdUsers[1].id;
 
     // create a user group
 
@@ -56,7 +65,7 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
     return true;
   });
 
-  after('Destroy the sub_account and user that was created', async () => {
+  after('Destroy the sub_account and users that were created', async () => {
     // Skip 'after' in case we don't have account configuration available
     // This means that the beforeHook also didn't run
     let config = cloudinary.config(true);
@@ -64,11 +73,13 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
       return;
     }
     let delRes = await cloudinary.provisioning.account.delete_sub_account(CLOUD_ID);
-    let delUserRes = await cloudinary.provisioning.account.delete_user(USER_ID);
+    let delUser1Res = await cloudinary.provisioning.account.delete_user(USER_ID_1);
+    let delUser2Res = await cloudinary.provisioning.account.delete_user(USER_ID_2);
     let delGroupRes = await cloudinary.provisioning.account.delete_user_group(GROUP_ID);
 
     expect(delRes.message).to.eql('ok');
-    expect(delUserRes.message).to.eql('ok');
+    expect(delUser1Res.message).to.eql('ok');
+    expect(delUser2Res.message).to.eql('ok');
     expect(delGroupRes.ok).to.eql(true); // notice the different response structure
   });
 
@@ -132,15 +143,15 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
   it('Updates a user', async function () {
     let NEW_EMAIL_ADDRESS = `updated+${Date.now()}@cloudinary.com`;
 
-    await cloudinary.provisioning.account.update_user(USER_ID, 'updated', NEW_EMAIL_ADDRESS).then((res) => {
+    await cloudinary.provisioning.account.update_user(USER_ID_1, 'updated', NEW_EMAIL_ADDRESS).then((res) => {
       expect(res.name).to.eql('updated');
       expect(res.email).to.eql(NEW_EMAIL_ADDRESS);
     }).catch((err) => {
       throw err;
     });
 
-    await cloudinary.provisioning.account.user(USER_ID).then((res) => {
-      expect(res.id).to.eql(USER_ID);
+    await cloudinary.provisioning.account.user(USER_ID_1).then((res) => {
+      expect(res.id).to.eql(USER_ID_1);
       expect(res.email).to.eql(NEW_EMAIL_ADDRESS);
     }).catch((err) => {
       throw err;
@@ -148,9 +159,9 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
 
     await cloudinary.provisioning.account.users().then((res) => {
       let user = res.users.find((userEntry) => {
-        return userEntry.id === USER_ID;
+        return userEntry.id === USER_ID_1;
       });
-      expect(user.id).to.eql(USER_ID);
+      expect(user.id).to.eql(USER_ID_1);
       expect(user.email).to.eql(NEW_EMAIL_ADDRESS);
     }).catch((err) => {
       throw err;
@@ -158,11 +169,50 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
   });
 
   it('Gets users in a list of userIDs', async () => {
-    await cloudinary.provisioning.account.users(null, [USER_ID]).then((res) => {
+    await cloudinary.provisioning.account.users(null, [USER_ID_1]).then((res) => {
       expect(res.users.length).to.eql(1);
     }).catch((err) => {
       throw err;
     });
+  });
+
+  it('Gets pending users', async () => {
+    const result = await cloudinary.provisioning.account.users(true, [USER_ID_1]);
+    expect(result.users.length).to.eql(1);
+  });
+
+  it('Gets non-pending users', async () => {
+    const result = await cloudinary.provisioning.account.users(false, [USER_ID_1]);
+    expect(result.users.length).to.eql(0);
+  });
+
+  it('Gets pending and non-pending users', async () => {
+    const result = await cloudinary.provisioning.account.users(null, [USER_ID_1]);
+    expect(result.users.length).to.eql(1);
+  });
+
+  it('Gets users by prefix', async () => {
+    const [result_1, result_2] = await Promise.all([
+      cloudinary.provisioning.account.users(true, null, USER_NAME_2.slice(0, -1)),
+      cloudinary.provisioning.account.users(true, null, USER_NAME_2+'zzz')
+    ]);
+    expect(result_1.users.length).to.eql(1);
+    expect(result_2.users.length).to.eql(0);
+  });
+
+  it('Gets users by sub_account_id', async () => {
+    const result = await cloudinary.provisioning.account.users(true, null, USER_NAME_2, CLOUD_ID);
+    expect(result.users.length).to.eql(1);
+  });
+
+  it('Should throw an error when attempting to get users by a nonexistent sub_account_id', async () => {
+    const random_id = Math.floor(Math.random() * 100000);
+    try {
+      await cloudinary.provisioning.account.users(true, null, null, random_id);
+      expect().fail()
+    } catch ({error}) {
+      expect(error.message).to.eql(`Cannot find sub account with id ${random_id}`);
+    }
   });
 
   it('Updates the user group', async () => {
@@ -174,13 +224,13 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
   });
 
   it('Adds and remove a user from a group', async () => {
-    let res = await cloudinary.provisioning.account.add_user_to_group(GROUP_ID, USER_ID);
+    let res = await cloudinary.provisioning.account.add_user_to_group(GROUP_ID, USER_ID_1);
     expect(res.users.length).to.eql(1);
 
     let groupUserData = await cloudinary.provisioning.account.user_group_users((GROUP_ID));
     expect(groupUserData.users.length).to.eql(1);
     //
-    let remUserFromGroupResp = await cloudinary.provisioning.account.remove_user_from_group(GROUP_ID, USER_ID);
+    let remUserFromGroupResp = await cloudinary.provisioning.account.remove_user_from_group(GROUP_ID, USER_ID_1);
     expect(remUserFromGroupResp.users.length).to.eql(0);
   });
 
