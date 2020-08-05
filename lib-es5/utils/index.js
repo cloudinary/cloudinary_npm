@@ -1187,8 +1187,8 @@ function download_zip_url() {
 }
 
 /**
- * Creates and returns a URL that when invokes creates an archive of a folder
- * @param {string} folder_path Full path from the root of the folder to download
+ * Creates and returns a URL that when invoked creates an archive of a folder
+ * @param {string} folder_path Full path (from the root) of the folder to download
  * @param {object} options Additional options
  * @returns {string} Url for downloading an archive of a folder
  */
