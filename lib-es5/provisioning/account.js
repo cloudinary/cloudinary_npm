@@ -138,7 +138,7 @@ function user(user_id) {
 
 /**
  * @desc Lists users in the account.
- * @param [pending] {boolean} - Whether to only return pending users. Default: false (all users)
+ * @param [pending] {boolean} - Limit results to pending users (true), users that are not pending (false), or all users (undefined, the default)
  * @param [user_ids] {string[]} - A list of up to 100 user IDs. When provided, other parameters are ignored.
  * @param [prefix] {string} - Returns users where the name or email address begins with the specified case-insensitive
  *                            string.
