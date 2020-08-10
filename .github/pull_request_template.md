@@ -4,15 +4,15 @@ Provide some context as to what was changed, from an implementation standpoint.
 -->
 
 #### What does this PR address?
-[ ] Gitub issue (Add reference - #XX)
-[ ] Refactoring
-[ ] New feature
-[ ] Bug fix
-[ ] Adds more tests
+- [ ] Github issue (Add reference - #XX)
+- [ ] Refactoring
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Adds more tests
 
 #### Are tests included?
-[ ] Yes
-[ ] No
+- [ ] Yes
+- [ ] No
 
 #### Reviewer, Please Note:
 <!--
