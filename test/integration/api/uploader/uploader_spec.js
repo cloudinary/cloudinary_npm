@@ -576,7 +576,7 @@ describe("uploader", function () {
       expect().fail();
     }).catch(function (error) {
       expect(error).not.to.be(void 0);
-      expect(error.message).to.contain("Detection is invalid");
+      expect(error.message).to.contain("Detection invalid model 'illegal'");
     });
   });
   it("should support requesting background_removal", function () {
