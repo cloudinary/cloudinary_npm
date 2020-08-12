@@ -27,4 +27,18 @@ describe("AuthToken tests using utils.generate_auth_token", function () {
 
     expect(token).to.eql("__cld_token__=st=222222222~exp=222222522~acl=%2f*%2ft_foobar~hmac=8e39600cc18cec339b21fe2b05fcb64b98de373355f8ce732c35710d8b10259f");
   });
+
+  it("should ignore URL in AuthToken generation if ACL is provided", function () {
+    const token_options = {
+      start_time: 222222222,
+      key: "00112233FF99",
+      duration: 300,
+      acl: "/*/t_foobar"
+    }
+    const token = utils.generate_auth_token(token_options);
+
+    token_options.url = "http://res.cloudinary.com/test123/image/upload/v1486020273/sample.jpg";
+    const token_with_url = utils.generate_auth_token(token_options);
+    expect(token).to.eql(token_with_url)
+  });
 });
