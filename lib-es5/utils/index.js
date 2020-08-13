@@ -385,15 +385,14 @@ function encode_context(metadataObj) {
       return `${key}=${escapeMetadataValue(value)}`;
 
       // If array, parse each item individually
-    } else if (isArray(value)) {
+    }if (isArray(value)) {
       var values = value.map(function (innerVal) {
         return `\"${escapeMetadataValue(innerVal)}\"`;
       }).join(',');
       return `${key}=[${values}]`;
       // if unknown, return the value as string
-    } else {
-      return value.toString();
     }
+    return value.toString();
   }).join('|');
 }
 
