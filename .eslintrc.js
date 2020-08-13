@@ -45,7 +45,7 @@ module.exports = {
         "no-confusing-arrow": "off",
         "no-console": "off",
         "no-dupe-keys": "error",
-        "no-else-return": "error",
+        "no-else-return": "off",
         "no-empty": "error",
         "no-empty-function": "error",
         "no-lonely-if": "off",
