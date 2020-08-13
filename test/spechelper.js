@@ -217,9 +217,8 @@ exports.provideMockObjects = function (providedFunction) {
 
     if (result && isFunction(result.then)) {
       return result.then(resolve);
-    } else {
-      return resolve(result);
     }
+    return resolve(result);
   }).finally(function () {
     requestSpy.restore();
     writeSpy.restore();

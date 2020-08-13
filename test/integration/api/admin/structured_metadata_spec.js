@@ -433,9 +433,9 @@ describe("structured metadata api", function () {
     };
 
     api.add_metadata_field(metadata, (res, res2) => {
-      cloudinary.v2.uploader.update_metadata({[EXTERNAL_ID_SET_4]: [1]}, ['sample'], (err, res) => {
+      cloudinary.v2.uploader.update_metadata({[EXTERNAL_ID_SET_4]: [1]}, ['sample'], (err, result) => {
         expect(typeof err).to.be('undefined');
-        expect(res.public_ids[0]).to.equal('sample');
+        expect(result.public_ids[0]).to.equal('sample');
         done();
       })
     });
