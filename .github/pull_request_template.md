@@ -4,7 +4,7 @@ Provide some context as to what was changed, from an implementation standpoint.
 -->
 
 #### What does this PR address?
-- [ ] Github issue (Add reference - #XX)
+- [ ] GitHub issue (Add reference - #XX)
 - [ ] Refactoring
 - [ ] New feature
 - [ ] Bug fix
