@@ -18,7 +18,8 @@ const {
   PRESETS,
   TRANSFORMATIONS,
   PUBLIC_ID_PREFIX,
-  UNIQUE_TEST_FOLDER
+  UNIQUE_TEST_FOLDER,
+  TEST_EVAL_STR
 } = testConstants;
 
 const {
@@ -656,7 +657,8 @@ describe("api", function () {
             colors: true,
             unsigned: true,
             disallow_public_id: true,
-            live: true
+            live: true,
+            eval: TEST_EVAL_STR
           });
         var expectedPath="/.*\/upload_presets/"+API_TEST_UPLOAD_PRESET3+"$";
         sinon.assert.calledWith(requestSpy, sinon.match({
@@ -667,6 +669,7 @@ describe("api", function () {
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('disallow_public_id', true, "disallow_public_id=true")));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('eval', TEST_EVAL_STR, `eval=${TEST_EVAL_STR}`)));
       });
     });
     it("should allow creating upload_presets", function () {
@@ -675,7 +678,8 @@ describe("api", function () {
           folder: "upload_folder",
           unsigned: true,
           tags: UPLOAD_TAGS,
-          live: true
+          live: true,
+          eval: TEST_EVAL_STR
         }).then((preset) => {
           cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
             console.log(err);
@@ -685,6 +689,7 @@ describe("api", function () {
 
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('unsigned', true, "unsigned=true")));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('live', true, "live=true")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('eval', TEST_EVAL_STR, `eval=${TEST_EVAL_STR}`)));
       });
     });
   });

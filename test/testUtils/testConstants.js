@@ -13,13 +13,18 @@ const TEST_TAG_PREFIX = "cloudinary_npm_test"; // identifies resources created b
 const TEST_TAG = `${TEST_TAG_PREFIX}_${UNIQUE_JOB_SUFFIX_ID}`;
 const UPLOAD_TAGS = [TEST_TAG, TEST_TAG_PREFIX, SDK_TAG];
 const UNIQUE_TEST_FOLDER = `${TEST_TAG}_${UNIQUE_JOB_SUFFIX_ID}_folder`;
+const TEST_IMG_WIDTH = 241;
 const TEST_CLOUD_NAME = process.env.CLOUDINARY_URL.split('@')[1];
 
+const TEST_EVAL_STR = 'if (resource_info["width"] < 450) { upload_options["tags"] = "a,b" }; ' +
+    'upload_options["context"] = "width=" + resource_info["width"]';
 module.exports = {
   TEST_TAG_PREFIX,
+  TEST_IMG_WIDTH,
   TEST_CLOUD_NAME,
   PUBLIC_ID_PREFIX,
   UNIQUE_TEST_FOLDER,
+  TEST_EVAL_STR,
   TIMEOUT: {
     SHORT: 5000,
     MEDIUM: 20000,

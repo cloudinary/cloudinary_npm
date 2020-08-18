@@ -308,6 +308,7 @@ function build_upload_params(options) {
     eager: utils.build_eager(options.eager),
     eager_async: utils.as_safe_bool(options.eager_async),
     eager_notification_url: options.eager_notification_url,
+    eval: options.eval,
     exif: utils.as_safe_bool(options.exif),
     faces: utils.as_safe_bool(options.faces),
     folder: options.folder,

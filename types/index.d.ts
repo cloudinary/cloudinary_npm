@@ -491,6 +491,7 @@ declare module 'cloudinary' {
         eager?: TransformationOptions;
         eager_async?: boolean;
         eager_notification_url?: string;
+        eval?: string;
         exif?: boolean;
         faces?: boolean;
         folder?: string;
