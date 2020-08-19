@@ -1135,7 +1135,7 @@ describe("uploader", function () {
     });
   });
 
-  it('should add eval parameter to an uploaded asset', async () => {
+  it('should add the eval parameter to an uploaded asset', async () => {
     const testEvalTagsResult = ['a', 'b'];
     const result = await UPLOADER_V2.upload(IMAGE_FILE, {
       tags: [TEST_TAG],
