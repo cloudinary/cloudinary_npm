@@ -8,6 +8,6 @@ then
   npm run test-es5
 else
   npm run test-es6
-fi
   npm run dtslint
+fi
 
