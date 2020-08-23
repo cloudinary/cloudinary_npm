@@ -3,14 +3,14 @@
 Provide some context as to what was changed, from an implementation standpoint.
 -->
 
-#### What does this PR address?
-- [ ] Github issue (Add reference - #XX)
+#### What Does This PR Address?
+- [ ] GitHub issue (Add reference - #XX)
 - [ ] Refactoring
 - [ ] New feature
 - [ ] Bug fix
 - [ ] Adds more tests
 
-#### Are tests included?
+#### Are Tests Included?
 - [ ] Yes
 - [ ] No
 
