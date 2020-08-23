@@ -30,7 +30,9 @@ const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
   TIMEOUT,
-  TAGS
+  TAGS,
+  TEST_EVAL_STR,
+  TEST_IMG_WIDTH
 } = testConstants;
 
 const {
@@ -1131,6 +1133,21 @@ describe("uploader", function () {
           expect(result.public_ids).to.contain(resource_2.public_id);
         });
     });
+  });
+
+  it('should add the eval parameter to an uploaded asset', async () => {
+    const testEvalTagsResult = ['a', 'b'];
+    const result = await UPLOADER_V2.upload(IMAGE_FILE, {
+      tags: [TEST_TAG],
+      eval: TEST_EVAL_STR
+    });
+
+    expect(result).not.to.be.empty();
+    expect(result.tags).to.be.an("array");
+    expect(result.tags).to.eql(testEvalTagsResult);
+    expect(result.context).to.be.an("object");
+    expect(result.context.custom).to.be.an("object");
+    expect(result.context.custom.width).to.eql(TEST_IMG_WIDTH);
   });
 
   describe("sign requests", function () {

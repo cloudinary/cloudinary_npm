@@ -119,6 +119,7 @@ exports.apiParamMatcher = function (name, value) {
   params = {};
   params[name] = value;
   expected = querystring.stringify(params);
+  expected = exports.escapeRegexp(expected);
   return function (arg) {
     return new RegExp(expected).test(arg);
   };
