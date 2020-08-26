@@ -1,3 +1,27 @@
+
+1.23.0 / 2020-08-26
+===================
+New functionality and features
+------------------------------
+* Add support for pending, prefix, and sub_account_id to users method (#417)
+* Add support for metadata array value (#433)
+* Detect data URLs with suffix in mime type (#418)
+* Add support for download backedup asset function (#415)
+* Add support `max_results` and `next_cursor` in `root_folders` and `sub_folders` (#411)
+* Add download_folder method (#404)
+
+Other Changes
+-------------
+* Added linter rules (#423)
+* Fix docstring for pending parameter of the users method (#436)
+* Fix invalid detection failing test (#439)
+* Test: Ignore URL in AuthToken generation if ACL is provided (#431)
+* Add pull_request_template.md (#435)
+* Fix and improve docstring for download_folder() (#434)
+* Refactor `pickOnlyExistingValues()` function (#432)
+* Add tests for new OCR features (#385)
+
+ 
 1.22.0 / 2020-06-08
 ==================
 
