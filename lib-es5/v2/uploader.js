@@ -35,3 +35,5 @@ exports.upload_tag_params = uploader.upload_tag_params;
 exports.upload_url = uploader.upload_url;
 exports.image_upload_tag = uploader.image_upload_tag;
 exports.unsigned_image_upload_tag = uploader.unsigned_image_upload_tag;
+exports.download_generated_sprite = uploader.download_generated_sprite;
+exports.download_multi = uploader.download_multi;
