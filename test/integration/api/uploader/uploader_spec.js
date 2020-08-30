@@ -892,6 +892,12 @@ describe("uploader", function () {
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher("async", 1)));
     });
   });
+  it("should pass `accessibility_analysis` option to the server", function () {
+    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+      cloudinary.v2.uploader.upload(IMAGE_FILE, { accessibility_analysis: true });
+      return sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("accessibility_analysis", 1)));
+    });
+  });
   describe("explicit", function () {
     var spy, xhr;
     spy = void 0;
@@ -933,6 +939,10 @@ describe("uploader", function () {
         tags: [TEST_TAG]
       });
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('raw_convert', 'google_speech')));
+    });
+    it("should pass `accessibility_analysis` to server", function () {
+      cloudinary.v2.uploader.explicit("cloudinary", { accessibility_analysis: true });
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('accessibility_analysis', 1)));
     });
   });
   it("should create an image upload tag with required properties", function () {

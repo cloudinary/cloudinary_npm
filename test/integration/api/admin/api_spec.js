@@ -284,6 +284,14 @@ describe("api", function () {
         });
       });
     });
+    it("should send `accessibility_analysis` param to the server", function () {
+      return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+        cloudinary.v2.api.resource(PUBLIC_ID, { accessibility_analysis: true });
+        return sinon.assert.calledWith(requestSpy, sinon.match({
+          query: sinon.match(helper.apiParamMatcher("accessibility_analysis", "true"))
+        }));
+      });
+    });
   });
   describe("backup resource", function () {
     this.timeout(TIMEOUT.MEDIUM);

@@ -111,7 +111,7 @@ exports.resource = function resource(public_id, callback) {
   resource_type = options.resource_type || "image";
   type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
-  return call_api("get", uri, pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis"), callback, options);
 };
 
 exports.restore = function restore(public_ids, callback) {
