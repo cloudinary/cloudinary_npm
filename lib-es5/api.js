@@ -24,7 +24,13 @@ exports.ping = function ping(callback) {
 exports.usage = function usage(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return call_api("get", ["usage"], {}, callback, options);
+  var uri = ["usage"];
+
+  if (options.date) {
+    uri.push(options.date);
+  }
+
+  return call_api("get", uri, {}, callback, options);
 };
 
 exports.resource_types = function resource_types(callback) {

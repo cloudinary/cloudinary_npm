@@ -1,4 +1,6 @@
 const sinon = require('sinon');
+const formatDate = require("date-fns").format;
+const subDate = require("date-fns").sub;
 const ClientRequest = require('_http_client').ClientRequest;
 const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
@@ -696,7 +698,20 @@ describe("api", function () {
   it("should support the usage API call", function () {
     this.timeout(TIMEOUT.MEDIUM);
     return cloudinary.v2.api.usage()
-      .then(usage => expect(usage.last_update).not.to.eql(null));
+      .then(usage => {
+        expect(usage).to.be.an("object");
+        expect(usage).to.have.keys("plan", "last_updated", "transformations", "objects", "bandwidth", "storage", "requests", "resources", "derived_resources", "media_limits");
+      });
+  });
+  it("should return usage values for a specific date", function () {
+    const yesterday = formatDate(subDate(new Date(), { days: 1 }), "dd-MM-yyyy");
+    return cloudinary.v2.api.usage({ date: yesterday })
+      .then(usage => {
+        expect(usage).to.be.an("object");
+        expect(usage).to.have.keys("plan", "last_updated", "transformations", "objects", "bandwidth", "storage", "requests", "resources", "derived_resources", "media_limits");
+        expect(usage.bandwidth).to.be.an("object");
+        expect(usage.bandwidth).to.not.have.keys("limit", "used_percent");
+      });
   });
   describe("delete_all_resources", function () {
     callReusableTest("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
