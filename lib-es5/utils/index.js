@@ -969,7 +969,11 @@ function base_api_url() {
 
   var cloudinary = ensureOption(options, "upload_prefix", UPLOAD_PREFIX);
   var cloud_name = ensureOption(options, "cloud_name");
-  return [cloudinary, "v1_1", cloud_name].concat(path).join("/");
+  var encode_path = function encode_path(unencoded_path) {
+    return encodeURIComponent(unencoded_path).replace("'", '%27');
+  };
+  var encoded_path = Array.isArray(path) ? path.map(encode_path) : encode_path(path);
+  return [cloudinary, "v1_1", cloud_name].concat(encoded_path).join("/");
 }
 
 function api_url() {
