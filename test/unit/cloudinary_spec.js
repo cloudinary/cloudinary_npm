@@ -545,7 +545,7 @@ describe("cloudinary", function () {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg==/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg/test");
   });
   it('should should not include custom function with undefined value', function () {
     var options, result;
@@ -567,7 +567,20 @@ describe("cloudinary", function () {
     };
     result = cloudinary.utils.url("test", options);
     expect(options).to.eql({});
-    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_pre:remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg==/test");
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_pre:remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg/test");
+  });
+  it('should generate url safe base64 in remote custom pre function', function () {
+    var options, result;
+    options = {
+      custom_pre_function: {
+        function_type: 'remote',
+        source:
+          "https://opengraphimg.com/.netlify/functions/generate-opengraph?author=opengraphimg&title=Hey%20Chris%20this%20is%20working"
+      }
+    };
+    result = cloudinary.utils.url("test", options);
+    expect(options).to.eql({});
+    expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_pre:remote:aHR0cHM6Ly9vcGVuZ3JhcGhpbWcuY29tLy5uZXRsaWZ5L2Z1bmN0aW9ucy9nZW5lcmF0ZS1vcGVuZ3JhcGg_YXV0aG9yPW9wZW5ncmFwaGltZyZ0aXRsZT1IZXklMjBDaHJpcyUyMHRoaXMlMjBpcyUyMHdvcmtpbmc/test");
   });
   it('should support custom pre function with no function_type or source', function () {
     var options, result;
