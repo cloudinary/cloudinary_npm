@@ -6,6 +6,6 @@ if [[ "${node_v%%.*}" == 'v4' || "${node_v%%.*}" == 'v6' ]]
 then
   echo 'Old node version - Skipping eslint'
 else
-  eslint .
+  eslint ./test ./lib
 fi
 
