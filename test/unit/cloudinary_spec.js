@@ -547,7 +547,7 @@ describe("cloudinary", function () {
     expect(options).to.eql({});
     expect(result).to.eql("http://res.cloudinary.com/test123/image/upload/fn_remote:aHR0cHM6Ly9kZjM0cmE0YS5leGVjdXRlLWFwaS51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9kZWZhdWx0L2Nsb3VkaW5hcnlGdW5jdGlvbg/test");
   });
-  it('should should not include custom function with undefined value', function () {
+  it('should not include custom function with undefined value', function () {
     var options, result;
     options = {
       custom_function: undefined
