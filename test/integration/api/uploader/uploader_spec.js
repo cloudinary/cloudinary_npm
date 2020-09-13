@@ -173,7 +173,7 @@ describe("uploader", function () {
         spy.restore();
         return xhr.restore();
       });
-      it("should should pass the invalidate value in rename to the server", function () {
+      it("should pass the invalidate value in rename to the server", function () {
         cloudinary.v2.uploader.rename("first_id", "second_id", {
           invalidate: true
         });
@@ -905,7 +905,7 @@ describe("uploader", function () {
       xhr.restore();
     });
     describe(":invalidate", function () {
-      it("should should pass the invalidate value to the server", function () {
+      it("should pass the invalidate value to the server", function () {
         cloudinary.v2.uploader.explicit("cloudinary", {
           type: "twitter_name",
           eager: [

@@ -1021,7 +1021,7 @@ describe("api", function () {
       expect(firstDelete).to.have.property("deleted");
       expect(secondDelete).to.have.property("deleted");
 
-      // Get the versions versions of the deleted asset
+      // Get the versions of the deleted asset
       const getVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, { versions: true });
 
       const firstAssetVersion = getVersionsResp.versions[0].version_id;

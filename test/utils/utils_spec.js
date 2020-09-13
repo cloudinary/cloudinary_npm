@@ -432,7 +432,7 @@ describe("utils", function () {
         type: "fetch"
       }, `http://res.cloudinary.com/${cloud_name}/image/fetch/http://blah.com/hello%3Fa%3Db`, {});
     });
-    it("should should escape http urls", function () {
+    it("should escape http urls", function () {
       test_cloudinary_url("http://www.youtube.com/watch?v=d9NF2edxy-M", {
         type: "youtube"
       }, `http://res.cloudinary.com/${cloud_name}/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M`, {});
