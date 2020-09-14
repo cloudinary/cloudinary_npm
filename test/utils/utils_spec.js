@@ -437,6 +437,11 @@ describe("utils", function () {
         type: "youtube"
       }, `http://res.cloudinary.com/${cloud_name}/image/youtube/http://www.youtube.com/watch%3Fv%3Dd9NF2edxy-M`, {});
     });
+    it('should escape api urls', function () {
+      const folderName = "sub^folder's test";
+      const url = utils.base_api_url(['folders', folderName]);
+      expect(url).to.match(/folders\/sub%5Efolder%27s%20test$/);
+    });
   });
   describe('transformation parameters', function () {
     describe("gravity", function () {
