@@ -347,8 +347,8 @@ declare module 'cloudinary' {
         use_root_path?: boolean;
         auth_token?: object;
         account_id?: string;
-        provisioning_api_key: string;
-        provisioning_api_secret: string;
+        provisioning_api_key?: string;
+        provisioning_api_secret?: string;
 
         [futureKey: string]: any;
     }
