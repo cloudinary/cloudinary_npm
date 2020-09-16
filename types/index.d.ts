@@ -535,6 +535,7 @@ declare module 'cloudinary' {
         start_time?: number;
         duration?: number;
         expiration?: number;
+        url?: string;
     }
 
     type TransformationOptions =
