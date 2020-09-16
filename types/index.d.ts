@@ -528,6 +528,16 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
+    export interface AuthTokenApiOptions {
+        key: string;
+        acl: string;
+        ip?: string;
+        start_time?: number;
+        duration?: number;
+        expiration?: number;
+        url?: string;
+    }
+
     type TransformationOptions =
         string
         | string[]
@@ -716,7 +726,7 @@ declare module 'cloudinary' {
 
             function download_zip_url(options?: ArchiveApiOptions | ConfigAndUrlOptions): string;
 
-            function generate_auth_token(options?: ConfigOptions): string;
+            function generate_auth_token(options?: AuthTokenApiOptions): string;
 
             function webhook_signature(data?: string, timestamp?: number, options?: ConfigOptions): string;
         }
