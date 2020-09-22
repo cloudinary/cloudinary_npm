@@ -11,6 +11,7 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const cloneDeep = require('lodash/cloneDeep');
+const ProxyAgent = require('proxy-agent');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
@@ -1397,4 +1398,30 @@ describe("uploader", function () {
       expect(url).to.beASignedDownloadUrl("image/multi", { tag: MULTI_TEST_TAG });
     });
   });
+  describe("proxy support", function () {
+    const mocked = helper.mockTest();
+    const proxy = "https://myuser:mypass@example.com"
+    it("should support proxy for upload calls", function () {
+      cloudinary.config({api_proxy: proxy});
+      UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG]});
+      sinon.assert.calledWith(mocked.request, sinon.match(
+        arg => arg.agent instanceof ProxyAgent
+      ));
+    });
+    it("should prioritize custom agent", function () {
+      cloudinary.config({api_proxy: proxy});
+      const custom_agent = https.Agent()
+      UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG], agent: custom_agent});
+      sinon.assert.calledWith(mocked.request, sinon.match(
+        arg => arg.agent === custom_agent
+      ));
+    });
+    it("should support api_proxy as options key", function () {
+      cloudinary.config({});
+      UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG], api_proxy: proxy});
+      sinon.assert.calledWith(mocked.request, sinon.match(
+        arg => arg.agent instanceof ProxyAgent
+      ));
+    });
+  })
 });
