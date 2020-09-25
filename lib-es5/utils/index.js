@@ -1397,8 +1397,7 @@ function archive_params() {
     timestamp: options.timestamp || exports.timestamp(),
     transformations: utils.build_eager(options.transformations),
     type: options.type,
-    use_original_filename: exports.as_safe_bool(options.use_original_filename),
-    folder_path: options.folder_path
+    use_original_filename: exports.as_safe_bool(options.use_original_filename)
   };
 }
 
