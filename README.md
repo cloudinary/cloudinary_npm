@@ -233,6 +233,9 @@ Additional resources are available at:
 npm run test
 ```
 
+## Node support
+This SDK requires node >= 8.
+
 ## Support
 
 You can [open an issue through GitHub](https://github.com/cloudinary/cloudinary_npm/issues).
