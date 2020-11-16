@@ -40,7 +40,7 @@
         <div class="photo">
           <h2><%= photo.title %></h2>
           <a href="<%= cloudinary.url(photo.image.public_id)%>" target="_blank">
-            <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: 80, crop: "fit", format:'jpg', class:'thumbnail inline'})%>
+            <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: "auto:eco", crop: "fit", format:'jpg', class:'thumbnail inline'})%>
           </a>
 
           <div class="less_info">
