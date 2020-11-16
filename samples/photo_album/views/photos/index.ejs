@@ -97,10 +97,16 @@
 		validateMaxWidthHeight: true,
 		tags: ["cl-Danny_Valentine"]
 	}, (error, result) => {
-		if (!error && result && result.event === "success") {
-	      console.log('Done! Here is the image info: ', result.info);
-		  addToPhotos(result.info);
-	  } else {
+		if (!error && result) {
+			if (result.event === "success") {
+				console.log('Done! Here is the image info: ', result.info);
+				addToPhotos(result.info);
+	  		}
+
+			if (result.event === "close") {
+		  		location.href = "/";
+	  		}
+  		} else if (error) {
 		  console.log(error);
 	  }
 	});
