@@ -91,7 +91,10 @@
 <script type="text/javascript">
 	var widget = cloudinary.createUploadWidget({
 		cloudName: "dwfnhpxvo",
-		uploadPreset: "interview_test"
+		uploadPreset: "interview_test",
+		maxImageWidth: 500,
+		maxImageHeight: 500,
+		validateMaxWidthHeight: true
 	}, (error, result) => {
 		if (!error && result && result.event === "success") {
 	      console.log('Done! Here is the image info: ', result.info);
