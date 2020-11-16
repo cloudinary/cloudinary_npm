@@ -99,6 +99,7 @@
 	}, (error, result) => {
 		if (!error && result && result.event === "success") {
 	      console.log('Done! Here is the image info: ', result.info);
+		  addToPhotos(result.info);
 	  } else {
 		  console.log(error);
 	  }
@@ -107,4 +108,18 @@
 	document.getElementById("uploadWidgetLink").addEventListener("click", function(){
 		widget.open();
 	}, false);
+
+	function addToPhotos(data) {
+		$.ajax({
+		    type: "POST",
+		    url: "/photos/add_via_widget",
+		    data: JSON.stringify(data),
+		    contentType: "application/json; charset=utf-8",
+		    dataType: "json",
+		    error: function(err) {
+				alert("Image uploaded to Cloudinary, but unable to add to local gallery!");
+				console.dir(err);
+		    }
+		});
+	}
 </script>

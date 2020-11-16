@@ -153,6 +153,24 @@ function create_direct(req, res) {
     });
 }
 
+function add_via_widget(req, res) {
+	var photo = new Photo({
+		title: req.body.original_filename,
+		image: req.body
+	});
+
+	photo.save().then(function () {
+	  console.log('** photo saved');
+	  res.status(200).json({message: 'Success!'});
+	})
+	  .catch(function (err) {
+		result.error = err;
+		console.log('** error saving photo');
+		console.dir(err);
+		res.status(400).json({message: 'Error saving photo!'});
+	  });
+}
+
 module.exports.wire = function (app) {
   // index
   app.get('/', index);
@@ -166,4 +184,7 @@ module.exports.wire = function (app) {
   app.get('/photos/add_direct', add_direct);
   app.get('/photos/add_direct_unsigned', add_direct_unsigned);
   app.post('/photos/direct', create_direct);
+
+  // Add photo via widget
+  app.post("/photos/add_via_widget", add_via_widget);
 };
