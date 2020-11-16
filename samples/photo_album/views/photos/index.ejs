@@ -27,6 +27,7 @@
   <a class="upload_link" href="/photos/add">Add photo</a>
   <a class="upload_link" href="/photos/add_direct">Add photo (direct upload)</a>
   <a class="upload_link" href="/photos/add_direct_unsigned">Add photo (unsigned direct upload)</a>
+  <a class="upload_link" href="#" id="uploadWidgetLink">Cloudinary Upload Widget</a>
 </div>
 
 <div class="photos">
@@ -87,4 +88,19 @@
   </ul>
 <% } %>
 </div>
+<script type="text/javascript">
+	var widget = cloudinary.createUploadWidget({
+		cloudName: "dwfnhpxvo",
+		uploadPreset: "interview_test"
+	}, (error, result) => {
+		if (!error && result && result.event === "success") {
+	      console.log('Done! Here is the image info: ', result.info);
+	  } else {
+		  console.log(error);
+	  }
+	});
 
+	document.getElementById("uploadWidgetLink").addEventListener("click", function(){
+		widget.open();
+	}, false);
+</script>
