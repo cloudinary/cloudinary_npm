@@ -9,14 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "blueimp-file-upload": "^9.34.0",
     "body-parser": "^1.5.2",
     "cloudinary": "^1.3.0",
-    "connect-multiparty": "^1.1.0",
     "cloudinary-jquery-file-upload": "^2.0.1",
+    "connect-multiparty": "^1.1.0",
     "dotenv": "^0.4.0",
     "ejs": "^2.5.5",
     "ejs-locals": "^1.0.2",
     "express": "^4.7.2",
+    "jquery": "^3.5.1",
     "jugglingdb": "^1.0.1",
     "jugglingdb-mongodb": "^0.1.1",
     "method-override": "^2.1.2"
