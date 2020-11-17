@@ -38,7 +38,9 @@
       <% for(var i=0; i<photos.length; i++) {%>
         <% var photo =  photos[i] ; %>
         <div class="photo">
-          <h2><%= photo.title %></h2>
+          <h2><%= photo.title %> <form class="delete" action="/photos/delete" method="post"><input type="hidden" name="public_id" value="<%=photo.image.public_id%>">
+          	&times;
+          </form></h2>
           <a href="<%= cloudinary.url(photo.image.public_id)%>" target="_blank">
             <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: "auto:eco", fetch_format: "auto", crop: "fit", format:'jpg', class:'thumbnail inline'})%>
           </a>
@@ -114,6 +116,12 @@
 	document.getElementById("uploadWidgetLink").addEventListener("click", function(){
 		widget.open();
 	}, false);
+
+	$("form.delete").click(function(){
+		if (confirm("Are you sure you want to delete this image?")) {
+			$(this).submit();
+		}
+	});
 
 	function addToPhotos(data) {
 		$.ajax({

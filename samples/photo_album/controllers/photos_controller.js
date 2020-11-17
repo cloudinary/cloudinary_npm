@@ -171,6 +171,29 @@ function add_via_widget(req, res) {
 	  });
 }
 
+function delete_photo(req, res) {
+	var targetPhoto = req.body.public_id;
+	cloudinary.api.delete_resources([targetPhoto], function(error, result) {
+		if (error || (result && result.deleted[targetPhoto] !== "deleted")) {
+			console.log("Unable to delete image from Cloudinary");
+			console.log(result, error);
+		} else {
+			console.log("Successfully deleted image from Cloudinary");
+		}
+	});
+
+	Photo.findOne({ where: { image: {public_id: targetPhoto }}}).then(function (pic) {
+		console.log('** Successfully removed photo from schema');
+		pic.destroy();
+	})
+	.catch(function (err) {
+		console.log('** error removing photo from schema');
+		console.dir(err);
+	});
+
+	res.redirect("/");
+}
+
 module.exports.wire = function (app) {
   // index
   app.get('/', index);
@@ -187,4 +210,7 @@ module.exports.wire = function (app) {
 
   // Add photo via widget
   app.post("/photos/add_via_widget", add_via_widget);
+
+  // Delete asset
+  app.post("/photos/delete", delete_photo);
 };
