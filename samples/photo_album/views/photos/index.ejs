@@ -42,7 +42,7 @@
           	&times;
           </form></h2>
           <a href="<%= cloudinary.url(photo.image.public_id)%>" target="_blank">
-            <%-cloudinary.image(photo.image.public_id, {width: 150, height: 150, quality: "auto:eco", fetch_format: "auto", crop: "fit", format:'jpg', class:'thumbnail inline'})%>
+            <%- cloudinary.image(photo.image.public_id, {responsive: "true", responsive_placeholder: "blank", width: 150, height: 150, quality: "auto:eco", fetch_format: "auto", crop: "fit", class:'thumbnail inline'})%>
           </a>
 
           <div class="less_info">
@@ -91,6 +91,8 @@
 <% } %>
 </div>
 <script type="text/javascript">
+	$.cloudinary.responsive();
+
 	var widget = cloudinary.createUploadWidget({
 		cloudName: "dwfnhpxvo",
 		uploadPreset: "interview_test",
