@@ -334,7 +334,7 @@ declare module 'cloudinary' {
         api_key?: string;
         api_secret?: string;
         private_cdn?: boolean;
-        secure_distribution?: boolean;
+        secure_distribution?: string;
         force_version?: boolean;
         ssl_detected?: boolean;
         secure?: boolean;
