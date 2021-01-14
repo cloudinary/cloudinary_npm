@@ -16,7 +16,7 @@ const UNIQUE_TEST_FOLDER = `${TEST_TAG}_${UNIQUE_JOB_SUFFIX_ID}_folder`;
 const TEST_IMG_WIDTH = 241;
 const TEST_CLOUD_NAME = process.env.CLOUDINARY_URL.split('@')[1];
 
-const TEST_EVAL_STR = 'if (resource_info["width"] < 450) { upload_options["tags"] = "a,b" }; ' +
+const TEST_EVAL_STR = 'if (resource_info["width"] < 450) { upload_options["quality_analysis"] = true }; ' +
     'upload_options["context"] = "width=" + resource_info["width"]';
 module.exports = {
   TEST_TAG_PREFIX,
