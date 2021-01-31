@@ -1146,18 +1146,17 @@ describe("uploader", function () {
   });
 
   it('should add the eval parameter to an uploaded asset', async () => {
-    const testEvalTagsResult = ['a', 'b'];
     const result = await UPLOADER_V2.upload(IMAGE_FILE, {
       tags: [TEST_TAG],
       eval: TEST_EVAL_STR
     });
 
     expect(result).not.to.be.empty();
-    expect(result.tags).to.be.an("array");
-    expect(result.tags).to.eql(testEvalTagsResult);
     expect(result.context).to.be.an("object");
     expect(result.context.custom).to.be.an("object");
     expect(result.context.custom.width).to.eql(TEST_IMG_WIDTH);
+    expect(result.quality_analysis).to.be.an("object");
+    expect(result.quality_analysis.focus).to.be.an("number");
   });
 
   describe("sign requests", function () {
