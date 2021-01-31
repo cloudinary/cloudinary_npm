@@ -1,4 +1,23 @@
 
+ 1.24.0 / 2021-01-31
+=============
+
+New functionality and features
+------------------------------
+  * Add `accessibility_analysis` parameter support (#463)
+  * Add support for date parameter in usage API (#467)
+
+Other Changes
+-------------
+  * Change test for `eval` upload parameter (#468)
+  * Update docstring for normalize_expression (#461)
+  * Fix secure_distribution has type (#462)
+  * Remove unused parameter from archive_params (#454)
+  * Fix type of generate_auth_token options (#448)
+  * Set the provisioning API config as optional (#451)
+  * Encode all URI components when building a URL in base_api_url() (#447)
+  * Generate url-safe base64 strings in remote custom functions (#446)
+
 1.23.0 / 2020-08-26
 ===================
 New functionality and features
