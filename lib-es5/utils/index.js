@@ -333,7 +333,8 @@ function build_upload_params(options) {
     unique_filename: utils.as_safe_bool(options.unique_filename),
     upload_preset: options.upload_preset,
     use_filename: utils.as_safe_bool(options.use_filename),
-    quality_override: options.quality_override
+    quality_override: options.quality_override,
+    accessibility_analysis: utils.as_safe_bool(options.accessibility_analysis)
   };
   return utils.updateable_resource_params(options, params);
 }
