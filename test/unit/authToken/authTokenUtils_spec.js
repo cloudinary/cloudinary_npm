@@ -41,4 +41,29 @@ describe("AuthToken tests using utils.generate_auth_token", function () {
     const token_with_url = utils.generate_auth_token(token_options);
     expect(token).to.eql(token_with_url)
   });
+
+  it("Should throw if generate_auth_token is missing acl or url", function () {
+    expect(() => {
+      utils.generate_auth_token({
+        start_time: 1111111111,
+        duration: 300
+      });
+    }).to.throwError();
+
+    expect(() => {
+      utils.generate_auth_token({
+        start_time: 1111111111,
+        duration: 300,
+        acl: `/*/t_foobar`
+      });
+    }).not.to.throwError();
+
+    expect(() => {
+      utils.generate_auth_token({
+        start_time: 1111111111,
+        duration: 300,
+        url: "http://res.cloudinary.com/test123/image/upload/v1486020273/sample.jpg"
+      });
+    }).not.to.throwError();
+  });
 });
