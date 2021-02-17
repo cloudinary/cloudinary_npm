@@ -1,4 +1,5 @@
 import * as cloudinary from 'cloudinary';
+import * as Http from "http";
 
 // $ExpectType void
 cloudinary.v2.config({
@@ -994,3 +995,23 @@ cloudinary.v2.provisioning.account.user_group_users(
     (res) => {
 
     });
+
+
+// $ExpectType string
+cloudinary.v2.utils.private_download_url('foo', 'foo', {
+    attachment: true,
+    expires_at: 111
+});
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.create_folder('foo',{
+    attachment: true,
+    expires_at: 111
+});
+
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.delete_folder('foo',{
+    agent: new Http.Agent()
+});

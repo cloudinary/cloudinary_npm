@@ -108,12 +108,7 @@ declare module 'cloudinary' {
         | "make_transparent"
         | "shadow"
         | "viesus_correct"
-        | "contrast"
-        | "vibrance"
         | "fill_light"
-        | "auto_color"
-        | "auto_contrast"
-        | "auto_brightness"
         | "gamma"
         | "improve";
 
@@ -148,7 +143,6 @@ declare module 'cloudinary' {
         | "clip_evenodd"
         | "cutter"
         | "force_strip"
-        | "force_strip"
         | "getinfo"
         | "ignore_aspect_ratio"
         | "immutable_cache"
@@ -157,7 +151,6 @@ declare module 'cloudinary' {
         | "layer_apply"
         | "lossy"
         | "preserve_transparency"
-        | "png8"
         | "png8"
         | "png32"
         | "progressive"
@@ -730,6 +723,13 @@ declare module 'cloudinary' {
             function generate_auth_token(options?: AuthTokenApiOptions): string;
 
             function webhook_signature(data?: string, timestamp?: number, options?: ConfigOptions): string;
+
+            function private_download_url(publicID: string, format:string, options: Partial<{
+                resource_type: ResourceType;
+                type: DeliveryType;
+                expires_at: number;
+                attachment: boolean;
+            }>): string;
         }
 
         /****************************** Admin API V2 Methods *************************************/
@@ -904,6 +904,10 @@ declare module 'cloudinary' {
             function usage(callback?: ResponseCallback, options?: AdminApiOptions): Promise<any>;
 
             function usage(options?: AdminApiOptions): Promise<any>;
+
+            function create_folder(path:string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
+
+            function delete_folder(path:string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
 
             /****************************** Structured Metadata API V2 Methods *************************************/
 
