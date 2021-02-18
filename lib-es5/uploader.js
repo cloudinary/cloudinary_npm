@@ -312,7 +312,19 @@ exports.explode = function explode(public_id, callback) {
   });
 };
 
-// options may include 'exclusive' (boolean) which causes clearing this tag from all other resources
+/**
+ *
+ * @param {String}          tag                  The tag or tags to assign. Can specify multiple
+ *                                               tags in a single string, separated by commas - "t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11".
+ *
+ * @param {Array}          public_ids           A list of public IDs (up to 1000) of assets uploaded to Cloudinary.
+ *
+ * @param {Function}        callback             Callback function
+ *
+ * @param {Object}          options              Configuration options may include 'exclusive' (boolean) which causes
+ *                                               clearing this tag from all other resources
+ * @return {Object}
+ */
 exports.add_tag = function add_tag(tag) {
   var public_ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var callback = arguments[2];
@@ -323,6 +335,18 @@ exports.add_tag = function add_tag(tag) {
   return call_tags_api(tag, command, public_ids, callback, options);
 };
 
+/**
+ * @param {String}          tag                  The tag or tags to remove. Can specify multiple
+ *                                               tags in a single string, separated by commas - "t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11".
+ *
+ * @param {Array}          public_ids            A list of public IDs (up to 1000) of assets uploaded to Cloudinary.
+ *
+ * @param {Function}        callback             Callback function
+ *
+ * @param {Object}          options              Configuration options may include 'exclusive' (boolean) which causes
+ *                                               clearing this tag from all other resources
+ * @return {Object}
+ */
 exports.remove_tag = function remove_tag(tag) {
   var public_ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var callback = arguments[2];
