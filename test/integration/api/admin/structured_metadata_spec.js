@@ -401,6 +401,28 @@ describe("structured metadata api", function () {
     });
   });
 
+  describe("sort_metadata_field_datasource", function () {
+    it("should sort by asc in a metadata field datasource", function () {
+      // datasource is set with values in the order v2, v3, v4
+      return api.sort_metadata_field_datasource(EXTERNAL_ID_SET_2, 'value', 'asc')
+        .then((result) => {
+          expect(result).to.beADatasource();
+          // ascending order means v2 is the first value
+          expect(result.values[0].value).to.eql('v2');
+        })
+    });
+
+    it("should sort by desc in a metadata field datasource", function () {
+      // datasource is set with values in the order v2, v3, v4
+      return api.sort_metadata_field_datasource(EXTERNAL_ID_SET_2, 'value', 'desc')
+        .then((result) => {
+          expect(result).to.beADatasource();
+          // descending order means v4 is the first value
+          expect(result.values[0].value).to.eql('v4');
+        })
+    });
+  });
+
   describe("restore_metadata_field_datasource", function () {
     it("should restore a deleted entry in a metadata field datasource", function () {
       return api.delete_datasource_entries(EXTERNAL_ID_SET_3, [DATASOURCE_ENTRY_EXTERNAL_ID])
