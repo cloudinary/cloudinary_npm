@@ -10,6 +10,7 @@ const ClientRequest = require('_http_client').ClientRequest;
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
+const cloneDeep = require('lodash/cloneDeep');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
@@ -1173,7 +1174,7 @@ describe("uploader", function () {
     writeSpy = void 0;
     beforeEach(function () {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-      configBck2 = cloudinary.config();
+      configBck2 = cloneDeep(cloudinary.config());
       cloudinary.config({
         api_key: "1234",
         api_secret: ""
