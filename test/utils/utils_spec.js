@@ -759,18 +759,18 @@ describe("utils", function () {
             resource_type: "fetch",
             url: "http://cloudinary.com/images/old_logo.png"
           },
-          "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc="
+          "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc"
         ],
         [
           "fetch remote UTF",
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/2/2b/고창갯벌.jpg"
           },
-          "fetch:aHR0cHM6Ly91cGxvYWQud2lraW1lZGlhLm9yZy93aWtpcGVkaWEvY29tbW9ucy8yLzJiLyVFQSVCMyVBMCVFQyVCMCVCRCVFQSVCMCVBRiVFQiVCMiU4Qy5qcGc="
+          "fetch:aHR0cHM6Ly91cGxvYWQud2lraW1lZGlhLm9yZy93aWtpcGVkaWEvY29tbW9ucy8yLzJiLyVFQSVCMyVBMCVFQyVCMCVCRCVFQSVCMCVBRiVFQiVCMiU4Qy5qcGc"
         ],
         ["fetch explicit",
           "fetch:http://cloudinary.com/images/old_logo.png",
-          "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc="]
+          "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc"]
       ];
       [
         {
