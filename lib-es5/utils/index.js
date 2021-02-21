@@ -173,9 +173,8 @@ function process_custom_function(customFunction) {
     return customFunction;
   }
   if (customFunction.function_type === "remote") {
-    var encodedSource = base64EncodeURL(customFunction.source).replace(/\+/g, '-') // Convert '+' to '-'
-    .replace(/\//g, '_') // Convert '/' to '_'
-    .replace(/=+$/, ''); // Remove ending '='
+    var encodedSource = base64EncodeURL(customFunction.source);
+
     return [customFunction.function_type, encodedSource].join(":");
   }
   return [customFunction.function_type, customFunction.source].join(":");

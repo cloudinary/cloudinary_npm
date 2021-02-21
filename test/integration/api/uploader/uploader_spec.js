@@ -99,6 +99,8 @@ describe("uploader", function () {
     });
   });
 
+
+
   it("should successfully override original_filename", function () {
     return cloudinary.v2.uploader.upload("http://cloudinary.com/images/old_logo.png", {
       filename_override: 'overridden'
@@ -114,6 +116,17 @@ describe("uploader", function () {
       resource_type: 'auto', // this defaults to 'image' if not specified
       tags: UPLOAD_TAGS
     });
+  });
+
+  it('should allow upload with url safe base64 in overlay', function () {
+    const overlayUrl = 'https://cdn.aldi-digital.co.uk//018399430856806-A.jpg?o=ulF9xap2DC0yJt5tWxuSssultr0j&V=hbVF';
+    const baseImageUrl ='http://cloudinary.com/images/old_logo.png';
+
+    const options = {transformation: {overlay: { url: overlayUrl }}};
+    return cloudinary.v2.uploader.upload(baseImageUrl, options)
+      .then((result) => {
+        expect(result).to.have.key("created_at");
+      });
   });
 
   describe("remote urls ", function () {
