@@ -690,3 +690,21 @@ exports.restore_metadata_field_datasource = function restore_metadata_field_data
   var params = { external_ids: entries_external_id };
   return call_api("post", ["metadata_fields", field_external_id, "datasource_restore"], params, callback, options);
 };
+
+/**
+ * Sorts metadata field datasource. Currently supports only value
+ * @param {String}   field_external_id    The ID of the metadata field
+ * @param {String}   sort_by              Criteria for the sort. Currently supports only value
+ * @param {String}   direction            Optional (gets either asc or desc)
+ * @param {Function} callback             Callback function
+ * @param {Object}   options              Configuration options
+ *
+ * @return {Object}
+ */
+exports.sort_metadata_field_datasource = function sort_metadata_field_datasource(field_external_id, sort_by, direction, callback) {
+  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+
+  options.content_type = "json";
+  var params = { sort_by: sort_by, direction: direction };
+  return call_api("post", ["metadata_fields", field_external_id, "datasource", "sort"], params, callback, options);
+};
