@@ -119,7 +119,7 @@ describe("uploader", function () {
   });
 
   it('should allow upload with url safe base64 in overlay', function () {
-    const overlayUrl = 'https://cdn.aldi-digital.co.uk//018399430856806-A.jpg?o=ulF9xap2DC0yJt5tWxuSssultr0j&V=hbVF';
+    const overlayUrl = 'https://res.cloudinary.com/demo/image/upload/logos/cloudinary_full_logo_white_small.png';
     const baseImageUrl ='http://cloudinary.com/images/old_logo.png';
 
     const options = {transformation: {overlay: { url: overlayUrl }}};
