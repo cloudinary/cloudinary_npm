@@ -1,3 +1,19 @@
+1.25.0 / 2021-02-22
+==================
+
+New functionality
+-----------------
+* Add sort by metadata field (#474)
+* Add filename override param (#471)
+
+Other changes
+-------------
+* Add safe base64 to all url generation (#477)
+* Fix config backup in sign requests test (#476)
+* Add missing types to create/delete_folder and private_download_url (#473)
+* Add validation to genreate_auth_token to enforce url or acl (#472)
+
+
 
  1.24.0 / 2021-01-31
 =============
