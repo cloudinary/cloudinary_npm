@@ -99,7 +99,9 @@ var _require2 = require('./consts'),
     LAYER_KEYWORD_PARAMS = _require2.LAYER_KEYWORD_PARAMS,
     TRANSFORMATION_PARAMS = _require2.TRANSFORMATION_PARAMS,
     SIMPLE_PARAMS = _require2.SIMPLE_PARAMS,
-    UPLOAD_PREFIX = _require2.UPLOAD_PREFIX;
+    UPLOAD_PREFIX = _require2.UPLOAD_PREFIX,
+    SUPPORTED_SIGNATURE_ALGORITHMS = _require2.SUPPORTED_SIGNATURE_ALGORITHMS,
+    DEFAULT_SIGNATURE_ALGORITHM = _require2.DEFAULT_SIGNATURE_ALGORITHM;
 
 function textStyle(layer) {
   var keywords = [];
@@ -757,6 +759,10 @@ function url(public_id) {
   var api_secret = consumeOption(options, "api_secret", config().api_secret);
   var url_suffix = consumeOption(options, "url_suffix");
   var use_root_path = consumeOption(options, "use_root_path", config().use_root_path);
+  var signature_algorithm = consumeOption(options, "signature_algorithm", config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM);
+  if (long_url_signature) {
+    signature_algorithm = 'sha256';
+  }
   var auth_token = consumeOption(options, "auth_token");
   if (auth_token !== false) {
     auth_token = exports.merge(config().auth_token, auth_token);
@@ -812,9 +818,8 @@ function url(public_id) {
       }
       // eslint-disable-next-line no-empty
     } catch (error) {}
-    var shasum = crypto.createHash(long_url_signature ? 'sha256' : 'sha1');
-    shasum.update(utf8_encode(to_sign + api_secret), 'binary');
-    signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
+    var hash = computeHash(to_sign + api_secret, signature_algorithm, 'base64');
+    signature = hash.replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
     signature = `s--${signature}--`;
   }
   var prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
@@ -1009,9 +1014,24 @@ function api_sign_request(params_to_sign, api_secret) {
 
     return `${k}=${toArray(v).join(",")}`;
   }).sort().join("&");
-  var shasum = crypto.createHash('sha1');
-  shasum.update(utf8_encode(to_sign + api_secret), 'binary');
-  return shasum.digest('hex');
+  return computeHash(to_sign + api_secret, config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM, 'hex');
+}
+
+/**
+ * Computes hash from input string using specified algorithm.
+ * @private
+ * @param {string} input string which to compute hash from
+ * @param {string} signature_algorithm algorithm to use for computing hash
+ * @param {string} encoding type of encoding
+ * @return {string} computed hash value
+ */
+function computeHash(input, signature_algorithm, encoding) {
+  if (!SUPPORTED_SIGNATURE_ALGORITHMS.includes(signature_algorithm)) {
+    throw new Error(`Signature algorithm ${signature_algorithm} is not supported. Supported algorithms: ${SUPPORTED_SIGNATURE_ALGORITHMS.join(', ')}`);
+  }
+  var hash = crypto.createHash(signature_algorithm);
+  hash.update(utf8_encode(input), 'binary');
+  return hash.digest(encoding);
 }
 
 function clear_blank(hash) {
@@ -1053,9 +1073,8 @@ function webhook_signature(data, timestamp) {
   ensurePresenceOf({ data, timestamp });
 
   var api_secret = ensureOption(options, 'api_secret');
-  var shasum = crypto.createHash('sha1');
-  shasum.update(data + timestamp + api_secret, 'binary');
-  return shasum.digest('hex');
+  var signature_algorithm = ensureOption(options, 'signature_algorithm', DEFAULT_SIGNATURE_ALGORITHM);
+  return computeHash(data + timestamp + api_secret, signature_algorithm, 'hex');
 }
 
 /**
@@ -1075,7 +1094,10 @@ function verifyNotificationSignature(body, timestamp, signature) {
   if (timestamp < Date.now() - valid_for) {
     return false;
   }
-  var payload_hash = utils.webhook_signature(body, timestamp, { api_secret: config().api_secret });
+  var payload_hash = utils.webhook_signature(body, timestamp, {
+    api_secret: config().api_secret,
+    signature_algorithm: config().signature_algorithm
+  });
   return signature === payload_hash;
 }
 
