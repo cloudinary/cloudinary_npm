@@ -34,7 +34,8 @@ describe("utils", function () {
       private_cdn: false,
       secure: false,
       cname: null,
-      cdn_subdomain: false
+      cdn_subdomain: false,
+      signature_algorithm: undefined
     }));
     this.orig = clone(this.cfg);
     cloud_name = cloudinary.config("cloud_name");
@@ -1438,6 +1439,20 @@ describe("utils", function () {
         )
       ).to.eql(true);
     });
+    it("should return true when signature with algorithm SHA256 is valid", function () {
+      cloudinary.config({
+        api_secret: 'hardcoded',
+        signature_algorithm: 'sha256'
+      });
+      const distant_future_timestamp = 7952342400000; // 2222-01-01T00:00:00Z
+      expect(
+        utils.verifyNotificationSignature(
+          response_json,
+          distant_future_timestamp,
+          "6c5a29fd8815772fbac2f10ae741e093d0859313947ef8fadeb29126ded6649c"
+        )
+      ).to.eql(true);
+    });
     it("should return false when signature is not valid", function () {
       response_signature = utils.webhook_signature(response_json, valid_response_timestamp, {
         api_secret: cloudinary.config().api_secret
@@ -1485,17 +1500,12 @@ describe("utils", function () {
     });
   });
   context("sign URLs", function () {
-    var configBck = void 0;
-    before(function () {
-      configBck = cloudinary.config();
+    beforeEach(function () {
       cloudinary.config({
         cloud_name: 'test123',
         api_key: "1234",
         api_secret: "b"
       });
-    });
-    after(function () {
-      cloudinary.config(configBck);
     });
     it("should correctly sign URLs", function () {
       test_cloudinary_url("image.jpg", {

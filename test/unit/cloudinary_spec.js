@@ -7,7 +7,8 @@ describe("cloudinary", function () {
       cloud_name: "test123",
       api_key: 'a',
       api_secret: 'b',
-      responsive_width_transformation: null
+      responsive_width_transformation: null,
+      signature_algorithm: 'sha1'
     }));
   });
   it("should use cloud_name from config", function () {
@@ -471,6 +472,30 @@ describe("cloudinary", function () {
       undef: void 0
     }, "1234")).to.eql("f05cfe85cee78e7e997b3c7da47ba212dcbf1ea5");
   });
+  it("should correctly sign api requests with signature algorithm SHA1", function () {
+    cloudinary.config({ signature_algorithm: 'sha1' });
+    expect(cloudinary.utils.api_sign_request({
+      username: "user@cloudinary.com",
+      timestamp: 1568810420,
+      cloud_name: "dn6ot3ged"
+    }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("14c00ba6d0dfdedbc86b316847d95b9e6cd46d94");
+  });
+  it("should correctly sign api requests with signature algorithm SHA1 as default", function () {
+    cloudinary.config({ signature_algorithm: null });
+    expect(cloudinary.utils.api_sign_request({
+      username: "user@cloudinary.com",
+      timestamp: 1568810420,
+      cloud_name: "dn6ot3ged"
+    }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("14c00ba6d0dfdedbc86b316847d95b9e6cd46d94");
+  });
+  it("should correctly sign api requests with signature algorithm SHA256", function () {
+    cloudinary.config({ signature_algorithm: 'sha256' });
+    expect(cloudinary.utils.api_sign_request({
+      username: "user@cloudinary.com",
+      timestamp: 1568810420,
+      cloud_name: "dn6ot3ged"
+    }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("45ddaa4fa01f0c2826f32f669d2e4514faf275fe6df053f1a150e7beae58a3bd");
+  });
   it("should correctly build signed preloaded image", function () {
     expect(cloudinary.utils.signed_preloaded_image({
       resource_type: "image",
@@ -826,5 +851,14 @@ describe("cloudinary", function () {
     };
     result = cloudinary.utils.url("sample.jpg", options);
     expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--v2fTPYTu--/sample.jpg');
+  });
+  it("should generate urls with signature algorithm SHA256 when sign_url is true", function () {
+    var options, result;
+    options = {
+      sign_url: true,
+      signature_algorithm: 'sha256'
+    };
+    result = cloudinary.utils.url("sample.jpg", options);
+    expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--2hbrSMPO--/sample.jpg');
   });
 });
