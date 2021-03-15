@@ -794,6 +794,20 @@ describe("uploader", function () {
     });
   });
 
+  it("should reject without promise rejection if error code is returned from the server", function (done) {
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, {
+      tags: UPLOAD_TAGS
+    }, () => {
+      // This should crash
+      // expect(res).to.be(undefined);
+    });
+
+    setTimeout(() => {
+      done();
+    }, 2000);
+  });
+
+
   it("should reject promise if error code is returned from the server", function () {
     return cloudinary.v2.uploader.upload(EMPTY_IMAGE, {
       tags: UPLOAD_TAGS
