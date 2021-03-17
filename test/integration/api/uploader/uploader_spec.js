@@ -801,7 +801,6 @@ describe("uploader", function () {
 
     function unhandledRejection() {
       spy();
-      done();
     }
     process.on('unhandledRejection', unhandledRejection);
 
@@ -820,7 +819,6 @@ describe("uploader", function () {
 
     function unhandledRejection() {
       spy();
-      done();
     }
     process.on('unhandledRejection', unhandledRejection);
 
