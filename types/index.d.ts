@@ -508,6 +508,7 @@ declare module 'cloudinary' {
         upload_preset?: string;
         use_filename?: boolean;
         chunk_size?: number;
+        disable_promises?: boolean;
 
         [futureKey: string]: any;
     }
