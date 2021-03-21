@@ -706,7 +706,7 @@ declare module 'cloudinary' {
 
             function api_sign_request(params_to_sign: object, api_secret: string): string;
 
-            function api_url(action?: string, options?: ConfigAndUrlOptions): Promise<any>;
+            function api_url(action?: string, options?: ConfigAndUrlOptions): string;
 
             function url(public_id?: string, options?: TransformationOptions | ConfigAndUrlOptions): string;
 
