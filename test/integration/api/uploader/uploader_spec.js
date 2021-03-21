@@ -812,6 +812,24 @@ describe("uploader", function () {
     }, 2000);
   });
 
+  it("should reject with promise rejection by default", function (done) {
+    const spy = sinon.spy();
+
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, () => {});
+
+    function unhandledRejection() {
+      spy();
+    }
+    process.on('unhandledRejection', unhandledRejection);
+
+    // Promises are not disabled meaning we should throw unhandledRejection
+    setTimeout(() => {
+      expect(sinon.assert.called(spy));
+      process.removeListener('unhandledRejection', unhandledRejection);
+      done();
+    }, 2000);
+  });
+
   it("should reject without promise rejection if disable_promises: true", function (done) {
     const spy = sinon.spy();
 
