@@ -24,7 +24,7 @@ var urlLib = require('url');
 
 // eslint-disable-next-line import/order
 
-var _require2 = require("./config"),
+var _require2 = require("./config")(),
     upload_prefix = _require2.upload_prefix;
 
 var isSecure = !(upload_prefix && upload_prefix.slice(0, 5) === 'http:');
