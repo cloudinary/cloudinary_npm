@@ -508,6 +508,7 @@ declare module 'cloudinary' {
         upload_preset?: string;
         use_filename?: boolean;
         chunk_size?: number;
+        disable_promises?: boolean;
 
         [futureKey: string]: any;
     }
@@ -706,7 +707,7 @@ declare module 'cloudinary' {
 
             function api_sign_request(params_to_sign: object, api_secret: string): string;
 
-            function api_url(action?: string, options?: ConfigAndUrlOptions): Promise<any>;
+            function api_url(action?: string, options?: ConfigAndUrlOptions): string;
 
             function url(public_id?: string, options?: TransformationOptions | ConfigAndUrlOptions): string;
 

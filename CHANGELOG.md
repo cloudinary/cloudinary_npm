@@ -1,3 +1,10 @@
+1.25.1 / 2021-03-22
+==================
+
+  * Fix/unhandled promise rejection call api (#481)
+  * Fix return type of api_url function(return String instead of Promise) (#483)
+  * Add SHA-256 support for auth signatures (#479)
+
 1.25.0 / 2021-02-22
 ==================
 

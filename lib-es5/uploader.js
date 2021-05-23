@@ -24,7 +24,7 @@ var urlLib = require('url');
 
 // eslint-disable-next-line import/order
 
-var _require2 = require("./config"),
+var _require2 = require("./config")(),
     upload_prefix = _require2.upload_prefix;
 
 var isSecure = !(upload_prefix && upload_prefix.slice(0, 5) === 'http:');
@@ -471,6 +471,8 @@ function call_api(action, callback, options, get_params) {
     callback = function callback() {};
   }
 
+  var USE_PROMISES = !options.disable_promises;
+
   var deferred = Q.defer();
   if (options == null) {
     options = {};
@@ -494,7 +496,10 @@ function call_api(action, callback, options, get_params) {
       // Already reported
     } else if (res.error) {
       errorRaised = true;
-      deferred.reject(res);
+
+      if (USE_PROMISES) {
+        deferred.reject(res);
+      }
       callback(res);
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
@@ -510,16 +515,22 @@ function call_api(action, callback, options, get_params) {
         result = parseResult(buffer, res);
         if (result.error) {
           result.error.http_code = res.statusCode;
-          deferred.reject(result.error);
+          if (USE_PROMISES) {
+            deferred.reject(result.error);
+          }
         } else {
           cacheResults(result, options);
-          deferred.resolve(result);
+          if (USE_PROMISES) {
+            deferred.resolve(result);
+          }
         }
         callback(result);
       });
       res.on("error", function (error) {
         errorRaised = true;
-        deferred.reject(error);
+        if (USE_PROMISES) {
+          deferred.reject(error);
+        }
         callback({ error });
       });
     } else {
@@ -528,7 +539,9 @@ function call_api(action, callback, options, get_params) {
         http_code: res.statusCode,
         name: "UnexpectedResponse"
       };
-      deferred.reject(error);
+      if (USE_PROMISES) {
+        deferred.reject(error);
+      }
       callback({ error });
     }
   };
@@ -550,7 +563,10 @@ function call_api(action, callback, options, get_params) {
   if (isObject(result)) {
     return result;
   }
-  return deferred.promise;
+
+  if (USE_PROMISES) {
+    return deferred.promise;
+  }
 }
 
 function post(url, post_data, boundary, file, callback, options) {
