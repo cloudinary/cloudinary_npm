@@ -795,6 +795,7 @@ describe("cloudinary", function () {
       api_key: "1234"
     });
   });
+
   it("should support preloaded identifier format", function () {
     var result = cloudinary.utils.url("raw/private/v123456/document.docx");
     expect(result).to.eql("http://res.cloudinary.com/test123/raw/private/v123456/document.docx");
@@ -804,6 +805,7 @@ describe("cloudinary", function () {
     });
     expect(result).to.eql("http://res.cloudinary.com/test123/image/private/c_scale,w_1.0/v123456/img.jpg");
   });
+
   it("should add responsive width transformation", function () {
     var options, result;
     options = {
@@ -860,5 +862,21 @@ describe("cloudinary", function () {
     };
     result = cloudinary.utils.url("sample.jpg", options);
     expect(result).to.eql('http://res.cloudinary.com/test123/image/upload/s--2hbrSMPO--/sample.jpg');
+  });
+
+  it("should not affect user variable names containing predefined names", function() {
+    const options = { transformation: [
+      {
+        $mywidth: "100",
+        $aheight: 300
+      },
+      {
+        width: "3 + $mywidth * 3 + 4 / 2 * initialWidth * $mywidth",
+        height: "3 * initialHeight + $aheight",
+        crop: 'scale'
+      }
+    ]};
+    const result = cloudinary.utils.url("sample", options);
+    expect(result).to.contain("$aheight_300,$mywidth_100/c_scale,h_3_mul_ih_add_$aheight,w_3_add_$mywidth_mul_3_add_4_div_2_mul_iw_mul_$mywidth");
   });
 });

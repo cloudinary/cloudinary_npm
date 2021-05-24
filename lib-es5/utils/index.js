@@ -156,9 +156,10 @@ function normalize_expression(expression) {
   });
 
   var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
-  var predefinedVarsReplaceRE = new RegExp(predefinedVarsPattern, "g");
-  expression = expression.replace(predefinedVarsReplaceRE, function (match, p1, offset) {
-    return expression[offset - 1] === '$' ? match : PREDEFINED_VARS[match];
+  var userVariablePattern = '(\\$_*[^_ ]+)';
+  var variablesReplaceRE = new RegExp(`${userVariablePattern}|${predefinedVarsPattern}`, "g");
+  expression = expression.replace(variablesReplaceRE, function (match) {
+    return PREDEFINED_VARS[match] || match;
   });
 
   return expression.replace(/[ _]+/g, '_');

@@ -1061,6 +1061,7 @@ describe("utils", function () {
         t = cloudinary.utils.generate_transformation_string(options);
         expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
       });
+
       it("should not change variable names even if they look like keywords", function () {
         var options, t;
         options = {
@@ -1076,6 +1077,7 @@ describe("utils", function () {
         t = cloudinary.utils.generate_transformation_string(options);
         expect(t).to.eql("$width_10/w_$width_add_10_add_w");
       });
+
       it("should support text values", function () {
         test_cloudinary_url("sample", {
           effect: "$efname:100",
