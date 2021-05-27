@@ -572,7 +572,7 @@ function call_api(action, callback, options, get_params) {
 function post(url, post_data, boundary, file, callback, options) {
   var file_header = void 0;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
-  var oauth_token = options.oauth_token || config().auth_token;
+  var oauth_token = options.oauth_token || config().oauth_token;
   if (file != null || options.stream) {
     // eslint-disable-next-line no-nested-ternary
     var filename = options.stream ? options.filename ? options.filename : "file" : basename(file);
