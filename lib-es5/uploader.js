@@ -33,6 +33,7 @@ var https = isSecure ? require('https') : require('http');
 var Cache = require('./cache');
 var utils = require("./utils");
 var UploadStream = require('./upload_stream');
+var config = require("./config");
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,
@@ -558,7 +559,6 @@ function call_api(action, callback, options, get_params) {
 
     return Buffer.from(encodeFieldPart(boundary, key, value), 'utf8');
   });
-
   var result = post(api_url, post_data, boundary, file, handle_response, options);
   if (isObject(result)) {
     return result;
@@ -572,6 +572,7 @@ function call_api(action, callback, options, get_params) {
 function post(url, post_data, boundary, file, callback, options) {
   var file_header = void 0;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
+  var oauth_token = options.oauth_token || config().auth_token;
   if (file != null || options.stream) {
     // eslint-disable-next-line no-nested-ternary
     var filename = options.stream ? options.filename ? options.filename : "file" : basename(file);
@@ -588,6 +589,10 @@ function post(url, post_data, boundary, file, callback, options) {
   if (options.x_unique_upload_id != null) {
     headers['X-Unique-Upload-Id'] = options.x_unique_upload_id;
   }
+  if (oauth_token != null) {
+    headers.Authorization = `Bearer ${oauth_token}`;
+  }
+
   post_options = extend(post_options, {
     method: 'POST',
     headers: headers

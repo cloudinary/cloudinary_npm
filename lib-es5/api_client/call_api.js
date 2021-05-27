@@ -14,7 +14,8 @@ function call_api(method, uri, params, callback, options) {
   var api_url = utils.base_api_url(uri, options);
   var auth = {
     key: ensureOption(options, "api_key"),
-    secret: ensureOption(options, "api_secret")
+    secret: ensureOption(options, "api_secret"),
+    oauth_token: ensureOption(options, "oauth_token")
   };
 
   return execute_request(method, params, auth, api_url, callback, options);

@@ -10,8 +10,7 @@
 function defaults(defaultOptions) {
   return function ensureOption(options, name, defaultValue) {
     var value = void 0;
-
-    if (typeof options[name] !== 'undefined') {
+    if (typeof options[name] !== 'undefined' || name === 'oauth_token') {
       value = options[name];
     } else if (typeof defaultOptions[name] !== 'undefined') {
       value = defaultOptions[name];
