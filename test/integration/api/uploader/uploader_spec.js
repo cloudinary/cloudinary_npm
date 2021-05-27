@@ -1245,7 +1245,8 @@ describe("uploader", function () {
       configBck2 = cloneDeep(cloudinary.config());
       cloudinary.config({
         api_key: "1234",
-        api_secret: ""
+        api_secret: "",
+        oauth_token: '111111'
       });
     });
     afterEach(function () {
@@ -1257,7 +1258,8 @@ describe("uploader", function () {
         public_id: 'folder/file',
         version: '1234',
         timestamp: 1569707219,
-        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e'
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
+        oauth_token: '1111111'
       });
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
@@ -1296,5 +1298,43 @@ describe("uploader", function () {
       expect(explicitResult.cinemagraph_analysis).to.be.an("object");
       expect(explicitResult.cinemagraph_analysis).to.have.property("cinemagraph_score");
     });
+  });
+});
+describe("oauth_token", function () {
+  it("should send the oauth key to the server upload_api", function() {
+    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+      cloudinary.v2.uploader.upload(IMAGE_FILE, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' });
+      return sinon.assert.calledWith(requestSpy,
+        sinon.match.has("headers",
+          sinon.match.has("Authorization", "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4")
+        ));
+    });
+  });
+
+  // it("should not fail when only providing api_key and secret", function() {
+  //   cloudinary.config({
+  //     api_key: "1234",
+  //     api_secret: "1234",
+  //     oauth_token: null
+  //   });
+  //   return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+  //     cloudinary.v2.uploader.upload(IMAGE_FILE, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' });
+  //     return sinon.assert.calledWith(requestSpy,
+  //       sinon.match.has("headers",
+  //         sinon.match.has("Authorization", "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4")
+  //       ));
+  //   });
+  // });
+
+  it("should fail when missing credentials admin_api", function() {
+    cloudinary.config({
+      api_key: null,
+      api_secret: null,
+      oauth_token: null
+    });
+    cloudinary.v2.uploader.upload(IMAGE_FILE)
+      .then(
+        () => expect().fail()
+      ).catch(({ error }) => expect(error.message).to.contain("unknown api_key"));
   });
 });
