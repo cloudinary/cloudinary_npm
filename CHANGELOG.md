@@ -1,3 +1,13 @@
+1.25.2 / 2021-05-30
+==================
+
+Other Changes
+  * Fix - Remove file extensions from require statements (#490)
+  * Fix - Add support for complex variable names (aheight) (#488)
+  * Fix - #486 - upload_prefix configuration retrieval (#487)
+
+
+
 1.25.1 / 2021-03-22
 ==================
 
