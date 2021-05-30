@@ -1,5 +1,5 @@
 
-const cloudinary = require("../../../cloudinary.js");
+const cloudinary = require("../../../cloudinary");
 
 describe("getUserAgent", function () {
   var platform = "";
