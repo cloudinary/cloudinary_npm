@@ -1,4 +1,4 @@
-const cloudinary = require("../../../../cloudinary.js");
+const cloudinary = require("../../../../cloudinary");
 const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const AUTH_KEY_1 = "00112233FF99";

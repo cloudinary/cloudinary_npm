@@ -1,4 +1,4 @@
-const cloudinary = require("../../../cloudinary.js");
+const cloudinary = require("../../../cloudinary");
 const commonAuthSetupAndTeardown = require('./utils/commonAuthSetupAndTeardown');
 
 describe("AuthToken tests using cloudinary.url and a private CDN", function () {

@@ -1,4 +1,4 @@
-const cloudinary = require("../../cloudinary.js");
+const cloudinary = require("../../cloudinary");
 const createTestConfig = require('../testUtils/createTestConfig');
 
 describe("cloudinary", function () {

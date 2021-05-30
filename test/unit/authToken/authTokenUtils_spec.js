@@ -1,4 +1,4 @@
-const cloudinary = require("../../../cloudinary.js");
+const cloudinary = require("../../../cloudinary");
 const commonAuthSetupAndTeardown = require('./utils/commonAuthSetupAndTeardown');
 
 const utils = cloudinary.utils;
