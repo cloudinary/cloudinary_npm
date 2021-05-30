@@ -1245,8 +1245,7 @@ describe("uploader", function () {
       configBck2 = cloneDeep(cloudinary.config());
       cloudinary.config({
         api_key: "1234",
-        api_secret: "",
-        oauth_token: '111111'
+        api_secret: ""
       });
     });
     afterEach(function () {
@@ -1258,8 +1257,7 @@ describe("uploader", function () {
         public_id: 'folder/file',
         version: '1234',
         timestamp: 1569707219,
-        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e',
-        oauth_token: '1111111'
+        signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e'
       });
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
