@@ -20,8 +20,8 @@ describe("oauth_token", function(){
   it("should send the oauth_token config to the server (admin_api)", function() {
     return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
       cloudinary.config({
-        api_key: null,
-        api_secret: null,
+        api_key: undefined,
+        api_secret: undefined,
         oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4'
       });
       cloudinary.v2.api.resource(PUBLIC_ID);
@@ -36,7 +36,7 @@ describe("oauth_token", function(){
     cloudinary.config({
       api_key: "1234",
       api_secret: "1234",
-      oauth_token: null
+      oauth_token: undefined
     });
     return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
       cloudinary.v2.api.resource(PUBLIC_ID);
@@ -46,14 +46,13 @@ describe("oauth_token", function(){
 
   it("should fail when missing all credentials (admin_api)", function() {
     cloudinary.config({
-      api_key: null,
-      api_secret: null,
-      oauth_token: null
+      api_key: undefined,
+      api_secret: undefined,
+      oauth_token: undefined
     });
-    return cloudinary.v2.api.resource(PUBLIC_ID)
-      .then(
-        () => expect().fail()
-      ).catch(({ error }) => expect(error.message).to.contain("unknown api_key"));
+    expect(() => {
+      cloudinary.v2.api.resource(PUBLIC_ID)
+    }).to.throwError(/Must supply api_key/);
   });
 
   it("oauth_token as option should take priority with secret and key (admin_api)", function() {
@@ -80,8 +79,8 @@ describe("oauth_token", function(){
   it("should send the oauth_token config to the server (upload_api)", function() {
     return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
       cloudinary.config({
-        api_key: null,
-        api_secret: null,
+        api_key: undefined,
+        api_secret: undefined,
         oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4'
       });
       cloudinary.v2.uploader.upload(PUBLIC_ID);
@@ -96,7 +95,7 @@ describe("oauth_token", function(){
     cloudinary.config({
       api_key: "1234",
       api_secret: "1234",
-      oauth_token: null
+      oauth_token: undefined
     });
     return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
       cloudinary.v2.uploader.upload(PUBLIC_ID)
@@ -106,13 +105,12 @@ describe("oauth_token", function(){
 
   it("should fail when missing all credentials (upload_api)", function() {
     cloudinary.config({
-      api_key: null,
-      api_secret: null,
-      oauth_token: null
+      api_key: undefined,
+      api_secret: undefined,
+      oauth_token: undefined
     });
-    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+    expect(() => {
       cloudinary.v2.uploader.upload(PUBLIC_ID)
-      return sinon.assert.calledWith(requestSpy, sinon.match({ auth: null }));
-    });
+    }).to.throwError(/Must supply api_key/);
   });
 });

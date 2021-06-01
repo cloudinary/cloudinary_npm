@@ -23,7 +23,7 @@ function execute_request(method, params, auth, api_url, callback) {
       handle_response = void 0; // declare to user later
   var key = auth.key;
   var secret = auth.secret;
-  var oauth_token = auth.oauth_token || config().oauth_token;
+  var oauth_token = auth.oauth_token;
   var content_type = 'application/x-www-form-urlencoded';
 
   if (options.content_type === 'json') {

@@ -10,7 +10,7 @@
 function defaults(defaultOptions) {
   return function ensureOption(options, name, defaultValue) {
     var value = void 0;
-    if (typeof options[name] !== 'undefined' || name === 'oauth_token') {
+    if (typeof options[name] !== 'undefined') {
       value = options[name];
     } else if (typeof defaultOptions[name] !== 'undefined') {
       value = defaultOptions[name];
@@ -19,7 +19,6 @@ function defaults(defaultOptions) {
     } else {
       throw `Must supply ${name}`;
     }
-
     return value;
   };
 }
