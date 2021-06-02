@@ -113,4 +113,16 @@ describe("oauth_token", function(){
       cloudinary.v2.uploader.upload(PUBLIC_ID)
     }).to.throwError(/Must supply api_key/);
   });
+
+  it("should not need credentials for unsigned upload", function() {
+    cloudinary.config({
+      api_key: undefined,
+      api_secret: undefined,
+      oauth_token: '1234'
+    });
+    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+      cloudinary.v2.uploader.unsigned_upload(PUBLIC_ID, 'preset')
+      return sinon.assert.calledWith(requestSpy, sinon.match({ auth: null }));
+    });
+  });
 });
