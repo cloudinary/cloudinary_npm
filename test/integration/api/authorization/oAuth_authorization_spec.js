@@ -118,7 +118,7 @@ describe("oauth_token", function(){
     cloudinary.config({
       api_key: undefined,
       api_secret: undefined,
-      oauth_token: '1234'
+      oauth_token: undefined
     });
     return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
       cloudinary.v2.uploader.unsigned_upload(PUBLIC_ID, 'preset')
