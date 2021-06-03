@@ -23,6 +23,7 @@ function execute_request(method, params, auth, api_url, callback) {
       handle_response = void 0; // declare to user later
   var key = auth.key;
   var secret = auth.secret;
+  var oauth_token = auth.oauth_token;
   var content_type = 'application/x-www-form-urlencoded';
 
   if (options.content_type === 'json') {
@@ -43,9 +44,15 @@ function execute_request(method, params, auth, api_url, callback) {
     headers: {
       'Content-Type': content_type,
       'User-Agent': utils.getUserAgent()
-    },
-    auth: key + ":" + secret
+    }
   });
+
+  if (oauth_token) {
+    request_options.headers.Authorization = `Bearer ${oauth_token}`;
+  } else {
+    request_options.auth = key + ":" + secret;
+  }
+
   if (options.agent != null) {
     request_options.agent = options.agent;
   }

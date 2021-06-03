@@ -342,6 +342,7 @@ declare module 'cloudinary' {
         account_id?: string;
         provisioning_api_key?: string;
         provisioning_api_secret?: string;
+        oauth_token?: string;
 
         [futureKey: string]: any;
     }
@@ -387,6 +388,7 @@ declare module 'cloudinary' {
     export interface AdminApiOptions {
         agent?: object;
         content_type?: string;
+        oauth_token?: string;
 
         [futureKey: string]: any;
     }
@@ -509,6 +511,7 @@ declare module 'cloudinary' {
         use_filename?: boolean;
         chunk_size?: number;
         disable_promises?: boolean;
+        oauth_token?: string;
 
         [futureKey: string]: any;
     }
