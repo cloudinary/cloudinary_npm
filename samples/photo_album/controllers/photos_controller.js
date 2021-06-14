@@ -21,7 +21,7 @@ function add_through_server(req, res) {
   })
     .finally(function () {
       res.render('photos/add', {
-        photo: photo,
+        photo: photo
       });
     });
 }
@@ -69,7 +69,7 @@ function add_direct(req, res) {
     .finally(function () {
       res.render('photos/add_direct', {
         photo: photo,
-        cloudinary_cors: cloudinary_cors,
+        cloudinary_cors: cloudinary_cors
       });
     });
 }
@@ -107,7 +107,7 @@ function add_direct_unsigned(req, res) {
         unsigned: true,
         name: preset_name,
         folder: "preset_folder",
-        return_delete_token: true,
+        return_delete_token: true
       });
     })
     .finally(function (preset) {
@@ -115,7 +115,7 @@ function add_direct_unsigned(req, res) {
         {
           photo: photo,
           cloudinary_cors: cloudinary_cors,
-          preset_name: preset_name,
+          preset_name: preset_name
         });
     });
 }

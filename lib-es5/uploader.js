@@ -24,7 +24,7 @@ var urlLib = require('url');
 
 // eslint-disable-next-line import/order
 
-var _require2 = require("./config"),
+var _require2 = require("./config")(),
     upload_prefix = _require2.upload_prefix;
 
 var isSecure = !(upload_prefix && upload_prefix.slice(0, 5) === 'http:');
@@ -33,13 +33,15 @@ var https = isSecure ? require('https') : require('http');
 var Cache = require('./cache');
 var utils = require("./utils");
 var UploadStream = require('./upload_stream');
+var config = require("./config");
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,
     includes = utils.includes,
     isObject = utils.isObject,
     isRemoteUrl = utils.isRemoteUrl,
-    merge = utils.merge;
+    merge = utils.merge,
+    pickOnlyExistingValues = utils.pickOnlyExistingValues;
 
 
 exports.unsigned_upload_stream = function unsigned_upload_stream(upload_preset, callback) {
@@ -252,7 +254,7 @@ exports.text = function text(content, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return call_api("text", callback, options, function () {
-    var textParams = utils.only.apply(utils, [options].concat(TEXT_PARAMS));
+    var textParams = pickOnlyExistingValues.apply(undefined, [options].concat(TEXT_PARAMS));
     var params = _extends({
       timestamp: utils.timestamp(),
       text: content
@@ -311,7 +313,19 @@ exports.explode = function explode(public_id, callback) {
   });
 };
 
-// options may include 'exclusive' (boolean) which causes clearing this tag from all other resources
+/**
+ *
+ * @param {String}          tag                  The tag or tags to assign. Can specify multiple
+ *                                               tags in a single string, separated by commas - "t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11".
+ *
+ * @param {Array}          public_ids           A list of public IDs (up to 1000) of assets uploaded to Cloudinary.
+ *
+ * @param {Function}        callback             Callback function
+ *
+ * @param {Object}          options              Configuration options may include 'exclusive' (boolean) which causes
+ *                                               clearing this tag from all other resources
+ * @return {Object}
+ */
 exports.add_tag = function add_tag(tag) {
   var public_ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var callback = arguments[2];
@@ -322,6 +336,18 @@ exports.add_tag = function add_tag(tag) {
   return call_tags_api(tag, command, public_ids, callback, options);
 };
 
+/**
+ * @param {String}          tag                  The tag or tags to remove. Can specify multiple
+ *                                               tags in a single string, separated by commas - "t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11".
+ *
+ * @param {Array}          public_ids            A list of public IDs (up to 1000) of assets uploaded to Cloudinary.
+ *
+ * @param {Function}        callback             Callback function
+ *
+ * @param {Object}          options              Configuration options may include 'exclusive' (boolean) which causes
+ *                                               clearing this tag from all other resources
+ * @return {Object}
+ */
 exports.remove_tag = function remove_tag(tag) {
   var public_ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var callback = arguments[2];
@@ -446,6 +472,8 @@ function call_api(action, callback, options, get_params) {
     callback = function callback() {};
   }
 
+  var USE_PROMISES = !options.disable_promises;
+
   var deferred = Q.defer();
   if (options == null) {
     options = {};
@@ -469,7 +497,10 @@ function call_api(action, callback, options, get_params) {
       // Already reported
     } else if (res.error) {
       errorRaised = true;
-      deferred.reject(res);
+
+      if (USE_PROMISES) {
+        deferred.reject(res);
+      }
       callback(res);
     } else if (includes([200, 400, 401, 404, 420, 500], res.statusCode)) {
       var buffer = "";
@@ -485,16 +516,22 @@ function call_api(action, callback, options, get_params) {
         result = parseResult(buffer, res);
         if (result.error) {
           result.error.http_code = res.statusCode;
-          deferred.reject(result.error);
+          if (USE_PROMISES) {
+            deferred.reject(result.error);
+          }
         } else {
           cacheResults(result, options);
-          deferred.resolve(result);
+          if (USE_PROMISES) {
+            deferred.resolve(result);
+          }
         }
         callback(result);
       });
       res.on("error", function (error) {
         errorRaised = true;
-        deferred.reject(error);
+        if (USE_PROMISES) {
+          deferred.reject(error);
+        }
         callback({ error });
       });
     } else {
@@ -503,7 +540,9 @@ function call_api(action, callback, options, get_params) {
         http_code: res.statusCode,
         name: "UnexpectedResponse"
       };
-      deferred.reject(error);
+      if (USE_PROMISES) {
+        deferred.reject(error);
+      }
       callback({ error });
     }
   };
@@ -520,17 +559,20 @@ function call_api(action, callback, options, get_params) {
 
     return Buffer.from(encodeFieldPart(boundary, key, value), 'utf8');
   });
-
   var result = post(api_url, post_data, boundary, file, handle_response, options);
   if (isObject(result)) {
     return result;
   }
-  return deferred.promise;
+
+  if (USE_PROMISES) {
+    return deferred.promise;
+  }
 }
 
 function post(url, post_data, boundary, file, callback, options) {
   var file_header = void 0;
   var finish_buffer = Buffer.from("--" + boundary + "--", 'ascii');
+  var oauth_token = options.oauth_token || config().oauth_token;
   if (file != null || options.stream) {
     // eslint-disable-next-line no-nested-ternary
     var filename = options.stream ? options.filename ? options.filename : "file" : basename(file);
@@ -547,6 +589,10 @@ function post(url, post_data, boundary, file, callback, options) {
   if (options.x_unique_upload_id != null) {
     headers['X-Unique-Upload-Id'] = options.x_unique_upload_id;
   }
+  if (oauth_token != null) {
+    headers.Authorization = `Bearer ${oauth_token}`;
+  }
+
   post_options = extend(post_options, {
     method: 'POST',
     headers: headers

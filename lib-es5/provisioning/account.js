@@ -1,6 +1,9 @@
 'use strict';
 
+var utils = require("../utils");
 var call_account_api = require('../api_client/call_account_api');
+
+var pickOnlyExistingValues = utils.pickOnlyExistingValues;
 
 /**
  * @desc Lists sub-accounts.
@@ -11,6 +14,7 @@ var call_account_api = require('../api_client/call_account_api');
  * @param [options] {object} - See {@link https://cloudinary.com/documentation/cloudinary_sdks#configuration_parameters|Configuration parameters} in the SDK documentation.
  * @param [callback] {function}
  */
+
 function sub_accounts(enabled) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var prefix = arguments[2];
@@ -134,7 +138,7 @@ function user(user_id) {
 
 /**
  * @desc Lists users in the account.
- * @param [pending] {boolean} - Whether to only return pending users. Default: false (all users)
+ * @param [pending] {boolean} - Limit results to pending users (true), users that are not pending (false), or all users (undefined, the default)
  * @param [user_ids] {string[]} - A list of up to 100 user IDs. When provided, other parameters are ignored.
  * @param [prefix] {string} - Returns users where the name or email address begins with the specified case-insensitive
  *                            string.
@@ -148,9 +152,12 @@ function users(pending, user_ids, prefix, sub_account_id) {
 
   var uri = ['users'];
   var params = {
-    ids: user_ids
+    ids: user_ids,
+    pending,
+    prefix,
+    sub_account_id
   };
-  return call_account_api('GET', uri, params, callback, options);
+  return call_account_api('GET', uri, pickOnlyExistingValues(params, "ids", "pending", "prefix", "sub_account_id"), callback, options);
 }
 
 /**

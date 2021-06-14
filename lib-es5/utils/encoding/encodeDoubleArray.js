@@ -5,7 +5,7 @@ var toArray = require('../parsing/toArray');
 
 /**
  * Serialize an array of arrays into a string
- * @param {[]|[[]]} array - An array of arrays.
+ * @param {string[] | Array.<Array.<string>>} array - An array of arrays.
  *                          If the first element is not an array the argument is wrapped in an array.
  * @returns {string} A string representation of the arrays.
  */

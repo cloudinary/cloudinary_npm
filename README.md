@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cloudinary/cloudinary_npm.svg?branch=master)](https://travis-ci.org/cloudinary/cloudinary_npm)
+
 Cloudinary
 ==========
 
@@ -230,6 +232,9 @@ Additional resources are available at:
 ```
 npm run test
 ```
+
+## Node support
+This SDK requires node >= 8.
 
 ## Support
 

@@ -74,5 +74,10 @@ module.exports = function (options) {
   }
   var auth = digest(toSign.join(tokenSeparator), options.key);
   tokenParts.push(`hmac=${auth}`);
+
+  if (!options.url && !options.acl) {
+    throw 'authToken must contain either an acl or a url property';
+  }
+
   return `${tokenName}=${tokenParts.join(tokenSeparator)}`;
 };
