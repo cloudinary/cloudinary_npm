@@ -118,6 +118,13 @@ module.exports = function (new_config, new_value) {
     var CLOUDINARY_ENV_URL = process.env.CLOUDINARY_URL;
     var CLOUDINARY_ENV_ACCOUNT_URL = process.env.CLOUDINARY_ACCOUNT_URL;
 
+    if (CLOUDINARY_ENV_URL && !CLOUDINARY_ENV_URL.toLowerCase().startsWith('cloudinary://')) {
+      throw new Error("Invalid CLOUDINARY_URL protocol. URL should begin with 'cloudinary://'");
+    }
+    if (CLOUDINARY_ENV_ACCOUNT_URL && !CLOUDINARY_ENV_ACCOUNT_URL.toLowerCase().startsWith('account://')) {
+      throw new Error("Invalid CLOUDINARY_ACCOUNT_URL protocol. URL should begin with 'account://'");
+    }
+
     [CLOUDINARY_ENV_URL, CLOUDINARY_ENV_ACCOUNT_URL].forEach(function (ENV_URL) {
       if (ENV_URL) {
         var parsedConfig = parseCloudinaryConfigFromEnvURL(ENV_URL);

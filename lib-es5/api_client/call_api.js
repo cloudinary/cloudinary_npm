@@ -11,14 +11,18 @@ var ensurePresenceOf = utils.ensurePresenceOf;
 
 function call_api(method, uri, params, callback, options) {
   ensurePresenceOf({ method, uri });
-  var cloudinary = ensureOption(options, "upload_prefix", "https://api.cloudinary.com");
-  var cloud_name = ensureOption(options, "cloud_name");
-  var api_url = [cloudinary, "v1_1", cloud_name].concat(uri).join("/");
-  var auth = {
-    key: ensureOption(options, "api_key"),
-    secret: ensureOption(options, "api_secret")
-  };
-
+  var api_url = utils.base_api_url(uri, options);
+  var auth = {};
+  if (options.oauth_token || config().oauth_token) {
+    auth = {
+      oauth_token: ensureOption(options, "oauth_token")
+    };
+  } else {
+    auth = {
+      key: ensureOption(options, "api_key"),
+      secret: ensureOption(options, "api_secret")
+    };
+  }
   return execute_request(method, params, auth, api_url, callback, options);
 }
 

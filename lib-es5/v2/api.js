@@ -34,6 +34,7 @@ v1_adapters(exports, api, {
   root_folders: 0,
   sub_folders: 1,
   delete_folder: 1,
+  create_folder: 1,
   upload_mappings: 0,
   upload_mapping: 1,
   delete_upload_mapping: 1,
@@ -59,5 +60,6 @@ v1_adapters(exports, api, {
   update_metadata_field: 2,
   update_metadata_field_datasource: 2,
   delete_datasource_entries: 2,
-  restore_metadata_field_datasource: 2
+  restore_metadata_field_datasource: 2,
+  sort_metadata_field_datasource: 3
 });

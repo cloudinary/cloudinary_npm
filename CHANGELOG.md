@@ -1,3 +1,151 @@
+1.26.0 / 2021-06-06
+==================
+
+Add support for oauth authorization (#489)
+
+
+1.25.2 / 2021-05-30
+==================
+
+Other Changes
+  * Fix - Remove file extensions from require statements (#490)
+  * Fix - Add support for complex variable names (aheight) (#488)
+  * Fix - #486 - upload_prefix configuration retrieval (#487)
+
+
+
+1.25.1 / 2021-03-22
+==================
+
+  * Fix/unhandled promise rejection call api (#481)
+  * Fix return type of api_url function(return String instead of Promise) (#483)
+  * Add SHA-256 support for auth signatures (#479)
+
+1.25.0 / 2021-02-22
+==================
+
+New functionality
+-----------------
+* Add sort by metadata field (#474)
+* Add filename override param (#471)
+
+Other changes
+-------------
+* Add safe base64 to all url generation (#477)
+* Fix config backup in sign requests test (#476)
+* Add missing types to create/delete_folder and private_download_url (#473)
+* Add validation to genreate_auth_token to enforce url or acl (#472)
+
+
+
+ 1.24.0 / 2021-01-31
+=============
+
+New functionality and features
+------------------------------
+  * Add `accessibility_analysis` parameter support (#463)
+  * Add support for date parameter in usage API (#467)
+
+Other Changes
+-------------
+  * Change test for `eval` upload parameter (#468)
+  * Update docstring for normalize_expression (#461)
+  * Fix secure_distribution has type (#462)
+  * Remove unused parameter from archive_params (#454)
+  * Fix type of generate_auth_token options (#448)
+  * Set the provisioning API config as optional (#451)
+  * Encode all URI components when building a URL in base_api_url() (#447)
+  * Generate url-safe base64 strings in remote custom functions (#446)
+
+1.23.0 / 2020-08-26
+===================
+New functionality and features
+------------------------------
+* Add support for pending, prefix, and sub_account_id to users method (#417)
+* Add support for metadata array value (#433)
+* Detect data URLs with suffix in mime type (#418)
+* Add support for download backedup asset function (#415)
+* Add support `max_results` and `next_cursor` in `root_folders` and `sub_folders` (#411)
+* Add download_folder method (#404)
+
+Other Changes
+-------------
+* Added linter rules (#423)
+* Fix docstring for pending parameter of the users method (#436)
+* Fix invalid detection failing test (#439)
+* Test: Ignore URL in AuthToken generation if ACL is provided (#431)
+* Add pull_request_template.md (#435)
+* Fix and improve docstring for download_folder() (#434)
+* Refactor `pickOnlyExistingValues()` function (#432)
+* Add tests for new OCR features (#385)
+
+ 
+1.22.0 / 2020-06-08
+==================
+
+
+New functionality and features
+------------------------------ 
+  * Feature encode sdk version (#371)
+  * Add support for cinemagraph_analysis parameter in upload, explicit, and resource (#391)
+  * Support for creating folders using Admin API (#370)
+  * Add support for pow operator in expressions (#386)
+  * Feature/support download backup version api (#380)
+  * Fix normalize_expression when variable is named like a keyword (e.g., ) (#367)
+  * Add support for 32 char SHA-256 signatures (#368)
+
+  Other Changes
+  -------------
+  * Add missing types for sign-request (#398)
+  * Add deprecation warning for node 6, add tests for node 14 (#389)
+  * Add linter (#388)
+  * Fix incorrect text implementation for list resources(#382)
+  * Update issue templates (#365)
+
+
+
+
+
+
+1.21.0 / 2020-03-29
+==================
+
+New functionality and features
+------------------------------ 
+  * Add types for Structured Metadata functions (#359)
+  * Added types for upload response callback (#360)
+  * Updated promise types for resources methods (#358)
+
+Other Changes
+-------------
+ * Add  back to responses sent from Admin API (#361)
+ * Align all structured metadata tests with reference implementation (#351)
+ * Improve provisioning api tests (#354)
+ * Refactor in a wait period for eager uploads (#355)
+
+
+1.20.0 / 2020-03-11
+==================
+
+New functionality and features
+------------------------------ 
+  * Add support for sources in video tag (#265)
+  * Add support multiple resource_types in ZIP generation (#348)
+  * Add API support for account/provisioning (#343)
+  * Add filename options (#273)
+  * Add use_filename option (#274)
+  * Support quality_override param for update and explicit api (#242)
+  
+  Other Changes
+  -------------
+  * Refactor out a duplicate test (#353)
+  * Refactor the order of the assertions in account_spec (#352)
+  * Fix type defs for stream upload methods (#336)
+  * Remove typings spec and config from npm package
+  * Add automation to delete the es5-lib dir when npm run compile is run
+  * Move typescript to devDependencies and update version
+  * Refactor out utils functions
+
 1.19.0 / 2020-01-20
 ==================
 

@@ -76,7 +76,7 @@ app.use(function (req, res, next) {
   console.log('error (404)');
   res.status(404).render('errors/404', {
     url: req.url,
-    error: 'Not found',
+    error: 'Not found'
   });
 });
 

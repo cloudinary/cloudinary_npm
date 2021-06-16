@@ -55,6 +55,11 @@ var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
+var getSDKVersions = require('./encoding/sdkAnalytics/getSDKVersions');
+
+var _require$Util = require('cloudinary-core').Util,
+    getAnalyticsOptions = _require$Util.getAnalyticsOptions,
+    getSDKAnalyticsSignature = _require$Util.getSDKAnalyticsSignature;
 
 exports = module.exports;
 var utils = module.exports;
@@ -93,7 +98,10 @@ var _require2 = require('./consts'),
     PREDEFINED_VARS = _require2.PREDEFINED_VARS,
     LAYER_KEYWORD_PARAMS = _require2.LAYER_KEYWORD_PARAMS,
     TRANSFORMATION_PARAMS = _require2.TRANSFORMATION_PARAMS,
-    SIMPLE_PARAMS = _require2.SIMPLE_PARAMS;
+    SIMPLE_PARAMS = _require2.SIMPLE_PARAMS,
+    UPLOAD_PREFIX = _require2.UPLOAD_PREFIX,
+    SUPPORTED_SIGNATURE_ALGORITHMS = _require2.SUPPORTED_SIGNATURE_ALGORITHMS,
+    DEFAULT_SIGNATURE_ALGORITHM = _require2.DEFAULT_SIGNATURE_ALGORITHM;
 
 function textStyle(layer) {
   var keywords = [];
@@ -129,20 +137,31 @@ function textStyle(layer) {
 }
 
 /**
- * Normalize an offset value
- * @param {String} expression a decimal value which may have a 'p' or '%' postfix. E.g. '35%', '0.4p'
- * @return {Object|String} a normalized String of the input value if possible otherwise the value itself
+ * Normalize an expression string, replace "nice names" with their coded values and spaces with "_"
+ * e.g. `width > 0` => `w_lt_0`
+ *
+ * @param {String} expression An expression to be normalized
+ * @return {Object|String} A normalized String of the input value if possible otherwise the value itself
  */
 function normalize_expression(expression) {
   if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/)) {
     return expression;
   }
-  var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\+|\\*";
-  var pattern = "((" + operators + ")(?=[ _])|" + Object.keys(PREDEFINED_VARS).join("|") + ")";
-  var replaceRE = new RegExp(pattern, "g");
-  expression = expression.replace(replaceRE, function (match) {
-    return CONDITIONAL_OPERATORS[match] || PREDEFINED_VARS[match];
+
+  var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\^|\\+|\\*";
+  var operatorsPattern = "((" + operators + ")(?=[ _]))";
+  var operatorsReplaceRE = new RegExp(operatorsPattern, "g");
+  expression = expression.replace(operatorsReplaceRE, function (match) {
+    return CONDITIONAL_OPERATORS[match];
   });
+
+  var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  var userVariablePattern = '(\\$_*[^_ ]+)';
+  var variablesReplaceRE = new RegExp(`${userVariablePattern}|${predefinedVarsPattern}`, "g");
+  expression = expression.replace(variablesReplaceRE, function (match) {
+    return PREDEFINED_VARS[match] || match;
+  });
+
   return expression.replace(/[ _]+/g, '_');
 }
 
@@ -157,7 +176,9 @@ function process_custom_function(customFunction) {
     return customFunction;
   }
   if (customFunction.function_type === "remote") {
-    return [customFunction.function_type, base64EncodeURL(customFunction.source)].join(":");
+    var encodedSource = base64EncodeURL(customFunction.source);
+
+    return [customFunction.function_type, encodedSource].join(":");
   }
   return [customFunction.function_type, customFunction.source].join(":");
 }
@@ -288,15 +309,18 @@ function build_upload_params(options) {
     async: utils.as_safe_bool(options.async),
     backup: utils.as_safe_bool(options.backup),
     callback: options.callback,
+    cinemagraph_analysis: utils.as_safe_bool(options.cinemagraph_analysis),
     colors: utils.as_safe_bool(options.colors),
     discard_original_filename: utils.as_safe_bool(options.discard_original_filename),
     eager: utils.build_eager(options.eager),
     eager_async: utils.as_safe_bool(options.eager_async),
     eager_notification_url: options.eager_notification_url,
+    eval: options.eval,
     exif: utils.as_safe_bool(options.exif),
     faces: utils.as_safe_bool(options.faces),
     folder: options.folder,
     format: options.format,
+    filename_override: options.filename_override,
     image_metadata: utils.as_safe_bool(options.image_metadata),
     invalidate: utils.as_safe_bool(options.invalidate),
     moderation: options.moderation,
@@ -314,7 +338,9 @@ function build_upload_params(options) {
     unique_filename: utils.as_safe_bool(options.unique_filename),
     upload_preset: options.upload_preset,
     use_filename: utils.as_safe_bool(options.use_filename),
-    quality_override: options.quality_override
+    analyze: JSON.stringify(options.analyze),
+    quality_override: options.quality_override,
+    accessibility_analysis: utils.as_safe_bool(options.accessibility_analysis)
   };
   return utils.updateable_resource_params(options, params);
 }
@@ -332,16 +358,53 @@ function encode_key_value(arg) {
   }).join('|');
 }
 
-function encode_context(arg) {
-  if (!isObject(arg)) {
-    return arg;
-  }
-  return entries(arg).map(function (_ref3) {
-    var _ref4 = _slicedToArray(_ref3, 2),
-        k = _ref4[0],
-        v = _ref4[1];
+/**
+ * @description Escape = and | with two backslashes \\
+ * @param {string|number} value
+ * @return {string}
+ */
+function escapeMetadataValue(value) {
+  return value.toString().replace(/([=|])/g, '\\$&');
+}
 
-    return `${k}=${v.replace(/([=|])/g, '\\$&')}`;
+/**
+ *
+ * @description Encode metadata fields based on incoming value.
+ *              If array, escape as color_id=[\"green\",\"red\"]
+ *              If string/number, escape as in_stock_id=50
+ *
+ *              Joins resulting values with a pipe:
+ *              in_stock_id=50|color_id=[\"green\",\"red\"]
+ *
+ *              = and | and escaped by default (this can't be turned off)
+ *
+ * @param metadataObj
+ * @return {string}
+ */
+function encode_context(metadataObj) {
+  if (!isObject(metadataObj)) {
+    return metadataObj;
+  }
+
+  return entries(metadataObj).map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        key = _ref4[0],
+        value = _ref4[1];
+
+    // if string, simply parse the value and move on
+    if (isString(value)) {
+      return `${key}=${escapeMetadataValue(value)}`;
+
+      // If array, parse each item individually
+    } else if (isArray(value)) {
+      var values = value.map(function (innerVal) {
+        return `\"${escapeMetadataValue(innerVal)}\"`;
+      }).join(',');
+      return `${key}=[${values}]`;
+      // if unknown, return the value as string
+    } else {
+      return value.toString();
+    }
   }).join('|');
 }
 
@@ -624,7 +687,7 @@ function updateable_resource_params(options) {
  * A list of keys used by the url() function.
  * @private
  */
-var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cname', 'format', 'private_cdn', 'resource_type', 'secure', 'secure_cdn_subdomain', 'secure_distribution', 'shorten', 'sign_url', 'ssl_detected', 'type', 'url_suffix', 'use_root_path', 'version'];
+var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cname', 'format', 'long_url_signature', 'private_cdn', 'resource_type', 'secure', 'secure_cdn_subdomain', 'secure_distribution', 'shorten', 'sign_url', 'ssl_detected', 'type', 'url_suffix', 'use_root_path', 'version'];
 
 /**
  * Create a new object with only URL parameters
@@ -633,7 +696,7 @@ var URL_KEYS = ['api_secret', 'auth_token', 'cdn_subdomain', 'cloud_name', 'cnam
  */
 
 function extractUrlParams(options) {
-  return utils.only.apply(utils, [options].concat(URL_KEYS));
+  return pickOnlyExistingValues.apply(undefined, [options].concat(URL_KEYS));
 }
 
 /**
@@ -643,7 +706,7 @@ function extractUrlParams(options) {
  */
 
 function extractTransformationParams(options) {
-  return utils.only.apply(utils, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
+  return pickOnlyExistingValues.apply(undefined, [options].concat(_toConsumableArray(TRANSFORMATION_PARAMS)));
 }
 
 /**
@@ -665,7 +728,6 @@ function patchFetchFormat() {
 function url(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-
   var signature = void 0,
       source_to_sign = void 0;
   utils.patchFetchFormat(options);
@@ -678,6 +740,7 @@ function url(public_id) {
   if (force_version == null) {
     force_version = true;
   }
+  var long_url_signature = !!consumeOption(options, "long_url_signature", config().long_url_signature);
   var format = consumeOption(options, "format");
   var cloud_name = consumeOption(options, "cloud_name", config().cloud_name);
   if (!cloud_name) {
@@ -698,6 +761,10 @@ function url(public_id) {
   var api_secret = consumeOption(options, "api_secret", config().api_secret);
   var url_suffix = consumeOption(options, "url_suffix");
   var use_root_path = consumeOption(options, "use_root_path", config().use_root_path);
+  var signature_algorithm = consumeOption(options, "signature_algorithm", config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM);
+  if (long_url_signature) {
+    signature_algorithm = 'sha256';
+  }
   var auth_token = consumeOption(options, "auth_token");
   if (auth_token !== false) {
     auth_token = exports.merge(config().auth_token, auth_token);
@@ -753,9 +820,8 @@ function url(public_id) {
       }
       // eslint-disable-next-line no-empty
     } catch (error) {}
-    var shasum = crypto.createHash('sha1');
-    shasum.update(utf8_encode(to_sign + api_secret), 'binary');
-    signature = shasum.digest('base64').replace(/\//g, '_').replace(/\+/g, '-').substring(0, 8);
+    var hash = computeHash(to_sign + api_secret, signature_algorithm, 'base64');
+    signature = hash.replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
     signature = `s--${signature}--`;
   }
   var prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
@@ -767,6 +833,23 @@ function url(public_id) {
     var token = generate_token(auth_token);
     resultUrl += `?${token}`;
   }
+
+  var urlAnalytics = ensureOption(options, 'urlAnalytics', false);
+
+  if (urlAnalytics === true) {
+    var sdkVersions = getSDKVersions();
+    var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));
+
+    var sdkAnalyticsSignature = getSDKAnalyticsSignature(analyticsOptions);
+
+    // url might already have a '?' query param
+    var appender = '?';
+    if (resultUrl.indexOf('?') >= 0) {
+      appender = '&';
+    }
+    resultUrl = `${resultUrl}${appender}_s=${sdkAnalyticsSignature}`;
+  }
+
   return resultUrl;
 }
 
@@ -890,14 +973,25 @@ function unsigned_url_prefix(source, cloud_name, private_cdn, cdn_subdomain, sec
   return prefix;
 }
 
+function base_api_url() {
+  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var cloudinary = ensureOption(options, "upload_prefix", UPLOAD_PREFIX);
+  var cloud_name = ensureOption(options, "cloud_name");
+  var encode_path = function encode_path(unencoded_path) {
+    return encodeURIComponent(unencoded_path).replace("'", '%27');
+  };
+  var encoded_path = Array.isArray(path) ? path.map(encode_path) : encode_path(path);
+  return [cloudinary, "v1_1", cloud_name].concat(encoded_path).join("/");
+}
+
 function api_url() {
   var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'upload';
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var cloudinary = ensureOption(options, "upload_prefix", "https://api.cloudinary.com");
-  var cloud_name = ensureOption(options, "cloud_name");
   var resource_type = options.resource_type || "image";
-  return [cloudinary, "v1_1", cloud_name, resource_type, action].join("/");
+  return base_api_url([resource_type, action], options);
 }
 
 function random_public_id() {
@@ -922,9 +1016,24 @@ function api_sign_request(params_to_sign, api_secret) {
 
     return `${k}=${toArray(v).join(",")}`;
   }).sort().join("&");
-  var shasum = crypto.createHash('sha1');
-  shasum.update(utf8_encode(to_sign + api_secret), 'binary');
-  return shasum.digest('hex');
+  return computeHash(to_sign + api_secret, config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM, 'hex');
+}
+
+/**
+ * Computes hash from input string using specified algorithm.
+ * @private
+ * @param {string} input string which to compute hash from
+ * @param {string} signature_algorithm algorithm to use for computing hash
+ * @param {string} encoding type of encoding
+ * @return {string} computed hash value
+ */
+function computeHash(input, signature_algorithm, encoding) {
+  if (!SUPPORTED_SIGNATURE_ALGORITHMS.includes(signature_algorithm)) {
+    throw new Error(`Signature algorithm ${signature_algorithm} is not supported. Supported algorithms: ${SUPPORTED_SIGNATURE_ALGORITHMS.join(', ')}`);
+  }
+  var hash = crypto.createHash(signature_algorithm);
+  hash.update(utf8_encode(input), 'binary');
+  return hash.digest(encoding);
 }
 
 function clear_blank(hash) {
@@ -966,9 +1075,8 @@ function webhook_signature(data, timestamp) {
   ensurePresenceOf({ data, timestamp });
 
   var api_secret = ensureOption(options, 'api_secret');
-  var shasum = crypto.createHash('sha1');
-  shasum.update(data + timestamp + api_secret, 'binary');
-  return shasum.digest('hex');
+  var signature_algorithm = ensureOption(options, 'signature_algorithm', DEFAULT_SIGNATURE_ALGORITHM);
+  return computeHash(data + timestamp + api_secret, signature_algorithm, 'hex');
 }
 
 /**
@@ -988,7 +1096,10 @@ function verifyNotificationSignature(body, timestamp, signature) {
   if (timestamp < Date.now() - valid_for) {
     return false;
   }
-  var payload_hash = utils.webhook_signature(body, timestamp, { api_secret: config().api_secret });
+  var payload_hash = utils.webhook_signature(body, timestamp, {
+    api_secret: config().api_secret,
+    signature_algorithm: config().signature_algorithm
+  });
   return signature === payload_hash;
 }
 
@@ -996,11 +1107,14 @@ function process_request_params(params, options) {
   if (options.unsigned != null && options.unsigned) {
     params = exports.clear_blank(params);
     delete params.timestamp;
+  } else if (options.oauth_token || config().oauth_token) {
+    params = exports.clear_blank(options);
   } else if (options.signature) {
     params = exports.clear_blank(options);
   } else {
     params = exports.sign_request(params, options);
   }
+
   return params;
 }
 
@@ -1035,6 +1149,26 @@ function zip_download_url(tag) {
 }
 
 /**
+ * The returned url should allow downloading the backedup asset based on the
+ * version and asset id
+ * asset and version id are returned with resource(<PUBLIC_ID1>, { versions: true })
+ * @param asset_id
+ * @param version_id
+ * @param options
+ * @returns {string }
+ */
+function download_backedup_asset(asset_id, version_id) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = exports.sign_request({
+    timestamp: options.timestamp || exports.timestamp(),
+    asset_id: asset_id,
+    version_id: version_id
+  }, options);
+  return exports.base_api_url(['download_backup'], options) + "?" + hashToQuery(params);
+}
+
+/**
  * Returns a URL that when invokes creates an archive and returns it.
  * @param {object} options
  * @param {string} [options.resource_type="image"] The resource type of files to include in the archive.
@@ -1043,6 +1177,8 @@ function zip_download_url(tag) {
  * @param {string|Array} [options.tags] list of tags to include in the archive
  * @param {string|Array<string>} [options.public_ids] list of public_ids to include in the archive
  * @param {string|Array<string>} [options.prefixes]  list of prefixes of public IDs (e.g., folders).
+ * @param {string|Array<string>} [options.fully_qualified_public_ids] list of fully qualified public_ids to include
+ *   in the archive.
  * @param {string|Array<string>} [options.transformations]  list of transformations.
  *   The derived images of the given transformations are included in the archive. Using the string representation of
  *   multiple chained transformations as we use for the 'eager' upload parameter.
@@ -1089,6 +1225,23 @@ function download_zip_url() {
 }
 
 /**
+ * Creates and returns a URL that when invoked creates an archive of a folder
+ * @param {string} folder_path Full path (from the root) of the folder to download
+ * @param {object} options Additional options
+ * @returns {string} Url for downloading an archive of a folder
+ */
+function download_folder(folder_path) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  options.resource_type = options.resource_type || "all";
+  options.prefixes = folder_path;
+  var cloudinary_params = exports.sign_request(exports.archive_params(merge(options, {
+    mode: "download"
+  })), options);
+  return exports.api_url("generate_archive", options) + "?" + hashToQuery(cloudinary_params);
+}
+
+/**
  * Render the key/value pair as an HTML tag attribute
  * @private
  * @param {string} key
@@ -1126,7 +1279,7 @@ exports.html_attrs = function html_attrs(attrs) {
 var CLOUDINARY_JS_CONFIG_PARAMS = ['api_key', 'cloud_name', 'private_cdn', 'secure_distribution', 'cdn_subdomain'];
 
 function cloudinary_js_config() {
-  var params = utils.only.apply(utils, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
+  var params = pickOnlyExistingValues.apply(undefined, [config()].concat(CLOUDINARY_JS_CONFIG_PARAMS));
   return `<script type='text/javascript'>\n$.cloudinary.config(${JSON.stringify(params)});\n</script>`;
 }
 
@@ -1264,6 +1417,7 @@ function archive_params() {
     mode: options.mode,
     notification_url: options.notification_url,
     prefixes: options.prefixes && toArray(options.prefixes),
+    fully_qualified_public_ids: options.fully_qualified_public_ids && toArray(options.fully_qualified_public_ids),
     public_ids: options.public_ids && toArray(options.public_ids),
     skip_transformation_name: exports.as_safe_bool(options.skip_transformation_name),
     tags: options.tags && toArray(options.tags),
@@ -1276,6 +1430,18 @@ function archive_params() {
     use_original_filename: exports.as_safe_bool(options.use_original_filename)
   };
 }
+
+exports.create_source_tag = function create_source_tag(src, source_type) {
+  var codecs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  var video_type = source_type === 'ogv' ? 'ogg' : source_type;
+  var mime_type = `video/${video_type}`;
+  if (!isEmpty(codecs)) {
+    var codecs_str = isArray(codecs) ? codecs.join(', ') : codecs;
+    mime_type += `; codecs=${codecs_str}`;
+  }
+  return `<source ${utils.html_attrs({ src, type: mime_type })}>`;
+};
 
 function build_explicit_api_params(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -1305,7 +1471,7 @@ function generate_responsive_breakpoints_string(breakpoints) {
 function build_streaming_profiles_param() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var params = utils.only(options, "display_name", "representations");
+  var params = pickOnlyExistingValues(options, "display_name", "representations");
   if (isArray(params.representations)) {
     params.representations = JSON.stringify(params.representations.map(function (r) {
       return {
@@ -1372,19 +1538,18 @@ function present(value) {
  * @return {object} A new object with the required keys and values.
  */
 
-function only(source) {
+function pickOnlyExistingValues(source) {
   var result = {};
   if (source) {
     for (var _len2 = arguments.length, keys = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
       keys[_key2 - 1] = arguments[_key2];
     }
 
-    for (var j = 0; j < keys.length; j++) {
-      var key = keys[j];
+    keys.forEach(function (key) {
       if (source[key] != null) {
         result[key] = source[key];
       }
-    }
+    });
   }
   return result;
 }
@@ -1463,8 +1628,13 @@ exports.generate_responsive_breakpoints_string = generate_responsive_breakpoints
 exports.build_streaming_profiles_param = build_streaming_profiles_param;
 exports.hashToParameters = hashToParameters;
 exports.present = present;
-exports.only = only;
+exports.only = pickOnlyExistingValues; // for backwards compatibility
+exports.pickOnlyExistingValues = pickOnlyExistingValues;
 exports.jsonArrayParam = jsonArrayParam;
+exports.download_folder = download_folder;
+exports.base_api_url = base_api_url;
+exports.download_backedup_asset = download_backedup_asset;
+
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
 exports.DEFAULT_VIDEO_SOURCE_TYPES = DEFAULT_VIDEO_SOURCE_TYPES;
