@@ -1,16 +1,41 @@
 import * as cloudinary from 'cloudinary';
 import * as Http from "http";
 
-// $ExpectType void
-cloudinary.v2.config({
-    cloud_name: 'demo',
-});
+// $ExpectType ConfigOptions
+cloudinary.v2.config();
 
-// $ExpectType void
+// $ExpectType ConfigOptions
 cloudinary.v2.config(true);
 
-// $ExpectType void
-cloudinary.v2.config("private_cdn", true);
+// $ExpectType ConfigOptions
+cloudinary.v2.config({ cloud_name: "demo" });
+
+// $ExpectError
+cloudinary.v2.config({ cloud_name: 0 });
+
+// $ExpectType boolean | undefined
+cloudinary.v2.config("private_cdn");
+
+// $ExpectType string | undefined
+cloudinary.v2.config("cloud_name", undefined);
+
+// $ExpectType any
+cloudinary.v2.config("not_a_key");
+
+// $ExpectType boolean | undefined
+cloudinary.v2.config(true).private_cdn;
+
+// $ExpectType boolean
+cloudinary.v2.config("private_cdn", true).private_cdn;
+
+// $ExpectType string | undefined
+cloudinary.v2.config(true).cloud_name;
+
+// $ExpectType string
+cloudinary.v2.config("cloud_name", "foo").cloud_name;
+
+// $ExpectError
+cloudinary.v2.config("private_cdn", true, "extra_parameter");
 
 // $ExpectType string
 const test = cloudinary.v2.image("front_face.png", {

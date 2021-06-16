@@ -686,9 +686,11 @@ declare module 'cloudinary' {
 
         function cloudinary_js_config(): string;
 
-        function config(new_config: ConfigOptions | string, new_value?: string | boolean): void;
+        function config(new_config?: boolean | ConfigOptions): ConfigOptions;
 
-        function config(new_config: boolean | object): void;
+        function config<K extends keyof ConfigOptions, V extends ConfigOptions[K]>(key: K, value?: undefined): V;
+
+        function config<K extends keyof ConfigOptions, V extends ConfigOptions[K]>(key: K, value: V): ConfigOptions & { [Property in K]: V }
 
         function url(public_id: string, options?: TransformationOptions | ConfigAndUrlOptions): string;
 
