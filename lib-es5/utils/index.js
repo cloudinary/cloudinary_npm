@@ -1107,7 +1107,7 @@ function process_request_params(params, options) {
     params = exports.clear_blank(params);
     delete params.timestamp;
   } else if (options.oauth_token || config().oauth_token) {
-    params = exports.clear_blank(options);
+    params = exports.clear_blank(params);
   } else if (options.signature) {
     params = exports.clear_blank(options);
   } else {
