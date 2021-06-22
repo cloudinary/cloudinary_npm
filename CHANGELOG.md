@@ -1,3 +1,10 @@
+1.26.1 / 2021-06-22
+==================
+
+  * updated sent upload params (#497)
+  * Improve the return type of cloudinary.v2.config() in TypeScript (#494)
+
+
 1.26.0 / 2021-06-06
 ==================
 
