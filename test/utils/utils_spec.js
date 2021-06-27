@@ -806,7 +806,7 @@ describe("utils", function () {
               font_size: "18"
             }
           });
-        expect(url).to.eql("http://res.cloudinary.com/sdk-test/image/upload/l_text:Times%20New%20Roman_18:sample%20text/sample");
+        expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/l_text:Times%20New%20Roman_18:sample%20text/sample`);
       });
       it("should encode raw_transformation with %20", () => {
         const transformation = "l_text:Times New Roman_109_line_spacing_1:Heading,x_197,y_202";
@@ -814,7 +814,7 @@ describe("utils", function () {
           {
             raw_transformation: transformation
           });
-        expect(url).to.eql("http://res.cloudinary.com/sdk-test/image/upload/l_text:Times%20New%20Roman_109_line_spacing_1:Heading,x_197,y_202/sample");
+        expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/l_text:Times%20New%20Roman_109_line_spacing_1:Heading,x_197,y_202/sample`);
       });
     });
     describe("streaming_profile", function () {
