@@ -826,7 +826,7 @@ function url(public_id) {
   var prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
   var resultUrl = [prefix, resource_type, type, signature, transformation, version, public_id].filter(function (part) {
     return part != null && part !== '';
-  }).join('/').replace(' ', '%20');
+  }).join('/').replace(/ /g, '%20');
   if (sign_url && !isEmpty(auth_token)) {
     auth_token.url = urlParse(resultUrl).path;
     var token = generate_token(auth_token);
