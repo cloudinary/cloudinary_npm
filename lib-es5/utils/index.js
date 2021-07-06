@@ -302,6 +302,38 @@ function process_radius(radius) {
   return radius.map(normalize_expression).join(':');
 }
 
+function build_multi_and_sprite_params(tagOrOptions, options) {
+  var tag = null;
+  if (typeof tagOrOptions === 'string') {
+    tag = tagOrOptions;
+  } else {
+    if (isEmpty(options)) {
+      options = tagOrOptions;
+    } else {
+      throw new Error('First argument must be a tag when additional options are passed');
+    }
+    tag = null;
+  }
+  if (!options && !tag) {
+    throw new Error('Either tag or urls are required');
+  }
+  if (!options) {
+    options = {};
+  }
+  var urls = options.urls;
+  var transformation = generate_transformation_string(extend({}, options, {
+    fetch_format: options.format
+  }));
+  return {
+    tag,
+    transformation,
+    urls,
+    timestamp: utils.timestamp(),
+    async: options.async,
+    notification_url: options.notification_url
+  };
+}
+
 function build_upload_params(options) {
   var params = {
     access_mode: options.access_mode,
@@ -1168,6 +1200,18 @@ function download_backedup_asset(asset_id, version_id) {
 }
 
 /**
+ * Utility method to create a signed URL for specified resources.
+ * @param action
+ * @param params
+ * @param options
+ */
+function api_download_url(action, params, options) {
+  var download_params = _extends({}, params, { mode: "download" });
+  var cloudinary_params = exports.sign_request(download_params, options);
+  return exports.api_url(action, options) + "?" + hashToQuery(cloudinary_params);
+}
+
+/**
  * Returns a URL that when invokes creates an archive and returns it.
  * @param {object} options
  * @param {string} [options.resource_type="image"] The resource type of files to include in the archive.
@@ -1204,10 +1248,10 @@ function download_backedup_asset(asset_id, version_id) {
 function download_archive_url() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var cloudinary_params = exports.sign_request(exports.archive_params(merge(options, {
+  var params = exports.archive_params(merge(options, {
     mode: "download"
-  })), options);
-  return exports.api_url("generate_archive", options) + "?" + hashToQuery(cloudinary_params);
+  }));
+  return api_download_url("generate_archive", params, options);
 }
 
 /**
@@ -1586,6 +1630,8 @@ exports.NOP = function () {};
 exports.generate_auth_token = generate_auth_token;
 exports.getUserAgent = getUserAgent;
 exports.build_upload_params = build_upload_params;
+exports.build_multi_and_sprite_params = build_multi_and_sprite_params;
+exports.api_download_url = api_download_url;
 exports.timestamp = function () {
   return Math.floor(new Date().getTime() / 1000);
 };
