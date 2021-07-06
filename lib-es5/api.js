@@ -54,7 +54,7 @@ exports.resources = function resources(callback) {
   if (options.start_at != null && Object.prototype.toString.call(options.start_at) === '[object Date]') {
     options.start_at = options.start_at.toUTCString();
   }
-  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "prefix", "tags", "context", "direction", "moderations", "start_at", "metadata"), callback, options);
 };
 
 exports.resources_by_tag = function resources_by_tag(tag, callback) {
@@ -64,7 +64,7 @@ exports.resources_by_tag = function resources_by_tag(tag, callback) {
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "tags", tag];
-  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations", "metadata"), callback, options);
 };
 
 exports.resources_by_context = function resources_by_context(key, value, callback) {
@@ -75,7 +75,7 @@ exports.resources_by_context = function resources_by_context(key, value, callbac
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "context"];
-  params = pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations");
+  params = pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations", "metadata");
   params.key = key;
   if (value != null) {
     params.value = value;
@@ -90,7 +90,7 @@ exports.resources_by_moderation = function resources_by_moderation(kind, status,
       uri = void 0;
   resource_type = options.resource_type || "image";
   uri = ["resources", resource_type, "moderations", kind, status];
-  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations"), callback, options);
+  return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations", "metadata"), callback, options);
 };
 
 exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
