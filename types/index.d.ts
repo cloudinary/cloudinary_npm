@@ -1042,6 +1042,12 @@ declare module 'cloudinary' {
             function upload_tag_params(options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<any>;
 
             function upload_url(options?: ConfigOptions): Promise<any>;
+
+            /****************************** Structured Metadata API V2 Methods *************************************/
+
+            function update_metadata(metadata: string | object, public_ids: string[], options?:UploadApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function update_metadata(metadata: string| object, public_ids: string[], callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
         }
 
         /****************************** Search API *************************************/

@@ -1,5 +1,6 @@
 import * as cloudinary from 'cloudinary';
 import * as Http from "http";
+import {MetadataFieldApiResponse, ResponseCallback, UploadApiOptions} from "cloudinary";
 
 // $ExpectType ConfigOptions
 cloudinary.v2.config();
@@ -622,6 +623,13 @@ const datasource_changes = {
         { external_id: "color_2", value: "black" },
     ],
 };
+
+cloudinary.v2.uploader.update_metadata({ metadata_color: "red", metadata_shape: "" }, ["test_id_1", "test_id_2"])
+    .then((res)=> {console.log(res)})
+    .catch((err)=> {console.log(err)});
+
+cloudinary.v2.uploader.update_metadata('countryFieldId=[\"id_us\",\"id_uk\",\"id_france"]', [ 'dog', 'lion' ],
+    function(error, result) { console.log(result, error) });
 
 cloudinary.v2.api.update_metadata_field_datasource('EXTERNAL_ID_GET_LIST1', datasource_changes)
     .then((res)=> {console.log(res)})
