@@ -701,10 +701,10 @@ exports.restore_metadata_field_datasource = function restore_metadata_field_data
  *
  * @return {Object}
  */
-exports.sort_metadata_field_datasource = function sort_metadata_field_datasource(field_external_id, sort_by, direction, callback) {
+exports.order_metadata_field_datasource = function order_metadata_field_datasource(field_external_id, sort_by, direction, callback) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
   options.content_type = "json";
-  var params = { sort_by: sort_by, direction: direction };
-  return call_api("post", ["metadata_fields", field_external_id, "datasource", "sort"], params, callback, options);
+  var params = { order_by: sort_by, direction: direction };
+  return call_api("post", ["metadata_fields", field_external_id, "datasource", "order"], params, callback, options);
 };
