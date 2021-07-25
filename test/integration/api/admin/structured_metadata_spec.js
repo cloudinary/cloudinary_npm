@@ -401,10 +401,10 @@ describe("structured metadata api", function () {
     });
   });
 
-  describe("sort_metadata_field_datasource", function () {
+  describe("order_metadata_field_datasource", function () {
     it("should sort by asc in a metadata field datasource", function () {
       // datasource is set with values in the order v2, v3, v4
-      return api.sort_metadata_field_datasource(EXTERNAL_ID_SET_3, 'value', 'asc')
+      return api.order_metadata_field_datasource(EXTERNAL_ID_SET_3, 'value', 'asc')
         .then((result) => {
           expect(result).to.beADatasource();
           // ascending order means v2 is the first value
@@ -414,7 +414,7 @@ describe("structured metadata api", function () {
 
     it("should sort by desc in a metadata field datasource", function () {
       // datasource is set with values in the order v2, v3, v4
-      return api.sort_metadata_field_datasource(EXTERNAL_ID_SET_3, 'value', 'desc')
+      return api.order_metadata_field_datasource(EXTERNAL_ID_SET_3, 'value', 'desc')
         .then((result) => {
           expect(result).to.beADatasource();
           // descending order means v4 is the first value
