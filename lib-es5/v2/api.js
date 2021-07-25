@@ -61,5 +61,5 @@ v1_adapters(exports, api, {
   update_metadata_field_datasource: 2,
   delete_datasource_entries: 2,
   restore_metadata_field_datasource: 2,
-  sort_metadata_field_datasource: 3
+  order_metadata_field_datasource: 3
 });

@@ -1261,7 +1261,7 @@ function join_pair(key, value) {
  * @return {*} Encoded string or original value if not a string
  */
 function escapeQuotes(value) {
-  return isString(value) ? value.replace('"', '&#34;').replace("'", '&#39;') : value;
+  return isString(value) ? value.replace(/\"/g, '&#34;').replace(/\'/g, '&#39;') : value;
 }
 
 /**
