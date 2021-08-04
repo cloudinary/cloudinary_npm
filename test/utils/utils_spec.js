@@ -1268,6 +1268,22 @@ describe("utils", function () {
             .emptyOptions();
         });
       });
+      it('should support text layer style identifier variables', function () {
+        const options = {
+          transformation: [
+            {
+              variables: [["$style", "!Arial_12!"]]
+            }, {
+              overlay: {
+                text: "hello-world",
+                text_style: "$style"
+              }
+            }
+          ]
+        }
+        const url = cloudinary.utils.url("sample", options);
+        expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/$style_!Arial_12!/l_text:$style:hello-world/sample`);
+      });
     });
   });
   describe('build_eager', function () {

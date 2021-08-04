@@ -312,6 +312,7 @@ declare module 'cloudinary' {
     }
 
     interface TextStyleOptions {
+        text_style?: string;
         font_family?: string;
         font_size?: number;
         font_color?: string;
