@@ -106,6 +106,10 @@ var _require2 = require('./consts'),
 function textStyle(layer) {
   var keywords = [];
   var style = "";
+
+  if (!isEmpty(layer.text_style)) {
+    return layer.text_style;
+  }
   Object.keys(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
     var default_value = LAYER_KEYWORD_PARAMS[attr];
     var attr_value = layer[attr] || default_value;
