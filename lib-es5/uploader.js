@@ -219,6 +219,29 @@ exports.create_zip = function create_zip(callback) {
   return exports.create_archive(callback, options, "zip");
 };
 
+exports.create_slideshow = function create_slideshow(options, callback) {
+  options.resource_type = "video";
+  return call_api("create_slideshow", callback, options, function () {
+    // Generate a transformation from the manifest_transformation key, which should be a valid transformation
+    var manifest_transformation = utils.generate_transformation_string(extend({}, options.manifest_transformation));
+
+    // Try to use all the options to generate a transformation (Example: options.width and options.height)
+    var transformation = utils.generate_transformation_string(extend({}, options));
+
+    return [{
+      timestamp: utils.timestamp(),
+      manifest_transformation: manifest_transformation,
+      upload_preset: options.upload_preset,
+      overwrite: options.overwrite,
+      public_id: options.public_id,
+      notification_url: options.notification_url,
+      manifest_json: options.manifest_json,
+      tags: options.tags,
+      transformation: transformation
+    }];
+  });
+};
+
 exports.destroy = function destroy(public_id, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 

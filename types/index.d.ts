@@ -1040,6 +1040,8 @@ declare module 'cloudinary' {
             function upload_tag_params(options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<any>;
 
             function upload_url(options?: ConfigOptions): Promise<any>;
+
+            function create_slideshow(options?: ConfigOptions & { manifest_transformation?: TransformationOptions, manifest_json?: Record<string, any>}, callback?: UploadResponseCallback): Promise<any>;
         }
 
         /****************************** Search API *************************************/

@@ -8,10 +8,10 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
   let CLOUD_API;
   let CLOUD_NAME;
   let CLOUD_ID;
-  let USER_NAME_1 = `SDK TEST ${Date.now()}`;
-  let USER_NAME_2 = `SDK TEST 2 ${Date.now()}`;
-  let USER_EMAIL_1 = `sdk-test+${Date.now()}@cloudinary.com`;
-  let USER_EMAIL_2 = `sdk-test2+${Date.now()}@cloudinary.com`;
+  let USER_NAME_1 = `NODE TEST ${Date.now()}`;
+  let USER_NAME_2 = `NODE TEST 2 ${Date.now()}`;
+  let USER_EMAIL_1 = `node-test+${Date.now()}@cloudinary.com`;
+  let USER_EMAIL_2 = `node-test2+${Date.now()}@cloudinary.com`;
   let USER_ROLE = 'billing';
   let USER_ID_1;
   let USER_ID_2;
