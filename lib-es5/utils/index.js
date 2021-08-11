@@ -148,7 +148,10 @@ function textStyle(layer) {
  * @return {Object|String} A normalized String of the input value if possible otherwise the value itself
  */
 function normalize_expression(expression) {
-  if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/)) {
+  // Exclude(Don't normalize) expressions that are variable strings foo_!width!
+  // Exclude(Don't normalize) expressions that contain a semicolon (e_preview:duration)
+  // Exclude(Don't normalize) if expression is not a string, or is an empty string
+  if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/) || expression.includes(':')) {
     return expression;
   }
 
