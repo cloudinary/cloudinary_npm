@@ -879,4 +879,17 @@ describe("cloudinary", function () {
     const result = cloudinary.utils.url("sample", options);
     expect(result).to.contain("$aheight_300,$mywidth_100/c_scale,h_3_mul_ih_add_$aheight,w_3_add_$mywidth_mul_3_add_4_div_2_mul_iw_mul_$mywidth");
   });
+
+  it('should support duration in video preview', () => {
+    const expected_url = `https://example.com/e_preview:duration_2/video_id`;
+    const options = {
+      transformation: 'foo:duration',
+      resource_type: 'video',
+      effect: "preview:duration_2"
+    };
+
+    const url = cloudinary.utils.url("video_id", options, expected_url, {});
+
+    expect(url.includes('preview:duration_2')).to.be(true);
+  });
 });
