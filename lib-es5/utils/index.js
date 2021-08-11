@@ -106,6 +106,10 @@ var _require2 = require('./consts'),
 function textStyle(layer) {
   var keywords = [];
   var style = "";
+
+  if (!isEmpty(layer.text_style)) {
+    return layer.text_style;
+  }
   Object.keys(LAYER_KEYWORD_PARAMS).forEach(function (attr) {
     var default_value = LAYER_KEYWORD_PARAMS[attr];
     var attr_value = layer[attr] || default_value;
@@ -826,7 +830,7 @@ function url(public_id) {
   var prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
   var resultUrl = [prefix, resource_type, type, signature, transformation, version, public_id].filter(function (part) {
     return part != null && part !== '';
-  }).join('/').replace(' ', '%20');
+  }).join('/').replace(/ /g, '%20');
   if (sign_url && !isEmpty(auth_token)) {
     auth_token.url = urlParse(resultUrl).path;
     var token = generate_token(auth_token);
@@ -1107,7 +1111,7 @@ function process_request_params(params, options) {
     params = exports.clear_blank(params);
     delete params.timestamp;
   } else if (options.oauth_token || config().oauth_token) {
-    params = exports.clear_blank(options);
+    params = exports.clear_blank(params);
   } else if (options.signature) {
     params = exports.clear_blank(options);
   } else {
@@ -1261,7 +1265,7 @@ function join_pair(key, value) {
  * @return {*} Encoded string or original value if not a string
  */
 function escapeQuotes(value) {
-  return isString(value) ? value.replace('"', '&#34;').replace("'", '&#39;') : value;
+  return isString(value) ? value.replace(/\"/g, '&#34;').replace(/\'/g, '&#39;') : value;
 }
 
 /**

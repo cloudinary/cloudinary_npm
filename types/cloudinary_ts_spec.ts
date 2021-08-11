@@ -1,16 +1,42 @@
 import * as cloudinary from 'cloudinary';
 import * as Http from "http";
+import {MetadataFieldApiResponse, ResponseCallback, UploadApiOptions} from "cloudinary";
 
-// $ExpectType void
-cloudinary.v2.config({
-    cloud_name: 'demo',
-});
+// $ExpectType ConfigOptions
+cloudinary.v2.config();
 
-// $ExpectType void
+// $ExpectType ConfigOptions
 cloudinary.v2.config(true);
 
-// $ExpectType void
-cloudinary.v2.config("private_cdn", true);
+// $ExpectType ConfigOptions
+cloudinary.v2.config({ cloud_name: "demo" });
+
+// $ExpectError
+cloudinary.v2.config({ cloud_name: 0 });
+
+// $ExpectType boolean | undefined
+cloudinary.v2.config("private_cdn");
+
+// $ExpectType string | undefined
+cloudinary.v2.config("cloud_name", undefined);
+
+// $ExpectType any
+cloudinary.v2.config("not_a_key");
+
+// $ExpectType boolean | undefined
+cloudinary.v2.config(true).private_cdn;
+
+// $ExpectType boolean
+cloudinary.v2.config("private_cdn", true).private_cdn;
+
+// $ExpectType string | undefined
+cloudinary.v2.config(true).cloud_name;
+
+// $ExpectType string
+cloudinary.v2.config("cloud_name", "foo").cloud_name;
+
+// $ExpectError
+cloudinary.v2.config("private_cdn", true, "extra_parameter");
 
 // $ExpectType string
 const test = cloudinary.v2.image("front_face.png", {
@@ -597,6 +623,13 @@ const datasource_changes = {
         { external_id: "color_2", value: "black" },
     ],
 };
+
+cloudinary.v2.uploader.update_metadata({ metadata_color: "red", metadata_shape: "" }, ["test_id_1", "test_id_2"])
+    .then((res)=> {console.log(res)})
+    .catch((err)=> {console.log(err)});
+
+cloudinary.v2.uploader.update_metadata('countryFieldId=[\"id_us\",\"id_uk\",\"id_france"]', [ 'dog', 'lion' ],
+    function(error, result) { console.log(result, error) });
 
 cloudinary.v2.api.update_metadata_field_datasource('EXTERNAL_ID_GET_LIST1', datasource_changes)
     .then((res)=> {console.log(res)})

@@ -121,8 +121,8 @@ describe('image helper', function () {
   });
   it("should escape quotes in html attributes", function() {
     expect(cloudinary.image("sample.jpg", {
-      alt: "asdfg\"'asdf"
-    })).to.eql(`<img src='${UPLOAD_PATH}/sample.jpg' alt='asdfg&#34;&#39;asdf'/>`);
+      alt: "here 'is' my \"alt\" escaped"
+    })).to.eql(`<img src='${UPLOAD_PATH}/sample.jpg' alt='here &#39;is&#39; my &#34;alt&#34; escaped'/>`);
   });
 
   describe(":client_hints", function () {
