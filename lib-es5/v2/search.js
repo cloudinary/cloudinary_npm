@@ -42,13 +42,27 @@ var Search = function () {
   }, {
     key: 'aggregate',
     value: function aggregate(value) {
-      this.query_hash.aggregate.push(value);
+      var found = this.query_hash.aggregate.find(function (v) {
+        return v === value;
+      });
+
+      if (!found) {
+        this.query_hash.aggregate.push(value);
+      }
+
       return this;
     }
   }, {
     key: 'with_field',
     value: function with_field(value) {
-      this.query_hash.with_field.push(value);
+      var found = this.query_hash.with_field.find(function (v) {
+        return v === value;
+      });
+
+      if (!found) {
+        this.query_hash.with_field.push(value);
+      }
+
       return this;
     }
   }, {
@@ -59,7 +73,20 @@ var Search = function () {
       var sort_bucket = void 0;
       sort_bucket = {};
       sort_bucket[field_name] = dir;
-      this.query_hash.sort_by.push(sort_bucket);
+
+      // Check if this field name is already stored in the hash
+      var previously_sorted_obj = this.query_hash.sort_by.find(function (sort_by) {
+        return sort_by[field_name];
+      });
+
+      // Since objects are references in Javascript, we can update the reference we found
+      // For example,
+      if (previously_sorted_obj) {
+        previously_sorted_obj[field_name] = dir;
+      } else {
+        this.query_hash.sort_by.push(sort_bucket);
+      }
+
       return this;
     }
   }, {
