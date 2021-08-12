@@ -155,6 +155,36 @@ describe("search_api", function () {
           expect(results).not.to.have.key('next_cursor');
         });
     });
+
+    it('Should eliminate duplicate fields when using sort_by, aggregate or with_fields', function () {
+      // This test ensures we can't push duplicate values into sort_by, aggregate or with_fields
+      const search_query = cloudinary.v2.search.max_results(10).expression(`tags:${SEARCH_TAG}`)
+        .sort_by('public_id', 'asc')
+        .sort_by('public_id', 'asc')
+        .sort_by('public_id', 'asc')
+        .sort_by('public_id', 'asc')
+        .sort_by('public_id', 'desc')
+        .sort_by('public_id', 'desc')
+        .aggregate('foo')
+        .aggregate('foo')
+        .aggregate('foo2')
+        .with_field('foo')
+        .with_field('foo')
+        .with_field('foo2')
+        .to_query();
+
+      expect(search_query.aggregate.length).to.be(2);
+      expect(search_query.with_field.length).to.be(2);
+      expect(search_query.sort_by.length).to.be(1);
+
+      expect(search_query.aggregate[0]).to.be('foo');
+      expect(search_query.aggregate[1]).to.be('foo2');
+      expect(search_query.with_field[0]).to.be('foo');
+      expect(search_query.with_field[1]).to.be('foo2');
+
+      expect(search_query.sort_by[0].public_id).to.be('desc');
+    });
+
     it('should include context', function () {
       return cloudinary.v2.search.expression(`tags:${SEARCH_TAG}`).with_field('context')
         .execute()
