@@ -86,7 +86,9 @@ describe("create slideshow tests", function () {
         }
       },
       transformation: {
-        format: 'auto'
+        width: 100,
+        height: 100,
+        crop: 'scale'
       },
       // manifest_json: slideshowManifestJson,
       tags: [TEST_TAG],

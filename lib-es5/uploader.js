@@ -34,6 +34,7 @@ var Cache = require('./cache');
 var utils = require("./utils");
 var UploadStream = require('./upload_stream');
 var config = require("./config");
+var ensureOption = require('./utils/ensureOption').defaults(config());
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,
@@ -220,13 +221,13 @@ exports.create_zip = function create_zip(callback) {
 };
 
 exports.create_slideshow = function create_slideshow(options, callback) {
-  options.resource_type = "video";
+  options.resource_type = ensureOption(options, "resource_type", "video");
   return call_api("create_slideshow", callback, options, function () {
     // Generate a transformation from the manifest_transformation key, which should be a valid transformation
     var manifest_transformation = utils.generate_transformation_string(extend({}, options.manifest_transformation));
 
     // Try to use all the options to generate a transformation (Example: options.width and options.height)
-    var transformation = utils.generate_transformation_string(extend({}, options));
+    var transformation = utils.generate_transformation_string(extend({}, ensureOption(options, 'transformation', {})));
 
     return [{
       timestamp: utils.timestamp(),
