@@ -1048,3 +1048,14 @@ cloudinary.v2.api.create_folder('foo',{
 cloudinary.v2.api.delete_folder('foo',{
     agent: new Http.Agent()
 });
+
+// $ExpectType Promise<any>
+cloudinary.v2.uploader.create_slideshow({
+    manifest_json: {
+        foo: 'bar' // This is a typescript Record
+    }, // In practice only one of the two are allowed
+    manifest_transformation: {
+        width: 100
+    },
+    height:100
+});

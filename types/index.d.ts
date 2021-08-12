@@ -1044,6 +1044,8 @@ declare module 'cloudinary' {
 
             function upload_url(options?: ConfigOptions): Promise<any>;
 
+            function create_slideshow(options?: ConfigOptions & { manifest_transformation?: TransformationOptions, manifest_json?: Record<string, any>}, callback?: UploadResponseCallback): Promise<any>;
+
             /****************************** Structured Metadata API V2 Methods *************************************/
 
             function update_metadata(metadata: string | object, public_ids: string[], options?:UploadApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
