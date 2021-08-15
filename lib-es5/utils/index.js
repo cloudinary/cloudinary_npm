@@ -149,12 +149,10 @@ function textStyle(layer) {
  */
 function normalize_expression(expression) {
   // Exclude(Don't normalize) expressions that are variable strings foo_!width!
-  // Exclude(Don't normalize) expressions that contain a semicolon (e_preview:duration)
   // Exclude(Don't normalize) if expression is not a string, or is an empty string
-  if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/) || expression.includes(':')) {
+  if (!isString(expression) || expression.length === 0 || expression.match(/^!.+!$/)) {
     return expression;
   }
-
   var operators = "\\|\\||>=|<=|&&|!=|>|=|<|/|-|\\^|\\+|\\*";
   var operatorsPattern = "((" + operators + ")(?=[ _]))";
   var operatorsReplaceRE = new RegExp(operatorsPattern, "g");
@@ -162,7 +160,8 @@ function normalize_expression(expression) {
     return CONDITIONAL_OPERATORS[match];
   });
 
-  var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  // Exclude(Don't normalize) expressions that contain a semicolon (e_preview:duration)
+  var predefinedVarsPattern = "(?<![\$:])(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
   var userVariablePattern = '(\\$_*[^_ ]+)';
   var variablesReplaceRE = new RegExp(`${userVariablePattern}|${predefinedVarsPattern}`, "g");
   expression = expression.replace(variablesReplaceRE, function (match) {
@@ -1640,6 +1639,7 @@ exports.jsonArrayParam = jsonArrayParam;
 exports.download_folder = download_folder;
 exports.base_api_url = base_api_url;
 exports.download_backedup_asset = download_backedup_asset;
+exports.normalize_expression = normalize_expression;
 
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
