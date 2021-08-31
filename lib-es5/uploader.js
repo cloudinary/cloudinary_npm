@@ -226,7 +226,7 @@ exports.create_slideshow = function create_slideshow(options, callback) {
     // Generate a transformation from the manifest_transformation key, which should be a valid transformation
     var manifest_transformation = utils.generate_transformation_string(extend({}, options.manifest_transformation));
 
-    // Try to use all the options to generate a transformation (Example: options.width and options.height)
+    // Try to use {options.transformation} to generate a transformation (Example: options.transformation.width, options.transformation.height)
     var transformation = utils.generate_transformation_string(extend({}, ensureOption(options, 'transformation', {})));
 
     return [{
