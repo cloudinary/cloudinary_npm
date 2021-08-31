@@ -159,7 +159,14 @@ function normalize_expression(expression) {
     return CONDITIONAL_OPERATORS[match];
   });
 
-  var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).join("|") + ")";
+  // Duplicate PREDEFINED_VARS to also include :{var_name} as well as {var_name}
+  // Example:
+  // -- PREDEFINED_VARS = ['foo']
+  // -- predefinedVarsPattern = ':foo|foo'
+  // It is done like this because node 6 does not support regex lookbehind
+  var predefinedVarsPattern = "(" + Object.keys(PREDEFINED_VARS).map(function (v) {
+    return `:${v}|${v}`;
+  }).join("|") + ")";
   var userVariablePattern = '(\\$_*[^_ ]+)';
   var variablesReplaceRE = new RegExp(`${userVariablePattern}|${predefinedVarsPattern}`, "g");
   expression = expression.replace(variablesReplaceRE, function (match) {
@@ -1643,6 +1650,7 @@ exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
 exports.DEFAULT_VIDEO_SOURCE_TYPES = DEFAULT_VIDEO_SOURCE_TYPES;
 
 Object.assign(module.exports, {
+  normalize_expression,
   at,
   clone,
   extend,
