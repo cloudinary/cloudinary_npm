@@ -312,6 +312,7 @@ declare module 'cloudinary' {
     }
 
     interface TextStyleOptions {
+        text_style?: string;
         font_family?: string;
         font_size?: number;
         font_color?: string;
@@ -686,9 +687,11 @@ declare module 'cloudinary' {
 
         function cloudinary_js_config(): string;
 
-        function config(new_config: ConfigOptions | string, new_value?: string | boolean): void;
+        function config(new_config?: boolean | ConfigOptions): ConfigOptions;
 
-        function config(new_config: boolean | object): void;
+        function config<K extends keyof ConfigOptions, V extends ConfigOptions[K]>(key: K, value?: undefined): V;
+
+        function config<K extends keyof ConfigOptions, V extends ConfigOptions[K]>(key: K, value: V): ConfigOptions & { [Property in K]: V }
 
         function url(public_id: string, options?: TransformationOptions | ConfigAndUrlOptions): string;
 
@@ -1040,6 +1043,14 @@ declare module 'cloudinary' {
             function upload_tag_params(options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<any>;
 
             function upload_url(options?: ConfigOptions): Promise<any>;
+
+            function create_slideshow(options?: ConfigOptions & { manifest_transformation?: TransformationOptions, manifest_json?: Record<string, any>}, callback?: UploadResponseCallback): Promise<any>;
+
+            /****************************** Structured Metadata API V2 Methods *************************************/
+
+            function update_metadata(metadata: string | object, public_ids: string[], options?:UploadApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+
+            function update_metadata(metadata: string| object, public_ids: string[], callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
         }
 
         /****************************** Search API *************************************/

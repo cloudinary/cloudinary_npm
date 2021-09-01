@@ -1,3 +1,28 @@
+1.26.3 / 2021-08-01
+==================
+
+  * Add update_metada type to upload api (#500)
+  * Return structured metadata in resources APIs (#503)
+
+1.26.2 / 2021-07-04
+==================
+
+  * fixed font_family encoding (#498)
+
+
+1.26.1 / 2021-06-22
+==================
+
+  * updated sent upload params (#497)
+  * Improve the return type of cloudinary.v2.config() in TypeScript (#494)
+
+
+1.26.0 / 2021-06-06
+==================
+
+Add support for oauth authorization (#489)
+
+
 1.25.2 / 2021-05-30
 ==================
 

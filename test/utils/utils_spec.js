@@ -797,6 +797,25 @@ describe("utils", function () {
           expect(["test", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/h_100,${letter}_text:hello,w_100/test`).and.emptyOptions();
         });
       });
+      it("should encode font_family with %20", () => {
+        let url = cloudinary.utils.url("sample",
+          {
+            overlay: {
+              text: "sample text",
+              font_family: "Times New Roman",
+              font_size: "18"
+            }
+          });
+        expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/l_text:Times%20New%20Roman_18:sample%20text/sample`);
+      });
+      it("should encode raw_transformation with %20", () => {
+        const transformation = "l_text:Times New Roman_109_line_spacing_1:Heading,x_197,y_202";
+        let url = cloudinary.utils.url("sample",
+          {
+            raw_transformation: transformation
+          });
+        expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/l_text:Times%20New%20Roman_109_line_spacing_1:Heading,x_197,y_202/sample`);
+      });
     });
     describe("streaming_profile", function () {
       it('should support streaming_profile in options', function () {
@@ -1248,6 +1267,22 @@ describe("utils", function () {
             .and
             .emptyOptions();
         });
+      });
+      it('should support text layer style identifier variables', function () {
+        const options = {
+          transformation: [
+            {
+              variables: [["$style", "!Arial_12!"]]
+            }, {
+              overlay: {
+                text: "hello-world",
+                text_style: "$style"
+              }
+            }
+          ]
+        }
+        const url = cloudinary.utils.url("sample", options);
+        expect(url).to.eql(`http://res.cloudinary.com/${cloud_name}/image/upload/$style_!Arial_12!/l_text:$style:hello-world/sample`);
       });
     });
   });

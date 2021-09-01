@@ -69,6 +69,8 @@ const EXPLICIT_TRANSFORMATION2 = {
   overlay: `text:Arial_60:${TEST_TAG}`
 };
 
+const METADATA_EXTERNAL_ID = "metadata_external_id_" + TEST_TAG;
+const METADATA_DEFAULT_VALUE = "metadata_default_value_" + TEST_TAG;
 
 
 function getAllTags({ resources }) {
@@ -87,6 +89,12 @@ describe("api", function () {
   before(function () {
     this.timeout(TIMEOUT.LONG);
     return Q.allSettled([
+      cloudinary.v2.api.add_metadata_field({
+        external_id: METADATA_EXTERNAL_ID,
+        label: METADATA_EXTERNAL_ID,
+        type: 'string',
+        default_value: METADATA_DEFAULT_VALUE
+      }),
       uploadImage({
         public_id: PUBLIC_ID,
         tags: UPLOAD_TAGS,
@@ -123,6 +131,7 @@ describe("api", function () {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
     return Q.allSettled([
+      cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID),
       cloudinary.v2.api.delete_resources_by_tag(TEST_TAG),
       cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1),
       cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2),
@@ -155,6 +164,76 @@ describe("api", function () {
         let resource = findByAttr(result.resources, "public_id", publicId);
         expect(resource).not.to.eql(void 0);
         expect(resource.type).to.eql("upload");
+      });
+    });
+    it("should allow listing resources with metadata", async function () {
+      this.timeout(TIMEOUT.MEDIUM);
+      let result = await cloudinary.v2.api.resources({
+        type: "upload",
+        prefix: PUBLIC_ID,
+        metadata: true
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.have.property('metadata');
+      });
+      result = await cloudinary.v2.api.resources({
+        type: "upload",
+        prefix: PUBLIC_ID,
+        metadata: false
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.not.have.property('metadata');
+      });
+    });
+    it("should allow listing resources by tag with metadata", async function () {
+      this.timeout(TIMEOUT.MEDIUM);
+      let result = await cloudinary.v2.api.resources_by_tag(TEST_TAG, {
+        metadata: true
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.have.property('metadata');
+      });
+      result = await cloudinary.v2.api.resources_by_tag(TEST_TAG, {
+        metadata: false
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.not.have.property('metadata');
+      });
+    });
+    it("should allow listing resources by context with metadata", async function () {
+      this.timeout(TIMEOUT.MEDIUM);
+      let result = await cloudinary.v2.api.resources_by_context(contextKey, null, {
+        metadata: true
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.have.property('metadata');
+      });
+      result = await cloudinary.v2.api.resources_by_context(contextKey, null, {
+        metadata: false
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.not.have.property('metadata');
+      });
+    });
+    it("should allow listing resources by moderation with metadata", async function () {
+      this.timeout(TIMEOUT.MEDIUM);
+      const moderation = "manual";
+      const status = "pending";
+      await uploadImage({
+        moderation,
+        tags: [TEST_TAG]
+      });
+      let result = await cloudinary.v2.api.resources_by_moderation(moderation, status, {
+        metadata: true
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.have.property('metadata');
+      });
+      result = await cloudinary.v2.api.resources_by_moderation(moderation, status, {
+        metadata: false
+      });
+      result.resources.forEach((resource) => {
+        expect(resource).to.not.have.property('metadata');
       });
     });
     it("should allow listing resources by type", function () {
