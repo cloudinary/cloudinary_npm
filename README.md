@@ -211,7 +211,7 @@ cloudinary.image("sample", {format: "png", width: 100, height: 100, crop: "fill"
 ### Samples
 
 You can find our simple and ready-to-use samples projects, along with documentation in the [samples folder](https://github.com/cloudinary/cloudinary_npm/tree/master/samples).
-Please consult with the [README file](https://github.com/cloudinary/cloudinary_npm/blob/master/samples/README.md), for usage and explanations.
+Please consult with the [README file](https://github.com/cloudinary/cloudinary_npm/blob/master/samples/readme.md), for usage and explanations.
 
 
 ## Additional resources ##########################################################
