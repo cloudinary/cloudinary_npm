@@ -41,6 +41,9 @@ const {
   UPLOAD_TAGS
 } = TAGS;
 
+const SAMPLE_IMAGE_URL_1 = "https://res.cloudinary.com/demo/image/upload/sample"
+const SAMPLE_IMAGE_URL_2 = "https://res.cloudinary.com/demo/image/upload/car"
+
 require('jsdom-global')();
 
 describe("uploader", function () {
@@ -1295,6 +1298,95 @@ describe("uploader", function () {
       expect(explicitResult).not.to.be.empty();
       expect(explicitResult.cinemagraph_analysis).to.be.an("object");
       expect(explicitResult.cinemagraph_analysis).to.have.property("cinemagraph_score");
+    });
+  });
+  describe("sprite", function () {
+    const SPRITE_TEST_TAG = `SPRITE_TEST_TAG${TEST_TAG}`
+
+    let uploaded_url_1, uploaded_url_2;
+
+    before(async function () {
+      // Upload images to be used by sprite and multi
+      const uploads = await Promise.all([
+        uploadImage({tags: [SPRITE_TEST_TAG, ...UPLOAD_TAGS]}),
+        uploadImage({tags: [SPRITE_TEST_TAG, ...UPLOAD_TAGS]})
+      ]);
+      uploaded_url_1 = uploads[0].url;
+      uploaded_url_2 = uploads[1].url;
+    });
+
+    it("should generate a sprite by tag", async function () {
+      const result = await UPLOADER_V2.generate_sprite(SPRITE_TEST_TAG);
+      expect(result).to.beASprite();
+      expect(Object.entries(result.image_infos).length).to.eql(2);
+    });
+    it("should generate a sprite by tag with raw transformation", async function () {
+      const result = await UPLOADER_V2.generate_sprite(SPRITE_TEST_TAG, {
+        transformation: {raw_transformation: 'w_100'}
+      });
+      expect(result).to.beASprite();
+      expect(result.css_url).to.contain('w_100');
+    });
+    it("should generate a sprite by tag with transformation params", async function () {
+      const result = await UPLOADER_V2.generate_sprite(SPRITE_TEST_TAG, {width: 100, format: 'jpg'});
+      expect(result).to.beASprite('jpg');
+      expect(result.css_url).to.contain('f_jpg,w_100');
+    });
+    it("should generate a sprite by URLs array", async function () {
+      const result = await UPLOADER_V2.generate_sprite({'urls': [uploaded_url_1, uploaded_url_2]});
+      expect(result).to.beASprite();
+      expect(Object.entries(result.image_infos).length).to.eql(2);
+    });
+    it("should generate an url to download a sprite by URLs array", function () {
+      const url = UPLOADER_V2.download_generated_sprite({'urls': [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2]});
+      expect(url).to.beASignedDownloadUrl("image/sprite", { urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2] });
+    });
+    it("should generate an url to download a sprite by tag", async function () {
+      const url = UPLOADER_V2.download_generated_sprite(SPRITE_TEST_TAG);
+      expect(url).to.beASignedDownloadUrl("image/sprite", { tag: SPRITE_TEST_TAG });
+    });
+  })
+  describe("multi", function () {
+    const MULTI_TEST_TAG = `MULTI_TEST_TAG${TEST_TAG}`
+
+    let uploaded_url_1, uploaded_url_2;
+
+    before(async function () {
+      // Upload images to be used by sprite and multi
+      const uploads = await Promise.all([
+        uploadImage({tags: [MULTI_TEST_TAG, ...UPLOAD_TAGS]}),
+        uploadImage({tags: [MULTI_TEST_TAG, ...UPLOAD_TAGS]})
+      ]);
+      uploaded_url_1 = uploads[0].url;
+      uploaded_url_2 = uploads[1].url;
+    });
+
+    it("should create a pdf by tag", async function () {
+      const result = await UPLOADER_V2.multi(MULTI_TEST_TAG, {format: "pdf"});
+      expect(result).to.beAMulti();
+      expect(result.url).to.match(new RegExp(`\.pdf$`));
+    });
+    it("should create a gif with a transformation by tag", async function () {
+      const options = { width: 0.5, crop: "crop" };
+      const transformation = cloudinary.utils.generate_transformation_string(Object.assign({}, options));
+      const result = await UPLOADER_V2.multi(MULTI_TEST_TAG, {transformation: options });
+      expect(result).to.beAMulti();
+      expect(result.url).to.match(new RegExp(`/image/multi/${transformation}/.*\.gif$`));
+    });
+    it("should generate a gif with a transformation by URLs array", async function () {
+      const options = { width: 0.5, crop: "crop" };
+      const transformation = cloudinary.utils.generate_transformation_string(Object.assign({}, options));
+      const result = await UPLOADER_V2.multi({ urls: [uploaded_url_1, uploaded_url_2], transformation: options});
+      expect(result).to.beAMulti();
+      expect(result.url).to.match(new RegExp(`/image/multi/${transformation}/.*\.gif$`));
+    });
+    it("should generate a download URL for a gif by URLs array", function () {
+      const url = UPLOADER_V2.download_multi({ urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2]});
+      expect(url).to.beASignedDownloadUrl("image/multi", { urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2] });
+    });
+    it("should generate a download URL for a gif by tag", function () {
+      const url = UPLOADER_V2.download_multi(MULTI_TEST_TAG);
+      expect(url).to.beASignedDownloadUrl("image/multi", { tag: MULTI_TEST_TAG });
     });
   });
 });
