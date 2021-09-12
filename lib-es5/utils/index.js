@@ -1125,7 +1125,7 @@ function webhook_signature(data, timestamp) {
  * Verifies the authenticity of a notification signature
  *
  * @param {string} body JSON of the request's body
- * @param {number} timestamp Unix timestamp. Can be retrieved from the X-Cld-Timestamp header
+ * @param {number} timestamp Unix timestamp in seconds. Can be retrieved from the X-Cld-Timestamp header
  * @param {string} signature Actual signature. Can be retrieved from the X-Cld-Signature header
  * @param {number} [valid_for=7200] The desired time in seconds for considering the request valid
  *
@@ -1135,7 +1135,7 @@ function verifyNotificationSignature(body, timestamp, signature) {
   var valid_for = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 7200;
 
   // verify that signature is valid for the given timestamp
-  if (timestamp < Date.now() - valid_for) {
+  if (timestamp < Math.round(Date.now() / 1000) - valid_for) {
     return false;
   }
   var payload_hash = utils.webhook_signature(body, timestamp, {

@@ -1459,8 +1459,8 @@ describe("utils", function () {
         'width': 100,
         'height': 100
       };
-      valid_response_timestamp = Date.now() - 5000;
-      invalid_response_timestamp = Date.now() - 50 * 1000;
+      valid_response_timestamp = (Date.now()/1000) - 5000;
+      invalid_response_timestamp = (Date.now()/1000) - 10000;
       response_json = JSON.stringify(expected_parameters);
       unexpected_response_json = JSON.stringify(unexpected_parameters);
     });
