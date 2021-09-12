@@ -1,3 +1,14 @@
+1.27.0 / 2021-09-12
+==================
+
+* Fix: `verifyNotificationSignature` timestamps are in seconds (#515)
+ * Allow multi and sprite with urls, add download_generated_sprite and download_multi methods (#493)
+ * Prevent preview:duration from being normalized (#513)
+ * Prevent duplicate search fields in search api (#510)
+ * Add support for create_slideshow Upload API (#508)
+ * Add support for variables in text style (#507)
+
+
 1.26.3 / 2021-08-01
 ==================
 
