@@ -27,6 +27,32 @@ exports.ICON_FILE = "test/.resources/favicon.ico";
 exports.VIDEO_URL = "http://res.cloudinary.com/demo/video/upload/dog.mp4";
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
+exports.ADDON_ALL = 'all'; // Test all addons.
+exports.ADDON_ASPOSE = 'aspose'; // Aspose document conversion.
+exports.ADDON_AZURE = 'azure'; // Microsoft azure video indexer.
+exports.ADDON_BG_REMOVAL = 'bgremoval'; // Cloudinary AI background removal.
+exports.ADDON_FACIAL_ATTRIBUTES_DETECTION = 'facialattributesdetection'; // Advanced facial attributes detection.
+exports.ADDON_GOOGLE = 'google'; /* Google AI video moderation, google AI
+                                    video transcription, google auto tagging,
+                                    google automatic video tagging,
+                                    google translation.
+                                  */
+exports.ADDON_IMAGGA = 'imagga'; // Imagga auto tagging, crop and scale.
+exports.ADDON_JPEGMINI = 'jpegmini'; // JPEGmini image optimization.
+exports.ADDON_LIGHTROOM = 'lightroom'; // Adobe photoshop lightroom (BETA).
+exports.ADDON_METADEFENDER = 'metadefender'; // MetaDefender anti-malware protection.
+exports.ADDON_NEURAL_ARTWORK = 'neuralartwork'; // Neural artwork style transfer.
+exports.ADDON_OBJECT_AWARE_CROPPING = 'objectawarecropping'; // Cloudinary object-aware cropping.
+exports.ADDON_OCR = 'ocr'; // OCR text detection and extraction.
+exports.ADDON_PIXELZ = 'pixelz'; // Remove the background.
+exports.ADDON_REKOGNITION = 'rekognition'; /* Amazon rekognition AI moderation,
+                                              amazon rekognition auto tagging,
+                                              amazon rekognition celebrity detection.
+                                            */
+exports.ADDON_URL2PNG = 'url2png'; // URL2PNG website screenshots.
+exports.ADDON_VIESUS = 'viesus'; // VIESUS automatic image enhancement.
+exports.ADDON_WEBPURIFY = 'webpurify'; // WebPurify image moderation.
+
 const { TEST_TAG } = require('./testUtils/testConstants').TAGS;
 
 exports.SAMPLE_VIDEO_SOURCES = [
@@ -258,5 +284,19 @@ exports.toISO8601DateOnly = function (timestamp) {
   const date = new Date(timestamp);
   return date.toISOString().split('T')[0];
 };
+
+/**
+ * Checks if tests for an addon should be executed.
+ *
+ * @param {string} addOn
+ * @returns {boolean}
+ */
+exports.shouldTestAddOn = function (addOn) {
+  const cldTestAddons = (process.env.CLD_TEST_ADDONS || '').toLowerCase();
+  if (cldTestAddons === this.ADDON_ALL) {
+    return true;
+  }
+  return cldTestAddons.trim().split(',').includes(addOn.toLowerCase())
+}
 
 

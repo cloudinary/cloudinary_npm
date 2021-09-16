@@ -18,6 +18,8 @@ const LARGE_VIDEO = helper.LARGE_VIDEO;
 const EMPTY_IMAGE = helper.EMPTY_IMAGE;
 const RAW_FILE = helper.RAW_FILE;
 const uploadImage = helper.uploadImage;
+const shouldTestAddOn = helper.shouldTestAddOn;
+const ADDON_OCR = helper.ADDON_OCR;
 const TEST_ID = Date.now();
 
 const METADATA_FIELD_UNIQUE_EXTERNAL_ID = 'metadata_field_external_id_' + TEST_ID;
@@ -1120,6 +1122,9 @@ describe("uploader", function () {
     const ocrType = "adv_ocr";
 
     it("should support requesting ocr when uploading", async function () {
+      if (!shouldTestAddOn(ADDON_OCR)) {
+        this.skip();
+      }
       // Upload an image and request ocr details in the response
       const result = await UPLOADER_V2.upload(IMAGE_FILE, {ocr: ocrType, tags: [TEST_TAG]});
 
@@ -1133,6 +1138,9 @@ describe("uploader", function () {
     });
 
     it("should support ocr parameter in explicit", async function () {
+      if (!shouldTestAddOn(ADDON_OCR)) {
+        this.skip();
+      }
       // Upload an image
       const uploadResult = await UPLOADER_V2.upload(IMAGE_FILE, {
         tags: [TEST_TAG]
