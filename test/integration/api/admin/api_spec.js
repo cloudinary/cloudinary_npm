@@ -8,6 +8,8 @@ const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const wait = require('../../../testUtils/helpers/wait');
 const uploadImage = helper.uploadImage;
+const shouldTestAddOn = helper.shouldTestAddOn;
+const ADDON_OCR = helper.ADDON_OCR;
 const callReusableTest = require('../../../testUtils/reusableTests/reusableTests').callReusableTest;
 const testConstants = require('../../../testUtils/testConstants');
 const API_V2 = cloudinary.v2.api;
@@ -861,6 +863,9 @@ describe("api", function () {
         })
       });
       it("should support requesting ocr when updating", async function () {
+        if (!shouldTestAddOn(ADDON_OCR)) {
+          this.skip();
+        }
         // Update an image with ocr parameter
         const ocrType = "adv_ocr";
         const updateResult = await API_V2.update(PUBLIC_ID_OCR_1, { ocr: ocrType });
@@ -872,6 +877,9 @@ describe("api", function () {
         expect(updateResult.info.ocr).to.have.property(ocrType);
       });
       it("should return 'Illegal value' errors for unknown ocr types", function () {
+        if (!shouldTestAddOn(ADDON_OCR)) {
+          this.skip();
+        }
         this.timeout(TIMEOUT.MEDIUM);
         return API_V2.update(PUBLIC_ID_OCR_1, {ocr: 'illegal'})
           .then(
