@@ -13,3 +13,9 @@ matrix:
     script: npm run test-with-temp-cloud
   - node_js: "14"
     script: npm run test-with-temp-cloud
+
+
+notifications:
+  email:
+    recipients:
+      - sdk_developers@cloudinary.com
