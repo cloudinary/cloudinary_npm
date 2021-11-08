@@ -15,6 +15,7 @@ var extend = require("lodash/extend");
 var isObject = require("lodash/isObject");
 var isString = require("lodash/isString");
 var isUndefined = require("lodash/isUndefined");
+var isEmpty = require("lodash/isEmpty");
 var entries = require('./utils/entries');
 
 var cloudinary_config = void 0;
@@ -117,12 +118,16 @@ module.exports = function (new_config, new_value) {
 
     var CLOUDINARY_ENV_URL = process.env.CLOUDINARY_URL;
     var CLOUDINARY_ENV_ACCOUNT_URL = process.env.CLOUDINARY_ACCOUNT_URL;
+    var CLOUDINARY_API_PROXY = process.env.CLOUDINARY_API_PROXY;
 
     if (CLOUDINARY_ENV_URL && !CLOUDINARY_ENV_URL.toLowerCase().startsWith('cloudinary://')) {
       throw new Error("Invalid CLOUDINARY_URL protocol. URL should begin with 'cloudinary://'");
     }
     if (CLOUDINARY_ENV_ACCOUNT_URL && !CLOUDINARY_ENV_ACCOUNT_URL.toLowerCase().startsWith('account://')) {
       throw new Error("Invalid CLOUDINARY_ACCOUNT_URL protocol. URL should begin with 'account://'");
+    }
+    if (!isEmpty(CLOUDINARY_API_PROXY)) {
+      extendCloudinaryConfig({ api_proxy: CLOUDINARY_API_PROXY }, cloudinary_config);
     }
 
     [CLOUDINARY_ENV_URL, CLOUDINARY_ENV_ACCOUNT_URL].forEach(function (ENV_URL) {

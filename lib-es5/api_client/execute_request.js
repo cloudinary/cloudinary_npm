@@ -8,9 +8,11 @@ var Q = require('q');
 var url = require('url');
 var utils = require("../utils");
 var ensureOption = require('../utils/ensureOption').defaults(config());
+var ProxyAgent = utils.optionalRequire('proxy-agent');
 
 var extend = utils.extend,
-    includes = utils.includes;
+    includes = utils.includes,
+    isEmpty = utils.isEmpty;
 
 
 function execute_request(method, params, auth, api_url, callback) {
@@ -55,6 +57,18 @@ function execute_request(method, params, auth, api_url, callback) {
 
   if (options.agent != null) {
     request_options.agent = options.agent;
+  }
+
+  var proxy = options.api_proxy || config().api_proxy;
+  if (!isEmpty(proxy)) {
+    if (!request_options.agent) {
+      if (ProxyAgent === null) {
+        throw new Error("Proxy value is set, but `proxy-agent` is not installed, please install `proxy-agent` module.");
+      }
+      request_options.agent = new ProxyAgent(proxy);
+    } else {
+      console.warn("Proxy is set, but request uses a custom agent, proxy is ignored.");
+    }
   }
   if (method !== "GET") {
     request_options.headers['Content-Length'] = Buffer.byteLength(query_params);

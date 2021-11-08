@@ -5,14 +5,18 @@ const cloudinary = require("../../cloudinary");
 describe("config", function () {
   let cloudinaryUrlBackup;
   let accountUrlBackup;
+  let proxyBackup;
+
   before(function () {
     cloudinaryUrlBackup = process.env.CLOUDINARY_URL;
     accountUrlBackup = process.env.CLOUDINARY_ACCOUNT_URL;
+    proxyBackup = process.env.CLOUDINARY_API_PROXY;
   });
 
   after(function () {
     process.env.CLOUDINARY_URL = cloudinaryUrlBackup || '';
     process.env.CLOUDINARY_ACCOUNT_URL = accountUrlBackup || '';
+    process.env.CLOUDINARY_API_PROXY = proxyBackup || '';
     cloudinary.config(true);
   });
 
@@ -79,5 +83,18 @@ describe("config", function () {
   it("should not throw an error when CLOUDINARY_ACCOUNT_URL environment variable is missing", function () {
     delete process.env.CLOUDINARY_ACCOUNT_URL;
     cloudinary.config(true);
+  });
+
+  it("should support CLOUDINARY_API_PROXY environment variable", function () {
+    const proxy = "https://myuser:mypass@example.com"
+    process.env.CLOUDINARY_API_PROXY = proxy;
+    const config = cloudinary.config(true);
+    expect(config.api_proxy).to.eql(proxy)
+  });
+
+  it("should support `api_proxy` config param", function () {
+    const proxy = "https://myuser:mypass@example.com"
+    const config = cloudinary.config({api_proxy: proxy});
+    expect(config.api_proxy).to.eql(proxy)
   });
 });

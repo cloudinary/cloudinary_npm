@@ -327,6 +327,7 @@ declare module 'cloudinary' {
         cloud_name?: string;
         api_key?: string;
         api_secret?: string;
+        api_proxy?: string;
         private_cdn?: boolean;
         secure_distribution?: string;
         force_version?: boolean;

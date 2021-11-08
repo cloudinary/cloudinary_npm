@@ -1,6 +1,8 @@
 const sinon = require('sinon');
 const formatDate = require("date-fns").format;
 const subDate = require("date-fns").sub;
+const https = require('https');
+const ProxyAgent = require('proxy-agent');
 const ClientRequest = require('_http_client').ClientRequest;
 const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
@@ -124,7 +126,7 @@ describe("api", function () {
     ]).finally(function () {});
   });
   after(function () {
-    var config = cloudinary.config();
+    var config = cloudinary.config(true);
     this.timeout(TIMEOUT.LONG);
     if (config.keep_test_products) {
       return Promise.resolve();
@@ -1335,4 +1337,29 @@ describe("api", function () {
       expect(resource.access_mode).to.be('public');
     }));
   });
+  describe("proxy support", function () {
+    const mocked = helper.mockTest();
+    it("should support proxy for api calls", function () {
+      cloudinary.config({api_proxy: "https://myuser:mypass@example.com"});
+      cloudinary.v2.api.resources({});
+      sinon.assert.calledWith(mocked.request, sinon.match(
+        arg => arg.agent instanceof ProxyAgent
+      ));
+    });
+    it("should prioritize custom agent", function () {
+      cloudinary.config({api_proxy: "https://myuser:mypass@example.com"});
+      const custom_agent = https.Agent()
+      cloudinary.v2.api.resources({agent: custom_agent});
+      sinon.assert.calledWith(mocked.request, sinon.match(
+        arg => arg.agent === custom_agent
+      ));
+    });
+    it("should support api_proxy as options key", function () {
+      cloudinary.config({});
+      cloudinary.v2.api.resources({api_proxy: "https://myuser:mypass@example.com"});
+      sinon.assert.calledWith(mocked.request, sinon.match(
+        arg => arg.agent instanceof ProxyAgent
+      ));
+    });
+  })
 });
