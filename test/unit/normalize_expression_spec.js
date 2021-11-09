@@ -1,5 +1,7 @@
 const cloudinary = require("../../cloudinary");
 const createTestConfig = require('../testUtils/createTestConfig');
+const helper = require("../spechelper");
+const { SIMPLE_PARAMS } = require(`../../${helper.libPath}/utils/consts`);
 
 describe("normalize_expression tests", function () {
   beforeEach(function () {
@@ -52,6 +54,33 @@ describe("normalize_expression tests", function () {
     Object.keys(cases).forEach(function (testDescription) {
       const [input, expected] = cases[testDescription];
       expect(cloudinary.utils.normalize_expression(input)).to.equal(expected);
+    });
+  });
+  describe('Normalize only specific parameters', () => {
+    const simpleTransformationParams = SIMPLE_PARAMS.map(param => param[0]);
+    const value = "width * 2";
+    const normalizedValue = "w_mul_2";
+    const normalizedParams = ["angle", "aspect_ratio", "dpr", "effect", "height", "opacity", "quality", "radius",
+      "width", "x", "y", "zoom"];
+    const nonNormalizedParams = simpleTransformationParams.concat('overlay', 'underlay')
+    normalizedParams.forEach((param) => {
+      it(`should normalize value in ${param}`, () => {
+        // c_scale needed to test h_ and w_ parameters that are ignored without crop mode
+        const options = {
+          crop: "scale",
+          [param]: value
+        };
+        const result = cloudinary.utils.generate_transformation_string(options);
+        expect(result).to.contain(normalizedValue);
+        expect(result).to.not.contain(value);
+      });
+    });
+    nonNormalizedParams.forEach((param) => {
+      it(`should not normalize value in ${param}`, () => {
+        const result = cloudinary.utils.generate_transformation_string({[param]: value});
+        expect(result).to.contain(value);
+        expect(result).to.not.contain(normalizedValue);
+      });
     });
   });
 });
