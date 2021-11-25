@@ -11,6 +11,7 @@ v1_adapters(exports, api, {
   resources_by_tag: 1,
   resources_by_context: 2,
   resources_by_moderation: 2,
+  resource_by_asset_id: 1,
   resources_by_ids: 1,
   resource: 1,
   restore: 1,

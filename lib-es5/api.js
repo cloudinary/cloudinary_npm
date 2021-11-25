@@ -15,6 +15,10 @@ function deleteResourcesParams(options) {
   return extend(params, pickOnlyExistingValues(options, "keep_original", "invalidate", "next_cursor", "transformations"));
 }
 
+function getResourceParams(options) {
+  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
+}
+
 exports.ping = function ping(callback) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -93,6 +97,13 @@ exports.resources_by_moderation = function resources_by_moderation(kind, status,
   return call_api("get", uri, pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "direction", "moderations", "metadata"), callback, options);
 };
 
+exports.resource_by_asset_id = function resource_by_asset_id(asset_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var uri = ["resources", asset_id];
+  return call_api("get", uri, getResourceParams(options), callback, options);
+};
+
 exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -117,7 +128,7 @@ exports.resource = function resource(public_id, callback) {
   resource_type = options.resource_type || "image";
   type = options.type || "upload";
   uri = ["resources", resource_type, type, public_id];
-  return call_api("get", uri, pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis"), callback, options);
+  return call_api("get", uri, getResourceParams(options), callback, options);
 };
 
 exports.restore = function restore(public_ids, callback) {
