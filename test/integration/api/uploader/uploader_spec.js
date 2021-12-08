@@ -773,6 +773,28 @@ describe("uploader", function () {
       });
     });
   });
+  describe("folder decoupling", () => {
+    const mocked = helper.mockTest();
+    it('should pass folder decoupling params', () => {
+      const public_id_prefix = "fd_public_id_prefix";
+      const asset_folder = "asset_folder";
+      const display_name = "display_name";
+      const use_filename_as_display_name = true;
+      const folder = "folder/test";
+      UPLOADER_V2.upload(IMAGE_FILE, {
+        public_id_prefix,
+        asset_folder,
+        display_name,
+        use_filename_as_display_name,
+        folder
+      });
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("public_id_prefix", public_id_prefix));
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("asset_folder", asset_folder));
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("display_name", display_name));
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("use_filename_as_display_name", 1));
+      sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("folder", folder));
+    });
+  });
   it("should support unsigned uploading using presets", async function () {
     this.timeout(TIMEOUT.LONG);
 
