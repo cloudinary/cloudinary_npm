@@ -293,6 +293,25 @@ describe("api", function () {
         expect(result.resources).to.have.length(1);
       });
     });
+    it("should allow get resource details by asset id", async () => {
+      const { asset_id } = await uploadImage({tags: TEST_TAG})
+      const resource = await API_V2.resource_by_asset_id(asset_id)
+      expect(resource).not.to.be.empty();
+      expect(resource.asset_id).to.equal(asset_id);
+      expect(resource).not.to.have.property('accessibility_analysis');
+      expect(resource).not.to.have.property('colors');
+      expect(resource).not.to.have.property('exif');
+      expect(resource).not.to.have.property('faces');
+    });
+    it("should allow get resource details by asset id including faces, colors and exif info", async () => {
+      const { asset_id } = await uploadImage({tags: TEST_TAG})
+      const resource = await API_V2.resource_by_asset_id(asset_id, { colors: true, faces: true, exif: true })
+      expect(resource).not.to.be.empty();
+      expect(resource.asset_id).to.equal(asset_id);
+      expect(resource).to.have.property('colors');
+      expect(resource).to.have.property('exif');
+      expect(resource).to.have.property('faces');
+    });
     it("should allow listing resources by public ids", function () {
       this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_ids([PUBLIC_ID, PUBLIC_ID_2], {
