@@ -349,11 +349,13 @@ function build_upload_params(options) {
   var params = {
     access_mode: options.access_mode,
     allowed_formats: options.allowed_formats && toArray(options.allowed_formats).join(","),
+    asset_folder: options.asset_folder,
     async: utils.as_safe_bool(options.async),
     backup: utils.as_safe_bool(options.backup),
     callback: options.callback,
     cinemagraph_analysis: utils.as_safe_bool(options.cinemagraph_analysis),
     colors: utils.as_safe_bool(options.colors),
+    display_name: options.display_name,
     discard_original_filename: utils.as_safe_bool(options.discard_original_filename),
     eager: utils.build_eager(options.eager),
     eager_async: utils.as_safe_bool(options.eager_async),
@@ -372,6 +374,7 @@ function build_upload_params(options) {
     phash: utils.as_safe_bool(options.phash),
     proxy: options.proxy,
     public_id: options.public_id,
+    public_id_prefix: options.public_id_prefix,
     quality_analysis: utils.as_safe_bool(options.quality_analysis),
     responsive_breakpoints: utils.generate_responsive_breakpoints_string(options.responsive_breakpoints),
     return_delete_token: utils.as_safe_bool(options.return_delete_token),
@@ -381,6 +384,7 @@ function build_upload_params(options) {
     unique_filename: utils.as_safe_bool(options.unique_filename),
     upload_preset: options.upload_preset,
     use_filename: utils.as_safe_bool(options.use_filename),
+    use_filename_as_display_name: utils.as_safe_bool(options.use_filename_as_display_name),
     quality_override: options.quality_override,
     accessibility_analysis: utils.as_safe_bool(options.accessibility_analysis)
   };
