@@ -1,3 +1,16 @@
+1.28.0 / 2022-01-02
+==================
+
+New functionality
+-----------------
+  * Add support for folder decoupling (#523)
+  * Add support for `resource_by_asset_id` Admin API (#522)
+  * Add proxy support (#518)
+
+Other changes
+-----------------
+  * Add tests for expression normalization (#521)
+
 1.27.1 / 2021-10-11
 ==================
 
