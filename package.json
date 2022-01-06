@@ -69,7 +69,7 @@
     "docs": "tools/scripts/docs.sh"
   },
   "optionalDependencies": {
-    "proxy-agent": "^4.0.1"
+    "proxy-agent": "^5.0.0"
   },
   "engines": {
     "node": ">=0.6"
