@@ -719,3 +719,21 @@ exports.order_metadata_field_datasource = function order_metadata_field_datasour
   var params = { order_by: sort_by, direction: direction };
   return call_api("post", ["metadata_fields", field_external_id, "datasource", "order"], params, callback, options);
 };
+
+/**
+ * Reorders metadata fields.
+ *
+ * @param {String}   order_by  Criteria for the order (one of the fields 'label', 'external_id', 'created_at').
+ * @param {String}   direction Optional (gets either asc or desc).
+ * @param {Function} callback  Callback function.
+ * @param {Object}   options   Configuration options.
+ *
+ * @return {Object}
+ */
+exports.reorder_metadata_fields = function reorder_metadata_fields(order_by, direction, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  options.content_type = "json";
+  var params = { order_by, direction };
+  return call_api("put", ["metadata_fields", "order"], params, callback, options);
+};

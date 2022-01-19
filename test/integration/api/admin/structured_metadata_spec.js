@@ -423,6 +423,53 @@ describe("structured metadata api", function () {
     });
   });
 
+  describe("reorder_metadata_fields", function () {
+    const pathname = /\/metadata_fields\/order$/
+    const method = /^PUT$/
+
+    it("should reorder the metadata fields for label order by asc", function () {
+      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+        api.reorder_metadata_fields("label", "asc");
+
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(pathname),
+          method: sinon.match(method)
+        }));
+
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher("order_by", "label")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher("direction", "asc")));
+      });
+    });
+
+    it("should reorder the metadata fields for external_id order by desc", function () {
+      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+        api.reorder_metadata_fields("external_id", "desc");
+
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(pathname),
+          method: sinon.match(method)
+        }));
+
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher("order_by", "external_id")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher("direction", "desc")));
+      });
+    });
+
+    it("should reorder the metadata fields for for created_at order by asc", function () {
+      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+        api.reorder_metadata_fields("created_at", "asc");
+
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(pathname),
+          method: sinon.match(method)
+        }));
+
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher("order_by", "created_at")));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher("direction", "asc")));
+      });
+    });
+  });
+
   describe("restore_metadata_field_datasource", function () {
     it("should restore a deleted entry in a metadata field datasource", function () {
       return api.delete_datasource_entries(EXTERNAL_ID_SET_3, [DATASOURCE_ENTRY_EXTERNAL_ID])
