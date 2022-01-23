@@ -273,6 +273,8 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
+    export function config(newConfig: ConfigOptions, newValue: ConfigOptions): ConfigOptions;
+
     export interface ImageTransformationOptions extends CommonTransformationOptions {
         underlay?: string | Object;
         color?: string;
