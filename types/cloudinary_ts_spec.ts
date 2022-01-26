@@ -451,6 +451,26 @@ cloudinary.v2.api.resources_by_context("mycontextkey",
     });
 
 // $ExpectType Promise<ResourceApiResponse>
+cloudinary.v2.api.resources_by_asset_ids(["asset_1", "asset_2"], {
+        context: true,
+        tags: true
+    }, function (error, result) {
+        console.log(result, error);
+    });
+
+// $ExpectType Promise<ResourceApiResponse>
+cloudinary.v2.api.resources_by_asset_ids(["asset_1", "asset_2"], {
+        context: true,
+        tags: true
+    });
+
+// $ExpectType Promise<ResourceApiResponse>
+cloudinary.v2.api.resources_by_asset_ids(["asset_1", "asset_2"],
+    function (error, result) {
+        console.log(result, error);
+    });
+
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_ids(["user_photo_1", "user_photo_2"],
     function (error, result) {
         console.log(result, error);

@@ -312,6 +312,17 @@ describe("api", function () {
       expect(resource).to.have.property('exif');
       expect(resource).to.have.property('faces');
     });
+    it('should allow listing resources by asset ids', async () => {
+      this.timeout(TIMEOUT.MEDIUM);
+      const uploads = await Promise.all([uploadImage({tags: TEST_TAG}), uploadImage({tags: TEST_TAG})]);
+      const assetIds = uploads.map(item => item.asset_id);
+      const publicIds = uploads.map(item => item.public_id);
+      const { resources } = await API_V2.resources_by_asset_ids(assetIds);
+      expect(resources).not.to.be.empty();
+      expect(resources.length).to.eql(2);
+      expect(publicIds).to.contain(resources[0].public_id);
+      expect(publicIds).to.contain(resources[1].public_id);
+    });
     it("should allow listing resources by public ids", function () {
       this.timeout(TIMEOUT.MEDIUM);
       return cloudinary.v2.api.resources_by_ids([PUBLIC_ID, PUBLIC_ID_2], {

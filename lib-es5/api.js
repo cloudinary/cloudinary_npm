@@ -104,6 +104,17 @@ exports.resource_by_asset_id = function resource_by_asset_id(asset_id, callback)
   return call_api("get", uri, getResourceParams(options), callback, options);
 };
 
+exports.resources_by_asset_ids = function resources_by_asset_ids(asset_ids, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = void 0,
+      uri = void 0;
+  uri = ["resources", "by_asset_ids"];
+  params = pickOnlyExistingValues(options, "tags", "context", "moderations");
+  params["asset_ids[]"] = asset_ids;
+  return call_api("get", uri, params, callback, options);
+};
+
 exports.resources_by_ids = function resources_by_ids(public_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
