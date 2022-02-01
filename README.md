@@ -32,7 +32,7 @@ For the complete documentation, see the [Node SDK Guide](https://cloudinary.com/
 ## Version Support
 | SDK Version   | node 6-14 |
 |---------------|-----------|
-| 1.28.1 & up    | X        |
+| 1.28.1 & up   | V         |
 
 
 ## Installation
