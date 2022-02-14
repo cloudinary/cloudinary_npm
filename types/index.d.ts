@@ -831,6 +831,10 @@ declare module 'cloudinary' {
 
             function resources_by_context(key: string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
+            function resources_by_asset_ids(asset_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
+            function resources_by_asset_ids(asset_ids: string[] | string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
             function resources_by_ids(public_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
             function resources_by_ids(public_ids: string[] | string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
