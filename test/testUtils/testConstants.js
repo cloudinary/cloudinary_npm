@@ -31,6 +31,10 @@ module.exports = {
     LONG: 50000,
     LARGE: 70000
   },
+  RETRY: {
+    LIMIT: 3,
+    DELAY: 1000
+  },
   UNIQUE_JOB_SUFFIX_ID,
   PUBLIC_IDS: {
     PUBLIC_ID,
