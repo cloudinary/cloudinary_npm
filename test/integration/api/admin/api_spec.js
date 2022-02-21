@@ -898,10 +898,13 @@ describe("api", function () {
     });
     describe(":ocr", function () {
       before(async function () {
-        await uploadImage({
-          public_id: PUBLIC_ID_OCR_1,
-          tags: [TEST_TAG]
-        })
+        this.timeout(TIMEOUT.MEDIUM);
+        await retry(async function() {
+          await uploadImage({
+            public_id: PUBLIC_ID_OCR_1,
+            tags: [TEST_TAG]
+          });
+        });
       });
       it("should support requesting ocr when updating", async function () {
         if (!shouldTestAddOn(ADDON_OCR)) {
