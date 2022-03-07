@@ -7,7 +7,7 @@ Effortlessly optimize, transform, upload and manage your cloud's assets.
 
 #### Note
 This Readme provides basic installation and usage information. 
-For the complete documentation, see the [Node SDK Guide](https://cloudinary.com/documentation/node_integrations).
+For the complete documentation, see the [Node SDK Guide](https://cloudinary.com/documentation/node_integration).
 
 ## Table of Contents
 - [Key Features](#key-features)
