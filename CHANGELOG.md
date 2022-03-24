@@ -1,3 +1,21 @@
+1.29.0 / 2022-03-24
+==================
+
+New functionality
+-----------------
+* Add support for `resources_by_asset_ids` Admin API (#529)
+* Add support for `reorder_metadata_fields` Admin API (#526)
+
+Other changes
+-----------------
+  * bump bson version (#541)
+  * bumbed ejs version in photo_album (#540)
+  * Add Travis configuration for node 16 (#535)
+  * Stabilize OCR tests (#533)
+  * update README (#528)
+  * Stabilize metadata tests (#530)
+ 
+
 1.28.1 / 2022-01-06
 ==================
 
