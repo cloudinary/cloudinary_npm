@@ -861,7 +861,7 @@ declare module 'cloudinary' {
 
             function sub_folders(root_folder: string, callback?: ResponseCallback): Promise<any>;
 
-            function tags(callback?: ResponseCallback, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, prefix?: string }): Promise<any>;
+            function tags(options?: AdminApiOptions | { max_results?: number, next_cursor?: string, prefix?: string }, callback?: ResponseCallback): Promise<any>;
 
             function transformation(transformation: TransformationOptions, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, named?: boolean }, callback?: ResponseCallback): Promise<any>;
 
