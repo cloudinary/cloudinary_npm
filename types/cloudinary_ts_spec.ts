@@ -940,6 +940,9 @@ cloudinary.v2.provisioning.account.users(
     ['str'],
     'str',
     'str',
+    true,
+    'str',
+    'str',
     {},
     (res) => {
 

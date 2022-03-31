@@ -1,5 +1,6 @@
 const cloudinary = require("../../../../cloudinary");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
+const helper = require("../../../spechelper");
 let runOnlyForInternalPRs = process.env.TRAVIS_SECURE_ENV_VARS ? describe : describe.skip;
 
 
@@ -196,6 +197,17 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
 
   it('Gets users by sub_account_id', async () => {
     const result = await cloudinary.provisioning.account.users(true, null, USER_NAME_2, CLOUD_ID);
+    expect(result.users.length).to.eql(1);
+  });
+
+  it('Gets users by last_login', async () => {
+    const from = helper.toISO8601DateOnly(new Date());
+    const to = helper.toISO8601DateOnly(new Date());
+
+    let result = await cloudinary.provisioning.account.users(true, null, USER_NAME_2, CLOUD_ID, true, from, to);
+    expect(result.users.length).to.eql(0);
+
+    result = await cloudinary.provisioning.account.users(true, null, USER_NAME_2, CLOUD_ID, false, from, to);
     expect(result.users.length).to.eql(1);
   });
 

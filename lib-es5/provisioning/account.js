@@ -143,21 +143,27 @@ function user(user_id) {
  * @param [prefix] {string} - Returns users where the name or email address begins with the specified case-insensitive
  *                            string.
  * @param [sub_account_id[ {string} - Only returns users who have access to the specified account.
+ * @param [last_login] {boolean} - Return only users that last logged in in the specified range of dates (true), users that didn’t last logged in in that range (false), or all users (null).
+ * @param [from] {string} - Last login start date.
+ * @param [to] {string} - Last login end date.
  * @param [options] {object} - See {@link https://cloudinary.com/documentation/cloudinary_sdks#configuration_parameters|Configuration parameters} in the SDK documentation.
  * @param [callback] {function}
  */
-function users(pending, user_ids, prefix, sub_account_id) {
-  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
-  var callback = arguments[5];
+function users(pending, user_ids, prefix, sub_account_id, last_login, from, to) {
+  var options = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : {};
+  var callback = arguments[8];
 
   var uri = ['users'];
   var params = {
     ids: user_ids,
     pending,
     prefix,
-    sub_account_id
+    sub_account_id,
+    last_login,
+    from,
+    to
   };
-  return call_account_api('GET', uri, pickOnlyExistingValues(params, "ids", "pending", "prefix", "sub_account_id"), callback, options);
+  return call_account_api('GET', uri, pickOnlyExistingValues(params, "ids", "pending", "prefix", "sub_account_id", "last_login", "from", "to"), callback, options);
 }
 
 /**
