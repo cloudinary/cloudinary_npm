@@ -602,6 +602,10 @@ describe("api", function () {
         expect(result.rate_limit_reset_at).to.be.an("object");
         expect(result.rate_limit_reset_at).to.have.property("getDate");
         expect(result.rate_limit_remaining).to.be.a("number");
+
+        expect(result.rate_limit_allowed).to.be.above(0);
+        expect(result.rate_limit_remaining).to.be.above(0);
+        expect(result.rate_limit_reset_at).to.be.above(0);
       });
     });
   });
