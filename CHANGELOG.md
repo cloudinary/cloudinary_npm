@@ -1,3 +1,10 @@
+1.29.1 / 2022-04-17
+==================
+
+  * Fix support of the lowercase response headers (#545)
+  * Fix tags function type definition (#544)
+
+
 1.29.0 / 2022-03-24
 ==================
 
