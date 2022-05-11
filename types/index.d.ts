@@ -492,6 +492,7 @@ declare module 'cloudinary' {
         eval?: string;
         exif?: boolean;
         faces?: boolean;
+        filename_override?: string;
         folder?: string;
         format?: VideoFormat | ImageFormat;
         image_metadata?: boolean;
