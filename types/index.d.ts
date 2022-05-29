@@ -591,7 +591,7 @@ declare module 'cloudinary' {
         access_control: Array<string>;
         context: object;
         metadata: object;
-        colors?: [`#${string}`, number][];
+        colors?: [string, number][];
 
         [futureKey: string]: any;
     }
