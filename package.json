@@ -13,7 +13,7 @@
   "dependencies": {
     "cloudinary-core": "^2.10.2",
     "core-js": "3.6.5",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "q": "^1.5.1"
   },
   "devDependencies": {
