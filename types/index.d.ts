@@ -669,7 +669,7 @@ declare module 'cloudinary' {
                 image_metadata: object;
                 faces: number[][];
                 quality_analysis: number;
-                colors: [`#${string}`, number][];
+                colors: [string, number][];
                 derived: Array<string>;
                 moderation: object;
                 phash: string;
