@@ -1,3 +1,10 @@
+1.30.1 / 2022-07-21
+==================
+
+* Bump lodash version to 4.17.21 (#551)
+* Add types for verifyNotificationSignature (#555)
+
+
 1.30.0 / 2022-05-15
 ==================
 
