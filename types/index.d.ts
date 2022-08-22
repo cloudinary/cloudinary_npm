@@ -731,6 +731,8 @@ declare module 'cloudinary' {
 
             function download_zip_url(options?: ArchiveApiOptions | ConfigAndUrlOptions): string;
 
+            function download_backedup_asset(asset_id?: string, version_id?: string, options?: ArchiveApiOptions | ConfigAndUrlOptions) : string
+
             function generate_auth_token(options?: AuthTokenApiOptions): string;
 
             function webhook_signature(data?: string, timestamp?: number, options?: ConfigOptions): string;
