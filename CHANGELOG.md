@@ -1,3 +1,10 @@
+1.31.0 / 2022-08-28
+==================
+
+  * Update core-js package (#558)
+  * Add download_backedup_asset typings (#557)
+
+
 1.30.1 / 2022-07-21
 ==================
 
