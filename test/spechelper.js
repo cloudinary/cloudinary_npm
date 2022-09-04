@@ -52,6 +52,7 @@ exports.ADDON_REKOGNITION = 'rekognition'; /* Amazon rekognition AI moderation,
 exports.ADDON_URL2PNG = 'url2png'; // URL2PNG website screenshots.
 exports.ADDON_VIESUS = 'viesus'; // VIESUS automatic image enhancement.
 exports.ADDON_WEBPURIFY = 'webpurify'; // WebPurify image moderation.
+exports.DYNAMIC_FOLDERS = 'dynamic_folders'
 
 const { TEST_TAG } = require('./testUtils/testConstants').TAGS;
 
@@ -297,6 +298,17 @@ exports.shouldTestAddOn = function (addOn) {
     return true;
   }
   return cldTestAddons.trim().split(',').includes(addOn.toLowerCase())
+}
+
+/**
+ * Should a certain feature be tested?
+ *
+ * @param {string} feature The feature to test.
+ *
+ * @return boolean
+ */
+exports.shouldTestFeature = function(feature){
+  return feature === 'ALL';
 }
 
 

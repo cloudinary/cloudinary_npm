@@ -30,6 +30,7 @@ const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahe
 const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const testConstants = require('../../../testUtils/testConstants');
+const {shouldTestFeature, DYNAMIC_FOLDERS} = require("../../../spechelper");
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
@@ -773,9 +774,9 @@ describe("uploader", function () {
       });
     });
   });
-  describe("folder decoupling", () => {
+  describe("dynamic folders", () => {
     const mocked = helper.mockTest();
-    it('should pass folder decoupling params', () => {
+    it('should pass dynamic folder params', () => {
       const public_id_prefix = "fd_public_id_prefix";
       const asset_folder = "asset_folder";
       const display_name = "display_name";
@@ -793,6 +794,47 @@ describe("uploader", function () {
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("display_name", display_name));
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("use_filename_as_display_name", 1));
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("folder", folder));
+    });
+
+    it('should not contain asset_folder in public_id', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+
+      const asset_folder = "asset_folder";
+      return UPLOADER_V2.upload(IMAGE_FILE, {
+        asset_folder
+      }).then((result) => {
+        expect(result.public_id).to.not.contain('asset_folder')
+      });
+    });
+
+    it('should not contain asset_folder in public_id when use_asset_folder_as_public_id_prefix is false', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+
+      const asset_folder = "asset_folder";
+      return UPLOADER_V2.upload(IMAGE_FILE, {
+        asset_folder,
+        use_asset_folder_as_public_id_prefix: false
+      }).then((result) => {
+        expect(result.public_id).to.not.contain('asset_folder')
+      });
+    });
+
+    it('should contain asset_folder in public_id when use_asset_folder_as_public_id_prefix is true', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+
+      const asset_folder = "asset_folder";
+      return UPLOADER_V2.upload(IMAGE_FILE, {
+        asset_folder,
+        use_asset_folder_as_public_id_prefix: true
+      }).then((result) => {
+        expect(result.public_id).to.contain('asset_folder')
+      });
     });
   });
   it("should support unsigned uploading using presets", async function () {

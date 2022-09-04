@@ -104,6 +104,17 @@ exports.resource_by_asset_id = function resource_by_asset_id(asset_id, callback)
   return call_api("get", uri, getResourceParams(options), callback, options);
 };
 
+exports.resources_by_asset_folder = function resources_by_asset_folder(asset_folder, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var params = void 0,
+      uri = void 0;
+  uri = ["resources", 'by_asset_folder'];
+  params = pickOnlyExistingValues(options, "next_cursor", "max_results", "tags", "context", "moderations");
+  params.asset_folder = asset_folder;
+  return call_api("get", uri, params, callback, options);
+};
+
 exports.resources_by_asset_ids = function resources_by_asset_ids(asset_ids, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 

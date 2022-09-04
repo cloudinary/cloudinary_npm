@@ -386,7 +386,8 @@ function build_upload_params(options) {
     use_filename: utils.as_safe_bool(options.use_filename),
     use_filename_as_display_name: utils.as_safe_bool(options.use_filename_as_display_name),
     quality_override: options.quality_override,
-    accessibility_analysis: utils.as_safe_bool(options.accessibility_analysis)
+    accessibility_analysis: utils.as_safe_bool(options.accessibility_analysis),
+    use_asset_folder_as_public_id_prefix: utils.as_safe_bool(options.use_asset_folder_as_public_id_prefix)
   };
   return utils.updateable_resource_params(options, params);
 }
@@ -725,6 +726,15 @@ function updateable_resource_params(options) {
   }
   if (options.quality_override != null) {
     params.quality_override = options.quality_override;
+  }
+  if (options.asset_folder != null) {
+    params.asset_folder = options.asset_folder;
+  }
+  if (options.display_name != null) {
+    params.display_name = options.display_name;
+  }
+  if (options.unique_display_name != null) {
+    params.unique_display_name = options.unique_display_name;
   }
   return params;
 }
