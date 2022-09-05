@@ -27,7 +27,7 @@ exports.ICON_FILE = "test/.resources/favicon.ico";
 exports.VIDEO_URL = "http://res.cloudinary.com/demo/video/upload/dog.mp4";
 exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
 
-exports.ADDON_ALL = 'all'; // Test all addons.
+const ADDON_ALL = 'all'; // Test all addons.
 exports.ADDON_ASPOSE = 'aspose'; // Aspose document conversion.
 exports.ADDON_AZURE = 'azure'; // Microsoft azure video indexer.
 exports.ADDON_BG_REMOVAL = 'bgremoval'; // Cloudinary AI background removal.
@@ -53,6 +53,8 @@ exports.ADDON_URL2PNG = 'url2png'; // URL2PNG website screenshots.
 exports.ADDON_VIESUS = 'viesus'; // VIESUS automatic image enhancement.
 exports.ADDON_WEBPURIFY = 'webpurify'; // WebPurify image moderation.
 exports.DYNAMIC_FOLDERS = 'dynamic_folders'
+
+const ALL = 'all';
 
 const { TEST_TAG } = require('./testUtils/testConstants').TAGS;
 
@@ -293,8 +295,9 @@ exports.toISO8601DateOnly = function (timestamp) {
  * @returns {boolean}
  */
 exports.shouldTestAddOn = function (addOn) {
+  
   const cldTestAddons = (process.env.CLD_TEST_ADDONS || '').toLowerCase();
-  if (cldTestAddons === this.ADDON_ALL) {
+  if (cldTestAddons === ADDON_ALL) {
     return true;
   }
   return cldTestAddons.trim().split(',').includes(addOn.toLowerCase())
@@ -308,7 +311,11 @@ exports.shouldTestAddOn = function (addOn) {
  * @return boolean
  */
 exports.shouldTestFeature = function(feature){
-  return feature === 'ALL';
+  const cldTestFeatures = (process.env.CLD_TEST_FEATURES || '').toLowerCase();
+  if (cldTestFeatures === ALL) {
+    return true;
+  }
+  return cldTestFeatures.trim().split(',').includes(feature.toLowerCase())
 }
 
 
