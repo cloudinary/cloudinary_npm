@@ -295,7 +295,6 @@ exports.toISO8601DateOnly = function (timestamp) {
  * @returns {boolean}
  */
 exports.shouldTestAddOn = function (addOn) {
-  
   const cldTestAddons = (process.env.CLD_TEST_ADDONS || '').toLowerCase();
   if (cldTestAddons === ADDON_ALL) {
     return true;
