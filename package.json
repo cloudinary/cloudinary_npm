@@ -68,6 +68,9 @@
     "test-es5": "tools/scripts/test.es5.sh",
     "docs": "tools/scripts/docs.sh"
   },
+  "optionalDependencies": {
+    "proxy-agent": "^5.0.0"
+  },
   "engines": {
     "node": ">=0.6"
   }
