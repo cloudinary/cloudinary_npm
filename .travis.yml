@@ -4,8 +4,7 @@ nvm:
 matrix:
   include:
   - node_js: "6"
-    npm unistall proxy-agent
-    script: npm run test-with-temp-cloud
+    script: npm unistall proxy-agent && npm run test-with-temp-cloud
   - node_js: "8"
     script: npm run test-with-temp-cloud
   - node_js: "10"
