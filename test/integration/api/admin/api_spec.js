@@ -15,7 +15,9 @@ const ADDON_OCR = helper.ADDON_OCR;
 const callReusableTest = require('../../../testUtils/reusableTests/reusableTests').callReusableTest;
 const testConstants = require('../../../testUtils/testConstants');
 const retry = require('../../../testUtils/helpers/retry');
+const {shouldTestFeature} = require("../../../spechelper");
 const API_V2 = cloudinary.v2.api;
+const DYNAMIC_FOLDERS = helper.DYNAMIC_FOLDERS;
 
 const {
   TIMEOUT,
@@ -1120,6 +1122,78 @@ describe("api", function () {
     })
     describe("sub_folders", function () {
       callReusableTest("a list with a cursor", cloudinary.v2.api.sub_folders, '/');
+    });
+  });
+  describe("dynamic folders", () => {
+    it('should create upload_preset when use_asset_folder_as_public_id_prefix is true', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+
+      this.timeout(TIMEOUT.LONG);
+      let preset = await cloudinary.v2.api.create_upload_preset({
+        use_asset_folder_as_public_id_prefix: true
+      })
+      let preset_details = await cloudinary.v2.api.upload_preset(preset.name);
+      expect(preset_details.settings).to.eql({ use_asset_folder_as_public_id_prefix: true })
+    });
+
+    it('should update upload_preset when use_asset_folder_as_public_id_prefix is true', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+      this.timeout(TIMEOUT.LONG);
+      let preset = await cloudinary.v2.api.create_upload_preset();
+      await cloudinary.v2.api.update_upload_preset(preset.name,
+        {
+          use_asset_folder_as_public_id_prefix: true
+        });
+
+      let preset_details = await cloudinary.v2.api.upload_preset(preset.name);
+      expect(preset_details.settings).to.eql({ use_asset_folder_as_public_id_prefix: true })
+    });
+    
+    it('should update asset_folder', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+      const asset_folder = "asset_folder";
+      return uploadImage({
+        asset_folder
+      }).then(result => {
+        return cloudinary.v2.api.update(result.public_id, {
+          asset_folder: 'updated_asset_folder'
+        }).then(res => {
+          expect(res.asset_folder).to.eql('updated_asset_folder')
+        })
+      });
+    });
+
+    it('should update asset_folder with unique_display_name', () => {
+      return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+        uploadImage().then(result => {
+          cloudinary.v2.api.update(result.public_id, {
+            unique_display_name: true
+          })
+          return sinon.assert.calledWith(requestSpy, sinon.match({
+            query: sinon.match(helper.apiParamMatcher("unique_display_name", "true"))
+          }));
+        });
+      });
+    });
+
+    it('should list resources_by_asset_folder', async function () {
+      if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
+        this.skip();
+      }
+
+      const asset_folder = "new_asset_folder";
+      return uploadImage({
+        asset_folder
+      }).then(async () => {
+        const result = await cloudinary.v2.api.resources_by_asset_folder('new_asset_folder')
+        expect(result.total_count).to.eql(1)
+      });
     });
   });
   describe('.restore', function () {

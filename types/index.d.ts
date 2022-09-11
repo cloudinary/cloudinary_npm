@@ -438,6 +438,9 @@ declare module 'cloudinary' {
         moderation_status?: string;
         unsafe_update?: object;
         allowed_for_strict?: boolean;
+        asset_folder?: string;
+        unique_display_name?: boolean;
+        display_name?: string
 
         [futureKey: string]: any;
     }
@@ -515,6 +518,7 @@ declare module 'cloudinary' {
         chunk_size?: number;
         disable_promises?: boolean;
         oauth_token?: string;
+        use_asset_folder_as_public_id_prefix?: boolean;
 
         [futureKey: string]: any;
     }
@@ -843,6 +847,10 @@ declare module 'cloudinary' {
             function resources_by_ids(public_ids: string[] | string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
             function resources_by_ids(public_ids: string[] | string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
+            function resources_by_asset_folder(asset_folder: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
+            function resources_by_asset_folder(asset_folder: string, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
             function resources_by_moderation(moderation: ModerationKind, status: Status, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
