@@ -31,7 +31,7 @@ function setup() {
       fs.writeFileSync(`tools/cloudinary_url.sh`, URL); // This is needed for Travis
       fs.writeFileSync(ENV_FILE_PATH, URL); // This is needed for local develoepr tests
 
-      require('dotenv').load();
+      require('dotenv').config();
 
       cloudinary.config(true);
 

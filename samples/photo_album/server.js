@@ -1,5 +1,5 @@
 // Load environment variables
-require('dotenv').load();
+require('dotenv').config();
 
 var cloudinary = require('cloudinary').v2;
 
