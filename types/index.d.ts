@@ -729,6 +729,8 @@ declare module 'cloudinary' {
 
             function video_url(public_id?: string, options?: VideoTransformationOptions | ConfigAndUrlOptions): string;
 
+            function generate_transformation_string(options: TransformationOptions): string;
+
             function archive_params(options?: ArchiveApiOptions): Promise<any>;
 
             function download_archive_url(options?: ArchiveApiOptions | ConfigAndUrlOptions): string
