@@ -595,6 +595,7 @@ declare module 'cloudinary' {
         access_control: Array<string>;
         context: object;
         metadata: object;
+        colors?: [string, number][];
 
         [futureKey: string]: any;
     }
@@ -672,7 +673,7 @@ declare module 'cloudinary' {
                 image_metadata: object;
                 faces: number[][];
                 quality_analysis: number;
-                colors: string[][];
+                colors: [string, number][];
                 derived: Array<string>;
                 moderation: object;
                 phash: string;
