@@ -16,8 +16,6 @@ const {
   PUBLIC_ID_3
 } = PUBLIC_IDS;
 
-
-
 const {
   UPLOAD_TAGS
 } = TAGS;
