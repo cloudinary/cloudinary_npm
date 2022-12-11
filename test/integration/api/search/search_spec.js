@@ -16,12 +16,14 @@ const {
   PUBLIC_ID_3
 } = PUBLIC_IDS;
 
+
+
 const {
   UPLOAD_TAGS
 } = TAGS;
 
 const SEARCH_TAG = 'npm_advanced_search_' + UNIQUE_JOB_SUFFIX_ID;
-
+const ASSET_IDS = [];
 
 describe("search_api", function () {
   describe("unit", function () {
@@ -110,6 +112,11 @@ describe("search_api", function () {
             context: "stage=validated"
           })
       ]).delay(10000)
+        .then((uploadResults) => {
+          uploadResults.forEach(({ value }) => {
+            ASSET_IDS.push(value.asset_id);
+          });
+        });
     });
 
     after(function () {
@@ -133,6 +140,25 @@ describe("search_api", function () {
           expect(results.resources.length).to.eql(1);
         });
     });
+
+    it(`should allow search by exact asset_id`, function () {
+      const [exampleAssetId] = ASSET_IDS;
+      return cloudinary.v2.search.expression(`asset_id=${exampleAssetId}`)
+        .execute()
+        .then(function (results) {
+          expect(results.resources.length).to.eql(1);
+        });
+    });
+
+    it(`should allow search by tokenized asset_id`, function () {
+      const [exampleAssetId] = ASSET_IDS;
+      return cloudinary.v2.search.expression(`asset_id:${exampleAssetId}`)
+        .execute()
+        .then(function (results) {
+          expect(results.resources.length).to.eql(1);
+        });
+    });
+
     it('should paginate resources limited by tag and orderd by ascing public_id', function () {
       return cloudinary.v2.search.max_results(1).expression(`tags:${SEARCH_TAG}`)
         .sort_by('public_id', 'asc')
