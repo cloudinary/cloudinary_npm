@@ -65,10 +65,10 @@ module.exports = function (options) {
   }
   tokenParts.push(`exp=${options.expiration}`);
   if (options.acl != null) {
+    if (Array.isArray(options.acl) === true) {
+      options.acl = options.acl.join("!");
+    }
     tokenParts.push(`acl=${escapeToLower(options.acl)}`);
-  }
-  if (Array.isArray(options.acl) === true) {
-    options.acl = options.acl.join("!");
   }
   var toSign = [].concat(tokenParts);
   if (options.url != null && options.acl == null) {
