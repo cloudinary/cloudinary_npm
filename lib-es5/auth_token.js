@@ -35,7 +35,7 @@ function escapeToLower(url) {
  * @property {number} start_time=now The start time of the token in seconds from epoch.
  * @property {string} expiration The expiration time of the token in seconds from epoch.
  * @property {string} duration The duration of the token (from start_time).
- * @property {string} acl The ACL for the token.
+ * @property {string|Array.} acl The ACL for the token.
  * @property {string} url The URL to authentication in case of a URL token.
  *
  */
@@ -66,6 +66,9 @@ module.exports = function (options) {
   tokenParts.push(`exp=${options.expiration}`);
   if (options.acl != null) {
     tokenParts.push(`acl=${escapeToLower(options.acl)}`);
+  }
+  if (Array.isArray(options.acl) === true) {
+    options.acl = options.acl.join("!");
   }
   var toSign = [].concat(tokenParts);
   if (options.url != null && options.acl == null) {
