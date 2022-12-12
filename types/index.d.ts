@@ -688,10 +688,7 @@ declare module 'cloudinary' {
         ]
     }
 
-    export interface SignApiOptions {
-        public_id: string;
-        version: number;
-    }
+    export type SignApiOptions = Record<string, any>;
 
     export interface DatasourceEntry {
         external_id?: string;
