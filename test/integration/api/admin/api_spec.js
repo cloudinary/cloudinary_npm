@@ -891,6 +891,17 @@ describe("api", function () {
           }
         });
       });
+      it("should support updating metadata with clear_invalid", function () {
+        this.timeout(TIMEOUT.LONG);
+        return uploadImage({
+        }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
+          clear_invalid: true
+        })).then(function () {
+          if (writeSpy.called) {
+            sinon.assert.calledWith(writeSpy, sinon.match(/clear_invalid=true/));
+          }
+        });
+      });
     });
     describe("quality override", function() {
       const mocked = helper.mockTest();
