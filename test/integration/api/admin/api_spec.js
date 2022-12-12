@@ -891,16 +891,18 @@ describe("api", function () {
           }
         });
       });
-      it("should support updating metadata with clear_invalid", function () {
+      it("should support updating metadata with clear_invalid", () => {
         this.timeout(TIMEOUT.LONG);
-        return uploadImage({
-        }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
-          clear_invalid: true
-        })).then(function () {
-          if (writeSpy.called) {
-            sinon.assert.calledWith(writeSpy, sinon.match(/clear_invalid=true/));
-          }
-        });
+        return uploadImage()
+          .then(upload_result => {
+            return cloudinary.v2.api.update(upload_result.public_id, {
+              clear_invalid: true
+            });
+          }).then(() => {
+            if (writeSpy.called) {
+              sinon.assert.calledWith(writeSpy, sinon.match(/clear_invalid=true/));
+            }
+          });
       });
     });
     describe("quality override", function() {
