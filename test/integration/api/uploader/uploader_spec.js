@@ -1145,6 +1145,17 @@ describe("uploader", function () {
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[1])));
       });
     });
+    it("should support updating metadata with clear_invalid", function () {
+      const metadata_fields = { metadata_color: "red" };
+      const public_ids = ["test_id_1"];
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids, { clear_invalid: true });
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          method: sinon.match("POST")
+        }));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("clear_invalid", true)));
+      });
+    })
   });
   describe("access_control", function () {
     var acl, acl_string, options, requestSpy, writeSpy;
