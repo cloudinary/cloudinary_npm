@@ -66,4 +66,15 @@ describe("AuthToken tests using utils.generate_auth_token", function () {
       });
     }).not.to.throwError();
   });
+
+  it("should support multiple ACLs", function () {
+    let token = utils.generate_auth_token({
+      start_time: 222222222,
+      key: "00112233FF99",
+      duration: 300,
+      acl: ["/*/t_foobar", "t_foobar/*/"]
+    });
+
+    expect(token).to.eql("__cld_token__=st=222222222~exp=222222522~acl=%2f*%2ft_foobar!t_foobar%2f*%2f~hmac=45d51dd32dd26a3c2339155f454076c1d8fbd93c611965461569a0b4279bbdd5");
+  });
 });
