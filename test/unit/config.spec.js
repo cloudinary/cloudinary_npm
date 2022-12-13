@@ -103,7 +103,7 @@ describe("config", function () {
     expect(config.hide_sensitive).to.eql(true)
   });
 
-  it.only("should hide API key and secret upon error when `hide_sensitive` is true", async function () {
+  it("should hide API key and secret upon error when `hide_sensitive` is true", async function () {
     cloudinary.config({hide_sensitive: true});
 
     try {
@@ -114,7 +114,7 @@ describe("config", function () {
     }
   });
 
-  it.only("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
+  it("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
     cloudinary.config({hide_sensitive: true});
 
     try {
