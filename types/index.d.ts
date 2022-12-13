@@ -508,7 +508,7 @@ declare module 'cloudinary' {
         proxy?: string;
         public_id?: string;
         quality_analysis?: boolean;
-        resource_type?: string;
+        resource_type?: "image" | "video" | "raw" | "auto";
         responsive_breakpoints?: Record<any,any>;
         return_delete_token?: boolean
         timestamp?: number;
