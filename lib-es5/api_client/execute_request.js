@@ -74,6 +74,14 @@ function execute_request(method, params, auth, api_url, callback) {
     request_options.headers['Content-Length'] = Buffer.byteLength(query_params);
   }
   handle_response = function handle_response(res) {
+    const {hide_sensitive = false} = config();
+    const sanitized_request_options = {...request_options};
+
+    if (hide_sensitive === true){
+      if ("auth" in sanitized_request_options) { delete sanitized_request_options.auth; }
+      if ("Authorization" in sanitized_request_options.headers) { delete sanitized_request_options.headers.Authorization; }
+    }
+
     if (includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)) {
       var buffer = "";
       var error = false;
@@ -106,8 +114,9 @@ function execute_request(method, params, auth, api_url, callback) {
 
         if (result.error) {
           deferred.reject(Object.assign({
-            request_options,
-            query_params
+            request_options: sanitized_request_options,
+            query_params,
+            hide_sensitive
           }, result));
         } else {
           deferred.resolve(result);
@@ -122,8 +131,9 @@ function execute_request(method, params, auth, api_url, callback) {
           error: {
             message: e,
             http_code: res.statusCode,
-            request_options,
-            query_params
+            request_options: sanitized_request_options,
+            query_params,
+            hide_sensitive
           }
         };
         deferred.reject(err_obj.error);
@@ -136,9 +146,10 @@ function execute_request(method, params, auth, api_url, callback) {
         error: {
           message: "Server returned unexpected status code - " + res.statusCode,
           http_code: res.statusCode,
-          request_options,
-          query_params
-        }
+          request_options: sanitized_request_options,
+          query_params,
+          hide_sensitive
+      }
       };
       deferred.reject(err_obj.error);
       if (typeof callback === "function") {
