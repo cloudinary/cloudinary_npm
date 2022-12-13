@@ -97,4 +97,31 @@ describe("config", function () {
     const config = cloudinary.config({api_proxy: proxy});
     expect(config.api_proxy).to.eql(proxy)
   });
+
+  it("should support `hide_sensitive` config param", function () {
+    const config = cloudinary.config({hide_sensitive: true});
+    expect(config.hide_sensitive).to.eql(true)
+  });
+
+  it.only("should hide API key and secret upon error when `hide_sensitive` is true", async function () {
+    cloudinary.config({hide_sensitive: true});
+
+    try {
+      const result = await cloudinary.v2.api.resource("?");
+      expect(result).fail();
+    } catch (err) {
+      expect(err.request_options).not.to.have.property("auth");
+    }
+  });
+
+  it.only("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
+    cloudinary.config({hide_sensitive: true});
+
+    try {
+      const result = await cloudinary.v2.api.resource("?", { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' });
+      expect(result).fail();
+    } catch (err) {
+      expect(err.request_options.headers).not.to.have.property("Authorization");
+    }
+  });
 });
