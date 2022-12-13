@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 // eslint-disable-next-line import/order
 var config = require("../config");
 var https = /^http:/.test(config().upload_prefix) ? require('http') : require('https');
@@ -74,12 +76,19 @@ function execute_request(method, params, auth, api_url, callback) {
     request_options.headers['Content-Length'] = Buffer.byteLength(query_params);
   }
   handle_response = function handle_response(res) {
-    const {hide_sensitive = false} = config();
-    const sanitized_request_options = {...request_options};
+    var _config = config(),
+        _config$hide_sensitiv = _config.hide_sensitive,
+        hide_sensitive = _config$hide_sensitiv === undefined ? false : _config$hide_sensitiv;
 
-    if (hide_sensitive === true){
-      if ("auth" in sanitized_request_options) { delete sanitized_request_options.auth; }
-      if ("Authorization" in sanitized_request_options.headers) { delete sanitized_request_options.headers.Authorization; }
+    var sanitized_request_options = _extends({}, request_options);
+
+    if (hide_sensitive === true) {
+      if ("auth" in sanitized_request_options) {
+        delete sanitized_request_options.auth;
+      }
+      if ("Authorization" in sanitized_request_options.headers) {
+        delete sanitized_request_options.headers.Authorization;
+      }
     }
 
     if (includes([200, 400, 401, 403, 404, 409, 420, 500], res.statusCode)) {
@@ -149,7 +158,7 @@ function execute_request(method, params, auth, api_url, callback) {
           request_options: sanitized_request_options,
           query_params,
           hide_sensitive
-      }
+        }
       };
       deferred.reject(err_obj.error);
       if (typeof callback === "function") {
