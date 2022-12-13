@@ -110,7 +110,7 @@ describe("config", function () {
       const result = await cloudinary.v2.api.resource("?");
       expect(result).fail();
     } catch (err) {
-      console.log(request_options);
+      console.log(err.request_options);
       expect(err.request_options).not.to.have.property("auth");
     }
   });
@@ -122,7 +122,7 @@ describe("config", function () {
       const result = await cloudinary.v2.api.resource("?", { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' });
       expect(result).fail();
     } catch (err) {
-      console.log(request_options);
+      console.log(err.request_options);
       expect(err.request_options.headers).not.to.have.property("Authorization");
     }
   });
