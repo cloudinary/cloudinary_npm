@@ -12,6 +12,7 @@ const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const cloneDeep = require('lodash/cloneDeep');
 const ProxyAgent = require('proxy-agent');
+const assert = require('assert');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
@@ -278,19 +279,16 @@ describe("uploader", function () {
       tags: UPLOAD_TAGS
     });
   });
-  describe("custom headers", function () {
-    it("should support custom headers in object format e.g. {Link: \"1\"}", function () {
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        headers: {
-          Link: "1"
-        },
-        tags: UPLOAD_TAGS
-      });
-    });
-    it("should support custom headers as array of strings e.g. [\"Link: 1\"]", function () {
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        headers: ["Link: 1"],
-        tags: UPLOAD_TAGS
+  describe("extra headers", function () {
+    it("should support extra headers in object format e.g. {Link: \"1\"}", function () {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        cloudinary.v2.uploader.upload(IMAGE_FILE, {
+          extra_headers: {
+            Link: "1"
+          }
+        });
+        assert.ok(requestSpy.args[0][0].headers.Link);
+        assert.equal(requestSpy.args[0][0].headers.Link, "1");
       });
     });
   });
