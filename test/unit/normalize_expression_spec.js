@@ -4,7 +4,7 @@ const helper = require("../spechelper");
 const {SIMPLE_PARAMS} = require(`../../${helper.libPath}/utils/consts`);
 const {generate_transformation_string} = require("../../lib/utils");
 
-describe.only("normalize_expression tests", function () {
+describe("normalize_expression tests", function () {
   beforeEach(function () {
     cloudinary.config(createTestConfig({
       cloud_name: "test123",
