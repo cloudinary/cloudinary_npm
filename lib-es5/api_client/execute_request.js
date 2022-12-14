@@ -80,14 +80,14 @@ function execute_request(method, params, auth, api_url, callback) {
         _config$hide_sensitiv = _config.hide_sensitive,
         hide_sensitive = _config$hide_sensitiv === undefined ? false : _config$hide_sensitiv;
 
-    var sanitized_request_options = _extends({}, request_options);
+    var sanitizedOptions = _extends({}, request_options);
 
     if (hide_sensitive === true) {
-      if ("auth" in sanitized_request_options) {
-        delete sanitized_request_options.auth;
+      if ("auth" in sanitizedOptions) {
+        delete sanitizedOptions.auth;
       }
-      if ("Authorization" in sanitized_request_options.headers) {
-        delete sanitized_request_options.headers.Authorization;
+      if ("Authorization" in sanitizedOptions.headers) {
+        delete sanitizedOptions.headers.Authorization;
       }
     }
 
@@ -123,9 +123,8 @@ function execute_request(method, params, auth, api_url, callback) {
 
         if (result.error) {
           deferred.reject(Object.assign({
-            request_options: sanitized_request_options,
-            query_params,
-            hide_sensitive
+            request_options: sanitizedOptions,
+            query_params
           }, result));
         } else {
           deferred.resolve(result);
@@ -140,9 +139,8 @@ function execute_request(method, params, auth, api_url, callback) {
           error: {
             message: e,
             http_code: res.statusCode,
-            request_options: sanitized_request_options,
-            query_params,
-            hide_sensitive
+            request_options: sanitizedOptions,
+            query_params
           }
         };
         deferred.reject(err_obj.error);
@@ -155,9 +153,8 @@ function execute_request(method, params, auth, api_url, callback) {
         error: {
           message: "Server returned unexpected status code - " + res.statusCode,
           http_code: res.statusCode,
-          request_options: sanitized_request_options,
-          query_params,
-          hide_sensitive
+          request_options: sanitizedOptions,
+          query_params
         }
       };
       deferred.reject(err_obj.error);

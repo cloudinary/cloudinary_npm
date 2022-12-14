@@ -20,6 +20,11 @@ describe("config", function () {
     cloudinary.config(true);
   });
 
+  it("should not have a `hide_sensitive` property by default", function () {
+    const config = cloudinary.config();
+    expect(config).not.to.have.property("hide_sensitive");
+  });
+
   it("should support `hide_sensitive` config param", function () {
     const config = cloudinary.config({hide_sensitive: true});
     expect(config.hide_sensitive).to.eql(true)
@@ -38,7 +43,7 @@ describe("config", function () {
   it("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
     try {
       cloudinary.config({hide_sensitive: true});
-      const result = await cloudinary.v2.api.resource("?", { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' });
+      const result = await cloudinary.v2.api.resource("?", { oauth_token: 'irrelevant' });
       expect(result).fail();
     } catch (err) {
       expect(err.request_options.headers).not.to.have.property("Authorization");
