@@ -567,6 +567,12 @@ function generate_transformation_string(options) {
     options.start_offset = _split_range2[0];
     options.end_offset = _split_range2[1];
   }
+  if (options.start_offset) {
+    options.start_offset = normalize_expression(options.start_offset);
+  }
+  if (options.end_offset) {
+    options.end_offset = normalize_expression(options.end_offset);
+  }
   var overlay = process_layer(consumeOption(options, "overlay"));
   var radius = process_radius(consumeOption(options, "radius"));
   var underlay = process_layer(consumeOption(options, "underlay"));
