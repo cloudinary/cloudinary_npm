@@ -1,3 +1,11 @@
+1.33.0 / 2022-12-15
+==================
+
+  * feat: start and end offset normalized in a transformation string
+  * feat: new config option for hiding sensitive data when logging errors
+  * feat: multiple ACLs for generate_auth_token
+  * fix: improved TS typing
+
 1.32.0 / 2022-09-14
 ==================
 
