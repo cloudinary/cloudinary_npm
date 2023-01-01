@@ -33,7 +33,7 @@ function create_through_server(req, res) {
   // and then saved to the database.
 
   // file was not uploaded redirecting to upload
-  if (req.files.image.ws.bytesWritten === 0) {
+  if (req.files.image.size === 0) {
     res.redirect('/photos/add');
     return;
   }
