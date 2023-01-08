@@ -581,7 +581,7 @@ declare module 'cloudinary' {
         width: number;
         height: number;
         format: string;
-        resource_type?: "image" | "video" | "raw" | "auto";
+        resource_type: "image" | "video" | "raw" | "auto";
         created_at: string;
         tags: Array<string>;
         pages: number;
