@@ -384,6 +384,13 @@ exports.sub_folders = function sub_folders(path, callback) {
   return call_api("get", uri, params, callback, options);
 };
 
+exports.search_folders = function search_folders(params, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  options.content_type = 'json';
+  return call_api("post", "folders/search", params, callback, options);
+};
+
 /**
  * Creates an empty folder
  *

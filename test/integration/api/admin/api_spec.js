@@ -1165,7 +1165,7 @@ describe("api", function () {
       let preset_details = await cloudinary.v2.api.upload_preset(preset.name);
       expect(preset_details.settings).to.eql({ use_asset_folder_as_public_id_prefix: true })
     });
-    
+
     it('should update asset_folder', async function () {
       if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
         this.skip();

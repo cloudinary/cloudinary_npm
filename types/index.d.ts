@@ -1,4 +1,3 @@
-import { AnyARecord } from 'dns';
 import { Transform } from 'stream';
 
 
@@ -882,6 +881,10 @@ declare module 'cloudinary' {
             function sub_folders(root_folder: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
 
             function sub_folders(root_folder: string, callback?: ResponseCallback): Promise<any>;
+
+            function search_folders(search_input: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
+
+            function search_folders(search_input: string, callback?: ResponseCallback): Promise<any>;
 
             function tags(options?: AdminApiOptions | { max_results?: number, next_cursor?: string, prefix?: string }, callback?: ResponseCallback): Promise<any>;
 
