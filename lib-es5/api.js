@@ -384,13 +384,6 @@ exports.sub_folders = function sub_folders(path, callback) {
   return call_api("get", uri, params, callback, options);
 };
 
-exports.search_folders = function search_folders(params, callback) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-  options.content_type = 'json';
-  return call_api("post", "folders/search", params, callback, options);
-};
-
 /**
  * Creates an empty folder
  *
@@ -549,6 +542,13 @@ exports.search = function search(params, callback) {
 
   options.content_type = 'json';
   return call_api("post", "resources/search", params, callback, options);
+};
+
+exports.search_folders = function search_folders(params, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  options.content_type = 'json';
+  return call_api("post", "folders/search", params, callback, options);
 };
 
 exports.update_resources_access_mode_by_prefix = function update_resources_access_mode_by_prefix(access_mode, prefix, callback) {
