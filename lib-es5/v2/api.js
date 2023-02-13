@@ -55,6 +55,7 @@ v1_adapters(exports, api, {
   update_resources_access_mode_by_tag: 2,
   update_resources_access_mode_by_ids: 2,
   search: 1,
+  search_folders: 1,
   delete_derived_by_transformation: 2,
   add_metadata_field: 1,
   list_metadata_fields: 1,

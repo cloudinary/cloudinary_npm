@@ -528,6 +528,11 @@ cloudinary.v2.api.sub_folders("cloud", function (error, result) {
 });
 
 // $ExpectType Promise<any>
+cloudinary.v2.api.search_folders("search input", function (error, result) {
+    console.log(result);
+});
+
+// $ExpectType Promise<any>
 cloudinary.v2.api.transformation({width: 150, height: 100, crop: 'fill'},
     function (error, result) {
         console.log(result, error);

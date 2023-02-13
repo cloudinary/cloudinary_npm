@@ -544,6 +544,13 @@ exports.search = function search(params, callback) {
   return call_api("post", "resources/search", params, callback, options);
 };
 
+exports.search_folders = function search_folders(params, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  options.content_type = 'json';
+  return call_api("post", "folders/search", params, callback, options);
+};
+
 exports.update_resources_access_mode_by_prefix = function update_resources_access_mode_by_prefix(access_mode, prefix, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
