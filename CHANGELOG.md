@@ -1,3 +1,10 @@
+1.34.0 / 2023-02-13
+==================
+
+  * fix: resource_type is not optional
+  * feat: search for folders
+  * feat: support for extra_headers in upload request
+
 1.33.0 / 2022-12-15
 ==================
 
