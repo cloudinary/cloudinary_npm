@@ -65,4 +65,21 @@ describe('Tests for sdk analytics through image tag', function () {
 
     expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=AMAlhAMA`);
   });
+
+  it('Reads from tracked analytics configuration', () => {
+    process.versions = {
+      node: '12.0.0'
+    };
+
+    let imgStr = cloudinary.image("hello", {
+      format: "png",
+      trackedAnalytics: {
+        sdkCode: "X",
+        sdkSemver: "7.3.0",
+        techVersion: "3.4.7"
+      }
+    });
+
+    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=AXAEzGT0`);
+  });
 });
