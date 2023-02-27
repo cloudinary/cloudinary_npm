@@ -269,7 +269,9 @@ exports.rename = function rename(from_public_id, to_public_id, callback) {
       to_public_id: to_public_id,
       overwrite: options.overwrite,
       invalidate: options.invalidate,
-      to_type: options.to_type
+      to_type: options.to_type,
+      context: options.context,
+      metadata: options.metadata
     }];
   });
 };
