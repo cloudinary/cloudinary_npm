@@ -1,3 +1,4 @@
+const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const defaults = require('lodash/defaults');
@@ -7,14 +8,27 @@ const TIMEOUT = require('../testUtils/testConstants').TIMEOUT;
 const describe = require('../testUtils/suite');
 const wait = require('../testUtils/helpers/wait');
 const generateBreakpoints = require(`../../${helper.libPath}/utils/generateBreakpoints`);
-const { srcsetUrl, generateSrcsetAttribute } = require(`../../${helper.libPath}/utils/srcsetUtils`);
+const {
+  srcsetUrl,
+  generateSrcsetAttribute
+} = require(`../../${helper.libPath}/utils/srcsetUtils`);
 
 const utils = cloudinary.utils;
-const { clone, isString, merge, pickOnlyExistingValues } = utils;
-const { sharedExamples, itBehavesLike, test_cloudinary_url } = helper;
+const {
+  clone,
+  isString,
+  merge,
+  pickOnlyExistingValues
+} = utils;
+const {
+  sharedExamples,
+  itBehavesLike,
+  test_cloudinary_url
+} = helper;
 
 const TEST_TAG = helper.TEST_TAG;
 const createTestConfig = require('../testUtils/createTestConfig');
+const {clear_blank} = require("../../lib/utils");
 // Defined globals
 var cloud_name = '';
 
@@ -782,10 +796,13 @@ describe("utils", function () {
           param: 'underlay',
           letter: 'u'
         }
-      ].forEach(function ({ param, letter }) {
+      ].forEach(function ({
+        param,
+        letter
+      }) {
         layers_options.forEach(function ([name, layer, result]) {
           it(`should support ${name} ${param}`, function () {
-            expect(["test", { [param]: layer }]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/${letter}_${result}/test`).and.emptyOptions();
+            expect(["test", {[param]: layer}]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/${letter}_${result}/test`).and.emptyOptions();
           });
         });
         it(`should not pass width/height to html for ${param}`, function () {
@@ -833,12 +850,12 @@ describe("utils", function () {
     });
     describe('fps', function () {
       [
-        [{ fps: "24-29.97" }, "fps_24-29.97"],
-        [{ fps: 24 }, "fps_24"],
-        [{ fps: 24.5 }, "fps_24.5"],
-        [{ fps: "24" }, "fps_24"],
-        [{ fps: "-24" }, "fps_-24"],
-        [{ fps: [24, 29.97] }, "fps_24-29.97"]
+        [{fps: "24-29.97"}, "fps_24-29.97"],
+        [{fps: 24}, "fps_24"],
+        [{fps: 24.5}, "fps_24.5"],
+        [{fps: "24"}, "fps_24"],
+        [{fps: "-24"}, "fps_-24"],
+        [{fps: [24, 29.97]}, "fps_24-29.97"]
       ].forEach(function ([option, expected]) {
         expect(cloudinary.utils.generate_transformation_string(option)).to.eql(expected);
       });
@@ -1034,8 +1051,8 @@ describe("utils", function () {
       });
     });
 
-    describe('Context metadata to user variables', function (){
-      it('should use context value as user variables', function(){
+    describe('Context metadata to user variables', function () {
+      it('should use context value as user variables', function () {
         const options = {
           variables: [["$xpos", "ctx:!x_pos!_to_f"], ["$ypos", "ctx:!y_pos!_to_f"]],
           crop: "crop",
@@ -1253,7 +1270,7 @@ describe("utils", function () {
             expect(["sample", opt]).to.produceUrl(`http://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
           });
           if (!isString(options)) {
-            itBehavesLike("a signed url", { overlay: options }, `l_${result}`);
+            itBehavesLike("a signed url", {overlay: options}, `l_${result}`);
           }
         });
         it("should not pass width/height to html for overlay", function () {
@@ -1308,19 +1325,19 @@ describe("utils", function () {
         [scaled(), sepia()],
         'c_scale,h_200,w_100|c_lfill,e_sepia,w_400'],
       ['should support transformations with multiple components',
-        [{ transformation: [scaled(), sepia()] }, sepia()],
+        [{transformation: [scaled(), sepia()]}, sepia()],
         'c_scale,h_200,w_100/c_lfill,e_sepia,w_400|c_lfill,e_sepia,w_400'],
       ['should concatenate format at the end of the transformation',
-        ([scaled({ format: 'gif' }), sepia()]),
+        ([scaled({format: 'gif'}), sepia()]),
         'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400'],
       ['should support an empty format',
-        ([scaled({ format: '' }), sepia()]),
+        ([scaled({format: ''}), sepia()]),
         'c_scale,h_200,w_100/|c_lfill,e_sepia,w_400'],
       ['should treat a null format as none',
-        ([scaled({ format: null }), sepia()]),
+        ([scaled({format: null}), sepia()]),
         'c_scale,h_200,w_100|c_lfill,e_sepia,w_400'],
       ['should concatenate format at the end of the transformation',
-        ([scaled({ format: 'gif' }), sepia({ format: 'jpg' })]),
+        ([scaled({format: 'gif'}), sepia({format: 'jpg'})]),
         'c_scale,h_200,w_100/gif|c_lfill,e_sepia,w_400/jpg'],
       ['should support transformations with multiple components and format',
         [{
@@ -1399,7 +1416,7 @@ describe("utils", function () {
     test_cloudinary_url("folder/test", {},
       `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
     test_cloudinary_url("folder/test",
-      { force_version: false }, `http://res.cloudinary.com/${cloud_name}/image/upload/folder/test`, {});
+      {force_version: false}, `http://res.cloudinary.com/${cloud_name}/image/upload/folder/test`, {});
   });
   it("explicitly set version is always passed", function () {
     test_cloudinary_url("test",
@@ -1414,14 +1431,14 @@ describe("utils", function () {
       }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1234/folder/test`, {});
   });
   it("should use force_version from config", function () {
-    cloudinary.config({ force_version: false });
+    cloudinary.config({force_version: false});
     test_cloudinary_url("folder/test",
       {}, `http://res.cloudinary.com/${cloud_name}/image/upload/folder/test`, {});
   });
   it("should override config with options", function () {
-    cloudinary.config({ force_version: false });
+    cloudinary.config({force_version: false});
     test_cloudinary_url("folder/test",
-      { force_version: true }, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
+      {force_version: true}, `http://res.cloudinary.com/${cloud_name}/image/upload/v1/folder/test`, {});
   });
   it("should allow to shorted image/upload urls", function () {
     test_cloudinary_url("test", {
@@ -1459,8 +1476,8 @@ describe("utils", function () {
         'width': 100,
         'height': 100
       };
-      valid_response_timestamp = (Date.now()/1000) - 5000;
-      invalid_response_timestamp = (Date.now()/1000) - 10000;
+      valid_response_timestamp = (Date.now() / 1000) - 5000;
+      invalid_response_timestamp = (Date.now() / 1000) - 10000;
       response_json = JSON.stringify(expected_parameters);
       unexpected_response_json = JSON.stringify(unexpected_parameters);
     });
@@ -1703,4 +1720,34 @@ describe("utils", function () {
       expect(utils.isRemoteUrl(helper.IMAGE_FILE)).not.to.be.ok();
     });
   });
+
+  describe('clear_blank', () => {
+    it('should remove properties with nulls', () => {
+      const input = {
+        key1: 'test',
+        key2: null,
+        key3: false,
+        key4: 0
+      };
+      const clearedInput = clear_blank(input);
+      assert.deepStrictEqual(clearedInput, {
+        key1: 'test',
+        key3: false,
+        key4: 0
+      });
+    });
+
+    it('should remove nested null values', () => {
+      const input = {
+        key1: 'test',
+        key2: [null],
+        key3: [1, null]
+      };
+      const clearedInput = clear_blank(input);
+      assert.deepStrictEqual(clearedInput, {
+        key1: 'test',
+        key3: [1]
+      });
+    });
+  })
 });

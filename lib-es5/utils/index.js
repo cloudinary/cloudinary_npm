@@ -1111,7 +1111,9 @@ function clear_blank(hash) {
         k = _ref29[0],
         v = _ref29[1];
 
-    filtered_hash[k] = v;
+    filtered_hash[k] = v.filter ? v.filter(function (x) {
+      return x;
+    }) : v;
   });
   return filtered_hash;
 }
@@ -1600,6 +1602,18 @@ function hashToQuery(hash) {
  */
 
 function present(value) {
+  // if (typeof value === 'string' || Array.isArray(value)) {
+  //   return value.length > 0;
+  // } else if (typeof value === 'number') {
+  //   return value > 0;
+  // } else if (typeof value === 'object') {
+  //   return true;
+  // } else if (typeof value === 'boolean') {
+  //   return value;
+  // }
+  if (Array.isArray(value)) {
+    return true;
+  }
   return value != null && ("" + value).length > 0;
 }
 
