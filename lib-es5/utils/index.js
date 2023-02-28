@@ -897,17 +897,19 @@ function url(public_id) {
   }
 
   var urlAnalytics = ensureOption(options, 'urlAnalytics', false);
-  var trackedAnalytics = ensureOption(options, 'trackedAnalytics', false);
 
-  if (urlAnalytics === true || trackedAnalytics) {
-    var sdkVersions = getSDKVersions();
+  if (urlAnalytics === true) {
+    var { sdkCode, sdkSemver, techVersion } = getSDKVersions();
+    var sdkVersions = {
+      sdkCode: ensureOption(options, 'sdkCode', sdkCode),
+      sdkSemver: ensureOption(options, 'sdkSemver', sdkSemver),
+      techVersion: ensureOption(options, 'techVersion', techVersion)
+    };
 
-    if (trackedAnalytics) {
-      sdkVersions = trackedAnalytics;
-      sdkVersions.urlAnalytics = true;
-    }
-    
-    var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));
+    var analyticsOptions = getAnalyticsOptions(
+      Object.assign({}, options, sdkVersions)
+    );
+
     var sdkAnalyticsSignature = getSDKAnalyticsSignature(analyticsOptions);
 
     // url might already have a '?' query param
