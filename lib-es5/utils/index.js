@@ -1111,7 +1111,9 @@ function clear_blank(hash) {
         k = _ref29[0],
         v = _ref29[1];
 
-    filtered_hash[k] = v;
+    filtered_hash[k] = v.filter ? v.filter(function (x) {
+      return x;
+    }) : v;
   });
   return filtered_hash;
 }
