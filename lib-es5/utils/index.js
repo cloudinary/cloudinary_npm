@@ -899,16 +899,18 @@ function url(public_id) {
   var urlAnalytics = ensureOption(options, 'urlAnalytics', false);
 
   if (urlAnalytics === true) {
-    var { sdkCode, sdkSemver, techVersion } = getSDKVersions();
+    var _getSDKVersions = getSDKVersions(),
+        sdkCode = _getSDKVersions.sdkCode,
+        sdkSemver = _getSDKVersions.sdkSemver,
+        techVersion = _getSDKVersions.techVersion;
+
     var sdkVersions = {
       sdkCode: ensureOption(options, 'sdkCode', sdkCode),
       sdkSemver: ensureOption(options, 'sdkSemver', sdkSemver),
       techVersion: ensureOption(options, 'techVersion', techVersion)
     };
 
-    var analyticsOptions = getAnalyticsOptions(
-      Object.assign({}, options, sdkVersions)
-    );
+    var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));
 
     var sdkAnalyticsSignature = getSDKAnalyticsSignature(analyticsOptions);
 

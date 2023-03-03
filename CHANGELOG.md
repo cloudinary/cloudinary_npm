@@ -1,3 +1,9 @@
+1.35.0 / 2023-03-03
+==================
+
+  * fix: removing nested nulls from options passed to api, closes #581
+  * feat: add option to configure tracked analytics
+
 1.34.0 / 2023-02-13
 ==================
 
