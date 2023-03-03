@@ -49,7 +49,7 @@ describe('Tests for sdk analytics through image tag', function () {
       urlAnalytics: true
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=AMAlhAM0`);
+    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAM0`);
   });
 
   it('Reads from process.versions and package.json (Mocked) - Responsive', () => {
@@ -63,7 +63,7 @@ describe('Tests for sdk analytics through image tag', function () {
       urlAnalytics: true
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=AMAlhAMA`);
+    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAMA`);
   });
 
   it('Reads from tracked analytics configuration', () => {
@@ -80,6 +80,6 @@ describe('Tests for sdk analytics through image tag', function () {
       
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_s=AXAEzGT0`);
+    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AXAEzGT0`);
   });
 });

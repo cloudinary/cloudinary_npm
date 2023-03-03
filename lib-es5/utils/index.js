@@ -917,7 +917,7 @@ function url(public_id) {
     if (resultUrl.indexOf('?') >= 0) {
       appender = '&';
     }
-    resultUrl = `${resultUrl}${appender}_s=${sdkAnalyticsSignature}`;
+    resultUrl = `${resultUrl}${appender}_a=${sdkAnalyticsSignature}`;
   }
 
   return resultUrl;
