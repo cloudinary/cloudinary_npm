@@ -899,8 +899,16 @@ function url(public_id) {
   var urlAnalytics = ensureOption(options, 'urlAnalytics', false);
 
   if (urlAnalytics === true) {
-    var sdkVersions = getSDKVersions();
-    var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));
+    var { sdkCode, sdkSemver, techVersion } = getSDKVersions();
+    var sdkVersions = {
+      sdkCode: ensureOption(options, 'sdkCode', sdkCode),
+      sdkSemver: ensureOption(options, 'sdkSemver', sdkSemver),
+      techVersion: ensureOption(options, 'techVersion', techVersion)
+    };
+
+    var analyticsOptions = getAnalyticsOptions(
+      Object.assign({}, options, sdkVersions)
+    );
 
     var sdkAnalyticsSignature = getSDKAnalyticsSignature(analyticsOptions);
 
@@ -909,7 +917,7 @@ function url(public_id) {
     if (resultUrl.indexOf('?') >= 0) {
       appender = '&';
     }
-    resultUrl = `${resultUrl}${appender}_s=${sdkAnalyticsSignature}`;
+    resultUrl = `${resultUrl}${appender}_a=${sdkAnalyticsSignature}`;
   }
 
   return resultUrl;
