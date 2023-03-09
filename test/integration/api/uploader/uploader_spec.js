@@ -191,6 +191,14 @@ describe("uploader", function () {
         expect(format).to.eql("png");
       });
     });
+    it('should include tags in rename response if requested explicitly', async () => {
+      const uploadResult = await cloudinary.v2.uploader.upload(IMAGE_FILE, { context: 'alt=Example|class=Example', tags: ['test-tag'] });
+
+      const renameResult = await cloudinary.v2.uploader.rename(uploadResult.public_id, `${uploadResult.public_id}-renamed`, {tags: true, context: true});
+
+      expect(renameResult).to.have.property('tags');
+      expect(renameResult).to.have.property('context');
+    });
     return context(":invalidate", function () {
       var spy, xhr;
       spy = void 0;
