@@ -472,6 +472,7 @@ declare module 'cloudinary' {
         derived_next_cursor?: string;
         faces?: boolean;
         image_metadata?: boolean;
+        media_metadata?: boolean;
         pages?: boolean;
         coordinates?: boolean;
         phash?: boolean;
@@ -499,6 +500,7 @@ declare module 'cloudinary' {
         folder?: string;
         format?: VideoFormat | ImageFormat;
         image_metadata?: boolean;
+        media_metadata?: boolean;
         invalidate?: boolean;
         moderation?: ModerationKind;
         notification_url?: string;
@@ -672,6 +674,7 @@ declare module 'cloudinary' {
                 derived_next_cursor: string;
                 exif: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
                 image_metadata: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
+                media_metadata: object;
                 faces: number[][];
                 quality_analysis: number;
                 colors: [string, number][];

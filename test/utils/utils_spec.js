@@ -1383,6 +1383,7 @@ describe("utils", function () {
       colors: "true",
       exif: "false",
       image_metadata: "false",
+      media_metadata: "false",
       invalidate: 1,
       eager_async: "1"
     };
@@ -1394,6 +1395,7 @@ describe("utils", function () {
       colors: 1,
       exif: 0,
       image_metadata: 0,
+      media_metadata: 0,
       invalidate: 1,
       eager_async: 1
     };
