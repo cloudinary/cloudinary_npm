@@ -16,7 +16,7 @@ function deleteResourcesParams(options) {
 }
 
 function getResourceParams(options) {
-  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
+  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "media_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
 }
 
 exports.ping = function ping(callback) {
