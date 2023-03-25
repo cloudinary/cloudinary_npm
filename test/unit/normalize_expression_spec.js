@@ -1,7 +1,8 @@
 const cloudinary = require("../../cloudinary");
 const createTestConfig = require('../testUtils/createTestConfig');
 const helper = require("../spechelper");
-const { SIMPLE_PARAMS } = require(`../../${helper.libPath}/utils/consts`);
+const {SIMPLE_PARAMS} = require(`../../${helper.libPath}/utils/consts`);
+const {generate_transformation_string} = require("../../lib/utils");
 
 describe("normalize_expression tests", function () {
   beforeEach(function () {
@@ -12,7 +13,21 @@ describe("normalize_expression tests", function () {
     }));
   });
 
-  it("Expression normalization", function() {
+  it('should normalize start_offset', function () {
+    const result = generate_transformation_string({
+      "start_offset": "idu - 5"
+    });
+    expect(result).to.equal("so_idu_sub_5");
+  });
+
+  it('should normalize end_offset', function () {
+    const result = generate_transformation_string({
+      "end_offset": "idu - 5"
+    });
+    expect(result).to.equal("eo_idu_sub_5");
+  });
+
+  it("Expression normalization", function () {
     const cases = {
       'null is not affected': [null, null],
       'None is not affected': ['None', 'None'],
@@ -61,8 +76,8 @@ describe("normalize_expression tests", function () {
     const value = "width * 2";
     const normalizedValue = "w_mul_2";
     const normalizedParams = ["angle", "aspect_ratio", "dpr", "effect", "height", "opacity", "quality", "radius",
-      "width", "x", "y", "zoom"];
-    const nonNormalizedParams = simpleTransformationParams.concat('overlay', 'underlay')
+      "width", "x", "y", "zoom", "end_offset", "start_offset"];
+    const nonNormalizedParams = simpleTransformationParams.concat('overlay', 'underlay').filter(param => !normalizedParams.includes(param));
     normalizedParams.forEach((param) => {
       it(`should normalize value in ${param}`, () => {
         // c_scale needed to test h_ and w_ parameters that are ignored without crop mode

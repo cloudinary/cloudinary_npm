@@ -269,7 +269,9 @@ exports.rename = function rename(from_public_id, to_public_id, callback) {
       to_public_id: to_public_id,
       overwrite: options.overwrite,
       invalidate: options.invalidate,
-      to_type: options.to_type
+      to_type: options.to_type,
+      context: options.context,
+      metadata: options.metadata
     }];
   });
 };
@@ -662,6 +664,9 @@ function post(url, post_data, boundary, file, callback, options) {
   if (options.x_unique_upload_id != null) {
     headers['X-Unique-Upload-Id'] = options.x_unique_upload_id;
   }
+  if (options.extra_headers !== null) {
+    headers = merge(headers, options.extra_headers);
+  }
   if (oauth_token != null) {
     headers.Authorization = `Bearer ${oauth_token}`;
   }
@@ -811,7 +816,8 @@ exports.update_metadata = function update_metadata(metadata, public_ids, callbac
       metadata: utils.encode_context(metadata),
       public_ids: utils.build_array(public_ids),
       timestamp: utils.timestamp(),
-      type: options.type
+      type: options.type,
+      clear_invalid: options.clear_invalid
     };
     return [params];
   });

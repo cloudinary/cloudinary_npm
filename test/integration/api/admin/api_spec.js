@@ -891,6 +891,19 @@ describe("api", function () {
           }
         });
       });
+      it("should support updating metadata with clear_invalid", () => {
+        this.timeout(TIMEOUT.LONG);
+        return uploadImage()
+          .then(upload_result => {
+            return cloudinary.v2.api.update(upload_result.public_id, {
+              clear_invalid: true
+            });
+          }).then(() => {
+            if (writeSpy.called) {
+              sinon.assert.calledWith(writeSpy, sinon.match(/clear_invalid=true/));
+            }
+          });
+      });
     });
     describe("quality override", function() {
       const mocked = helper.mockTest();
@@ -1152,7 +1165,7 @@ describe("api", function () {
       let preset_details = await cloudinary.v2.api.upload_preset(preset.name);
       expect(preset_details.settings).to.eql({ use_asset_folder_as_public_id_prefix: true })
     });
-    
+
     it('should update asset_folder', async function () {
       if (!shouldTestFeature(DYNAMIC_FOLDERS)) {
         this.skip();

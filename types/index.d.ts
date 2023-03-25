@@ -260,9 +260,9 @@ declare module 'cloudinary' {
         background?: string;
         angle?: Angle;
         radius?: number | string;
-        overlay?: string | object;
+        overlay?: string | object; //might be Record<any, any>
         custom_function?: string | { function_type: (string & {}) | "wasm" | "remote", source: string }
-        variables?: Array<string | object>;
+        variables?: Array<string | object>; //might be Record<any, any>
         if?: string;
         else?: string;
         end_if?: string;
@@ -274,7 +274,7 @@ declare module 'cloudinary' {
     }
 
     export interface ImageTransformationOptions extends CommonTransformationOptions {
-        underlay?: string | Object;
+        underlay?: string | Object; //might be Record<any, any>
         color?: string;
         color_space?: ColorSpace;
         opacity?: number | string;
@@ -293,7 +293,7 @@ declare module 'cloudinary' {
     interface VideoTransformationOptions extends CommonTransformationOptions {
         audio_codec?: AudioCodec;
         audio_frequency?: AudioFrequency;
-        video_codec?: string | Object;
+        video_codec?: string | Object; //might be Record<any, any>
         bit_rate?: number | string;
         fps?: string | Array<number | string>;
         keyframe_interval?: string;
@@ -340,7 +340,7 @@ declare module 'cloudinary' {
         sign_url?: boolean;
         long_url_signature?: boolean;
         use_root_path?: boolean;
-        auth_token?: object;
+        auth_token?: AuthTokenApiOptions;
         account_id?: string;
         provisioning_api_key?: string;
         provisioning_api_secret?: string;
@@ -365,8 +365,8 @@ declare module 'cloudinary' {
     export interface ImageTagOptions {
         html_height?: string;
         html_width?: string;
-        srcset?: object;
-        attributes?: object;
+        srcset?: object; //might be Record<any, any>
+        attributes?: object; //might be Record<any, any>
         client_hints?: boolean;
         responsive?: boolean;
         hidpi?: boolean;
@@ -379,7 +379,7 @@ declare module 'cloudinary' {
         source_types?: string | string[];
         source_transformation?: TransformationOptions;
         fallback_content?: string;
-        poster?: string | object;
+        poster?: string | object; //might be Record<any, any>
         controls?: boolean;
         preload?: string;
 
@@ -388,7 +388,7 @@ declare module 'cloudinary' {
 
     /****************************** Admin API Options *************************************/
     export interface AdminApiOptions {
-        agent?: object;
+        agent?: object; //might be Record<any, any>
         content_type?: string;
         oauth_token?: string;
 
@@ -436,7 +436,7 @@ declare module 'cloudinary' {
         similarity_search?: string;
         tags?: string | string[];
         moderation_status?: string;
-        unsafe_update?: object;
+        unsafe_update?: object; //might be Record<any, any>
         allowed_for_strict?: boolean;
         asset_folder?: string;
         unique_display_name?: boolean;
@@ -472,6 +472,7 @@ declare module 'cloudinary' {
         derived_next_cursor?: string;
         faces?: boolean;
         image_metadata?: boolean;
+        media_metadata?: boolean;
         pages?: boolean;
         coordinates?: boolean;
         phash?: boolean;
@@ -499,6 +500,7 @@ declare module 'cloudinary' {
         folder?: string;
         format?: VideoFormat | ImageFormat;
         image_metadata?: boolean;
+        media_metadata?: boolean;
         invalidate?: boolean;
         moderation?: ModerationKind;
         notification_url?: string;
@@ -507,7 +509,8 @@ declare module 'cloudinary' {
         proxy?: string;
         public_id?: string;
         quality_analysis?: boolean;
-        responsive_breakpoints?: object;
+        resource_type?: "image" | "video" | "raw" | "auto";
+        responsive_breakpoints?: Record<any,any>;
         return_delete_token?: boolean
         timestamp?: number;
         transformation?: TransformationOptions;
@@ -527,7 +530,7 @@ declare module 'cloudinary' {
         account_id?: string;
         provisioning_api_key?: string;
         provisioning_api_secret?: string;
-        agent?: object;
+        agent?: object; //might be Record<any, any>?
         content_type?: string;
 
         [futureKey: string]: any;
@@ -548,6 +551,7 @@ declare module 'cloudinary' {
         | string[]
         | VideoTransformationOptions
         | ImageTransformationOptions
+        | Object //might be Record<any, any>
         | Array<ImageTransformationOptions>
         | Array<VideoTransformationOptions>;
 
@@ -578,7 +582,7 @@ declare module 'cloudinary' {
         width: number;
         height: number;
         format: string;
-        resource_type: string;
+        resource_type: "image" | "video" | "raw" | "auto";
         created_at: string;
         tags: Array<string>;
         pages: number;
@@ -592,8 +596,9 @@ declare module 'cloudinary' {
         original_filename: string;
         moderation: Array<string>;
         access_control: Array<string>;
-        context: object;
-        metadata: object;
+        context: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
+        metadata: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
+        colors?: [string, number][];
 
         [futureKey: string]: any;
     }
@@ -620,8 +625,8 @@ declare module 'cloudinary' {
         label?: string;
         mandatory?: boolean;
         default_value?: number;
-        validation?: object;
-        datasource?: object;
+        validation?: object; //there are 4 types, we need to discuss documentation team about it before implementing.
+        datasource?: DatasourceEntry;
 
         [futureKey: string]: any;
     }
@@ -632,8 +637,8 @@ declare module 'cloudinary' {
         label: string;
         mandatory: boolean;
         default_value: number;
-        validation: object;
-        datasource: object;
+        validation: object; //there are 4 types, we need to discuss documentation team about it before implementing.
+        datasource: DatasourceEntry;
 
         [futureKey: string]: any;
     }
@@ -643,7 +648,7 @@ declare module 'cloudinary' {
     }
 
     export interface DatasourceChange {
-        values: Array<object>
+        values: Array<DatasourceEntry>
     }
 
     export interface ResourceApiResponse {
@@ -664,19 +669,20 @@ declare module 'cloudinary' {
                 url: string;
                 secure_url: string;
                 tags: Array<string>;
-                context: object;
+                context: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
                 next_cursor: string;
                 derived_next_cursor: string;
-                exif: object;
-                image_metadata: object;
+                exif: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
+                image_metadata: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
+                media_metadata: object;
                 faces: number[][];
                 quality_analysis: number;
-                colors: string[][];
+                colors: [string, number][];
                 derived: Array<string>;
-                moderation: object;
+                moderation: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
                 phash: string;
-                predominant: object;
-                coordinates: object;
+                predominant: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
+                coordinates: object; //won't change since it's response, we need to discuss documentation team about it before implementing.
                 access_control: Array<string>;
                 pages: number;
 
@@ -685,6 +691,12 @@ declare module 'cloudinary' {
         ]
     }
 
+    export type SignApiOptions = Record<string, any>;
+
+    export interface DatasourceEntry {
+        external_id?: string;
+        value: string;
+    }
 
     export namespace v2 {
 
@@ -714,9 +726,9 @@ declare module 'cloudinary' {
 
         namespace utils {
 
-            function sign_request(params_to_sign: object, options?: ConfigAndUrlOptions): { signature: string; api_key: string; [key:string]:any};
+            function sign_request(params_to_sign: SignApiOptions, options?: ConfigAndUrlOptions): { signature: string; api_key: string; [key:string]:any};
 
-            function api_sign_request(params_to_sign: object, api_secret: string): string;
+            function api_sign_request(params_to_sign: SignApiOptions, api_secret: string): string;
 
             function verifyNotificationSignature(body: string, timestamp: number, signature: string, valid_for?: number): boolean;
 
@@ -873,6 +885,10 @@ declare module 'cloudinary' {
 
             function sub_folders(root_folder: string, callback?: ResponseCallback): Promise<any>;
 
+            function search_folders(search_input: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
+
+            function search_folders(search_input: string, callback?: ResponseCallback): Promise<any>;
+
             function tags(options?: AdminApiOptions | { max_results?: number, next_cursor?: string, prefix?: string }, callback?: ResponseCallback): Promise<any>;
 
             function transformation(transformation: TransformationOptions, options?: AdminApiOptions | { max_results?: number, next_cursor?: string, named?: boolean }, callback?: ResponseCallback): Promise<any>;
@@ -955,9 +971,9 @@ declare module 'cloudinary' {
 
             function update_metadata_field(external_id: string, field: MetadataFieldApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: DatasourceChange, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function update_metadata_field_datasource(field_external_id: string, entries_external_id: object, callback?: ResponseCallback): Promise<DatasourceChange>;
+            function update_metadata_field_datasource(field_external_id: string, entries_external_id: DatasourceChange, callback?: ResponseCallback): Promise<DatasourceChange>;
 
             function delete_datasource_entries(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
@@ -1065,9 +1081,9 @@ declare module 'cloudinary' {
 
             /****************************** Structured Metadata API V2 Methods *************************************/
 
-            function update_metadata(metadata: string | object, public_ids: string[], options?:UploadApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+            function update_metadata(metadata: string | Record<any, any>, public_ids: string[], options?:UploadApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
 
-            function update_metadata(metadata: string| object, public_ids: string[], callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
+            function update_metadata(metadata: string| Record<any, any>, public_ids: string[], callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
         }
 
         /****************************** Search API *************************************/
@@ -1113,11 +1129,11 @@ declare module 'cloudinary' {
 
                 function sub_account(subAccountId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function create_sub_account(name: string, cloudName: string, customAttributes?: object, enabled?: boolean, baseAccount?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function create_sub_account(name: string, cloudName: string, customAttributes?: Record<any,any>, enabled?: boolean, baseAccount?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
                 function delete_sub_account(subAccountId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function update_sub_account(subAccountId: string, name?: string, cloudName?: string, customAttributes?: object, enabled?: boolean, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function update_sub_account(subAccountId: string, name?: string, cloudName?: string, customAttributes?: Record<any,any>, enabled?: boolean, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
                 function user(userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 

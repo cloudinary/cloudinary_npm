@@ -16,7 +16,7 @@ function deleteResourcesParams(options) {
 }
 
 function getResourceParams(options) {
-  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
+  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "media_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
 }
 
 exports.ping = function ping(callback) {
@@ -182,6 +182,9 @@ exports.update = function update(public_id, callback) {
   params = utils.updateable_resource_params(options);
   if (options.moderation_status != null) {
     params.moderation_status = options.moderation_status;
+  }
+  if (options.clear_invalid !== null) {
+    params.clear_invalid = options.clear_invalid;
   }
   return call_api("post", uri, params, callback, options);
 };
@@ -539,6 +542,13 @@ exports.search = function search(params, callback) {
 
   options.content_type = 'json';
   return call_api("post", "resources/search", params, callback, options);
+};
+
+exports.search_folders = function search_folders(params, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  options.content_type = 'json';
+  return call_api("post", "folders/search", params, callback, options);
 };
 
 exports.update_resources_access_mode_by_prefix = function update_resources_access_mode_by_prefix(access_mode, prefix, callback) {

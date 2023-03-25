@@ -367,6 +367,7 @@ function build_upload_params(options) {
     format: options.format,
     filename_override: options.filename_override,
     image_metadata: utils.as_safe_bool(options.image_metadata),
+    media_metadata: utils.as_safe_bool(options.media_metadata),
     invalidate: utils.as_safe_bool(options.invalidate),
     moderation: options.moderation,
     notification_url: options.notification_url,
@@ -566,6 +567,12 @@ function generate_transformation_string(options) {
 
     options.start_offset = _split_range2[0];
     options.end_offset = _split_range2[1];
+  }
+  if (options.start_offset) {
+    options.start_offset = normalize_expression(options.start_offset);
+  }
+  if (options.end_offset) {
+    options.end_offset = normalize_expression(options.end_offset);
   }
   var overlay = process_layer(consumeOption(options, "overlay"));
   var radius = process_radius(consumeOption(options, "radius"));
@@ -893,7 +900,17 @@ function url(public_id) {
   var urlAnalytics = ensureOption(options, 'urlAnalytics', false);
 
   if (urlAnalytics === true) {
-    var sdkVersions = getSDKVersions();
+    var _getSDKVersions = getSDKVersions(),
+        sdkCode = _getSDKVersions.sdkCode,
+        sdkSemver = _getSDKVersions.sdkSemver,
+        techVersion = _getSDKVersions.techVersion;
+
+    var sdkVersions = {
+      sdkCode: ensureOption(options, 'sdkCode', sdkCode),
+      sdkSemver: ensureOption(options, 'sdkSemver', sdkSemver),
+      techVersion: ensureOption(options, 'techVersion', techVersion)
+    };
+
     var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));
 
     var sdkAnalyticsSignature = getSDKAnalyticsSignature(analyticsOptions);
@@ -903,7 +920,7 @@ function url(public_id) {
     if (resultUrl.indexOf('?') >= 0) {
       appender = '&';
     }
-    resultUrl = `${resultUrl}${appender}_s=${sdkAnalyticsSignature}`;
+    resultUrl = `${resultUrl}${appender}_a=${sdkAnalyticsSignature}`;
   }
 
   return resultUrl;
@@ -1105,7 +1122,9 @@ function clear_blank(hash) {
         k = _ref29[0],
         v = _ref29[1];
 
-    filtered_hash[k] = v;
+    filtered_hash[k] = v.filter ? v.filter(function (x) {
+      return x;
+    }) : v;
   });
   return filtered_hash;
 }

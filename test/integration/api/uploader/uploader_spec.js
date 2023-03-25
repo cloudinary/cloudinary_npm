@@ -12,6 +12,7 @@ const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const cloneDeep = require('lodash/cloneDeep');
 const ProxyAgent = require('proxy-agent');
+const assert = require('assert');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
@@ -190,6 +191,14 @@ describe("uploader", function () {
         expect(format).to.eql("png");
       });
     });
+    it('should include tags in rename response if requested explicitly', async () => {
+      const uploadResult = await cloudinary.v2.uploader.upload(IMAGE_FILE, { context: 'alt=Example|class=Example', tags: ['test-tag'] });
+
+      const renameResult = await cloudinary.v2.uploader.rename(uploadResult.public_id, `${uploadResult.public_id}-renamed`, {tags: true, context: true});
+
+      expect(renameResult).to.have.property('tags');
+      expect(renameResult).to.have.property('context');
+    });
     return context(":invalidate", function () {
       var spy, xhr;
       spy = void 0;
@@ -278,19 +287,16 @@ describe("uploader", function () {
       tags: UPLOAD_TAGS
     });
   });
-  describe("custom headers", function () {
-    it("should support custom headers in object format e.g. {Link: \"1\"}", function () {
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        headers: {
-          Link: "1"
-        },
-        tags: UPLOAD_TAGS
-      });
-    });
-    it("should support custom headers as array of strings e.g. [\"Link: 1\"]", function () {
-      return cloudinary.v2.uploader.upload(IMAGE_FILE, {
-        headers: ["Link: 1"],
-        tags: UPLOAD_TAGS
+  describe("extra headers", function () {
+    it("should support extra headers in object format e.g. {Link: \"1\"}", function () {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        cloudinary.v2.uploader.upload(IMAGE_FILE, {
+          extra_headers: {
+            Link: "1"
+          }
+        });
+        assert.ok(requestSpy.args[0][0].headers.Link);
+        assert.equal(requestSpy.args[0][0].headers.Link, "1");
       });
     });
   });
@@ -1145,6 +1151,17 @@ describe("uploader", function () {
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", public_ids[1])));
       });
     });
+    it("should support updating metadata with clear_invalid", function () {
+      const metadata_fields = { metadata_color: "red" };
+      const public_ids = ["test_id_1"];
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids, { clear_invalid: true });
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          method: sinon.match("POST")
+        }));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("clear_invalid", true)));
+      });
+    })
   });
   describe("access_control", function () {
     var acl, acl_string, options, requestSpy, writeSpy;

@@ -1,3 +1,24 @@
+1.35.0 / 2023-03-03
+==================
+
+  * fix: removing nested nulls from options passed to api, closes #581
+  * feat: add option to configure tracked analytics
+
+1.34.0 / 2023-02-13
+==================
+
+  * fix: resource_type is not optional
+  * feat: search for folders
+  * feat: support for extra_headers in upload request
+
+1.33.0 / 2022-12-15
+==================
+
+  * feat: start and end offset normalized in a transformation string
+  * feat: new config option for hiding sensitive data when logging errors
+  * feat: multiple ACLs for generate_auth_token
+  * fix: improved TS typing
+
 1.32.0 / 2022-09-14
 ==================
 
