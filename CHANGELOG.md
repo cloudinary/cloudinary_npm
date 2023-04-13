@@ -1,3 +1,8 @@
+1.36.1 / 2023-04-13
+==================
+
+chore: overriding vulnerable transitive dependency
+
 1.36.0 / 2023-04-13
 ==================
 
