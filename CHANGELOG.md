@@ -1,3 +1,9 @@
+1.36.0 / 2023-04-13
+==================
+
+* feat: add support for `media_metadata` param for `upload` and `explicit`
+* feat: passing context and metadata when using rename
+
 1.35.0 / 2023-03-03
 ==================
 
