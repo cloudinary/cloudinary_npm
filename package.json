@@ -71,6 +71,9 @@
   "optionalDependencies": {
     "proxy-agent": "^5.0.0"
   },
+  "overrides": {
+    "vm2": "3.9.16"
+  },
   "engines": {
     "node": ">=0.6"
   }
