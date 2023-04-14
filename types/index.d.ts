@@ -6,7 +6,7 @@ declare module 'cloudinary' {
     /****************************** Constants *************************************/
     /****************************** Transformations *******************************/
     type CropMode =
-        string
+        | (string & {})
         | "scale"
         | "fit"
         | "limit"
@@ -21,7 +21,7 @@ declare module 'cloudinary' {
         | "imagga_crop"
         | "imagga_scale";
     type Gravity =
-        string
+        | (string & {})
         | "north_west"
         | "north"
         | "north_east"
@@ -59,9 +59,9 @@ declare module 'cloudinary' {
         | "auto:none"
         | "liquid"
         | "ocr_text";
-    type Angle = number | string | Array<number | string> | "auto_right" | "auto_left" | "ignore" | "vflip" | "hflip";
+    type Angle = number | (string & {}) | Array<number | string> | "auto_right" | "auto_left" | "ignore" | "vflip" | "hflip";
     type ImageEffect =
-        string
+        | (string & {})
         | "hue"
         | "red"
         | "green"
@@ -112,11 +112,11 @@ declare module 'cloudinary' {
         | "gamma"
         | "improve";
 
-    type VideoEffect = string | "accelerate" | "reverse" | "boomerang" | "loop" | "make_transparent" | "transition";
-    type AudioCodec = string | "none" | "aac" | "vorbis" | "mp3";
+    type VideoEffect = (string & {}) | "accelerate" | "reverse" | "boomerang" | "loop" | "make_transparent" | "transition";
+    type AudioCodec = (string & {}) | "none" | "aac" | "vorbis" | "mp3";
     type AudioFrequency =
         string
-        | number
+        | (number & {})
         | 8000
         | 11025
         | 16000
@@ -133,7 +133,7 @@ declare module 'cloudinary' {
         | 192000;
     /****************************** Flags *************************************/
     type ImageFlags =
-        string
+        | (string & {})
         | Array<string>
         | "any_format"
         | "attachment"
@@ -166,7 +166,7 @@ declare module 'cloudinary' {
         | "tiff8_lzw"
         | "tiled";
     type VideoFlags =
-        string
+        | (string & {})
         | Array<string>
         | "animated"
         | "awebp"
@@ -181,9 +181,9 @@ declare module 'cloudinary' {
         | "relative"
         | "truncate_ts"
         | "waveform";
-    type ColorSpace = string | "srgb" | "no_cmyk" | "keep_cmyk";
+    type ColorSpace = (string & {}) | "srgb" | "no_cmyk" | "keep_cmyk";
     type DeliveryType =
-        string
+        | (string & {})
         | "upload"
         | "private"
         | "authenticated"
@@ -204,9 +204,9 @@ declare module 'cloudinary' {
         | "worldstarhiphop"
         | "dailymotion";
     /****************************** URL *************************************/
-    type ResourceType = string | "image" | "raw" | "video";
+    type ResourceType = (string & {}) | "image" | "raw" | "video";
     type ImageFormat =
-        string
+        | (string & {})
         | "gif"
         | "png"
         | "jpg"
@@ -232,7 +232,7 @@ declare module 'cloudinary' {
         | "tga"
         | "heic"
     type VideoFormat =
-        string
+        | (string & {})
         | "auto"
         | "flv"
         | "m3u8"
@@ -261,7 +261,7 @@ declare module 'cloudinary' {
         angle?: Angle;
         radius?: number | string;
         overlay?: string | object; //might be Record<any, any>
-        custom_function?: string | { function_type: string | "wasm" | "remote", source: string }
+        custom_function?: string | { function_type: (string & {}) | "wasm" | "remote", source: string }
         variables?: Array<string | object>; //might be Record<any, any>
         if?: string;
         else?: string;
@@ -564,11 +564,11 @@ declare module 'cloudinary' {
     type AdminAndUpdateApiOptions = AdminApiOptions | UpdateApiOptions;
 
     /****************************** API *************************************/
-    type Status = string | "pending" | "approved" | "rejected";
-    type StreamingProfiles = string | "4k" | "full_hd" | "hd" | "sd" | "full_hd_wifi" | "full_hd_lean" | "hd_lean";
-    type ModerationKind = string | "manual" | "webpurify" | "aws_rek" | "metascan";
-    type AccessMode = string | "public" | "authenticated";
-    type TargetArchiveFormat = string | "zip" | "tgz";
+    type Status = (string & {}) | "pending" | "approved" | "rejected";
+    type StreamingProfiles = (string & {}) | "4k" | "full_hd" | "hd" | "sd" | "full_hd_wifi" | "full_hd_lean" | "hd_lean";
+    type ModerationKind = (string & {}) | "manual" | "webpurify" | "aws_rek" | "metascan";
+    type AccessMode = (string & {}) | "public" | "authenticated";
+    type TargetArchiveFormat = (string & {}) | "zip" | "tgz";
 
     // err is kept for backwards compatibility, it currently will always be undefined
     type ResponseCallback = (err?: any, callResult?: any) => any;
