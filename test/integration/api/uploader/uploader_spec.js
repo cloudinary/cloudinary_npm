@@ -1274,6 +1274,32 @@ describe("uploader", function () {
           expect(result.metadata[METADATA_FIELD_UNIQUE_EXTERNAL_ID]).to.eql(METADATA_FIELD_VALUE);
         });
     });
+    it('should allow passing both string and a number for a number smd field', () => {
+      const smdNumberField = 'smd_number_field';
+      cloudinary.v2.api.add_metadata_field({
+        external_id: smdNumberField,
+        label: smdNumberField,
+        type: 'number'
+      }).then(() => {
+        return Promise.all([
+          uploadImage({
+            tags: UPLOAD_TAGS,
+            metadata: {
+              [smdNumberField]: 123
+            }
+          }),
+          uploadImage({
+            tags: UPLOAD_TAGS,
+            metadata: {
+              [smdNumberField]: '123'
+            }
+          })
+        ]);
+      }).then(([firstUpload, secondUpload]) => {
+        expect(firstUpload.metadata[smdNumberField]).to.eql(123);
+        expect(secondUpload.metadata[smdNumberField]).to.eql(123);
+      });
+    });
     it("should be updatable with uploader.update_metadata on an existing resource", function () {
       let publicId;
       return uploadImage({
