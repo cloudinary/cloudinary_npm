@@ -1,3 +1,9 @@
+1.36.3 / 2023-05-02
+==================
+
+  * fix: smd number field allows both numbers and string when uploading
+  * fix: isRemoteUrl not working on big files sometimes
+
 1.36.2 / 2023-04-24
 ==================
 

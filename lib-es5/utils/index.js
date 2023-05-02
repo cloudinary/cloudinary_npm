@@ -449,6 +449,9 @@ function encode_context(metadataObj) {
         return `\"${escapeMetadataValue(innerVal)}\"`;
       }).join(',');
       return `${key}=[${values}]`;
+      // if number, convert to string
+    } else if (Number.isInteger(value)) {
+      return `${key}=${escapeMetadataValue(String(value))}`;
       // if unknown, return the value as string
     } else {
       return value.toString();
