@@ -8,7 +8,9 @@ var isString = require('lodash/isString');
  * @returns {boolean} true if the given url is a remote location or data
  */
 function isRemoteUrl(url) {
-  return isString(url) && /^ftp:|^https?:|^gs:|^s3:|^data:/.test(url);
+  var SUBSTRING_LENGTH = 120;
+  var urlSubstring = url.substring(0, SUBSTRING_LENGTH);
+  return isString(url) && /^ftp:|^https?:|^gs:|^s3:|^data:([\w-.]+\/[\w-.]+(\+[\w-.]+)?)?(;[\w-.]+=[\w-.]+)*;base64,([a-zA-Z0-9\/+\n=]+)$/.test(urlSubstring);
 }
 
 module.exports = isRemoteUrl;
