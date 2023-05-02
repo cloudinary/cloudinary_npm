@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-var isString = require('lodash/isString');
+var isString = require("lodash/isString");
 
 /**
  * Checks whether a given url or path is a local file
@@ -8,7 +8,13 @@ var isString = require('lodash/isString');
  * @returns {boolean} true if the given url is a remote location or data
  */
 function isRemoteUrl(url) {
-  return isString(url) && /^ftp:|^https?:|^gs:|^s3:|^data:([\w-.]+\/[\w-.]+(\+[\w-.]+)?)?(;[\w-.]+=[\w-.]+)*;base64,([a-zA-Z0-9\/+\n=]+)$/.test(url);
+  const substring = url.substring(0, 2000);
+  return (
+    isString(url) &&
+    /^ftp:|^https?:|^gs:|^s3:|^data:([\w-.]+\/[\w-.]+(\+[\w-.]+)?)?(;[\w-.]+=[\w-.]+)*;base64,([a-zA-Z0-9\/+\n=]+)$/.test(
+      urlSubString
+    )
+  );
 }
 
 module.exports = isRemoteUrl;
