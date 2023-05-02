@@ -9,7 +9,7 @@ var isString = require('lodash/isString');
  */
 function isRemoteUrl(url) {
   var SUBSTRING_LENGTH = 120;
-  var urlSubstring = url.substring(0, SUBSTRING_LENGTH);
+  var urlSubstring = isString(url) && url.substring(0, SUBSTRING_LENGTH);
   return isString(url) && /^ftp:|^https?:|^gs:|^s3:|^data:([\w-.]+\/[\w-.]+(\+[\w-.]+)?)?(;[\w-.]+=[\w-.]+)*;base64,([a-zA-Z0-9\/+\n=]+)$/.test(urlSubstring);
 }
 
