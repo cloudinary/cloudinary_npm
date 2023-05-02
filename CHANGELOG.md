@@ -4,14 +4,6 @@
   * fix: smd number field allows both numbers and string when uploading
   * fix: isRemoteUrl not working on big files sometimes
 
-
- / 2023-05-02
-=============
-
-  * Merge pull request #584 from matheuswanted/fix/isRemoteUrl-breaking
-  * Merge pull request #603 from cloudinary/smd-number-field-fix
-  * fix: smd number field allows both numbers and string when uploading
-  * fix: isRemoteUrl not working on big files sometimes
 1.36.2 / 2023-04-24
 ==================
 
