@@ -1,3 +1,8 @@
+1.36.4 / 2023-05-02
+==================
+
+fix: isRemoteUrl check improved to reduce false positives
+
 1.36.3 / 2023-05-02
 ==================
 
