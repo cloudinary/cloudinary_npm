@@ -769,3 +769,31 @@ exports.reorder_metadata_fields = function reorder_metadata_fields(order_by, dir
   var params = { order_by, direction };
   return call_api("put", ["metadata_fields", "order"], params, callback, options);
 };
+
+exports.list_metadata_rules = function list_metadata_rules(callback) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return call_api('get', ['metadata_rules'], {}, callback, options);
+};
+
+exports.add_metadata_rule = function add_metadata_rule(metadata_rule, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  options.content_type = 'json';
+  var params = pickOnlyExistingValues(metadata_rule, 'metadata_field_id', 'condition', 'result', 'name');
+  return call_api('post', ['metadata_rules'], params, callback, options);
+};
+
+exports.update_metadata_rule = function update_metadata_rule(field_external_id, updated_metadata_rule, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  options.content_type = 'json';
+  var params = pickOnlyExistingValues(updated_metadata_rule, 'metadata_field_id', 'condition', 'result', 'name', 'state');
+  return call_api('put', ['metadata_rules', field_external_id], params, callback, options);
+};
+
+exports.delete_metadata_rule = function delete_metadata_rule(field_external_id, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return call_api('delete', ['metadata_rules', field_external_id], {}, callback, options);
+};
