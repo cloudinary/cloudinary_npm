@@ -1060,21 +1060,21 @@ declare module 'cloudinary' {
             function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
 
             /****************************** Structured Metadata Rules API V2 Methods *************************************/
-            function add_metadata_field(rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+            function add_metadata_rule(rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
 
-            function add_metadata_field(rule: MetadataRule, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+            function add_metadata_rule(rule: MetadataRule, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
 
-            function list_metadata_fields(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataRulesListResponse>;
+            function list_metadata_rules(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataRulesListResponse>;
 
-            function list_metadata_fields(options?: AdminApiOptions): Promise<MetadataRulesListResponse>;
+            function list_metadata_rules(options?: AdminApiOptions): Promise<MetadataRulesListResponse>;
 
-            function update_metadata_field(external_id: string, rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+            function update_metadata_rule(external_id: string, rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
 
-            function update_metadata_field(external_id: string, rule: MetadataRule, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+            function update_metadata_rule(external_id: string, rule: MetadataRule, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
 
-            function delete_metadata_field(external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteApiResponse>;
+            function delete_metadata_rule(external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteApiResponse>;
 
-            function delete_metadata_field(external_id: string, callback?: ResponseCallback): Promise<DeleteApiResponse>;
+            function delete_metadata_rule(external_id: string, callback?: ResponseCallback): Promise<DeleteApiResponse>;
 
         }
 
