@@ -1,3 +1,4 @@
+const assert = require('assert');
 const Q = require('q');
 const sinon = require('sinon');
 const cloudinary = require("../../../../cloudinary");
@@ -96,14 +97,16 @@ describe("structured metadata api", function () {
     // Create the metadata fields required for the tests
     return Q.allSettled(
       metadata_fields_to_create.map(field => createMetadataFieldForTest(field))
-    ).finally(function () {});
+    ).finally(function () {
+    });
   });
 
   after(function () {
     // Delete all metadata fields created during testing
     return Q.allSettled(
       metadata_fields_external_ids.map(field => api.delete_metadata_field(field))
-    ).finally(function () {});
+    ).finally(function () {
+    });
   });
 
   describe("list_metadata_fields", function () {
@@ -123,7 +126,7 @@ describe("structured metadata api", function () {
     it("should return metadata field by external id", function () {
       return api.metadata_field_by_field_id(EXTERNAL_ID_GENERAL)
         .then((result) => {
-          expect([result, { label: EXTERNAL_ID_GENERAL }]).to.beAMetadataField();
+          expect([result, {label: EXTERNAL_ID_GENERAL}]).to.beAMetadataField();
         });
     });
   });
@@ -174,7 +177,10 @@ describe("structured metadata api", function () {
         expect(result).to.beAMetadataField();
         return api.metadata_field_by_field_id(EXTERNAL_ID_DATE);
       }).then((result) => {
-        expect([result, { ...metadata, mandatory: false }]).to.beAMetadataField();
+        expect([result, {
+          ...metadata,
+          mandatory: false
+        }]).to.beAMetadataField();
       });
     });
     it("should create enum metadata field", function () {
@@ -195,7 +201,7 @@ describe("structured metadata api", function () {
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_ENUM)));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('type', 'enum')));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_ENUM)));
-        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', { values: datasource_single })));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', {values: datasource_single})));
       });
     });
     it("should create set metadata field", function () {
@@ -251,7 +257,7 @@ describe("structured metadata api", function () {
 
   describe("update_metadata_field_datasource", function () {
     it("should update metadata field datasource by external id", function () {
-      return api.update_metadata_field_datasource(EXTERNAL_ID_ENUM_2, { values: datasource_single })
+      return api.update_metadata_field_datasource(EXTERNAL_ID_ENUM_2, {values: datasource_single})
         .then(() => api.metadata_field_by_field_id(EXTERNAL_ID_ENUM_2))
         .then((result) => {
           expect(result.datasource).to.beADatasource();
@@ -283,7 +289,7 @@ describe("structured metadata api", function () {
           expect(result.message).to.eql("ok");
           return api.add_metadata_field(metadata);
         })
-        .catch(({ error }) => {
+        .catch(({error}) => {
           expect(error).not.to.be(void 0);
           expect(error.http_code).to.eql(400);
           expect(error.message).to.contain(`external id ${EXTERNAL_ID_DELETE_2} already exists`);
@@ -393,7 +399,7 @@ describe("structured metadata api", function () {
         .then((result) => {
           expect(result).to.beAMetadataField();
           return api.metadata_field_by_field_id(EXTERNAL_ID_INT_VALIDATION_2);
-        }).catch(({ error }) => {
+        }).catch(({error}) => {
           expect(error).not.to.be(void 0);
           expect(error.http_code).to.eql(400);
           expect(error.message).to.contain(`default_value is invalid`);
@@ -507,6 +513,88 @@ describe("structured metadata api", function () {
         expect(result.public_ids[0]).to.equal('sample');
         done();
       })
+    });
+  });
+
+  describe('rules', () => {
+    it('should allow listing metadata rules', () => {
+      const expectedPath = '/metadata_rules';
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        api.list_metadata_rules();
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match('GET')
+        }));
+      });
+    });
+
+    it('should allow adding new metadata rules', () => {
+      const expectedPath = '/metadata_rules';
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        const newMetadataRule = {
+          metadata_field_id: 'field_id',
+          name: 'rule_name',
+          condition: {},
+          result: {}
+        };
+        api.add_metadata_rule(newMetadataRule);
+
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match('POST')
+        }));
+
+        sinon.assert.calledOnce(writeSpy);
+
+        const firstCallArgs = JSON.parse(writeSpy.firstCall.args[0]);
+        assert.deepStrictEqual(firstCallArgs, {
+          metadata_field_id: 'field_id',
+          name: 'rule_name',
+          condition: {},
+          result: {}
+        });
+      });
+    });
+
+    it('should allow editing metadata rules', () => {
+      const expectedPath = '/metadata_rules/some-metadata-rule-id';
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        const ruleUpdate = {
+          metadata_field_id: 'new_field_id',
+          name: 'new_rule_name',
+          condition: {},
+          result: {},
+          state: 'inactive'
+        };
+        api.update_metadata_rule('some-metadata-rule-id', ruleUpdate);
+
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match('PUT')
+        }));
+
+        sinon.assert.calledOnce(writeSpy);
+
+        const firstCallArgs = JSON.parse(writeSpy.firstCall.args[0]);
+        assert.deepStrictEqual(firstCallArgs, {
+          metadata_field_id: 'new_field_id',
+          name: 'new_rule_name',
+          condition: {},
+          result: {},
+          state: 'inactive'
+        });
+      });
+    });
+
+    it('should allow removing existing metadata rules', () => {
+      const expectedPath = '/metadata_rules/some-metadata-rule-id';
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        api.delete_metadata_rule('some-metadata-rule-id');
+        sinon.assert.calledWith(requestSpy, sinon.match({
+          pathname: sinon.match(new RegExp(expectedPath)),
+          method: sinon.match('DELETE')
+        }));
+      });
     });
   });
 });

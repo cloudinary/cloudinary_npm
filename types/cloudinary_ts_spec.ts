@@ -663,6 +663,52 @@ cloudinary.v2.api.update_metadata_field_datasource('EXTERNAL_ID_GET_LIST1', data
 cloudinary.v2.api.delete_datasource_entries('EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES', ['size_2'])
     .then((res)=>{console.log(res)})
 
+cloudinary.v2.api.add_metadata_rule({
+    metadata_field_id: 'EXTERNAL_ID_GET_LIST',
+    name: 'rule-name',
+    condition: {
+        metadata_field_id: 'EXTERNAL_ID_GET_LIST',
+        populated: true,
+    },
+    result: {
+        enable: true,
+        activate_values: 'all',
+    },
+}).then((result) => {
+    console.log(result);
+}).catch((error) => {
+    console.error(error);
+});
+
+cloudinary.v2.api.list_metadata_rules().then((rules) => {
+    console.log(rules);
+}).catch((error) => {
+    console.error(error);
+});
+
+cloudinary.v2.api.update_metadata_rule('RULE_EXTERNAL_ID', {
+    metadata_field_id: 'EXTERNAL_ID_GET_LIST',
+    name: 'rule-name',
+    condition: {
+        metadata_field_id: 'EXTERNAL_ID_GET_LIST',
+        populated: true,
+    },
+    result: {
+        enable: true,
+        activate_values: 'all',
+    },
+}).then((updatedRule) => {
+    console.log(updatedRule);
+}).catch((error) => {
+    console.error(error);
+})
+
+cloudinary.v2.api.delete_metadata_rule('RULE_EXTERNAL_ID').then((result) => {
+    console.log(result);
+}).catch((error) => {
+    console.error(error);
+});
+
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.add_context('alt=Animal|class=Mammalia', ['dog', 'lion'],
     function (error, result) {

@@ -1,4 +1,4 @@
-import { Transform } from 'stream';
+import {Transform} from 'stream';
 
 
 declare module 'cloudinary' {
@@ -651,6 +651,80 @@ declare module 'cloudinary' {
         values: Array<DatasourceEntry>
     }
 
+    export type MetadataRuleCondition =
+        MetadataRulePopulatedCondition
+        | MetadataRuleEqualsCondition
+        | MetadataRuleIncludesCondition
+        | MetadataRuleOrCondition
+        | MetadataRuleAndCondition;
+
+    export interface MetadataRulePopulatedCondition {
+        metadata_field_id: string;
+        populated: boolean;
+    }
+
+    export interface MetadataRuleEqualsCondition {
+        metadata_field_id: string;
+        equals: string;
+    }
+
+    export interface MetadataRuleIncludesCondition {
+        metadata_field_id: string;
+        includes: Array<string>;
+    }
+
+    export interface MetadataRuleOrCondition {
+        and: Array<MetadataRuleCondition>
+    }
+
+    export interface MetadataRuleAndCondition {
+        or: Array<MetadataRuleCondition>
+    }
+
+    export type MetadataRuleResult =
+        MetadataRuleResultEnable
+        | MetadataRuleResultEnableWithActivate
+        | MetadataRuleResultEnableWithApply;
+
+    interface MetadataRuleResultCommon {
+        set_mandatory?: boolean;
+    }
+
+    export interface MetadataRuleResultEnable extends MetadataRuleResultCommon {
+        enable: boolean;
+    }
+
+    export interface MetadataRuleResultEnableWithActivate extends MetadataRuleResultCommon {
+        enable?: boolean;
+        activate_values: "all" | {
+            external_ids: string | Array<string> | null;
+            mode?: "override" | "append";
+        }
+    }
+
+    export interface MetadataRuleResultEnableWithApply extends MetadataRuleResultCommon {
+        enable?: boolean;
+        apply_value: {
+            value: string | Array<string>;
+            mode?: "default" | "append";
+        }
+    }
+
+    export interface MetadataRule {
+        metadata_field_id: string;
+        name: string | null;
+        condition: MetadataRuleCondition;
+        result: MetadataRuleResult | Array<MetadataRuleResult>;
+        state?: string;
+    }
+
+    export interface MetadataRuleResponse extends MetadataRule {
+        condition_signature: string;
+        external_id: string;
+    }
+
+    export type MetadataRulesListResponse = Array<MetadataRuleResponse>;
+
     export interface ResourceApiResponse {
         resources: [
             {
@@ -984,6 +1058,24 @@ declare module 'cloudinary' {
             function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
             function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            /****************************** Structured Metadata Rules API V2 Methods *************************************/
+            function add_metadata_rule(rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+
+            function add_metadata_rule(rule: MetadataRule, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+
+            function list_metadata_rules(callback?: ResponseCallback, options?: AdminApiOptions): Promise<MetadataRulesListResponse>;
+
+            function list_metadata_rules(options?: AdminApiOptions): Promise<MetadataRulesListResponse>;
+
+            function update_metadata_rule(external_id: string, rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+
+            function update_metadata_rule(external_id: string, rule: MetadataRule, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
+
+            function delete_metadata_rule(external_id: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteApiResponse>;
+
+            function delete_metadata_rule(external_id: string, callback?: ResponseCallback): Promise<DeleteApiResponse>;
+
         }
 
         /****************************** Upload API V2 Methods *************************************/
