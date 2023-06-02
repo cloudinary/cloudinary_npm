@@ -11,7 +11,7 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const cloneDeep = require('lodash/cloneDeep');
-const ProxyAgent = require('proxy-agent');
+const { ProxyAgent } = require('proxy-agent');
 const assert = require('assert');
 
 const IMAGE_FILE = helper.IMAGE_FILE;

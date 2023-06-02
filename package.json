@@ -17,9 +17,9 @@
     "q": "1.5.1"
   },
   "devDependencies": {
+    "@types/expect.js": "^0.3.29",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.5.0",
-    "@types/expect.js": "^0.3.29",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -69,10 +69,7 @@
     "docs": "tools/scripts/docs.sh"
   },
   "optionalDependencies": {
-    "proxy-agent": "^5.0.0"
-  },
-  "overrides": {
-    "vm2": "3.9.17"
+    "proxy-agent": "6.2.1"
   },
   "engines": {
     "node": ">=0.6"
