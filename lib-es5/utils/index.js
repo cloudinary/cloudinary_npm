@@ -1669,19 +1669,6 @@ function jsonArrayParam(data, modifier) {
   return JSON.stringify(data);
 }
 
-function optionalRequire(moduleName) {
-  var module = void 0;
-  try {
-    module = require(moduleName);
-    return module;
-  } catch (e) {
-    if (e.code === "MODULE_NOT_FOUND") {
-      return null;
-    }
-    throw e;
-  }
-}
-
 /**
  * Empty function - do nothing
  *
@@ -1739,7 +1726,6 @@ exports.jsonArrayParam = jsonArrayParam;
 exports.download_folder = download_folder;
 exports.base_api_url = base_api_url;
 exports.download_backedup_asset = download_backedup_asset;
-exports.optionalRequire = optionalRequire;
 
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
