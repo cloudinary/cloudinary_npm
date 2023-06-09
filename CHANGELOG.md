@@ -1,3 +1,10 @@
+1.37.1 / 2023-06-09
+==================
+
+  * chore: removing ts installed with dtslint to prevent fails on older node.js
+  * fix: only explicit require used
+  * fix: upgrade core-js from 3.30.1 to 3.30.2
+
 1.37.0 / 2023-05-16
 ==================
 
