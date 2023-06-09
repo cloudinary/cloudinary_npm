@@ -34,8 +34,8 @@ var Cache = require('./cache');
 var utils = require("./utils");
 var UploadStream = require('./upload_stream');
 var config = require("./config");
-var ProxyAgent = utils.optionalRequire('proxy-agent');
 var ensureOption = require('./utils/ensureOption').defaults(config());
+var ProxyAgent = utils.optionalRequireProxyAgent();
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,

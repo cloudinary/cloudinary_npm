@@ -10,7 +10,7 @@ var Q = require('q');
 var url = require('url');
 var utils = require("../utils");
 var ensureOption = require('../utils/ensureOption').defaults(config());
-var ProxyAgent = utils.optionalRequire('proxy-agent');
+var ProxyAgent = utils.optionalRequireProxyAgent();
 
 var extend = utils.extend,
     includes = utils.includes,
