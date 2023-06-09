@@ -12,7 +12,7 @@
   "main": "cloudinary.js",
   "dependencies": {
     "cloudinary-core": "2.13.0",
-    "core-js": "3.30.1",
+    "core-js": "3.30.2",
     "lodash": "4.17.21",
     "q": "1.5.1"
   },
