@@ -1,3 +1,526 @@
+1.37.1 / 2023-06-09
+==================
+
+  * chore: removing ts installed with dtslint to prevent fails on older node.js
+  * fix: only explicit require used
+  * fix: upgrade core-js from 3.30.1 to 3.30.2
+
+1.37.0 / 2023-05-16
+==================
+
+* feat: exposing structured metadata rules api
+
+1.36.4 / 2023-05-02
+==================
+
+fix: isRemoteUrl check improved to reduce false positives
+
+1.36.3 / 2023-05-02
+==================
+
+  * fix: smd number field allows both numbers and string when uploading
+  * fix: isRemoteUrl not working on big files sometimes
+
+1.36.2 / 2023-04-24
+==================
+
+fix: bumped vm2 override to latest
+
+1.36.1 / 2023-04-13
+==================
+
+chore: overriding vulnerable transitive dependency
+
+1.36.0 / 2023-04-13
+==================
+
+* feat: add support for `media_metadata` param for `upload` and `explicit`
+* feat: passing context and metadata when using rename
+
+1.35.0 / 2023-03-03
+==================
+
+  * fix: removing nested nulls from options passed to api, closes #581
+  * feat: add option to configure tracked analytics
+
+1.34.0 / 2023-02-13
+==================
+
+  * fix: resource_type is not optional
+  * feat: search for folders
+  * feat: support for extra_headers in upload request
+
+1.33.0 / 2022-12-15
+==================
+
+  * feat: start and end offset normalized in a transformation string
+  * feat: new config option for hiding sensitive data when logging errors
+  * feat: multiple ACLs for generate_auth_token
+  * fix: improved TS typing
+
+1.32.0 / 2022-09-14
+==================
+
+* Add dynamic folder feature (#559)
+
+
+1.31.0 / 2022-08-28
+==================
+
+  * Update core-js package (#558)
+  * Add download_backedup_asset typings (#557)
+
+
+1.30.1 / 2022-07-21
+==================
+
+* Bump lodash version to 4.17.21 (#551)
+* Add types for verifyNotificationSignature (#555)
+
+
+1.30.0 / 2022-05-15
+==================
+
+  * Add filename_override option to types (#548)
+
+
+1.29.1 / 2022-04-17
+==================
+
+  * Fix support of the lowercase response headers (#545)
+  * Fix tags function type definition (#544)
+
+
+1.29.0 / 2022-03-24
+==================
+
+New functionality
+-----------------
+* Add support for `resources_by_asset_ids` Admin API (#529)
+* Add support for `reorder_metadata_fields` Admin API (#526)
+
+Other changes
+-----------------
+  * bump bson version (#541)
+  * bumbed ejs version in photo_album (#540)
+  * Add Travis configuration for node 16 (#535)
+  * Stabilize OCR tests (#533)
+  * update README (#528)
+  * Stabilize metadata tests (#530)
+ 
+
+1.28.1 / 2022-01-06
+==================
+
+* Bump proxy-agent version to ^5.0.0 due to vulnerability 
+
+1.28.0 / 2022-01-02
+==================
+
+New functionality
+-----------------
+  * Add support for folder decoupling (#523)
+  * Add support for `resource_by_asset_id` Admin API (#522)
+  * Add proxy support (#518)
+
+Other changes
+-----------------
+  * Add tests for expression normalization (#521)
+
+1.27.1 / 2021-10-11
+==================
+
+  * Add node version to user agent (#519)
+
+
+1.27.0 / 2021-09-12
+==================
+
+* Fix: `verifyNotificationSignature` timestamps are in seconds (#515)
+ * Allow multi and sprite with urls, add download_generated_sprite and download_multi methods (#493)
+ * Prevent preview:duration from being normalized (#513)
+ * Prevent duplicate search fields in search api (#510)
+ * Add support for create_slideshow Upload API (#508)
+ * Add support for variables in text style (#507)
+
+
+1.26.3 / 2021-08-01
+==================
+
+  * Add update_metada type to upload api (#500)
+  * Return structured metadata in resources APIs (#503)
+
+1.26.2 / 2021-07-04
+==================
+
+  * fixed font_family encoding (#498)
+
+
+1.26.1 / 2021-06-22
+==================
+
+  * updated sent upload params (#497)
+  * Improve the return type of cloudinary.v2.config() in TypeScript (#494)
+
+
+1.26.0 / 2021-06-06
+==================
+
+Add support for oauth authorization (#489)
+
+
+1.25.2 / 2021-05-30
+==================
+
+Other Changes
+  * Fix - Remove file extensions from require statements (#490)
+  * Fix - Add support for complex variable names (aheight) (#488)
+  * Fix - #486 - upload_prefix configuration retrieval (#487)
+
+
+
+1.25.1 / 2021-03-22
+==================
+
+  * Fix/unhandled promise rejection call api (#481)
+  * Fix return type of api_url function(return String instead of Promise) (#483)
+  * Add SHA-256 support for auth signatures (#479)
+
+1.25.0 / 2021-02-22
+==================
+
+New functionality
+-----------------
+* Add sort by metadata field (#474)
+* Add filename override param (#471)
+
+Other changes
+-------------
+* Add safe base64 to all url generation (#477)
+* Fix config backup in sign requests test (#476)
+* Add missing types to create/delete_folder and private_download_url (#473)
+* Add validation to genreate_auth_token to enforce url or acl (#472)
+
+
+
+ 1.24.0 / 2021-01-31
+=============
+
+New functionality and features
+------------------------------
+  * Add `accessibility_analysis` parameter support (#463)
+  * Add support for date parameter in usage API (#467)
+
+Other Changes
+-------------
+  * Change test for `eval` upload parameter (#468)
+  * Update docstring for normalize_expression (#461)
+  * Fix secure_distribution has type (#462)
+  * Remove unused parameter from archive_params (#454)
+  * Fix type of generate_auth_token options (#448)
+  * Set the provisioning API config as optional (#451)
+  * Encode all URI components when building a URL in base_api_url() (#447)
+  * Generate url-safe base64 strings in remote custom functions (#446)
+
+1.23.0 / 2020-08-26
+===================
+New functionality and features
+------------------------------
+* Add support for pending, prefix, and sub_account_id to users method (#417)
+* Add support for metadata array value (#433)
+* Detect data URLs with suffix in mime type (#418)
+* Add support for download backedup asset function (#415)
+* Add support `max_results` and `next_cursor` in `root_folders` and `sub_folders` (#411)
+* Add download_folder method (#404)
+
+Other Changes
+-------------
+* Added linter rules (#423)
+* Fix docstring for pending parameter of the users method (#436)
+* Fix invalid detection failing test (#439)
+* Test: Ignore URL in AuthToken generation if ACL is provided (#431)
+* Add pull_request_template.md (#435)
+* Fix and improve docstring for download_folder() (#434)
+* Refactor `pickOnlyExistingValues()` function (#432)
+* Add tests for new OCR features (#385)
+
+ 
+1.22.0 / 2020-06-08
+==================
+
+
+New functionality and features
+------------------------------ 
+  * Feature encode sdk version (#371)
+  * Add support for cinemagraph_analysis parameter in upload, explicit, and resource (#391)
+  * Support for creating folders using Admin API (#370)
+  * Add support for pow operator in expressions (#386)
+  * Feature/support download backup version api (#380)
+  * Fix normalize_expression when variable is named like a keyword (e.g., ) (#367)
+  * Add support for 32 char SHA-256 signatures (#368)
+
+  Other Changes
+  -------------
+  * Add missing types for sign-request (#398)
+  * Add deprecation warning for node 6, add tests for node 14 (#389)
+  * Add linter (#388)
+  * Fix incorrect text implementation for list resources(#382)
+  * Update issue templates (#365)
+
+
+
+
+
+
+1.21.0 / 2020-03-29
+==================
+
+New functionality and features
+------------------------------ 
+  * Add types for Structured Metadata functions (#359)
+  * Added types for upload response callback (#360)
+  * Updated promise types for resources methods (#358)
+
+Other Changes
+-------------
+ * Add  back to responses sent from Admin API (#361)
+ * Align all structured metadata tests with reference implementation (#351)
+ * Improve provisioning api tests (#354)
+ * Refactor in a wait period for eager uploads (#355)
+
+
+1.20.0 / 2020-03-11
+==================
+
+New functionality and features
+------------------------------ 
+  * Add support for sources in video tag (#265)
+  * Add support multiple resource_types in ZIP generation (#348)
+  * Add API support for account/provisioning (#343)
+  * Add filename options (#273)
+  * Add use_filename option (#274)
+  * Support quality_override param for update and explicit api (#242)
+  
+  Other Changes
+  -------------
+  * Refactor out a duplicate test (#353)
+  * Refactor the order of the assertions in account_spec (#352)
+  * Fix type defs for stream upload methods (#336)
+  * Remove typings spec and config from npm package
+  * Add automation to delete the es5-lib dir when npm run compile is run
+  * Move typescript to devDependencies and update version
+  * Refactor out utils functions
+
+1.19.0 / 2020-01-20
+==================
+
+New functionality and features
+------------------------------ 
+ * Add structured metadata support
+ * Add verifyNotificationSignature()
+
+Other Changes
+-------------
+  * Fix isRemoteUrl to correctly detect docx files
+  * Fix named transformations with spaces
+  * Fix/fixed type def for upload stream
+  * Add name to errors in uploader.js
+
+1.18.1 / 2019-12-11
+==================
+
+* Fix acl and url escaping in auth_token generation
+
+1.18.0 / 2019-12-09
+===================
+
+ New functionality
+ -----------------
+  * Add live parameter to create_upload_preset and update_upload_preset
+
+ Other changes
+ -------------
+  * Fixed tests on Utils and Cloudinary_spec and removed a duplicate one
+
+
+1.17.0 / 2019-11-11
+===================
+
+  * Update ejs dependency in photo album
+  * Add Type Script declaration file
+
+1.16.0 / 2019-10-15
+===================
+
+  * Support different radius for each corner (containing images and overlays) (#260)
+  * Add feature to allow override on timestamp and signature (#295)
+  * remove package-lock (#303)
+  * Fixed open linting issues (#279)
+  * Feature/publish script (#289)
+  * Fix parameters sent when creating a text image (#298)
+  * Add custom pre function support (#302)
+  * Escape quotes in HTML attributes (#259)
+
+1.15.0 / 2019-09-08
+===================
+
+New functionality
+-----------------
+
+* Add 'derived_next_resource' to api.resource method
+* Add support for 'delete folder' API
+* Add support for remote/local function invocation (fn:remote and fn:wasm) (#261)
+* Add antialiasing and hinting
+* Add `force_version` transformation parameterAdd automatic JavaScript linting and fix existing code conflicts (#262)
+* Add automatic JavaScript linting and fix existing code conflicts (#262)
+
+Other changes
+-------------
+  * Mock upload preset listing test
+  * Feature/duration to condition video
+  * Update test for change moderation status
+  * Simplified error assertions in a few test specs
+  * Fix base64 URL validation
+  * Rearrange util tests
+  * Test support of `async` option in explicit api
+  * Remove unnecessary return statements and options from tests
+  * Remove unnecessary use of options and API in access_control_spec.js
+  * Merge pull request #239 from tornqvist/remove-coffeescript-transform
+  * Remove coffee script deps and transform
+
+1.14.0 / 2019-03-26
+===================
+
+New functionality
+-----------------
+
+  * Support format in transformation API
+  * Add support for `start_offset` value `auto`
+  * Add support for gs:// urls in uploader
+  * Add support for the `quality_analysis` upload parameter. Fixes #171
+  * Add `fps` transformation parameter (#230)
+
+Other changes
+-------------
+
+  * Update code samples in the README file. Fixes #135
+  * Reject deferred on request error. Fixes #136
+  * Refactor test code after conversion from CoffeeScript
+  * Convert test code from CoffeeScript to JavaScript
+  * Merge pull request #208 from cloudinary/fix_update_samples_readme
+  * Fix the "upload large" test for node 4
+  * Remove bower from the sample code
+  * Add timeout to search integration tests
+  * Fix detection test
+  * Fix broken links in node sample project readme
+
+1.13.2 / 2018-11-14
+===================
+
+  * Use a new timestamp for each chunk in `upload_large` API
+
+1.13.1 / 2018-11-13
+===================
+
+  * Filter files in the npm package
+  * Add polyfill for `Object.entries`
+  * Add `update_version` script
+
+1.13.0 / 2018-11-13
+===================
+
+  * Support listing of named transformations using the `named` parameter
+  * Fix Node version check. Fixes #217
+
+1.12.0 / 2018-11-08
+===================
+
+New functionality
+-----------------
+
+  * Add Responsive Breakpoints cache
+  * Add `picture` and `source` tags
+  * Add fetch support to overlay/underlay (#189)
+  * Add async param to uploader (#193)
+ 
+Other changes
+-------------
+
+  * Convert CoffeeScript source to JavaScript
+  * Refactor compiled coffee to proper JS
+  * Remove old lib files
+  * Move all sources from `src` to `lib`
+  * Move `cloudinary.js` inside the src folder
+  * Setup library and tests to run with either es6 or es5
+  * Apply babel to support older Node versions
+  * Refactor tests to use promises
+  * Fix Tests
+  * Refactor utils
+  * Move utils.js to utils folder
+  * Add `ensurePresenceOf` and `rimraf` utility functions
+  * Add `nyc` for coverage and update sinon
+  * Add "Join the Community" (#201)
+  * Use upload params in explicit API
+  * Fix raw convert test
+
+1.11.0 / 2018-03-19
+===================
+
+New functionality
+-----------------
+
+  * Add `access_control` parameter to `upload` and `update`
+ 
+Other changes
+-------------
+
+  * Mock `delete_all_resources` test
+  * Add `compileTests` script to `package.json`
+  * Add http/https handling to spec helper
+  * Mock moderation tests
+  * Fix `categorization` test
+  * Remove `similiarity_search` test
+  * Add test helper functions
+  * Add utility functions to `utils`
+  * Replace lodash's `_` with explicitly requiring methods
+
+1.10.0 / 2018-02-13
+===================
+
+New functionality
+-----------------
+
+  * Support url suffix for shared CDN
+  * Add Node 8 to Travis CI tests and remove secure variables
+  * Fix breakpoints format parameter
+  * Extend support of url_suffix for different resource types
+  * Add support for URLs in upload_large
+  * Add support for transformations parameter in delete_resources api
+  * Add support for delete_derived_by_transformation
+  * Add format parameter support to responsive-breakpoints encoder
+  * Add expires_at parameter to archive_params
+  * Add `faces` parameter to the `explicit` API
+
+Other changes
+-------------
+
+  * Fix typos
+  * Test transformations api with next_cursor
+  * add test cases of ocr for upload and url generation
+  * add test case of conditional tags
+  * Update dependencies
+  * Fix tests
+  * Remove tests for `auto_tagging`
+
+1.9.1 / 2017-10-24
+==================
+
+  * Decode string to sign before creating the signature (#167)
+  * Update Readme to point to HTTPS URLs of cloudinary.com
+  * Update lib files
+  * Ignore error when `.env` file is missing.
+  * Remove CoffeeScript header
+  * Add `lib\v2\search.js` to git.
 
 1.9.0 / 2017-04-30
 ==================

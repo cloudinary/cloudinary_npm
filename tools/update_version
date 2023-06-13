@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+
+# Update version number and prepare for publishing the new version
+
+set -e
+
+# CMD_PREFIX is prepended to each command line.
+# Empty to run the rest of the line and "echo" for a dry run.
+CMD_PREFIX=
+
+# For a dry run, extra quotes must be added to the text
+QUOTE=
+
+NEW_VERSION=
+
+function echo_err
+{
+    echo "$@" 1>&2;
+}
+
+function usage
+{
+      echo "Usage: $0 [parameters]"
+      echo "      -v | --version <version> set a new version"
+      echo "      -p | --publish publish the new version"
+      echo "      -c | --current show current version"
+      echo "      -d | --dry-run print the commands without executing them"
+      echo "      -h | --help print this information and exit"
+      echo
+      echo "For example: $0 -v 1.2.3"
+}
+
+function process_arguments
+{
+    while [ "$1" != "" ]; do
+        case $1 in
+            -v | --version )
+                shift
+                NEW_VERSION=${1:-}
+                if ! [[ "${NEW_VERSION}" =~ [0-9]+\.[0-9]+\.[0-9]+(\-.+)? ]]; then
+                  echo_err "You must supply a new semver version after -v or --version"
+                  echo_err "For example:"
+                  echo_err "  1.2.3"
+                  echo_err "  1.2.3-rc1"
+                  echo_err ""
+                  usage; return 1
+                fi
+                ;;
+            -p | --publish )
+                PUBLISH=y
+            ;;
+            -c | --current )
+                echo `current_version`
+                return 0
+                ;;
+            -d | --dry-run )
+                CMD_PREFIX=echo
+                echo "========== Dry Run =========="
+                echo ""
+                ;;
+            -h | --help )
+                usage; return 0
+                ;;
+            * )
+              usage; return 1
+        esac
+        shift || true
+    done
+}
+
+# Intentionally make pushd silent
+function pushd
+{
+    command pushd "$@" > /dev/null
+}
+
+# Intentionally make popd silent
+function popd
+{
+    command popd "$@" > /dev/null
+}
+
+# Check if one version is less than or equal than other
+# Example:
+# ver_lte 1.2.3 1.2.3 && echo "yes" || echo "no" # yes
+# ver_lte 1.2.3 1.2.4 && echo "yes" || echo "no" # yes
+# ver_lte 1.2.4 1.2.3 && echo "yes" || echo "no" # no
+function ver_lte
+{
+    [[ $1 == "`echo -e "$1\n$2" | sort -V | head -n1`" ]]
+}
+
+# Extract the last entry or entry for a given version
+# The function is not currently used in this file.
+# Examples:
+#   changelog_last_entry
+#   changelog_last_entry 1.10.0
+#
+function changelog_last_entry
+{
+    sed -e "1,/^${1}/d" -e '/^=/d' -e '/^$/d' -e '/^[0-9]/,$d' CHANGELOG.md
+}
+
+function verify_dependencies
+{
+    # Test if the gnu grep is installed
+    if ! grep --version | grep -q GNU
+    then
+        echo_err "GNU grep is required for this script"
+        echo_err "You can install it using the following command:"
+        echo_err ""
+        echo_err "brew install grep --with-default-names"
+        return 1
+    fi
+
+    if [[ -z "$(type -t git-changelog)" ]]
+    then
+        echo_err "git-extras packages is not installed."
+        echo_err "You can install it using the following command:"
+        echo_err ""
+        echo_err "brew install git-extras"
+        return 1
+    fi
+}
+
+# Replace old string only if it is present in the file, otherwise return 1
+function safe_replace
+{
+    local old=$1
+    local new=$2
+    local file=$3
+
+    grep -q "${old}" "${file}" || { echo_err "${old} was not found in ${file}"; return 1; }
+
+    ${CMD_PREFIX} sed -E -i '.bak' "${QUOTE}s/${old}/${new}/${QUOTE}" "${file}"
+}
+
+function current_version
+{
+    grep -oiP '(?<=version": ")([0-9.]+)(?=")' package.json
+}
+
+# Update version in package.json and create an entry in CHANGELOG.md
+# Variables:
+#   NEW_VERSION - the new version to set
+#   CDM_PREFIX - dry run command (echo)
+function update_version
+{
+    # Enter git root
+    # TODO support mono-repo, which may have multiple package.json files
+    pushd $(git rev-parse --show-toplevel)
+    local current_version=$(current_version)
+
+    if [[ -z "${current_version}" ]]; then
+        echo_err "Failed getting current version, please check directory structure and/or contact developer"
+        popd
+        return 1
+    fi
+
+    # Use literal dot character in regular expression
+    local current_version_re=${current_version//./\\.}
+
+    echo "# Current version is: ${current_version}"
+    echo "# New version is:     ${NEW_VERSION}"
+    echo ""
+    ver_lte "${NEW_VERSION}" "${current_version}" && {
+        echo_err "New version is not greater than current version"
+        popd
+        return 1
+        }
+
+    # Add a quote if this is a dry run
+    QUOTE=${CMD_PREFIX:+"\\\""}
+
+    ${CMD_PREFIX} npm version --no-git-tag-version "${NEW_VERSION}"
+
+    ${CMD_PREFIX} git changelog -t ${NEW_VERSION} || true
+
+    # show the user the files that were modified
+    [[ -z "${CMD_PREFIX}" ]] && git status
+
+    # don't print the following if the publish function is about to be invoked
+    [[ -n "${PUBLISH}" ]] && return
+
+    echo ""
+    echo "# After editing CHANGELOG.md, optionally review changes and issue these commands:"
+    echo git add package.json CHANGELOG.md
+    echo git commit -m \"Version ${NEW_VERSION}\"
+    echo sed -e "'1,/^${NEW_VERSION//./\\.}/d'" \
+             -e "'/^=/d'" \
+             -e "'/^$/d'" \
+             -e "'/^[0-9]/,\$d'" \
+             CHANGELOG.md \
+         \| git tag -a "'${NEW_VERSION}'" --file=-
+
+    popd
+}
+
+function publish
+{
+    # Enter git root
+    # TODO support mono-repo, which may have multiple package.json files
+    pushd $(git rev-parse --show-toplevel)
+    local version=${NEW_VERSION:-$(current_version)}
+    if [[ -z $(git status --short) ]]; then
+        ${CMD_PREFIX} git add package.json CHANGELOG.md           &&
+        ${CMD_PREFIX} git commit -m "${QUOTE}Version ${version}${QUOTE}"    &&
+        [[ -z "${CMD_PREFIX}" ]] && {
+            sed -e "1,/^${version//./\\.}/d" \
+                -e "/^=/d" \
+                -e "/^$/d" \
+                -e "/^[0-9]/,\$d" \
+                CHANGELOG.md \
+            |  git tag -a "${version}" --file=-
+        }
+        # print the command instead of executing it
+        [[ -n "${CMD_PREFIX}" ]] &&
+            echo sed -e "'1,/^${version//./\\.}/d'" \
+                 -e "'/^=/d'" \
+                 -e "'/^$/d'" \
+                 -e "'/^[0-9]/,\$d'" \
+                 CHANGELOG.md \
+            \| git tag -a "'${version}'" --file=-
+    fi
+    [[ $? == 0 ]] && ${CMD_PREFIX} git push && ${CMD_PREFIX} git push --tags
+
+    [[ $? == 0 ]] && ${CMD_PREFIX} npm publish
+
+    [[ -z ${CMD_PREFIX} ]] && echo "Remember to create a new release in github: ${$(git remote get-url origin)%.git}/releases"
+
+    popd
+}
+
+verify_dependencies
+process_arguments $*
+[[ -n "${NEW_VERSION}" ]] && update_version
+[[ -n "${PUBLISH}" ]] && publish

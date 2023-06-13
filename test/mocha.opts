@@ -1,4 +1,0 @@
---require expect.js
--R spec
---ui bdd
---compilers coffee:coffee-script/register

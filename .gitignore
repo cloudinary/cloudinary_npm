@@ -4,6 +4,12 @@ bower_components/
 .DS_Store
 .env
 bin
-lib/*spec.*
-*.js
 *.map
+!lib
+test_cache/
+.nyc_output
+docs
+coverage
+# contains temporary cloudianry_url for test accounts
+tools/cloudinary_url.sh
+package-lock.json
