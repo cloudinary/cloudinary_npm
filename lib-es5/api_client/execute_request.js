@@ -10,12 +10,13 @@ var Q = require('q');
 var url = require('url');
 var utils = require("../utils");
 var ensureOption = require('../utils/ensureOption').defaults(config());
-var ProxyAgent = utils.optionalRequireProxyAgent();
 
 var extend = utils.extend,
     includes = utils.includes,
     isEmpty = utils.isEmpty;
 
+
+var agent = config.api_proxy ? new https.Agent(config.api_proxy) : null;
 
 function execute_request(method, params, auth, api_url, callback) {
   var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
@@ -63,11 +64,10 @@ function execute_request(method, params, auth, api_url, callback) {
 
   var proxy = options.api_proxy || config().api_proxy;
   if (!isEmpty(proxy)) {
-    if (!request_options.agent) {
-      if (ProxyAgent === null) {
-        throw new Error("Proxy value is set, but `proxy-agent` is not installed, please install `proxy-agent` module.");
-      }
-      request_options.agent = new ProxyAgent(proxy);
+    if (!request_options.agent && agent) {
+      request_options.agent = agent;
+    } else if (!request_options.agent) {
+      request_options.agent = new https.Agent(proxy);
     } else {
       console.warn("Proxy is set, but request uses a custom agent, proxy is ignored.");
     }

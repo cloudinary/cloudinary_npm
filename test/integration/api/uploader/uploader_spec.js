@@ -11,7 +11,6 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const cloneDeep = require('lodash/cloneDeep');
-const ProxyAgent = require('proxy-agent');
 const assert = require('assert');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
@@ -1512,7 +1511,7 @@ describe("uploader", function () {
       cloudinary.config({api_proxy: proxy});
       UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG]});
       sinon.assert.calledWith(mocked.request, sinon.match(
-        arg => arg.agent instanceof ProxyAgent
+        arg => arg.agent instanceof https.Agent
       ));
     });
     it("should prioritize custom agent", function () {
@@ -1527,7 +1526,7 @@ describe("uploader", function () {
       cloudinary.config({});
       UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG], api_proxy: proxy});
       sinon.assert.calledWith(mocked.request, sinon.match(
-        arg => arg.agent instanceof ProxyAgent
+        arg => arg.agent instanceof https.Agent
       ));
     });
   })

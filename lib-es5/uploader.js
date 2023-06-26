@@ -35,7 +35,8 @@ var utils = require("./utils");
 var UploadStream = require('./upload_stream');
 var config = require("./config");
 var ensureOption = require('./utils/ensureOption').defaults(config());
-var ProxyAgent = utils.optionalRequireProxyAgent();
+
+var agent = config.api_proxy ? new https.Agent(config.api_proxy) : null;
 
 var build_upload_params = utils.build_upload_params,
     extend = utils.extend,
@@ -680,11 +681,10 @@ function post(url, post_data, boundary, file, callback, options) {
   }
   var proxy = options.api_proxy || config().api_proxy;
   if (!isEmpty(proxy)) {
-    if (!post_options.agent) {
-      if (ProxyAgent === null) {
-        throw new Error("Proxy value is set, but `proxy-agent` is not installed, please install `proxy-agent` module.");
-      }
-      post_options.agent = new ProxyAgent(proxy);
+    if (!post_options.agent && agent) {
+      post_options.agent = agent;
+    } else if (!post_options.agent) {
+      post_options.agent = new https.Agent(proxy);
     } else {
       console.warn("Proxy is set, but request uses a custom agent, proxy is ignored.");
     }

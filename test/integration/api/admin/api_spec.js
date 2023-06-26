@@ -2,7 +2,6 @@ const sinon = require('sinon');
 const formatDate = require("date-fns").format;
 const subDate = require("date-fns").sub;
 const https = require('https');
-const ProxyAgent = require('proxy-agent');
 const ClientRequest = require('_http_client').ClientRequest;
 const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
@@ -1476,7 +1475,7 @@ describe("api", function () {
       cloudinary.config({api_proxy: "https://myuser:mypass@example.com"});
       cloudinary.v2.api.resources({});
       sinon.assert.calledWith(mocked.request, sinon.match(
-        arg => arg.agent instanceof ProxyAgent
+        arg => arg.agent instanceof https.Agent
       ));
     });
     it("should prioritize custom agent", function () {
@@ -1491,7 +1490,7 @@ describe("api", function () {
       cloudinary.config({});
       cloudinary.v2.api.resources({api_proxy: "https://myuser:mypass@example.com"});
       sinon.assert.calledWith(mocked.request, sinon.match(
-        arg => arg.agent instanceof ProxyAgent
+        arg => arg.agent instanceof https.Agent
       ));
     });
   })
