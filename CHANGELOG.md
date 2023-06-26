@@ -1,3 +1,8 @@
+1.37.3 / 2023-06-26
+==================
+
+* fix: native http agent used instead of an external dependency
+
 1.37.2 / 2023-06-19
 ==================
 
