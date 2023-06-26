@@ -35,7 +35,6 @@ var utils = require("./utils");
 var UploadStream = require('./upload_stream');
 var config = require("./config");
 var ensureOption = require('./utils/ensureOption').defaults(config());
-var ProxyAgent = utils.optionalRequireProxyAgent();
 
 var agent = config.api_proxy ? new https.Agent(config.api_proxy) : null;
 
