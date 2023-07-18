@@ -1196,9 +1196,13 @@ declare module 'cloudinary' {
 
             sort_by(key: string, value: 'asc' | 'desc'): search;
 
+            ttl(newTtl: number): search;
+
             to_query(value?: string): search;
 
             with_field(value?: string): search;
+
+            to_url(newTtl: number | null, next_cursor: string | null, options: any): string; //todo: improve typing for options
 
             static aggregate(args?: string): search;
 
@@ -1211,6 +1215,8 @@ declare module 'cloudinary' {
             static next_cursor(args?: string): search;
 
             static sort_by(key: string, value: 'asc' | 'desc'): search;
+
+            static ttl(newTtl: number): search;
 
             static with_field(args?: string): search;
         }

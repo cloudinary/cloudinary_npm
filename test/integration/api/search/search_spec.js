@@ -3,6 +3,8 @@ const cloudinary = require('../../../../cloudinary');
 const helper = require("../../../spechelper");
 const testConstants = require('../../../testUtils/testConstants');
 const describe = require('../../../testUtils/suite');
+const exp = require("constants");
+const cluster = require("cluster");
 const {
   TIMEOUT,
   TAGS,
@@ -83,7 +85,72 @@ describe("search_api", function () {
         with_field: ['context', 'tags']
       });
     });
+
+    describe('to_url', () => {
+      const cloudName = 'test-cloud';
+
+      const commonUrlOptions = {
+        secure: true,
+        cloud_name: cloudName,
+        api_secret: 'test-secret',
+        api_key: 'test-key'
+      };
+
+      beforeEach(() => {
+        cloudinary.v2.config(commonUrlOptions);
+      });
+
+      const search = cloudinary.v2.search.expression('resource_type:image').sort_by('public_id', 'asc').max_results(10);
+
+      const defaultSignature = 'b2eb2ae76343207c92c267130111b241c87c0246';
+      const defaultTtl = '300';
+      const encodedSearchPayload = 'eyJzb3J0X2J5IjpbeyJwdWJsaWNfaWQiOiJhc2MifV0sImV4cHJlc3Npb24iOiJyZXNvdXJjZV90eXBlOmltYWdlIiwibWF4X3Jlc3VsdHMiOjEwfQ==';
+
+      it('should build search url', () => {
+        const actual = search.to_url();
+
+        const expected = `https://res.cloudinary.com/${cloudName}/search/${defaultSignature}/${defaultTtl}/${encodedSearchPayload}/`;
+        expect(actual).to.eql(expected);
+      });
+
+      it('should build search url including next_cursor', () => {
+        const actual = search.to_url(null, 'next_cursor');
+        const expected = `https://res.cloudinary.com/${cloudName}/search/${defaultSignature}/${defaultTtl}/${encodedSearchPayload}/next_cursor`;
+        expect(actual).to.eql(expected);
+      });
+
+      it('should build search url including next_cursor and ttl', () => {
+        const newTtl = 1000;
+        const actual = search.to_url(newTtl, 'next_cursor');
+        const signature = '53314df951a294297d593b53d0b8e08f1bed5a81';
+        const expected = `https://res.cloudinary.com/${cloudName}/search/${signature}/${newTtl}/${encodedSearchPayload}/next_cursor`;
+        expect(actual).to.eql(expected);
+      });
+
+      it('should build search url including next_cursor and ttl', () => {
+        const newTtl = 1000;
+        const actual = search.next_cursor('next_cursor').ttl(newTtl).to_url();
+        const signature = '53314df951a294297d593b53d0b8e08f1bed5a81';
+        const expected = `https://res.cloudinary.com/${cloudName}/search/${signature}/${newTtl}/${encodedSearchPayload}/next_cursor`;
+        expect(actual).to.eql(expected);
+      });
+
+      it('should build search url when private cdn configured', () => {
+        cloudinary.v2.config({
+          secure: true,
+          cloud_name: cloudName,
+          private_cdn: true,
+          api_secret: 'secret',
+          api_key: 'key'
+        });
+        const signature = '23154796f4aa4e81540ba36aece6b62fed911832';
+        const actual = search.to_url(defaultTtl);
+        const expected = `https://${cloudName}-res.cloudinary.com/search/${signature}/${defaultTtl}/${encodedSearchPayload}/`;
+        expect(actual).to.eql(expected);
+      });
+    });
   });
+
   describe("integration", function () {
     this.timeout(TIMEOUT.LONG);
     before(function () {
@@ -111,7 +178,7 @@ describe("search_api", function () {
           })
       ]).delay(10000)
         .then((uploadResults) => {
-          uploadResults.forEach(({ value }) => {
+          uploadResults.forEach(({value}) => {
             ASSET_IDS.push(value.asset_id);
           });
         });

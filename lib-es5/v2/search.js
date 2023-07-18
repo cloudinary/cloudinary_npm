@@ -5,10 +5,26 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var api = require('./api');
+var config = require('../config');
+var ensureOption = require('../utils/ensureOption').defaults(config());
 
 var _require = require('../utils'),
     isEmpty = _require.isEmpty,
-    isNumber = _require.isNumber;
+    isNumber = _require.isNumber,
+    api_sign_request = _require.api_sign_request,
+    compact_and_sort = _require.compact_and_sort,
+    compute_hash = _require.compute_hash,
+    build_distribution_domain = _require.build_distribution_domain,
+    clear_blank = _require.clear_blank;
+
+var _require2 = require("../utils/consts"),
+    DEFAULT_SIGNATURE_ALGORITHM = _require2.DEFAULT_SIGNATURE_ALGORITHM;
+
+var _require3 = require("crypto"),
+    sign = _require3.sign;
+
+var _require4 = require("../utils/encoding/base64Encode"),
+    base64Encode = _require4.base64Encode;
 
 var Search = function () {
   function Search() {
@@ -19,6 +35,7 @@ var Search = function () {
       aggregate: [],
       with_field: []
     };
+    this._ttl = 300;
   }
 
   _createClass(Search, [{
@@ -90,6 +107,16 @@ var Search = function () {
       return this;
     }
   }, {
+    key: 'ttl',
+    value: function ttl(newTtl) {
+      if (isNumber(newTtl)) {
+        this._ttl = newTtl;
+        return this;
+      }
+
+      throw new Error('New TTL value has to be a Number.');
+    }
+  }, {
     key: 'to_query',
     value: function to_query() {
       var _this = this;
@@ -110,6 +137,37 @@ var Search = function () {
       }
       options = options || {};
       return api.search(this.to_query(), options, callback);
+    }
+  }, {
+    key: 'to_url',
+    value: function to_url(ttl, next_cursor) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var apiSecret = 'api_secret' in options ? options.api_secret : config().api_secret;
+      if (!apiSecret) {
+        throw new Error('Must supply api_secret');
+      }
+
+      var signingAlgorithm = options.signature_algorithm || config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM;
+
+      var urlTtl = ttl || this._ttl;
+
+      var query = this.to_query();
+
+      var urlCursor = next_cursor;
+      if (query.next_cursor && !next_cursor) {
+        urlCursor = query.next_cursor;
+        delete query.next_cursor;
+      }
+
+      var data = clear_blank(query);
+      var encodedQuery = base64Encode(JSON.stringify(data));
+
+      var urlPrefix = build_distribution_domain(options);
+
+      var signature = compute_hash(`${urlTtl}${encodedQuery}${apiSecret}`, signingAlgorithm, 'hex');
+
+      return urlCursor ? `${urlPrefix}/search/${signature}/${urlTtl}/${encodedQuery}/${urlCursor}` : `${urlPrefix}/search/${signature}/${urlTtl}/${encodedQuery}/`;
     }
   }], [{
     key: 'instance',
@@ -147,6 +205,11 @@ var Search = function () {
       var dir = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'asc';
 
       return this.instance().sort_by(field_name, dir);
+    }
+  }, {
+    key: 'ttl',
+    value: function ttl(newTtl) {
+      return this.instance().ttl(newTtl);
     }
   }]);
 
