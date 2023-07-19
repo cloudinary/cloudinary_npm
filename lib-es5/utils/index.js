@@ -1152,6 +1152,13 @@ function clear_blank(hash) {
   return filtered_hash;
 }
 
+function sort_object_by_key(object) {
+  return Object.keys(object).sort().reduce(function (obj, key) {
+    obj[key] = object[key];
+    return obj;
+  }, {});
+}
+
 function merge(hash1, hash2) {
   return _extends({}, hash1, hash2);
 }
@@ -1757,6 +1764,7 @@ exports.base_api_url = base_api_url;
 exports.download_backedup_asset = download_backedup_asset;
 exports.compute_hash = compute_hash;
 exports.build_distribution_domain = build_distribution_domain;
+exports.sort_object_by_key = sort_object_by_key;
 
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;

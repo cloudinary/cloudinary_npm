@@ -6,25 +6,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var api = require('./api');
 var config = require('../config');
-var ensureOption = require('../utils/ensureOption').defaults(config());
 
 var _require = require('../utils'),
     isEmpty = _require.isEmpty,
     isNumber = _require.isNumber,
-    api_sign_request = _require.api_sign_request,
-    compact_and_sort = _require.compact_and_sort,
     compute_hash = _require.compute_hash,
     build_distribution_domain = _require.build_distribution_domain,
-    clear_blank = _require.clear_blank;
+    clear_blank = _require.clear_blank,
+    sort_object_by_key = _require.sort_object_by_key;
 
-var _require2 = require("../utils/consts"),
-    DEFAULT_SIGNATURE_ALGORITHM = _require2.DEFAULT_SIGNATURE_ALGORITHM;
-
-var _require3 = require("crypto"),
-    sign = _require3.sign;
-
-var _require4 = require("../utils/encoding/base64Encode"),
-    base64Encode = _require4.base64Encode;
+var _require2 = require('../utils/encoding/base64Encode'),
+    base64Encode = _require2.base64Encode;
 
 var Search = function () {
   function Search() {
@@ -148,8 +140,6 @@ var Search = function () {
         throw new Error('Must supply api_secret');
       }
 
-      var signingAlgorithm = options.signature_algorithm || config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM;
-
       var urlTtl = ttl || this._ttl;
 
       var query = this.to_query();
@@ -157,17 +147,18 @@ var Search = function () {
       var urlCursor = next_cursor;
       if (query.next_cursor && !next_cursor) {
         urlCursor = query.next_cursor;
-        delete query.next_cursor;
       }
+      delete query.next_cursor;
 
-      var data = clear_blank(query);
-      var encodedQuery = base64Encode(JSON.stringify(data));
+      var dataOrderedByKey = sort_object_by_key(clear_blank(query));
+      var encodedQuery = base64Encode(JSON.stringify(dataOrderedByKey));
 
       var urlPrefix = build_distribution_domain(options);
 
-      var signature = compute_hash(`${urlTtl}${encodedQuery}${apiSecret}`, signingAlgorithm, 'hex');
+      var signature = compute_hash(`${urlTtl}${encodedQuery}${apiSecret}`, 'sha256', 'hex');
 
-      return urlCursor ? `${urlPrefix}/search/${signature}/${urlTtl}/${encodedQuery}/${urlCursor}` : `${urlPrefix}/search/${signature}/${urlTtl}/${encodedQuery}/`;
+      var urlWithoutCursor = `${urlPrefix}/search/${signature}/${urlTtl}/${encodedQuery}`;
+      return urlCursor ? `${urlWithoutCursor}/${urlCursor}` : urlWithoutCursor;
     }
   }], [{
     key: 'instance',
