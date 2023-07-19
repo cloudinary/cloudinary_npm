@@ -1321,7 +1321,7 @@ declare module 'cloudinary' {
 
             with_field(value?: string): search;
 
-            to_url(newTtl: number | null, next_cursor: string | null, options: ConfigOptions): string;
+            to_url(newTtl?: number, next_cursor?: string, options?: ConfigOptions): string;
 
             static aggregate(args?: string): search;
 

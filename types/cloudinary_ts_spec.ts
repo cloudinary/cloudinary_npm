@@ -881,6 +881,7 @@ cloudinary.v2.search
     .expression('cat -tags:kitten')
     .sort_by('public_id', 'desc')
     .aggregate('format')
+    .ttl(10)
     .execute().then(result => console.log(result));
 
 // $ExpectType Promise<void>
@@ -889,6 +890,7 @@ cloudinary.v2.search
     .with_field('context')
     .with_field('tags')
     .max_results(10)
+    .ttl(10)
     .execute().then(result => console.log(result));
 
 // $ExpectType Promise<void>
@@ -896,7 +898,16 @@ cloudinary.v2.search
     .expression('resource_type:image AND tags=kitten AND uploaded_at>1d AND bytes>1m')
     .sort_by('public_id', 'desc')
     .max_results(30)
+    .ttl(10)
     .execute().then(result => console.log(result));
+
+// $ExpectType string
+cloudinary.v2.search
+    .expression('resource_type:image AND tags=kitten AND uploaded_at>1d AND bytes>1m')
+    .sort_by('public_id', 'desc')
+    .max_results(30)
+    .ttl(10)
+    .to_url();
 
 // $ExpectType string
 let test2 = cloudinary.v2.url("sample.jpg", {
