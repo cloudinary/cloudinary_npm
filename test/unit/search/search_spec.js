@@ -68,13 +68,13 @@ describe('Search', () => {
   });
 
   describe('to_url', () => {
-    const cloudName = 'test-cloud';
+    const cloudName = 'test123';
 
     const commonUrlOptions = {
       secure: true,
       cloud_name: cloudName,
-      api_secret: 'test-secret',
-      api_key: 'test-key'
+      api_secret: 'secret',
+      api_key: 'key'
     };
 
     beforeEach(() => {
@@ -82,14 +82,15 @@ describe('Search', () => {
     });
 
     const expression = 'resource_type:image AND tags=kitten AND uploaded_at>1d AND bytes>1m';
-    const search = cloudinary.v2.search.expression(expression).sort_by('public_id', 'desc').max_results('30');
+    const search = cloudinary.v2.search.expression(expression).sort_by('public_id', 'desc').max_results(30);
 
-    const encodedSearchPayload = 'eyJleHByZXNzaW9uIjoicmVzb3VyY2VfdHlwZTppbWFnZSBBTkQgdGFncz1raXR0ZW4gQU5EIH' +
-      'VwbG9hZGVkX2F0PjFkIEFORCBieXRlcz4xbSIsIm1heF9yZXN1bHRzIjoiMzAiLCJzb3J0X2J5IjpbeyJwdWJsaWNfaWQiOiJkZXNjIn1dfQ==';
-    const ttl300Sig = '4a239e6a6461eebb9ee48617245a1efb01d362dd8263f42861f92611491b47eb';
-    const ttl1000Sig = '4bdf0749f71b875bea640ed037a0f809dd7498db1ef8d6e4231887eec88d9a2c';
+    const encodedSearchPayload = 'eyJleHByZXNzaW9uIjoicmVzb3VyY2VfdHlwZTppbWFnZSBBTkQgdGFncz1raXR0ZW4gQU5EIHVw' +
+      'bG9hZGVkX2F0PjFkIEFORCBieXRlcz4xbSIsIm1heF9yZXN1bHRzIjozMCwic29ydF9ieSI6W3sicHVibGljX2lkIjoiZGVzYyJ9XX0=';
+    const ttl300Sig = '431454b74cefa342e2f03e2d589b2e901babb8db6e6b149abf25bc0dd7ab20b7';
+    const ttl1000Sig = '25b91426a37d4f633a9b34383c63889ff8952e7ffecef29a17d600eeb3db0db7';
     const defaultTtl = 300;
     const newTtl = 1000;
+    const nextCursor = 'db27cfb02b3f69cb39049969c23ca430c6d33d5a3a7c3ad1d870c54e1a54ee0faa5acdd9f6d288666986001711759d10';
 
     it('should build cached search url', () => {
       const actual = search.to_url();
@@ -104,20 +105,20 @@ describe('Search', () => {
     });
 
     it('should build cached search url including next_cursor', () => {
-      const actual = search.to_url(undefined, 'next_cursor');
-      const expected = `https://res.cloudinary.com/${cloudName}/search/${ttl300Sig}/${defaultTtl}/${encodedSearchPayload}/next_cursor`;
+      const actual = search.to_url(undefined, nextCursor);
+      const expected = `https://res.cloudinary.com/${cloudName}/search/${ttl300Sig}/${defaultTtl}/${encodedSearchPayload}/${nextCursor}`;
       expect(actual).to.eql(expected);
     });
 
     it('should build cached search url including next_cursor and ttl', () => {
-      const actual = search.to_url(newTtl, 'next_cursor');
-      const expected = `https://res.cloudinary.com/${cloudName}/search/${ttl1000Sig}/${newTtl}/${encodedSearchPayload}/next_cursor`;
+      const actual = search.to_url(newTtl, nextCursor);
+      const expected = `https://res.cloudinary.com/${cloudName}/search/${ttl1000Sig}/${newTtl}/${encodedSearchPayload}/${nextCursor}`;
       expect(actual).to.eql(expected);
     });
 
     it('should build cached search url including next_cursor and ttl set on instance', () => {
-      const actual = search.next_cursor('next_cursor').ttl(newTtl).to_url();
-      const expected = `https://res.cloudinary.com/${cloudName}/search/${ttl1000Sig}/${newTtl}/${encodedSearchPayload}/next_cursor`;
+      const actual = search.next_cursor(nextCursor).ttl(newTtl).to_url();
+      const expected = `https://res.cloudinary.com/${cloudName}/search/${ttl1000Sig}/${newTtl}/${encodedSearchPayload}/${nextCursor}`;
       expect(actual).to.eql(expected);
     });
 
