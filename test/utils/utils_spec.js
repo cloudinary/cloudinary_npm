@@ -28,7 +28,10 @@ const {
 
 const TEST_TAG = helper.TEST_TAG;
 const createTestConfig = require('../testUtils/createTestConfig');
-const {clear_blank} = require("../../lib/utils");
+const {
+  clear_blank,
+  sort_object_by_key
+} = require("../../lib/utils");
 // Defined globals
 var cloud_name = '';
 
@@ -1752,4 +1755,19 @@ describe("utils", function () {
       });
     });
   })
+
+  describe('sort_object_by_keys', () => {
+    it("should sort object's properties alphabetically", () => {
+      const unordered = {
+        z: 'irrelevant',
+        m: 'irrelevant',
+        a: 'irrelevant'
+      };
+
+      assert.deepStrictEqual(Object.keys(unordered), ['z', 'm', 'a']);
+
+      const ordered = sort_object_by_key(unordered);
+      assert.deepStrictEqual(Object.keys(ordered), ['a', 'm', 'z'])
+    });
+  });
 });

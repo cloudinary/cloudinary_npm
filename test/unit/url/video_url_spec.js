@@ -206,7 +206,8 @@ describe("Cloudinary::Utils for video", function () {
     var options, path, source;
     source = "movie_id";
     options = createTestConfig({
-      cloud_name: "test123"
+      cloud_name: "test123",
+      secure: false
     });
     path = utils.video_thumbnail_url(source, options);
     it("should generate a cloudinary URI to the video thumbnail", function () {

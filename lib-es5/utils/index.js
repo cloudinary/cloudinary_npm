@@ -466,6 +466,7 @@ function build_eager(transformations) {
     return format == null ? transformationString : `${transformationString}/${format}`;
   }).join('|');
 }
+
 /**
  * Build the custom headers for the request
  * @private
@@ -791,6 +792,24 @@ function patchFetchFormat() {
   }
 }
 
+function build_distribution_domain(options) {
+  var source = consumeOption(options, 'source', '');
+  var cloud_name = consumeOption(options, 'cloud_name', config().cloud_name);
+
+  if (!cloud_name) {
+    throw new Error('Must supply cloud_name in tag or in configuration');
+  }
+
+  var secure = consumeOption(options, 'secure', config().secure);
+  var private_cdn = consumeOption(options, 'private_cdn', config().private_cdn);
+  var cname = consumeOption(options, 'cname', config().cname);
+  var secure_distribution = consumeOption(options, 'secure_distribution', config().secure_distribution);
+  var cdn_subdomain = consumeOption(options, 'cdn_subdomain', config().cdn_subdomain);
+  var secure_cdn_subdomain = consumeOption(options, 'secure_cdn_subdomain', config().secure_cdn_subdomain);
+
+  return unsigned_url_prefix(source, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
+}
+
 function url(public_id) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -886,7 +905,7 @@ function url(public_id) {
       }
       // eslint-disable-next-line no-empty
     } catch (error) {}
-    var hash = computeHash(to_sign + api_secret, signature_algorithm, 'base64');
+    var hash = compute_hash(to_sign + api_secret, signature_algorithm, 'base64');
     signature = hash.replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
     signature = `s--${signature}--`;
   }
@@ -1002,6 +1021,7 @@ function finalize_resource_type(resource_type, type, url_suffix, use_root_path, 
   }
   return [resource_type, type];
 }
+
 // cdn_subdomain and secure_cdn_subdomain
 // 1) Customers in shared distribution (e.g. res.cloudinary.com)
 //    if cdn_domain is true uses res-[1-5].cloudinary.com for both http and https.
@@ -1092,7 +1112,7 @@ function api_sign_request(params_to_sign, api_secret) {
 
     return `${k}=${toArray(v).join(",")}`;
   }).sort().join("&");
-  return computeHash(to_sign + api_secret, config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM, 'hex');
+  return compute_hash(to_sign + api_secret, config().signature_algorithm || DEFAULT_SIGNATURE_ALGORITHM, 'hex');
 }
 
 /**
@@ -1103,7 +1123,7 @@ function api_sign_request(params_to_sign, api_secret) {
  * @param {string} encoding type of encoding
  * @return {string} computed hash value
  */
-function computeHash(input, signature_algorithm, encoding) {
+function compute_hash(input, signature_algorithm, encoding) {
   if (!SUPPORTED_SIGNATURE_ALGORITHMS.includes(signature_algorithm)) {
     throw new Error(`Signature algorithm ${signature_algorithm} is not supported. Supported algorithms: ${SUPPORTED_SIGNATURE_ALGORITHMS.join(', ')}`);
   }
@@ -1132,6 +1152,13 @@ function clear_blank(hash) {
   return filtered_hash;
 }
 
+function sort_object_by_key(object) {
+  return Object.keys(object).sort().reduce(function (obj, key) {
+    obj[key] = object[key];
+    return obj;
+  }, {});
+}
+
 function merge(hash1, hash2) {
   return _extends({}, hash1, hash2);
 }
@@ -1150,11 +1177,14 @@ function sign_request(params) {
 function webhook_signature(data, timestamp) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  ensurePresenceOf({ data, timestamp });
+  ensurePresenceOf({
+    data,
+    timestamp
+  });
 
   var api_secret = ensureOption(options, 'api_secret');
   var signature_algorithm = ensureOption(options, 'signature_algorithm', DEFAULT_SIGNATURE_ALGORITHM);
-  return computeHash(data + timestamp + api_secret, signature_algorithm, 'hex');
+  return compute_hash(data + timestamp + api_secret, signature_algorithm, 'hex');
 }
 
 /**
@@ -1253,7 +1283,9 @@ function download_backedup_asset(asset_id, version_id) {
  * @param options
  */
 function api_download_url(action, params, options) {
-  var download_params = _extends({}, params, { mode: "download" });
+  var download_params = _extends({}, params, {
+    mode: "download"
+  });
   var cloudinary_params = exports.sign_request(download_params, options);
   return exports.api_url(action, options) + "?" + hashToQuery(cloudinary_params);
 }
@@ -1487,6 +1519,7 @@ function process_video_params(param) {
       return null;
   }
 }
+
 /**
  * Returns a Hash of parameters used to create an archive
  * @private
@@ -1530,7 +1563,10 @@ exports.create_source_tag = function create_source_tag(src, source_type) {
     var codecs_str = isArray(codecs) ? codecs.join(', ') : codecs;
     mime_type += `; codecs=${codecs_str}`;
   }
-  return `<source ${utils.html_attrs({ src, type: mime_type })}>`;
+  return `<source ${utils.html_attrs({
+    src,
+    type: mime_type
+  })}>`;
 };
 
 function build_explicit_api_params(public_id) {
@@ -1726,6 +1762,9 @@ exports.jsonArrayParam = jsonArrayParam;
 exports.download_folder = download_folder;
 exports.base_api_url = base_api_url;
 exports.download_backedup_asset = download_backedup_asset;
+exports.compute_hash = compute_hash;
+exports.build_distribution_domain = build_distribution_domain;
+exports.sort_object_by_key = sort_object_by_key;
 
 // was exported before, so kept for backwards compatibility
 exports.DEFAULT_POSTER_OPTIONS = DEFAULT_POSTER_OPTIONS;
