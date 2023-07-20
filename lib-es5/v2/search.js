@@ -153,7 +153,7 @@ var Search = function () {
       var dataOrderedByKey = sort_object_by_key(clear_blank(query));
       var encodedQuery = base64Encode(JSON.stringify(dataOrderedByKey));
 
-      var urlPrefix = build_distribution_domain(options);
+      var urlPrefix = build_distribution_domain(options.source, options);
 
       var signature = compute_hash(`${urlTtl}${encodedQuery}${apiSecret}`, 'sha256', 'hex');
 

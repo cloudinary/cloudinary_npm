@@ -1,3 +1,8 @@
+1.38.0 / 2023-07-20
+==================
+
+  * feat: new method to_url added to support cached search feature
+
 1.37.3 / 2023-06-26
 ==================
 

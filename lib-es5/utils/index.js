@@ -792,15 +792,18 @@ function patchFetchFormat() {
   }
 }
 
-function build_distribution_domain(options) {
-  var source = consumeOption(options, 'source', '');
+function build_distribution_domain(source, options) {
   var cloud_name = consumeOption(options, 'cloud_name', config().cloud_name);
-
   if (!cloud_name) {
     throw new Error('Must supply cloud_name in tag or in configuration');
   }
 
-  var secure = consumeOption(options, 'secure', config().secure);
+  var secure = consumeOption(options, 'secure', null);
+  var ssl_detected = consumeOption(options, 'ssl_detected', config().ssl_detected);
+  if (secure === null) {
+    secure = ssl_detected || config().secure;
+  }
+
   var private_cdn = consumeOption(options, 'private_cdn', config().private_cdn);
   var cname = consumeOption(options, 'cname', config().cname);
   var secure_distribution = consumeOption(options, 'secure_distribution', config().secure_distribution);
@@ -827,20 +830,6 @@ function url(public_id) {
   }
   var long_url_signature = !!consumeOption(options, "long_url_signature", config().long_url_signature);
   var format = consumeOption(options, "format");
-  var cloud_name = consumeOption(options, "cloud_name", config().cloud_name);
-  if (!cloud_name) {
-    throw "Unknown cloud_name";
-  }
-  var private_cdn = consumeOption(options, "private_cdn", config().private_cdn);
-  var secure_distribution = consumeOption(options, "secure_distribution", config().secure_distribution);
-  var secure = consumeOption(options, "secure", null);
-  var ssl_detected = consumeOption(options, "ssl_detected", config().ssl_detected);
-  if (secure === null) {
-    secure = ssl_detected || config().secure;
-  }
-  var cdn_subdomain = consumeOption(options, "cdn_subdomain", config().cdn_subdomain);
-  var secure_cdn_subdomain = consumeOption(options, "secure_cdn_subdomain", config().secure_cdn_subdomain);
-  var cname = consumeOption(options, "cname", config().cname);
   var shorten = consumeOption(options, "shorten", config().shorten);
   var sign_url = consumeOption(options, "sign_url", config().sign_url);
   var api_secret = consumeOption(options, "api_secret", config().api_secret);
@@ -909,7 +898,7 @@ function url(public_id) {
     signature = hash.replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
     signature = `s--${signature}--`;
   }
-  var prefix = unsigned_url_prefix(public_id, cloud_name, private_cdn, cdn_subdomain, secure_cdn_subdomain, cname, secure, secure_distribution);
+  var prefix = build_distribution_domain(public_id, options);
   var resultUrl = [prefix, resource_type, type, signature, transformation, version, public_id].filter(function (part) {
     return part != null && part !== '';
   }).join('/').replace(/ /g, '%20');
