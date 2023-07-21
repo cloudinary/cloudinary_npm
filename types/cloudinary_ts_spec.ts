@@ -1131,6 +1131,18 @@ cloudinary.v2.api.delete_folder('foo',{
     agent: new Http.Agent()
 });
 
+// $ExpectType Promise<NewAssetRelationResponse>
+cloudinary.v2.api.add_related_assets('public-id', 'public-id-to-relate');
+
+// $ExpectType Promise<NewAssetRelationResponse>
+cloudinary.v2.api.add_related_assets_by_asset_id('asset-id', 'public-id-to-relate');
+
+// $ExpectType Promise<DeleteAssetRelation>
+cloudinary.v2.api.delete_related_assets('public-id', 'public-id-to-unrelate');
+
+// $ExpectType Promise<DeleteAssetRelation>
+cloudinary.v2.api.delete_related_assets_by_asset_id('asset-id', 'public-id-to-unrelate');
+
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.create_slideshow({
     manifest_json: {
