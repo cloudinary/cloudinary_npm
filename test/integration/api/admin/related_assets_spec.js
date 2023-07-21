@@ -23,7 +23,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/image/upload/test-public-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/test-public-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id']);
         });
@@ -38,7 +38,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/image/upload/${testPublicId}`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/${testPublicId}`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id-1&assets_to_relate=related-public-id-2']);
         });
@@ -52,7 +52,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/test-asset-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id']);
         });
@@ -64,7 +64,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/test-asset-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id-1&assets_to_relate=related-public-id-2']);
         });
@@ -83,7 +83,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/image/upload/test-public-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/test-public-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id']);
         });
@@ -98,7 +98,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/image/upload/test-public-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/test-public-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id-1&assets_to_unrelate=related-public-id-2']);
         });
@@ -112,7 +112,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/test-asset-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id']);
         });
@@ -124,7 +124,7 @@ describe('Asset relations API', () => {
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
-          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/test-asset-id`);
+          strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
           deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id-1&assets_to_unrelate=related-public-id-2']);
         });
