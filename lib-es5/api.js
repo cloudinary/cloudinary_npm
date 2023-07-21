@@ -16,7 +16,7 @@ function deleteResourcesParams(options) {
 }
 
 function getResourceParams(options) {
-  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "media_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
+  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "media_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis", 'related', 'related_next_cursor');
 }
 
 exports.ping = function ping(callback) {
@@ -262,28 +262,28 @@ exports.add_related_assets = function (publicId, assetsToRelate, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = createRelationParams(assetsToRelate);
-  return call_api('post', ['resources', options.resource_type, options.type, publicId], params, callback, options);
+  return call_api('post', ['resources', 'related_assets', options.resource_type, options.type, publicId], params, callback, options);
 };
 
 exports.add_related_assets_by_asset_id = function (assetId, assetsToRelate, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = createRelationParams(assetsToRelate);
-  return call_api('post', ['resources', assetId], params, callback, options);
+  return call_api('post', ['resources', 'related_assets', assetId], params, callback, options);
 };
 
 exports.delete_related_assets = function (publicId, assetsToUnrelate, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = deleteRelationParams(assetsToUnrelate);
-  return call_api('delete', ['resources', options.resource_type, options.type, publicId], params, callback, options);
+  return call_api('delete', ['resources', 'related_assets', options.resource_type, options.type, publicId], params, callback, options);
 };
 
 exports.delete_related_assets_by_asset_id = function (assetId, assetsToUnrelate, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   var params = deleteRelationParams(assetsToUnrelate);
-  return call_api('delete', ['resources', assetId], params, callback, options);
+  return call_api('delete', ['resources', 'related_assets', assetId], params, callback, options);
 };
 
 exports.delete_derived_resources = function delete_derived_resources(derived_resource_ids, callback) {

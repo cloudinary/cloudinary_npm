@@ -493,6 +493,7 @@ declare module 'cloudinary' {
         phash?: boolean;
         cinemagraph_analysis?: boolean;
         accessibility_analysis?: boolean;
+        related?: boolean;
 
         [futureKey: string]: any;
     }
