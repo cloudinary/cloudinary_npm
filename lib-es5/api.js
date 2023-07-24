@@ -16,7 +16,7 @@ function deleteResourcesParams(options) {
 }
 
 function getResourceParams(options) {
-  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "media_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis");
+  return pickOnlyExistingValues(options, "exif", "cinemagraph_analysis", "colors", "derived_next_cursor", "faces", "image_metadata", "media_metadata", "pages", "phash", "coordinates", "max_results", "versions", "accessibility_analysis", 'related', 'related_next_cursor');
 }
 
 exports.ping = function ping(callback) {
@@ -240,6 +240,50 @@ exports.delete_all_resources = function delete_all_resources(callback) {
   return call_api("delete", uri, deleteResourcesParams(options, {
     all: true
   }), callback, options);
+};
+
+var createRelationParams = function createRelationParams() {
+  var publicIds = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+  return {
+    assets_to_relate: Array.isArray(publicIds) ? publicIds : [publicIds]
+  };
+};
+
+var deleteRelationParams = function deleteRelationParams() {
+  var publicIds = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+  return {
+    assets_to_unrelate: Array.isArray(publicIds) ? publicIds : [publicIds]
+  };
+};
+
+exports.add_related_assets = function (publicId, assetsToRelate, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = createRelationParams(assetsToRelate);
+  return call_api('post', ['resources', 'related_assets', options.resource_type, options.type, publicId], params, callback, options);
+};
+
+exports.add_related_assets_by_asset_id = function (assetId, assetsToRelate, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = createRelationParams(assetsToRelate);
+  return call_api('post', ['resources', 'related_assets', assetId], params, callback, options);
+};
+
+exports.delete_related_assets = function (publicId, assetsToUnrelate, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = deleteRelationParams(assetsToUnrelate);
+  return call_api('delete', ['resources', 'related_assets', options.resource_type, options.type, publicId], params, callback, options);
+};
+
+exports.delete_related_assets_by_asset_id = function (assetId, assetsToUnrelate, callback) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  var params = deleteRelationParams(assetsToUnrelate);
+  return call_api('delete', ['resources', 'related_assets', assetId], params, callback, options);
 };
 
 exports.delete_derived_resources = function delete_derived_resources(derived_resource_ids, callback) {
@@ -748,7 +792,10 @@ exports.order_metadata_field_datasource = function order_metadata_field_datasour
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
   options.content_type = "json";
-  var params = { order_by: sort_by, direction: direction };
+  var params = {
+    order_by: sort_by,
+    direction: direction
+  };
   return call_api("post", ["metadata_fields", field_external_id, "datasource", "order"], params, callback, options);
 };
 
@@ -766,7 +813,10 @@ exports.reorder_metadata_fields = function reorder_metadata_fields(order_by, dir
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   options.content_type = "json";
-  var params = { order_by, direction };
+  var params = {
+    order_by,
+    direction
+  };
   return call_api("put", ["metadata_fields", "order"], params, callback, options);
 };
 

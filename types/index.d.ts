@@ -493,6 +493,7 @@ declare module 'cloudinary' {
         phash?: boolean;
         cinemagraph_analysis?: boolean;
         accessibility_analysis?: boolean;
+        related?: boolean;
 
         [futureKey: string]: any;
     }
@@ -640,6 +641,30 @@ declare module 'cloudinary' {
     export interface DeleteApiResponse {
         message: string;
         http_code: number;
+    }
+
+    export interface BaseAssetRelation {
+        asset: string;
+        status: 200;
+    }
+    export interface AssetRelationSuccess extends BaseAssetRelation {
+        message: 'success';
+        code: 'success_ids'
+    }
+
+    export interface AssetRelationAlreadyExists extends BaseAssetRelation {
+        message: 'resource already exists';
+        code: 'already_exists_ids';
+    }
+
+    export interface NewAssetRelationResponse {
+        failed: [any],
+        success: Array<AssetRelationSuccess | AssetRelationAlreadyExists>
+    }
+
+    export interface DeleteAssetRelation {
+        failed: [any],
+        success: Array<AssetRelationSuccess>
     }
 
     export interface MetadataFieldApiOptions {
@@ -1091,6 +1116,14 @@ declare module 'cloudinary' {
             function create_folder(path: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
 
             function delete_folder(path: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
+
+            function add_related_assets(public_id: string, public_ids_to_relate: string | Array<string>, options?: AdminApiOptions, callback?: ResponseCallback): Promise<NewAssetRelationResponse>;
+
+            function add_related_assets_by_asset_id(asset_id: string, public_ids_to_relate: string | Array<string>, options?: AdminApiOptions, callback?: ResponseCallback): Promise<NewAssetRelationResponse>;
+
+            function delete_related_assets(public_id: string, public_ids_to_unrelate: string | Array<string>, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteAssetRelation>;
+
+            function delete_related_assets_by_asset_id(asset_id: string, public_ids_to_unrelate: string | Array<string>, options?: AdminApiOptions, callback?: ResponseCallback): Promise<DeleteAssetRelation>;
 
             /****************************** Structured Metadata API V2 Methods *************************************/
 
