@@ -9,10 +9,10 @@ cloudinary.v2.config();
 cloudinary.v2.config(true);
 
 // $ExpectType ConfigOptions
-cloudinary.v2.config({ cloud_name: "demo" });
+cloudinary.v2.config({cloud_name: "demo"});
 
 // $ExpectError
-cloudinary.v2.config({ cloud_name: 0 });
+cloudinary.v2.config({cloud_name: 0});
 
 // $ExpectType boolean | undefined
 cloudinary.v2.config("private_cdn");
@@ -237,19 +237,27 @@ cloudinary.v2.api.delete_derived_by_transformation(['image1', 'image2'], 'f_auto
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_derived_by_transformation(['image1', 'image2'], 'f_auto',
     {content_type: 'json'},
-    function(err,res){console.log(err);});
+    function (err, res) {
+        console.log(err);
+    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_derived_by_transformation(['image1', 'image2'], 'f_auto',
-    function(err,res){console.log(err);});
+    function (err, res) {
+        console.log(err);
+    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_derived_resources(['image1', 'image2'],
-    function (err,res){console.log(err);});
+    function (err, res) {
+        console.log(err);
+    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_derived_resources(['image1', 'image2'], {keep_original: true},
-    function (err,res){console.log(err);});
+    function (err, res) {
+        console.log(err);
+    });
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.delete_resources_by_prefix('sunday',
@@ -331,7 +339,7 @@ cloudinary.v2.api.list_streaming_profiles(
     });
 
 // $ExpectType Promise<any>
-cloudinary.v2.api.list_streaming_profiles( {content_type: 'json'},
+cloudinary.v2.api.list_streaming_profiles({content_type: 'json'},
     function (err, res) {
         console.log(err);
     });
@@ -452,17 +460,17 @@ cloudinary.v2.api.resources_by_context("mycontextkey",
 
 // $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_asset_ids(["asset_1", "asset_2"], {
-        context: true,
-        tags: true
-    }, function (error, result) {
-        console.log(result, error);
-    });
+    context: true,
+    tags: true
+}, function (error, result) {
+    console.log(result, error);
+});
 
 // $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_asset_ids(["asset_1", "asset_2"], {
-        context: true,
-        tags: true
-    });
+    context: true,
+    tags: true
+});
 
 // $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.resources_by_asset_ids(["asset_1", "asset_2"],
@@ -625,43 +633,57 @@ cloudinary.v2.api.add_metadata_field({
     label: 'LABEL_INT_1',
     type: "integer",
     default_value: 10,
-}).then((result)=> {
+}).then((result) => {
     console.log(result);
 });
 
-cloudinary.v2.api.list_metadata_fields().then((result)=> {
+cloudinary.v2.api.list_metadata_fields().then((result) => {
     console.log(result.metadata_fields[0].datasource);
 });
 
 cloudinary.v2.api.delete_metadata_field('EXTERNAL_ID_GET_LIST').then((res) => {
-  console.log(res.message)
-}).catch((err)=> {console.log(err)})
-
-cloudinary.v2.api.update_metadata_field('EXTERNAL_ID_GET_LIST',{mandatory: true},
-    function (res) {
-    console.log(res);
+    console.log(res.message)
+}).catch((err) => {
+    console.log(err)
 })
+
+cloudinary.v2.api.update_metadata_field('EXTERNAL_ID_GET_LIST', {mandatory: true},
+    function (res) {
+        console.log(res);
+    })
 
 const datasource_changes = {
     values: [
-        { external_id: "color_1", value: "brown" },
-        { external_id: "color_2", value: "black" },
+        {external_id: "color_1", value: "brown"},
+        {external_id: "color_2", value: "black"},
     ],
 };
 
-cloudinary.v2.uploader.update_metadata({ metadata_color: "red", metadata_shape: "" }, ["test_id_1", "test_id_2"])
-    .then((res)=> {console.log(res)})
-    .catch((err)=> {console.log(err)});
+cloudinary.v2.uploader.update_metadata({metadata_color: "red", metadata_shape: ""}, ["test_id_1", "test_id_2"])
+    .then((res) => {
+        console.log(res)
+    })
+    .catch((err) => {
+        console.log(err)
+    });
 
-cloudinary.v2.uploader.update_metadata('countryFieldId=[\"id_us\",\"id_uk\",\"id_france"]', [ 'dog', 'lion' ],
-    function(error, result) { console.log(result, error) });
+cloudinary.v2.uploader.update_metadata('countryFieldId=[\"id_us\",\"id_uk\",\"id_france"]', ['dog', 'lion'],
+    function (error, result) {
+        console.log(result, error)
+    });
 
 cloudinary.v2.api.update_metadata_field_datasource('EXTERNAL_ID_GET_LIST1', datasource_changes)
-    .then((res)=> {console.log(res)})
-    .catch((err)=> {console.log(err)});
+    .then((res) => {
+        console.log(res)
+    })
+    .catch((err) => {
+        console.log(err)
+    });
 
 cloudinary.v2.api.delete_datasource_entries('EXTERNAL_ID_DELETE_DATASOURCE_ENTRIES', ['size_2'])
-    .then((res)=>{console.log(res)})
+    .then((res) => {
+        console.log(res)
+    })
 
 cloudinary.v2.api.add_metadata_rule({
     metadata_field_id: 'EXTERNAL_ID_GET_LIST',
@@ -852,7 +874,8 @@ cloudinary.v2.uploader.upload_large("my_large_video.mp4",
         resource_type: "video",
         chunk_size: 6000000
     },
-    function (error, result) {console.log(result, error);
+    function (error, result) {
+        console.log(result, error);
     });
 
 // $ExpectType Promise<UploadApiResponse>
@@ -872,8 +895,7 @@ cloudinary.v2.utils.download_zip_url(
 
 // $ExpectType { [key: string]: any; signature: string; api_key: string; }
 cloudinary.v2.utils.sign_request(
-    {
-    }
+    {}
 );
 
 // $ExpectType Promise<void>
@@ -951,7 +973,7 @@ cloudinary.v2.provisioning.account.sub_accounts(
 cloudinary.v2.provisioning.account.sub_account(
     'str',
     [],
-        (res) => {
+    (res) => {
 
     });
 
@@ -960,7 +982,7 @@ cloudinary.v2.provisioning.account.sub_account(
 cloudinary.v2.provisioning.account.create_sub_account(
     'str',
     'str',
-    {foo:'bar'},
+    {foo: 'bar'},
     false,
     'sds',
     {},
@@ -1120,14 +1142,14 @@ cloudinary.v2.utils.private_download_url('foo', 'foo', {
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.api.create_folder('foo',{
+cloudinary.v2.api.create_folder('foo', {
     attachment: true,
     expires_at: 111
 });
 
 
 // $ExpectType Promise<any>
-cloudinary.v2.api.delete_folder('foo',{
+cloudinary.v2.api.delete_folder('foo', {
     agent: new Http.Agent()
 });
 
@@ -1135,13 +1157,25 @@ cloudinary.v2.api.delete_folder('foo',{
 cloudinary.v2.api.add_related_assets('public-id', 'public-id-to-relate');
 
 // $ExpectType Promise<NewAssetRelationResponse>
+cloudinary.v2.api.add_related_assets('public-id', ['public-id-to-relate-1', 'public-id-to-relate-2']);
+
+// $ExpectType Promise<NewAssetRelationResponse>
 cloudinary.v2.api.add_related_assets_by_asset_id('asset-id', 'public-id-to-relate');
+
+// $ExpectType Promise<NewAssetRelationResponse>
+cloudinary.v2.api.add_related_assets_by_asset_id('asset-id', ['public-id-to-relate-1', 'public-id-to-relate-2']);
 
 // $ExpectType Promise<DeleteAssetRelation>
 cloudinary.v2.api.delete_related_assets('public-id', 'public-id-to-unrelate');
 
 // $ExpectType Promise<DeleteAssetRelation>
+cloudinary.v2.api.delete_related_assets('public-id', ['public-id-to-unrelate-1', 'public-id-to-unrelate-2']);
+
+// $ExpectType Promise<DeleteAssetRelation>
 cloudinary.v2.api.delete_related_assets_by_asset_id('asset-id', 'public-id-to-unrelate');
+
+// $ExpectType Promise<DeleteAssetRelation>
+cloudinary.v2.api.delete_related_assets_by_asset_id('asset-id', ['public-id-to-unrelate-1', 'public-id-to-unrelate-2']);
 
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.create_slideshow({
@@ -1151,5 +1185,5 @@ cloudinary.v2.uploader.create_slideshow({
     manifest_transformation: {
         width: 100
     },
-    height:100
+    height: 100
 });
