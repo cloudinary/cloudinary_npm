@@ -410,6 +410,8 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
+    export type VisualSearchParams = { image_url: string } | { image_asset_id: string } | { text: string };
+
     export interface ArchiveApiOptions {
         allow_missing?: boolean;
         async?: boolean;
@@ -647,6 +649,7 @@ declare module 'cloudinary' {
         asset: string;
         status: 200;
     }
+
     export interface AssetRelationSuccess extends BaseAssetRelation {
         message: 'success';
         code: 'success_ids'
@@ -1030,6 +1033,10 @@ declare module 'cloudinary' {
             function search_folders(search_input: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
 
             function search_folders(search_input: string, callback?: ResponseCallback): Promise<any>;
+
+            function visual_search(params: VisualSearchParams, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
+
+            function visual_search(params: VisualSearchParams, callback?: ResponseCallback): Promise<any>;
 
             function tags(options?: AdminApiOptions | {
                 max_results?: number,

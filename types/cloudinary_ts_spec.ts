@@ -541,6 +541,21 @@ cloudinary.v2.api.search_folders("search input", function (error, result) {
 });
 
 // $ExpectType Promise<any>
+cloudinary.v2.api.visual_search({image_url: 'image-url'}, function (error, result) {
+    console.log(result);
+});
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.visual_search({image_asset_id: 'image-asset-id'}, function (error, result) {
+    console.log(result);
+});
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.visual_search({text: 'visual-search-input'}, function (error, result) {
+    console.log(result);
+});
+
+// $ExpectType Promise<any>
 cloudinary.v2.api.transformation({width: 150, height: 100, crop: 'fill'},
     function (error, result) {
         console.log(result, error);

@@ -183,7 +183,7 @@ exports.update = function update(public_id, callback) {
   if (options.moderation_status != null) {
     params.moderation_status = options.moderation_status;
   }
-  if (options.clear_invalid !== null) {
+  if (options.clear_invalid != null) {
     params.clear_invalid = options.clear_invalid;
   }
   return call_api("post", uri, params, callback, options);
@@ -586,6 +586,13 @@ exports.search = function search(params, callback) {
 
   options.content_type = 'json';
   return call_api("post", "resources/search", params, callback, options);
+};
+
+exports.visual_search = function visual_search(params, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var allowedParams = pickOnlyExistingValues(params, 'image_url', 'image_asset_id', 'text');
+  return call_api('get', ['resources', 'visual_search'], allowedParams, callback, options);
 };
 
 exports.search_folders = function search_folders(params, callback) {
