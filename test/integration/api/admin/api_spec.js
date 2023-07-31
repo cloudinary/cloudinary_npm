@@ -914,6 +914,17 @@ describe("api", function () {
             }
           });
       });
+      it('should support visual_search parameter', () => {
+        this.timeout(TIMEOUT.LONG);
+        return uploadImage()
+          .then(upload_result => {
+            return cloudinary.v2.api.update(upload_result.public_id, {
+              visual_search: true
+            });
+          }).then(() => {
+            sinon.assert.calledWith(writeSpy, sinon.match(/visual_search=true/));
+          });
+      });
     });
     describe("quality override", function () {
       const mocked = helper.mockTest();
