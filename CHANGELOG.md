@@ -1,3 +1,9 @@
+1.40.0 / 2023-07-31
+==================
+
+* feat: visual search api
+* fix: adding clear_invalid only when not null
+
 1.39.0 / 2023-07-24
 ==================
 
