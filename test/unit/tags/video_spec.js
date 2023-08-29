@@ -7,6 +7,7 @@ cloudinary = require('../../../cloudinary');
 helper = require("../../spechelper");
 
 const createTestConfig = require('../../testUtils/createTestConfig');
+const assert = require("assert");
 
 describe("video tag helper", function () {
   var DEFAULT_UPLOAD_PATH, VIDEO_UPLOAD_PATH;
@@ -157,6 +158,16 @@ describe("video tag helper", function () {
     cloudinary.video('hello', options);
     expect(options.video_codec).to.eql('auto');
     expect(options.autoplay).to.be(true);
+  });
+  it('should generate working url for video with fetch overlay', () => {
+    const videoTag = cloudinary.video('video-public-id', {
+      transformation: [
+        { overlay: { url: 'https://res.cloudinary.com/demo/video/upload/electronic.mp4', resource_type: 'video' } },
+        { flags: 'layer_apply' }
+      ]
+    });
+
+    assert.strictEqual(videoTag, '<video poster=\'http://res.cloudinary.com/test123/video/upload/l_video:fetch:aHR0cHM6Ly9yZXMuY2xvdWRpbmFyeS5jb20vZGVtby92aWRlby91cGxvYWQvZWxlY3Ryb25pYy5tcDQ/fl_layer_apply/video-public-id.jpg\'><source src=\'http://res.cloudinary.com/test123/video/upload/l_video:fetch:aHR0cHM6Ly9yZXMuY2xvdWRpbmFyeS5jb20vZGVtby92aWRlby91cGxvYWQvZWxlY3Ryb25pYy5tcDQ/fl_layer_apply/video-public-id.webm\' type=\'video/webm\'><source src=\'http://res.cloudinary.com/test123/video/upload/l_video:fetch:aHR0cHM6Ly9yZXMuY2xvdWRpbmFyeS5jb20vZGVtby92aWRlby91cGxvYWQvZWxlY3Ryb25pYy5tcDQ/fl_layer_apply/video-public-id.mp4\' type=\'video/mp4\'><source src=\'http://res.cloudinary.com/test123/video/upload/l_video:fetch:aHR0cHM6Ly9yZXMuY2xvdWRpbmFyeS5jb20vZGVtby92aWRlby91cGxvYWQvZWxlY3Ryb25pYy5tcDQ/fl_layer_apply/video-public-id.ogv\' type=\'video/ogg\'></video>');
   });
 
   describe('sources', function() {

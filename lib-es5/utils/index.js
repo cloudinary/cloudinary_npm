@@ -225,7 +225,11 @@ function process_layer(layer) {
   var result = '';
   if (isPlainObject(layer)) {
     if (layer.resource_type === "fetch" || layer.url != null) {
-      result = `fetch:${base64EncodeURL(layer.url)}`;
+      if (layer.resource_type === 'video') {
+        result = `video:fetch:${base64EncodeURL(layer.url)}`;
+      } else {
+        result = `fetch:${base64EncodeURL(layer.url)}`;
+      }
     } else {
       var public_id = layer.public_id;
       var format = layer.format;
