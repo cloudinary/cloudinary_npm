@@ -652,6 +652,30 @@ describe("uploader", function () {
     });
   });
 
+  describe('when passing on_success in parameters', () => {
+    var spy, xhr;
+    spy = void 0;
+    xhr = void 0;
+    before(function () {
+      xhr = sinon.useFakeXMLHttpRequest();
+      spy = sinon.spy(ClientRequest.prototype, 'write');
+    });
+    after(function () {
+      spy.restore();
+      return xhr.restore();
+    });
+
+    it('should pass its value to the upload api', () => {
+      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+        on_success: 'current_asset.update({tags: ["autocaption"]});'
+      });
+
+      expect(spy.calledWith(sinon.match((arg) => {
+        return arg.toString().match(/on_success='current_asset.update({tags: ["autocaption"]});'/);
+      })));
+    });
+  });
+
   describe("upload_chunked", function () {
     this.timeout(TIMEOUT.LONG * 10);
     it("should specify chunk size", function (done) {
