@@ -131,8 +131,8 @@ function textStyle(layer) {
   });
 
   if (layer.hasOwnProperty("font_size" || "font_family") || !isEmpty(keywords)) {
-    if (!layer.font_size) throw `Must supply font_size for text in overlay/underlay`;
-    if (!layer.font_family) throw `Must supply font_family for text in overlay/underlay`;
+    if (!layer.font_size) throw new Error('Must supply font_size for text in overlay/underlay');
+    if (!layer.font_family) throw new Error('Must supply font_family for text in overlay/underlay');
     keywords.unshift(layer.font_size);
     keywords.unshift(layer.font_family);
     style = compact(keywords).join("_");
@@ -222,71 +222,117 @@ function process_if(ifValue) {
  * @return {string} layer transformation string
  */
 function process_layer(layer) {
-  var result = '';
-  if (isPlainObject(layer)) {
-    if (layer.resource_type === "fetch" || layer.url != null) {
-      result = `fetch:${base64EncodeURL(layer.url)}`;
+  if (isString(layer)) {
+    var resourceType = null;
+    var layerUrl = '';
+
+    var fetchLayerBegin = 'fetch:';
+    if (layer.startsWith(fetchLayerBegin)) {
+      layerUrl = layer.substring(fetchLayerBegin.length);
+    } else if (layer.indexOf(':fetch:', 0) !== -1) {
+      var parts = layer.split(':', 3);
+      resourceType = parts[0];
+      layerUrl = parts[2];
     } else {
-      var public_id = layer.public_id;
-      var format = layer.format;
-      var resource_type = layer.resource_type || "image";
-      var type = layer.type || "upload";
-      var text = layer.text;
-      var style = null;
-      var components = [];
-      var noPublicId = isEmpty(public_id);
-      if (!noPublicId) {
-        public_id = public_id.replace(new RegExp("/", 'g'), ":");
-        if (format != null) {
-          public_id = `${public_id}.${format}`;
-        }
-      }
-      if (isEmpty(text) && resource_type !== "text") {
-        if (noPublicId) {
-          throw "Must supply public_id for resource_type layer_parameter";
-        }
-        if (resource_type === "subtitles") {
-          style = textStyle(layer);
-        }
-      } else {
-        resource_type = "text";
-        type = null;
-        // type is ignored for text layers
-        style = textStyle(layer);
-        if (!isEmpty(text)) {
-          var noStyle = isEmpty(style);
-          if (!(noPublicId || noStyle) || noPublicId && noStyle) {
-            throw "Must supply either style parameters or a public_id when providing text parameter in a text overlay/underlay";
-          }
-          var re = /\$\([a-zA-Z]\w*\)/g;
-          var start = 0;
-          var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
-          text = "";
-          for (var res = re.exec(textSource); res; res = re.exec(textSource)) {
-            text += smart_escape(textSource.slice(start, res.index));
-            text += res[0];
-            start = res.index + res[0].length;
-          }
-          text += encodeURIComponent(textSource.slice(start));
-        }
-      }
-      if (resource_type !== "image") {
-        components.push(resource_type);
-      }
-      if (type !== "upload") {
-        components.push(type);
-      }
-      components.push(style);
-      components.push(public_id);
-      components.push(text);
-      result = compact(components).join(":");
+      return layer;
     }
-  } else if (/^fetch:.+/.test(layer)) {
-    result = `fetch:${base64EncodeURL(layer.substr(6))}`;
-  } else {
-    result = layer;
+
+    layer = {
+      url: layerUrl,
+      type: 'fetch'
+    };
+
+    if (resourceType) {
+      layer.resource_type = resourceType;
+    }
   }
-  return result;
+
+  if (typeof layer !== 'object') {
+    return layer;
+  }
+
+  var _layer = layer,
+      resource_type = _layer.resource_type,
+      text = _layer.text,
+      type = _layer.type,
+      public_id = _layer.public_id,
+      format = _layer.format,
+      fetchUrl = _layer.url;
+
+  var components = [];
+
+  if (!isEmpty(text) && isEmpty(resource_type)) {
+    resource_type = 'text';
+  }
+
+  if (!isEmpty(fetchUrl) && isEmpty(type)) {
+    type = 'fetch';
+  }
+
+  if (!isEmpty(public_id) && !isEmpty(format)) {
+    public_id = `${public_id}.${format}`;
+  }
+
+  if (isEmpty(public_id) && resource_type !== 'text' && type !== 'fetch') {
+    throw new Error('Must supply public_id for non-text overlay');
+  }
+
+  if (!isEmpty(resource_type) && resource_type !== 'image') {
+    components.push(resource_type);
+  }
+
+  if (!isEmpty(type) && type !== 'upload') {
+    components.push(type);
+  }
+
+  if (resource_type === 'text' || resource_type === 'subtitles') {
+    if (isEmpty(public_id) && isEmpty(text)) {
+      throw new Error('Must supply either text or public_in in overlay');
+    }
+
+    var textOptions = textStyle(layer);
+
+    if (!isEmpty(textOptions)) {
+      components.push(textOptions);
+    }
+
+    if (!isEmpty(public_id)) {
+      public_id = public_id.replace('/', ':');
+      components.push(public_id);
+    }
+
+    if (!isEmpty(text)) {
+      // const pattern = /(\$\([a-zA-Z]\w+\))/g;
+      // const parts = text.split(pattern).filter(x => x !== '').map(part => {
+      //   let isVariable = part.match(pattern);
+      //   if (isVariable) {
+      //     return part;
+      //   }
+      //   // return smart_escape(smart_escape(part, /[,\/]/g));
+      //   return encodeURIComponent(part);
+      // }).join('');
+      // components.push(parts);
+      var re = /\$\([a-zA-Z]\w*\)/g;
+      var start = 0;
+      var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
+      text = "";
+      for (var res = re.exec(textSource); res; res = re.exec(textSource)) {
+        text += smart_escape(textSource.slice(start, res.index));
+        text += res[0];
+        start = res.index + res[0].length;
+      }
+      text += encodeURIComponent(textSource.slice(start));
+      components.push(text);
+    }
+  } else if (type === 'fetch') {
+    var encodedUrl = base64EncodeURL(fetchUrl);
+    components.push(encodedUrl);
+  } else {
+    public_id = public_id.replace('/', ':');
+    components.push(public_id);
+  }
+
+  return components.join(':');
 }
 
 /**
@@ -1546,6 +1592,8 @@ function archive_params() {
     use_original_filename: exports.as_safe_bool(options.use_original_filename)
   };
 }
+
+exports.process_layer = process_layer;
 
 exports.create_source_tag = function create_source_tag(src, source_type) {
   var codecs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
