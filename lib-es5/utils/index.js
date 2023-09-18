@@ -302,16 +302,6 @@ function process_layer(layer) {
     }
 
     if (!isEmpty(text)) {
-      // const pattern = /(\$\([a-zA-Z]\w+\))/g;
-      // const parts = text.split(pattern).filter(x => x !== '').map(part => {
-      //   let isVariable = part.match(pattern);
-      //   if (isVariable) {
-      //     return part;
-      //   }
-      //   // return smart_escape(smart_escape(part, /[,\/]/g));
-      //   return encodeURIComponent(part);
-      // }).join('');
-      // components.push(parts);
       var re = /\$\([a-zA-Z]\w*\)/g;
       var start = 0;
       var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
