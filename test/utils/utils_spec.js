@@ -774,7 +774,7 @@ describe("utils", function () {
         [
           "fetch remote",
           {
-            resource_type: "fetch",
+            type: "fetch",
             url: "http://cloudinary.com/images/old_logo.png"
           },
           "fetch:aHR0cDovL2Nsb3VkaW5hcnkuY29tL2ltYWdlcy9vbGRfbG9nby5wbmc"
