@@ -601,6 +601,16 @@ declare module 'cloudinary' {
 
     type UploadResponseCallback = (err?: UploadApiErrorResponse, callResult?: UploadApiResponse) => void;
 
+    export interface AdminApiPaginationResponse {
+        next_cursor?: string;
+    }
+
+    export interface AdminApiRateLimitingResponse {
+        rate_limit_allowed?: number;
+        rate_limit_reset_at?: string;
+        rate_limit_remaining?: number;
+    }
+
     export interface UploadApiResponse {
         public_id: string;
         version: number;
@@ -694,7 +704,7 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
-    export interface MetadataFieldsApiResponse {
+    export interface MetadataFieldsApiResponse extends AdminApiPaginationResponse, AdminApiRateLimitingResponse  {
         metadata_fields: MetadataFieldApiResponse[]
     }
 
@@ -776,7 +786,7 @@ declare module 'cloudinary' {
 
     export type MetadataRulesListResponse = Array<MetadataRuleResponse>;
 
-    export interface ResourceApiResponse {
+    export interface ResourceApiResponse extends AdminApiPaginationResponse, AdminApiRateLimitingResponse {
         resources: [
             {
                 public_id: string;
@@ -813,11 +823,7 @@ declare module 'cloudinary' {
 
                 [futureKey: string]: any;
             }
-        ],
-        next_cursor?: string;
-        rate_limit_allowed?: number;
-        rate_limit_reset_at?: string;
-        rate_limit_remaining?: number;
+        ]
     }
 
     export type SignApiOptions = Record<string, any>;
