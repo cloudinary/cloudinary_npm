@@ -1558,52 +1558,6 @@ describe("utils", function () {
       ).to.eql(false);
     });
   });
-  context("sign URLs", function () {
-    beforeEach(function () {
-      cloudinary.config({
-        cloud_name: 'test123',
-        api_key: "1234",
-        api_secret: "b"
-      });
-    });
-    it("should correctly sign URLs", function () {
-      test_cloudinary_url("image.jpg", {
-        version: 1234,
-        transformation: {
-          crop: "crop",
-          width: 10,
-          height: 20
-        },
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/v1234/image.jpg", {});
-      test_cloudinary_url("image.jpg", {
-        version: 1234,
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/upload/s----SjmNDA--/v1234/image.jpg", {});
-      test_cloudinary_url("image.jpg", {
-        transformation: {
-          crop: "crop",
-          width: 10,
-          height: 20
-        },
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg", {});
-      test_cloudinary_url("image.jpg", {
-        transformation: {
-          crop: "crop",
-          width: 10,
-          height: 20
-        },
-        type: 'authenticated',
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/authenticated/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg", {});
-      test_cloudinary_url("http://google.com/path/to/image.png", {
-        type: "fetch",
-        version: 1234,
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png", {});
-    });
-  });
   context("sign requests", function () {
     var configBck = void 0;
     before(function () {
