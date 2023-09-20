@@ -813,7 +813,11 @@ declare module 'cloudinary' {
 
                 [futureKey: string]: any;
             }
-        ]
+        ],
+        next_cursor?: string;
+        rate_limit_allowed?: number;
+        rate_limit_reset_at?: string;
+        rate_limit_remaining?: number;
     }
 
     export type SignApiOptions = Record<string, any>;
