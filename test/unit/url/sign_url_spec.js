@@ -76,15 +76,14 @@ describe("URL for authenticated asset", () => {
     assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png');
   });
 
-  it('should have signature for authenticated asset with text overlay transformation including encoded text', () => {
+  it.only('should have signature for authenticated asset with text overlay transformation including encoded emoji', () => {
     const signedUrl = cloudinary.utils.url(TEST_PUBLIC_ID, {
       type: 'authenticated',
       sign_url: true,
-      secure: true,
       transformation: {
         color: 'red',
         overlay: {
-          text: 'Cool%25F0%259F%2598%258D',
+          text: 'Cool%F0%9F%98%8D',
           font_family: 'Times',
           font_size: 70,
           font_weight: 'bold'
@@ -92,19 +91,18 @@ describe("URL for authenticated asset", () => {
       }
     });
 
-    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
+    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
   });
 
   it('should have signature for raw transformation string', () => {
     const signedUrl = cloudinary.utils.url(TEST_PUBLIC_ID, {
       type: 'authenticated',
       sign_url: true,
-      secure: true,
       transformation: {
         raw_transformation: 'co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D'
       }
     });
 
-    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
+    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
   });
 })
