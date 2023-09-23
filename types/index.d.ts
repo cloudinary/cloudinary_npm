@@ -605,7 +605,7 @@ declare module 'cloudinary' {
         next_cursor?: string;
     }
 
-    export interface AdminApiRateLimitingResponse {
+    export interface AdminApiBaseResponse {
         rate_limit_allowed?: number;
         rate_limit_reset_at?: string;
         rate_limit_remaining?: number;
@@ -704,7 +704,7 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
-    export interface MetadataFieldsApiResponse extends AdminApiPaginationResponse, AdminApiRateLimitingResponse  {
+    export interface MetadataFieldsApiResponse extends AdminApiPaginationResponse, AdminApiBaseResponse  {
         metadata_fields: MetadataFieldApiResponse[]
     }
 
@@ -786,7 +786,7 @@ declare module 'cloudinary' {
 
     export type MetadataRulesListResponse = Array<MetadataRuleResponse>;
 
-    export interface ResourceApiResponse extends AdminApiPaginationResponse, AdminApiRateLimitingResponse {
+    export interface ResourceApiResponse extends AdminApiPaginationResponse, AdminApiBaseResponse {
         resources: [
             {
                 public_id: string;
