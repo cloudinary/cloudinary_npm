@@ -326,8 +326,14 @@ function process_layer(layer) {
   return components.join(':');
 }
 
+function replaceAllSubstrings(string, search) {
+  var replacement = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+  return string.split(search).join(replacement);
+}
+
 function encodeCurlyBraces(input) {
-  return input.replaceAll('(', '%28').replaceAll(')', '%29');
+  return replaceAllSubstrings(replaceAllSubstrings(input, '(', '%28'), ')', '%29');
 }
 
 /**
