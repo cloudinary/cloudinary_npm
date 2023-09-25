@@ -76,7 +76,7 @@ describe("URL for authenticated asset", () => {
     assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png');
   });
 
-  it.only('should have signature for authenticated asset with text overlay transformation including encoded emoji', () => {
+  it('should have signature for authenticated asset with text overlay transformation including encoded emoji', () => {
     const signedUrl = cloudinary.utils.url(TEST_PUBLIC_ID, {
       type: 'authenticated',
       sign_url: true,
