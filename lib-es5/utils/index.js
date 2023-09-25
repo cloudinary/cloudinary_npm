@@ -301,17 +301,19 @@ function process_layer(layer) {
     }
 
     if (!isEmpty(text)) {
-      var re = /\$\([a-zA-Z]\w*\)/g;
-      var start = 0;
-      var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
-      text = "";
-      for (var res = re.exec(textSource); res; res = re.exec(textSource)) {
-        text += smart_escape(textSource.slice(start, res.index));
-        text += res[0];
-        start = res.index + res[0].length;
-      }
-      text += encodeURIComponent(textSource.slice(start));
-      components.push(text);
+      var variablesRegex = new RegExp(/(\$\([a-zA-Z]\w+\))/g);
+      var textDividedByVariables = text.split(variablesRegex).filter(function (x) {
+        return x;
+      });
+      var encodedParts = textDividedByVariables.map(function (subText) {
+        var matches = variablesRegex[Symbol.match](subText);
+        var isVariable = matches ? matches.length > 0 : false;
+        if (isVariable) {
+          return subText;
+        }
+        return encodeCurlyBraces(encodeURIComponent(smart_escape(subText, new RegExp(/([,\/])/g))));
+      });
+      components.push(encodedParts.join(''));
     }
   } else if (type === 'fetch') {
     var encodedUrl = base64EncodeURL(fetchUrl);
@@ -322,6 +324,10 @@ function process_layer(layer) {
   }
 
   return components.join(':');
+}
+
+function encodeCurlyBraces(input) {
+  return input.replaceAll('(', '%28').replaceAll(')', '%29');
 }
 
 /**
