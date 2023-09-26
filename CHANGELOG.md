@@ -1,3 +1,11 @@
+1.41.0 / 2023-09-26
+==================
+
+* fix: improved calculation of the signature in url
+* fix: improved ResourceApiResponse interface
+* fix: fetch overlay video creates correct transformation
+* feat: added support for on_success script for uploader_spec.js
+
 1.40.0 / 2023-07-31
 ==================
 
