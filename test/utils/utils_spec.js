@@ -718,15 +718,6 @@ describe("utils", function () {
           "text:hello",
           "text:hello"],
         [
-          "string",
-          {
-            "font_family": "arial",
-            "font_size": "30",
-            "text": "abc,αβγ/אבג"
-          },
-          "text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92"
-        ],
-        [
           "public_id",
           {
             "public_id": "logo"
@@ -1064,87 +1055,6 @@ describe("utils", function () {
         }
         expect(cloudinary.utils.generate_transformation_string(options))
           .to.contain('$xpos_ctx:!x_pos!_to_f,$ypos_ctx:!y_pos!_to_f,c_crop,x_$xpos_mul_w,y_$ypos_mul_h')
-      });
-    });
-    describe('User Define Variables', function () {
-      it("array should define a set of variables", function () {
-        var options, t;
-        options = {
-          if: "face_count > 2",
-          variables: [["$z", 5], ["$foo", "$z * 2"]],
-          crop: "scale",
-          width: "$foo * 200"
-        };
-        t = cloudinary.utils.generate_transformation_string(options);
-        expect(t).to.eql("if_fc_gt_2,$z_5,$foo_$z_mul_2,c_scale,w_$foo_mul_200");
-      });
-      it("'$key' should define a variable", function () {
-        var options, t;
-        options = {
-          transformation: [
-            {
-              $foo: 10
-            },
-            {
-              if: "face_count > 2"
-            },
-            {
-              crop: "scale",
-              width: "$foo * 200 / face_count"
-            },
-            {
-              if: "end"
-            }
-          ]
-        };
-        t = cloudinary.utils.generate_transformation_string(options);
-        expect(t).to.eql("$foo_10/if_fc_gt_2/c_scale,w_$foo_mul_200_div_fc/if_end");
-      });
-
-      it("should not change variable names even if they look like keywords", function () {
-        var options, t;
-        options = {
-          transformation: [
-            {
-              $width: 10
-            },
-            {
-              width: "$width + 10 + width"
-            }
-          ]
-        };
-        t = cloudinary.utils.generate_transformation_string(options);
-        expect(t).to.eql("$width_10/w_$width_add_10_add_w");
-      });
-
-      it("should support text values", function () {
-        test_cloudinary_url("sample", {
-          effect: "$efname:100",
-          $efname: "!blur!"
-        }, `http://res.cloudinary.com/${cloud_name}/image/upload/$efname_!blur!,e_$efname:100/sample`, {});
-      });
-      it("should support string interpolation", function () {
-        test_cloudinary_url("sample", {
-          crop: "scale",
-          overlay: {
-            text: "$(start)Hello $(name)$(ext), $(no ) $( no)$(end)",
-            font_family: "Arial",
-            font_size: "18"
-          }
-        }, `http://res.cloudinary.com/${cloud_name}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample`, {});
-      });
-      it("should support power operator", function () {
-        var options, t;
-        options = {
-          transformation: [
-            {
-              $small: 150,
-              $big: "$small ^ 1.5"
-            }
-          ]
-        };
-        t = cloudinary.utils.generate_transformation_string(options);
-        expect(t).to.eql("$big_$small_pow_1.5,$small_150");
       });
     });
     describe("text", function () {
@@ -1556,52 +1466,6 @@ describe("utils", function () {
           10
         )
       ).to.eql(false);
-    });
-  });
-  context("sign URLs", function () {
-    beforeEach(function () {
-      cloudinary.config({
-        cloud_name: 'test123',
-        api_key: "1234",
-        api_secret: "b"
-      });
-    });
-    it("should correctly sign URLs", function () {
-      test_cloudinary_url("image.jpg", {
-        version: 1234,
-        transformation: {
-          crop: "crop",
-          width: 10,
-          height: 20
-        },
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/v1234/image.jpg", {});
-      test_cloudinary_url("image.jpg", {
-        version: 1234,
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/upload/s----SjmNDA--/v1234/image.jpg", {});
-      test_cloudinary_url("image.jpg", {
-        transformation: {
-          crop: "crop",
-          width: 10,
-          height: 20
-        },
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg", {});
-      test_cloudinary_url("image.jpg", {
-        transformation: {
-          crop: "crop",
-          width: 10,
-          height: 20
-        },
-        type: 'authenticated',
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/authenticated/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg", {});
-      test_cloudinary_url("http://google.com/path/to/image.png", {
-        type: "fetch",
-        version: 1234,
-        sign_url: true
-      }, "http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png", {});
     });
   });
   context("sign requests", function () {

@@ -49,7 +49,6 @@ var encodeDoubleArray = require('./encoding/encodeDoubleArray');
 
 var config = require("../config");
 var generate_token = require("../auth_token");
-var utf8_encode = require('./utf8_encode');
 var crc32 = require('./crc32');
 var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
@@ -302,17 +301,19 @@ function process_layer(layer) {
     }
 
     if (!isEmpty(text)) {
-      var re = /\$\([a-zA-Z]\w*\)/g;
-      var start = 0;
-      var textSource = smart_escape(decodeURIComponent(text), /[,\/]/g);
-      text = "";
-      for (var res = re.exec(textSource); res; res = re.exec(textSource)) {
-        text += smart_escape(textSource.slice(start, res.index));
-        text += res[0];
-        start = res.index + res[0].length;
-      }
-      text += encodeURIComponent(textSource.slice(start));
-      components.push(text);
+      var variablesRegex = new RegExp(/(\$\([a-zA-Z]\w+\))/g);
+      var textDividedByVariables = text.split(variablesRegex).filter(function (x) {
+        return x;
+      });
+      var encodedParts = textDividedByVariables.map(function (subText) {
+        var matches = variablesRegex[Symbol.match](subText);
+        var isVariable = matches ? matches.length > 0 : false;
+        if (isVariable) {
+          return subText;
+        }
+        return encodeCurlyBraces(encodeURIComponent(smart_escape(subText, new RegExp(/([,\/])/g))));
+      });
+      components.push(encodedParts.join(''));
     }
   } else if (type === 'fetch') {
     var encodedUrl = base64EncodeURL(fetchUrl);
@@ -323,6 +324,16 @@ function process_layer(layer) {
   }
 
   return components.join(':');
+}
+
+function replaceAllSubstrings(string, search) {
+  var replacement = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+  return string.split(search).join(replacement);
+}
+
+function encodeCurlyBraces(input) {
+  return replaceAllSubstrings(replaceAllSubstrings(input, '(', '%28'), ')', '%29');
 }
 
 /**
@@ -425,7 +436,8 @@ function build_upload_params(options) {
     quality_override: options.quality_override,
     accessibility_analysis: utils.as_safe_bool(options.accessibility_analysis),
     use_asset_folder_as_public_id_prefix: utils.as_safe_bool(options.use_asset_folder_as_public_id_prefix),
-    visual_search: utils.as_safe_bool(options.visual_search)
+    visual_search: utils.as_safe_bool(options.visual_search),
+    on_success: options.on_success
   };
   return utils.updateable_resource_params(options, params);
 }
@@ -928,16 +940,20 @@ function url(public_id) {
     var to_sign = [transformation, source_to_sign].filter(function (part) {
       return part != null && part !== '';
     }).join('/');
-    try {
-      for (var i = 0; to_sign !== decodeURIComponent(to_sign) && i < 10; i++) {
-        to_sign = decodeURIComponent(to_sign);
-      }
-      // eslint-disable-next-line no-empty
-    } catch (error) {}
-    var hash = compute_hash(to_sign + api_secret, signature_algorithm, 'base64');
-    signature = hash.replace(/\//g, '_').replace(/\+/g, '-').substring(0, long_url_signature ? 32 : 8);
-    signature = `s--${signature}--`;
+
+    var signatureConfig = {};
+    if (long_url_signature) {
+      signatureConfig.algorithm = 'sha256';
+      signatureConfig.signatureLength = 32;
+    } else {
+      signatureConfig.algorithm = signature_algorithm;
+      signatureConfig.signatureLength = 8;
+    }
+
+    var truncated = compute_hash(to_sign + api_secret, signatureConfig.algorithm, 'base64').slice(0, signatureConfig.signatureLength).replace(/\//g, '_').replace(/\+/g, '-');
+    signature = `s--${truncated}--`;
   }
+
   var prefix = build_distribution_domain(public_id, options);
   var resultUrl = [prefix, resource_type, type, signature, transformation, version, public_id].filter(function (part) {
     return part != null && part !== '';
@@ -1156,9 +1172,8 @@ function compute_hash(input, signature_algorithm, encoding) {
   if (!SUPPORTED_SIGNATURE_ALGORITHMS.includes(signature_algorithm)) {
     throw new Error(`Signature algorithm ${signature_algorithm} is not supported. Supported algorithms: ${SUPPORTED_SIGNATURE_ALGORITHMS.join(', ')}`);
   }
-  var hash = crypto.createHash(signature_algorithm);
-  hash.update(utf8_encode(input), 'binary');
-  return hash.digest(encoding);
+  var hash = crypto.createHash(signature_algorithm).update(input).digest();
+  return Buffer.from(hash).toString(encoding);
 }
 
 function clear_blank(hash) {
