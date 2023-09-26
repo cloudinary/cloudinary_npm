@@ -601,6 +601,16 @@ declare module 'cloudinary' {
 
     type UploadResponseCallback = (err?: UploadApiErrorResponse, callResult?: UploadApiResponse) => void;
 
+    export interface AdminApiPaginationResponse {
+        next_cursor?: string;
+    }
+
+    export interface AdminApiBaseResponse {
+        rate_limit_allowed?: number;
+        rate_limit_reset_at?: string;
+        rate_limit_remaining?: number;
+    }
+
     export interface UploadApiResponse {
         public_id: string;
         version: number;
@@ -694,7 +704,7 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
-    export interface MetadataFieldsApiResponse {
+    export interface MetadataFieldsApiResponse extends AdminApiPaginationResponse, AdminApiBaseResponse  {
         metadata_fields: MetadataFieldApiResponse[]
     }
 
@@ -776,7 +786,7 @@ declare module 'cloudinary' {
 
     export type MetadataRulesListResponse = Array<MetadataRuleResponse>;
 
-    export interface ResourceApiResponse {
+    export interface ResourceApiResponse extends AdminApiPaginationResponse, AdminApiBaseResponse {
         resources: [
             {
                 public_id: string;
