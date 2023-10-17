@@ -556,6 +556,16 @@ cloudinary.v2.api.visual_search({text: 'visual-search-input'}, function (error, 
 });
 
 // $ExpectType Promise<any>
+cloudinary.v2.api.visual_search({image_file: 'path/to/file'}, function (error, result) {
+    console.log(result);
+});
+
+// $ExpectType Promise<any>
+cloudinary.v2.api.visual_search({image_file: Buffer.from('abc')}, function (error, result) {
+    console.log(result);
+});
+
+// $ExpectType Promise<any>
 cloudinary.v2.api.transformation({width: 150, height: 100, crop: 'fill'},
     function (error, result) {
         console.log(result, error);
