@@ -2,6 +2,7 @@
 
 var utils = require("./utils");
 var call_api = require("./api_client/call_api");
+var fs = require("fs");
 
 var extend = utils.extend,
     pickOnlyExistingValues = utils.pickOnlyExistingValues;
@@ -588,10 +589,24 @@ exports.search = function search(params, callback) {
   return call_api("post", "resources/search", params, callback, options);
 };
 
+function handleImageFile(image_file) {
+  if (Buffer.isBuffer(image_file)) {
+    return image_file;
+  }
+  if (typeof image_file === 'string') {
+    return fs.createReadStream(image_file);
+  }
+  throw new Error('image_file has to be either a path to file or a buffer');
+}
+
 exports.visual_search = function visual_search(params, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var allowedParams = pickOnlyExistingValues(params, 'image_url', 'image_asset_id', 'text');
+  var allowedParams = pickOnlyExistingValues(params, 'image_url', 'image_asset_id', 'text', 'image_file');
+  if ('image_file' in allowedParams) {
+    var imageFileData = handleImageFile(allowedParams.image_file);
+    return call_api('post', ['resources', 'visual_search'], { image_file: imageFileData }, callback, options);
+  }
   return call_api('get', ['resources', 'visual_search'], allowedParams, callback, options);
 };
 

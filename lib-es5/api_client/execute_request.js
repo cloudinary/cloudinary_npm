@@ -10,6 +10,7 @@ var Q = require('q');
 var url = require('url');
 var utils = require("../utils");
 var ensureOption = require('../utils/ensureOption').defaults(config());
+var request = require('request');
 
 var extend = utils.extend,
     includes = utils.includes,
@@ -17,6 +18,50 @@ var extend = utils.extend,
 
 
 var agent = config.api_proxy ? new https.Agent(config.api_proxy) : null;
+
+function requestWithUpload(uploadConfig, file, callback) {
+  var options = _extends({
+    method: 'POST',
+    url: uploadConfig.api_url,
+    formData: {
+      image_file: file
+    }
+  }, uploadConfig.auth.oauth_token && { headers: { 'Authorization': `Bearer ${uploadConfig.auth.oauth_token}` } }, uploadConfig.auth.key && uploadConfig.auth.secret && {
+    auth: {
+      user: uploadConfig.auth.key,
+      pass: uploadConfig.auth.secret
+    }
+  });
+
+  if (typeof callback === "function") {
+    return request(options, function (error, response, body) {
+      if (error) {
+        return callback(error);
+      }
+      return callback({
+        statusCode: response.statusCode,
+        body: JSON.parse(body)
+      });
+    });
+  }
+
+  return new Promise(function (resolve, reject) {
+    var req = request(options, function (error, response, body) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve({
+          statusCode: response.statusCode,
+          body: JSON.parse(body)
+        });
+      }
+    });
+
+    req.on('error', function (error) {
+      reject(error);
+    });
+  });
+}
 
 function execute_request(method, params, auth, api_url, callback) {
   var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
@@ -30,6 +75,13 @@ function execute_request(method, params, auth, api_url, callback) {
   var secret = auth.secret;
   var oauth_token = auth.oauth_token;
   var content_type = 'application/x-www-form-urlencoded';
+
+  if (params.image_file && method.toLowerCase() === 'post') {
+    return requestWithUpload({
+      api_url,
+      auth
+    }, params.image_file, callback);
+  }
 
   if (options.content_type === 'json') {
     query_params = JSON.stringify(params);
@@ -164,16 +216,16 @@ function execute_request(method, params, auth, api_url, callback) {
     }
   };
 
-  var request = https.request(request_options, handle_response);
-  request.on("error", function (e) {
+  var req = https.request(request_options, handle_response);
+  req.on("error", function (e) {
     deferred.reject(e);
     return typeof callback === "function" ? callback({ error: e }) : void 0;
   });
-  request.setTimeout(ensureOption(options, "timeout", 60000));
+  req.setTimeout(ensureOption(options, "timeout", 60000));
   if (method !== "GET") {
-    request.write(query_params);
+    req.write(query_params);
   }
-  request.end();
+  req.end();
   return deferred.promise;
 }
 
