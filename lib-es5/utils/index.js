@@ -54,11 +54,6 @@ var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
-// const getSDKVersions = require('./encoding/sdkAnalytics/getSDKVersions');
-// const {
-//   getAnalyticsOptions,
-//   getSDKAnalyticsSignature
-// } = require('cloudinary-core').Util;
 
 var getSDKVersions = require('./analytics/getSDKVersions');
 
