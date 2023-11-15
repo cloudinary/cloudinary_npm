@@ -54,11 +54,17 @@ var ensurePresenceOf = require('./ensurePresenceOf');
 var ensureOption = require('./ensureOption').defaults(config());
 var entries = require('./entries');
 var isRemoteUrl = require('./isRemoteUrl');
-var getSDKVersions = require('./encoding/sdkAnalytics/getSDKVersions');
+// const getSDKVersions = require('./encoding/sdkAnalytics/getSDKVersions');
+// const {
+//   getAnalyticsOptions,
+//   getSDKAnalyticsSignature
+// } = require('cloudinary-core').Util;
 
-var _require$Util = require('cloudinary-core').Util,
-    getAnalyticsOptions = _require$Util.getAnalyticsOptions,
-    getSDKAnalyticsSignature = _require$Util.getSDKAnalyticsSignature;
+var getSDKVersions = require('./analytics/getSDKVersions');
+
+var _require2 = require('./analytics'),
+    getAnalyticsOptions = _require2.getAnalyticsOptions,
+    getSDKAnalyticsSignature = _require2.getSDKAnalyticsSignature;
 
 exports = module.exports;
 var utils = module.exports;
@@ -89,18 +95,18 @@ function getUserAgent() {
   return isEmpty(utils.userPlatform) ? `${utils.USER_AGENT}` : `${utils.userPlatform} ${utils.USER_AGENT}`;
 }
 
-var _require2 = require('./consts'),
-    DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = _require2.DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION,
-    DEFAULT_POSTER_OPTIONS = _require2.DEFAULT_POSTER_OPTIONS,
-    DEFAULT_VIDEO_SOURCE_TYPES = _require2.DEFAULT_VIDEO_SOURCE_TYPES,
-    CONDITIONAL_OPERATORS = _require2.CONDITIONAL_OPERATORS,
-    PREDEFINED_VARS = _require2.PREDEFINED_VARS,
-    LAYER_KEYWORD_PARAMS = _require2.LAYER_KEYWORD_PARAMS,
-    TRANSFORMATION_PARAMS = _require2.TRANSFORMATION_PARAMS,
-    SIMPLE_PARAMS = _require2.SIMPLE_PARAMS,
-    UPLOAD_PREFIX = _require2.UPLOAD_PREFIX,
-    SUPPORTED_SIGNATURE_ALGORITHMS = _require2.SUPPORTED_SIGNATURE_ALGORITHMS,
-    DEFAULT_SIGNATURE_ALGORITHM = _require2.DEFAULT_SIGNATURE_ALGORITHM;
+var _require3 = require('./consts'),
+    DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION = _require3.DEFAULT_RESPONSIVE_WIDTH_TRANSFORMATION,
+    DEFAULT_POSTER_OPTIONS = _require3.DEFAULT_POSTER_OPTIONS,
+    DEFAULT_VIDEO_SOURCE_TYPES = _require3.DEFAULT_VIDEO_SOURCE_TYPES,
+    CONDITIONAL_OPERATORS = _require3.CONDITIONAL_OPERATORS,
+    PREDEFINED_VARS = _require3.PREDEFINED_VARS,
+    LAYER_KEYWORD_PARAMS = _require3.LAYER_KEYWORD_PARAMS,
+    TRANSFORMATION_PARAMS = _require3.TRANSFORMATION_PARAMS,
+    SIMPLE_PARAMS = _require3.SIMPLE_PARAMS,
+    UPLOAD_PREFIX = _require3.UPLOAD_PREFIX,
+    SUPPORTED_SIGNATURE_ALGORITHMS = _require3.SUPPORTED_SIGNATURE_ALGORITHMS,
+    DEFAULT_SIGNATURE_ALGORITHM = _require3.DEFAULT_SIGNATURE_ALGORITHM;
 
 function textStyle(layer) {
   var keywords = [];
@@ -970,12 +976,14 @@ function url(public_id) {
     var _getSDKVersions = getSDKVersions(),
         sdkCode = _getSDKVersions.sdkCode,
         sdkSemver = _getSDKVersions.sdkSemver,
-        techVersion = _getSDKVersions.techVersion;
+        techVersion = _getSDKVersions.techVersion,
+        product = _getSDKVersions.product;
 
     var sdkVersions = {
       sdkCode: ensureOption(options, 'sdkCode', sdkCode),
       sdkSemver: ensureOption(options, 'sdkSemver', sdkSemver),
-      techVersion: ensureOption(options, 'techVersion', techVersion)
+      techVersion: ensureOption(options, 'techVersion', techVersion),
+      product: ensureOption(options, 'product', product)
     };
 
     var analyticsOptions = getAnalyticsOptions(Object.assign({}, options, sdkVersions));

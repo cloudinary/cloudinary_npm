@@ -3,7 +3,6 @@
 var fs = require('fs');
 var path = require('path');
 var sdkCode = 'M'; // Constant per SDK
-// const packageJson = require('../../../package.json');
 
 /**
  * @description Gets the relevant versions of the SDK(package version, node version and sdkCode)
@@ -15,7 +14,7 @@ function getSDKVersions() {
   var useSDKVersion = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'default';
   var useNodeVersion = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'default';
 
-  var pkgJSONFile = fs.readFileSync(path.join(__dirname, '../../../../package.json'), 'utf-8');
+  var pkgJSONFile = fs.readFileSync(path.join(__dirname, '../../../package.json'), 'utf-8');
 
   // allow to pass a custom SDKVersion
   var sdkSemver = useSDKVersion === 'default' ? JSON.parse(pkgJSONFile).version : useSDKVersion;
@@ -23,10 +22,13 @@ function getSDKVersions() {
   // allow to pass a custom techVersion (Node version)
   var techVersion = useNodeVersion === 'default' ? process.versions.node : useNodeVersion;
 
+  var product = 'A';
+
   return {
     sdkSemver,
     techVersion,
-    sdkCode
+    sdkCode,
+    product
   };
 }
 
