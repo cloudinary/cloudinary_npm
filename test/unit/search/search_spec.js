@@ -67,6 +67,10 @@ describe('Search', () => {
     });
   });
 
+  it('should run without an expression', () => {
+    cloudinary.v2.search.execute();
+  });
+
   describe('to_url', () => {
     const cloudName = 'test123';
 

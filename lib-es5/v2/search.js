@@ -202,6 +202,11 @@ var Search = function () {
     value: function ttl(newTtl) {
       return this.instance().ttl(newTtl);
     }
+  }, {
+    key: 'execute',
+    value: function execute(options, callback) {
+      return this.instance().execute(options, callback);
+    }
   }]);
 
   return Search;
