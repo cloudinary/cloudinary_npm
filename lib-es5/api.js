@@ -634,7 +634,7 @@ exports.update_resources_access_mode_by_ids = function update_resources_access_m
 exports.add_metadata_field = function add_metadata_field(field, callback) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var params = pickOnlyExistingValues(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  var params = pickOnlyExistingValues(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource", "restrictions");
   options.content_type = "json";
   return call_api("post", ["metadata_fields"], params, callback, options);
 };
@@ -709,7 +709,7 @@ exports.metadata_field_by_field_id = function metadata_field_by_field_id(externa
 exports.update_metadata_field = function update_metadata_field(external_id, field, callback) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-  var params = pickOnlyExistingValues(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource");
+  var params = pickOnlyExistingValues(field, "external_id", "type", "label", "mandatory", "default_value", "validation", "datasource", "restrictions");
   options.content_type = "json";
   return call_api("put", ["metadata_fields", external_id], params, callback, options);
 };
