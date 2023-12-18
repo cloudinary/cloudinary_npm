@@ -1,3 +1,8 @@
+1.41.1 / 2023-12-18
+==================
+
+ * fix: sending restrictions when creating or updating metadata fields
+
 1.41.0 / 2023-09-26
 ==================
 
