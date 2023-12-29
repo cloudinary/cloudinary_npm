@@ -3,6 +3,8 @@ nvm:
 
 matrix:
   include:
+  - node_js: "9"
+    script: npm run test-with-temp-cloud
   - node_js: "10"
     script: npm run test-with-temp-cloud
   - node_js: "12"
