@@ -11,7 +11,7 @@ const cloudinary = require("../cloudinary");
 
 const { utils, config, Cache } = cloudinary;
 
-const libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
+const libPath = 'lib';
 const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
 const KeyValueCacheAdapter = require(`../${libPath}/cache/KeyValueCacheAdapter`);
 exports.libPath = libPath;
