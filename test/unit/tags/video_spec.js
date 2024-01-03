@@ -10,8 +10,8 @@ const createTestConfig = require('../../testUtils/createTestConfig');
 
 describe("video tag helper", function () {
   var DEFAULT_UPLOAD_PATH, VIDEO_UPLOAD_PATH;
-  VIDEO_UPLOAD_PATH = "http://res.cloudinary.com/test123/video/upload/";
-  DEFAULT_UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload/";
+  VIDEO_UPLOAD_PATH = "https://res.cloudinary.com/test123/video/upload/";
+  DEFAULT_UPLOAD_PATH = "https://res.cloudinary.com/test123/image/upload/";
   beforeEach(function () {
     cloudinary.config(true); // Reset
     cloudinary.config(createTestConfig({
@@ -119,7 +119,7 @@ describe("video tag helper", function () {
   it("should generate video tag with configurable poster", function () {
     var expected_poster_url, expected_url;
     expected_url = VIDEO_UPLOAD_PATH + "movie";
-    expected_poster_url = 'http://image/somewhere.jpg';
+    expected_poster_url = 'https://image/somewhere.jpg';
     expect(cloudinary.video("movie", {
       poster: expected_poster_url,
       source_types: "mp4"

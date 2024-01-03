@@ -3,7 +3,7 @@
   "name": "cloudinary",
   "description": "Cloudinary NPM for node.js integration",
   "version": "1.41.1",
-  "homepage": "http://cloudinary.com",
+  "homepage": "https://cloudinary.com",
   "license": "MIT",
   "repository": {
     "type": "git",

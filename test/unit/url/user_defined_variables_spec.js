@@ -81,7 +81,7 @@ describe('User Define Variables', function () {
       $efname: '!blur!'
     });
 
-    assert.strictEqual(url, `http://res.cloudinary.com/${CLOUD_NAME}/image/upload/$efname_!blur!,e_$efname:100/sample`);
+    assert.strictEqual(url, `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/$efname_!blur!,e_$efname:100/sample`);
   });
 
   it('should support string interpolation', function () {
@@ -94,6 +94,6 @@ describe('User Define Variables', function () {
       }
     });
 
-    assert.strictEqual(url, `http://res.cloudinary.com/${CLOUD_NAME}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample`);
+    assert.strictEqual(url, `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/c_scale,l_text:Arial_18:$(start)Hello%20$(name)$(ext)%252C%20%24%28no%20%29%20%24%28%20no%29$(end)/sample`);
   });
 });

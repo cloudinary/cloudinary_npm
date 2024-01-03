@@ -1,6 +1,5 @@
 const path = require('path');
 const mock = require('mock-fs');
-const getSDKVersions = require('../../../lib/utils/encoding/sdkAnalytics/getSDKVersions');
 const cloudinary = require('../../../cloudinary');
 const TEST_CLOUD_NAME = require('../../testUtils/testConstants').TEST_CLOUD_NAME;
 
@@ -49,7 +48,7 @@ describe('Tests for sdk analytics through image tag', function () {
       urlAnalytics: true
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAM0`);
+    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAM0`);
   });
 
   it('Reads from process.versions and package.json (Mocked) - Responsive', () => {
@@ -63,7 +62,7 @@ describe('Tests for sdk analytics through image tag', function () {
       urlAnalytics: true
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAMA`);
+    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAMA`);
   });
 
   it('Reads from tracked analytics configuration', () => {
@@ -77,9 +76,9 @@ describe('Tests for sdk analytics through image tag', function () {
       sdkCode: "X",
       sdkSemver: "7.3.0",
       techVersion: "3.4.7"
-      
+
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AXAEzGT0`);
+    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AXAEzGT0`);
   });
 });

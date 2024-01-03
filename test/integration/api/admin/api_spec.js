@@ -40,13 +40,11 @@ const {
   PUBLIC_ID_6,
   PUBLIC_ID_BACKUP_1,
   PUBLIC_ID_BACKUP_2,
-  PUBLIC_ID_BACKUP_3,
   PUBLIC_ID_OCR_1
 } = PUBLIC_IDS;
 
 const {
   TEST_TAG,
-  SDK_TAG,
   UPLOAD_TAGS
 } = TAGS;
 
@@ -893,10 +891,10 @@ describe("api", function () {
           moderation: "manual"
         }).then(upload_result => cloudinary.v2.api.update(upload_result.public_id, {
           moderation_status: "approved",
-          notification_url: "http://example.com"
+          notification_url: "https://example.com"
         })).then(function () {
           if (writeSpy.called) {
-            sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=http%3A%2F%2Fexample.com/));
+            sinon.assert.calledWith(writeSpy, sinon.match(/notification_url=https%3A%2F%2Fexample.com/));
             sinon.assert.calledWith(writeSpy, sinon.match(/moderation_status=approved/));
           }
         });
@@ -1369,26 +1367,26 @@ describe("api", function () {
       this.timeout(TIMEOUT.LONG);
       return cloudinary.v2.api
         .create_upload_mapping(this.mapping, {
-          template: "http://cloudinary.com",
+          template: "https://cloudinary.com",
           tags: UPLOAD_TAGS
         }).then(
           () => cloudinary.v2.api.upload_mapping(this.mapping)
         ).then((result) => {
           this.deleteMapping = true;
-          expect(result.template).to.eql("http://cloudinary.com");
+          expect(result.template).to.eql("https://cloudinary.com");
           return cloudinary.v2.api.update_upload_mapping(this.mapping, {
-            template: "http://res.cloudinary.com"
+            template: "https://res.cloudinary.com"
           });
         }).then(
           result => cloudinary.v2.api.upload_mapping(this.mapping)
         ).then((result) => {
-          expect(result.template).to.eql("http://res.cloudinary.com");
+          expect(result.template).to.eql("https://res.cloudinary.com");
           return cloudinary.v2.api.upload_mappings();
         }).then((result) => {
           expect(result.mappings.find(({
             folder,
             template
-          }) => folder === this.mapping && template === "http://res.cloudinary.com")).to.be.ok();
+          }) => folder === this.mapping && template === "https://res.cloudinary.com")).to.be.ok();
           return cloudinary.v2.api.delete_upload_mapping(this.mapping);
         }).then((result) => {
           this.deleteMapping = false;
