@@ -32,8 +32,8 @@ For the complete documentation, see the [Node SDK Guide](https://cloudinary.com/
 ## Version Support
 | SDK Version | Node version |
 |-------------|--------------|
-| 1.0.0 & up  | Node@6 & up  |
-| 2.0.0 & up  | Node@9 & up  |
+| 1.x.x       | Node@6 & up  |
+| 2.x.x       | Node@9 & up  |
 
 ## Installation
 ```bash
