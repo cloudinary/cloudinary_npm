@@ -79,7 +79,7 @@ cloudinary.v2.image("yellow_tulip.jpg", {
 // $ExpectType string
 cloudinary.v2.image("sample.jpg", {
     audio_codec: '1', overlay:
-        {url: "http://cloudinary.com/images/old_logo.png7"}
+        {url: "https://cloudinary.com/images/old_logo.png7"}
 });
 
 // $ExpectType string
@@ -192,7 +192,7 @@ cloudinary.v2.api.update_transformation("my_named",
 
 // $ExpectType Promise<any>
 cloudinary.v2.api.create_upload_mapping('my_map',
-    {template: "http://www.example.com/images/"},
+    {template: "https://www.example.com/images/"},
     function (error, result) {
         console.log(result);
     });
@@ -867,7 +867,7 @@ cloudinary.v2.uploader.text("Sample text string",
     });
 
 // $ExpectType Promise<UploadApiResponse>
-cloudinary.v2.uploader.upload("http://www.example.com/sample.jpg",
+cloudinary.v2.uploader.upload("https://www.example.com/sample.jpg",
     function (error, result) {
         console.log(result, error);
     });
@@ -968,7 +968,7 @@ cloudinary.v2.uploader.remove_tag('12', ['11'], function (err, res) {
 
 // $ExpectType UploadStream
 cloudinary.v2.uploader.upload_stream(
-    {template: "http://www.example.com/images/"},
+    {template: "https://www.example.com/images/"},
     function (error, result) {
         console.log(result);
     });

@@ -17,14 +17,13 @@ describe("Cloudinary::Utils for video", function () {
       cloud_name: "test123",
       secure_distribution: null,
       private_cdn: false,
-      secure: false,
       cname: null,
       cdn_subdomain: false,
       api_key: "1234",
       api_secret: "b"
     }));
   });
-  root_path = "http://res.cloudinary.com/test123";
+  root_path = "https://res.cloudinary.com/test123";
   upload_path = `${root_path}/video/upload`;
   describe("utils.url", function () {
     describe(":video_codec", function () {
@@ -206,8 +205,7 @@ describe("Cloudinary::Utils for video", function () {
     var options, path, source;
     source = "movie_id";
     options = createTestConfig({
-      cloud_name: "test123",
-      secure: false
+      cloud_name: "test123"
     });
     path = utils.video_thumbnail_url(source, options);
     it("should generate a cloudinary URI to the video thumbnail", function () {

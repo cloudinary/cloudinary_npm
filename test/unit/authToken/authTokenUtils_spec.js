@@ -37,7 +37,7 @@ describe("AuthToken tests using utils.generate_auth_token", function () {
     }
     const token = utils.generate_auth_token(token_options);
 
-    token_options.url = "http://res.cloudinary.com/test123/image/upload/v1486020273/sample.jpg";
+    token_options.url = "https://res.cloudinary.com/test123/image/upload/v1486020273/sample.jpg";
     const token_with_url = utils.generate_auth_token(token_options);
     expect(token).to.eql(token_with_url)
   });
@@ -62,7 +62,7 @@ describe("AuthToken tests using utils.generate_auth_token", function () {
       utils.generate_auth_token({
         start_time: 1111111111,
         duration: 300,
-        url: "http://res.cloudinary.com/test123/image/upload/v1486020273/sample.jpg"
+        url: "https://res.cloudinary.com/test123/image/upload/v1486020273/sample.jpg"
       });
     }).not.to.throwError();
   });

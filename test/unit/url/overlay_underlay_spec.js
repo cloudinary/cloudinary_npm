@@ -19,7 +19,7 @@ describe('URL utils with transformation parameters', () => {
       }
     });
 
-    assert.strictEqual(url, `http://res.cloudinary.com/${CLOUD_NAME}/image/upload/l_text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92/test`);
+    assert.strictEqual(url, `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/l_text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92/test`);
   });
 
   it('should create a correct link with underlay string', () => {
@@ -31,6 +31,6 @@ describe('URL utils with transformation parameters', () => {
       }
     });
 
-    assert.strictEqual(url, `http://res.cloudinary.com/${CLOUD_NAME}/image/upload/u_text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92/test`);
+    assert.strictEqual(url, `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/u_text:arial_30:abc%252C%CE%B1%CE%B2%CE%B3%252F%D7%90%D7%91%D7%92/test`);
   });
 });
