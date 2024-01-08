@@ -1,3 +1,10 @@
+2.0.0-rc / 2024-01-08
+==================
+
+* feat!: secure option from config set to true by default
+* feat!: url analytics enabled by default
+* feat!: dropped Node@6 and Node@8
+
 1.41.1 / 2023-12-18
 ==================
 
