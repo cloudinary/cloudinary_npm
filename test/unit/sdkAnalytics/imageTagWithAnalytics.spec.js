@@ -26,6 +26,19 @@ describe('Tests for sdk analytics through image tag', function () {
     process.versions = processVersions;
   });
 
+  it('Can be turned off via options', () => {
+    process.versions = {
+      node: '12.0.0'
+    };
+
+    let imgStr = cloudinary.image("hello", {
+      format: "png",
+      urlAnalytics: false
+    });
+
+    expect(imgStr).not.to.contain(`MAlhAM0`);
+  });
+
   it('Defaults to true even if analytics is not passed as an option', () => {
     process.versions = {
       node: '12.0.0'
