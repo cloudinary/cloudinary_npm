@@ -4,61 +4,101 @@ const sinon = require('sinon');
 const cloudinary = require('../../../../lib/cloudinary');
 const createTestConfig = require('../../../testUtils/createTestConfig');
 const helper = require('../../../spechelper');
+const ClientRequest = require('_http_client').ClientRequest;
 
 describe('Uploader', () => {
-  beforeEach(function () {
-    cloudinary.config(true);
-    cloudinary.config(createTestConfig());
+  let spy;
+  let xhr;
+
+  before(() => {
+    xhr = sinon.useFakeXMLHttpRequest();
+    spy = sinon.spy(ClientRequest.prototype, 'write');
   });
 
-  it('should upload with custom region gravity that represents a box', () => {
-    const boxRegionGravityEncoded = '{box_1}1,2,3,4|{box_2}5,6,7,8';
+  after(() => {
+    spy.restore();
+    xhr.restore();
+  });
 
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      helper.uploadImage({
+  describe('upload', () => {
+    it('should send a request with encoded custom region gravity that represents a box', () => {
+      const boxRegionGravityEncoded = '{box_1}1,2,3,4|{box_2}5,6,7,8';
+
+      cloudinary.v2.uploader.upload('irrelevant', {
         regions: {
           'box_1': [[1, 2], [3, 4]],
           'box_2': [[5, 6], [7, 8]]
         }
       });
 
-      sinon.assert.calledWith(requestSpy, sinon.match({
-        method: sinon.match('POST')
-      }));
-
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('regions', boxRegionGravityEncoded)));
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', boxRegionGravityEncoded)));
     });
-  });
 
-  it('should upload with custom region gravity that represents a custom shape', () => {
-    const customRegionGravityEncoded = '{custom_1}1,2,3,4,5,6,7,8|{custom_2}10,11,12,13,14,15';
+    it('should send a request with encoded custom region gravity that represents a custom shape', () => {
+      const customRegionGravityEncoded = '{custom_1}1,2,3,4,5,6,7,8|{custom_2}10,11,12,13,14,15';
 
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      helper.uploadImage({
+      cloudinary.v2.uploader.upload('irrelevant', {
         regions: {
           'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
           'custom_2': [[10, 11], [12, 13], [14, 15]]
         }
       });
 
-      sinon.assert.calledWith(requestSpy, sinon.match({
-        method: sinon.match('POST')
-      }));
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', customRegionGravityEncoded)));
+    });
 
-      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('regions', customRegionGravityEncoded)));
+    it('should throw an error when insufficient custom region gravity details', () => {
+      assert.throws(() => {
+        cloudinary.v2.uploader.upload('irrelevant', {
+          regions: {
+            'error_1': [[1, 2]]
+          }
+        })
+      }, {
+        name: 'TypeError',
+        message: 'Regions should contain at least two arrays with two coordinates'
+      });
     });
   });
 
-  it('should not upload with insufficient custom region gravity details', () => {
-    assert.throws(() => {
-      cloudinary.v2.uploader.upload('irrelevant', {
+  describe('explicit', () => {
+    it('should send a request with encoded custom region gravity that represents a box', () => {
+      const boxRegionGravityEncoded = '{box_1}1,2,3,4|{box_2}5,6,7,8';
+
+      cloudinary.v2.uploader.explicit('irrelevant', {
         regions: {
-          'error_1': [[1, 2]]
+          'box_1': [[1, 2], [3, 4]],
+          'box_2': [[5, 6], [7, 8]]
         }
       });
-    }, {
-      name: 'TypeError',
-      message: 'Regions should contain at least two arrays with two coordinates'
+
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', boxRegionGravityEncoded)));
+    });
+
+    it('should send a request with encoded custom region gravity that represents a custom shape', () => {
+      const customRegionGravityEncoded = '{custom_1}1,2,3,4,5,6,7,8|{custom_2}10,11,12,13,14,15';
+
+      cloudinary.v2.uploader.explicit('irrelevant', {
+        regions: {
+          'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
+          'custom_2': [[10, 11], [12, 13], [14, 15]]
+        }
+      });
+
+      sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', customRegionGravityEncoded)));
+    });
+
+    it('should throw an error when insufficient custom region gravity details', () => {
+      assert.throws(() => {
+        cloudinary.v2.uploader.upload('irrelevant', {
+          regions: {
+            'error_1': [[1, 2]]
+          }
+        })
+      }, {
+        name: 'TypeError',
+        message: 'Regions should contain at least two arrays with two coordinates'
+      });
     });
   });
 });
