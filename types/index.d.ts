@@ -540,9 +540,12 @@ declare module 'cloudinary' {
         disable_promises?: boolean;
         oauth_token?: string;
         use_asset_folder_as_public_id_prefix?: boolean;
+        regions?: Record<string, [RegionCoordinate, RegionCoordinate, ...Array<RegionCoordinate>]>;
 
         [futureKey: string]: any;
     }
+
+    export type RegionCoordinate = [number, number];
 
     export interface ProvisioningApiOptions {
         account_id?: string;
