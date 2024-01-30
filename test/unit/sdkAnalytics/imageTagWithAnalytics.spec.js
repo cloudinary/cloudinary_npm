@@ -25,7 +25,20 @@ describe('Tests for sdk analytics through image tag', function () {
     process.versions = processVersions;
   });
 
-  it('Defaults to false if analytics is not passed as an option', () => {
+  it('Can be turned off via options', () => {
+    process.versions = {
+      node: '12.0.0'
+    };
+
+    let imgStr = cloudinary.image("hello", {
+      format: "png",
+      urlAnalytics: false
+    });
+
+    expect(imgStr).not.to.contain(`MAlhAM0`);
+  });
+
+  it('Defaults to true even if analytics is not passed as an option', () => {
     process.versions = {
       node: '12.0.0'
     };
@@ -34,7 +47,7 @@ describe('Tests for sdk analytics through image tag', function () {
       format: "png"
     });
 
-    expect(imgStr).not.to.contain(`MAlhAM0`);
+    expect(imgStr).to.contain(`MAlhAM0`);
   });
 
   it('Reads from process.versions and package.json (Mocked)', () => {
@@ -47,7 +60,7 @@ describe('Tests for sdk analytics through image tag', function () {
       urlAnalytics: true
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BAMAlhAM0`);
+    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAM0`);
   });
 
   it('Reads from process.versions and package.json (Mocked) - Responsive', () => {
@@ -61,7 +74,7 @@ describe('Tests for sdk analytics through image tag', function () {
       urlAnalytics: true
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BAMAlhAMA`);
+    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=AMAlhAMA`);
   });
 
   it('Reads from tracked analytics configuration', () => {
@@ -78,6 +91,6 @@ describe('Tests for sdk analytics through image tag', function () {
       product: 'B'
     });
 
-    expect(imgStr).to.contain(`src='http://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BBXAEzGT0`);
+    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BBXAEzGT0`);
   });
 });

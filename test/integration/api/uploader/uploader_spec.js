@@ -84,8 +84,7 @@ describe("uploader", function () {
   });
   it("should successfully upload with metadata", function () {
     return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      const metadata_fields = METADATA_SAMPLE_DATA;
-      uploadImage({ metadata: metadata_fields });
+      uploadImage({ metadata: METADATA_SAMPLE_DATA });
       sinon.assert.calledWith(requestSpy, sinon.match({
         method: sinon.match("POST")
       }));
@@ -93,7 +92,7 @@ describe("uploader", function () {
     });
   });
   it("should successfully upload url", function () {
-    return cloudinary.v2.uploader.upload("http://cloudinary.com/images/old_logo.png", {
+    return cloudinary.v2.uploader.upload("https://cloudinary.com/images/old_logo.png", {
       tags: UPLOAD_TAGS
     }).then(function (result) {
       var expected_signature;
@@ -107,7 +106,7 @@ describe("uploader", function () {
     });
   });
   it("should successfully override original_filename", function () {
-    return cloudinary.v2.uploader.upload("http://cloudinary.com/images/old_logo.png", {
+    return cloudinary.v2.uploader.upload("https://cloudinary.com/images/old_logo.png", {
       filename_override: 'overridden'
     }).then((result) => {
       expect(result.original_filename).to.eql('overridden');
@@ -123,7 +122,7 @@ describe("uploader", function () {
   });
   it('should allow upload with url safe base64 in overlay', function () {
     const overlayUrl = 'https://res.cloudinary.com/demo/image/upload/logos/cloudinary_full_logo_white_small.png';
-    const baseImageUrl ='http://cloudinary.com/images/old_logo.png';
+    const baseImageUrl ='https://cloudinary.com/images/old_logo.png';
 
     const options = {transformation: {overlay: { url: overlayUrl }}};
     return cloudinary.v2.uploader.upload(baseImageUrl, options)
@@ -264,7 +263,7 @@ describe("uploader", function () {
         format: "jpg",
         version: result.version
       });
-      expect(result.eager[0].url).to.eql(url);
+      expect(result.eager[0].secure_url).to.eql(url);
     });
   });
   it("should support eager in upload", function () {
@@ -447,7 +446,7 @@ describe("uploader", function () {
   });
   it("should support timeouts", function () {
     // testing a 1ms timeout, nobody is that fast.
-    return cloudinary.v2.uploader.upload("http://cloudinary.com/images/old_logo.png", {
+    return cloudinary.v2.uploader.upload("https://cloudinary.com/images/old_logo.png", {
       timeout: 1,
       tags: UPLOAD_TAGS
     }).then(function () {
@@ -810,7 +809,7 @@ describe("uploader", function () {
     });
     it("should support uploading based on a url", function (done) {
       this.timeout(TIMEOUT.MEDIUM);
-      cloudinary.v2.uploader.upload_large("http://cloudinary.com/images/old_logo.png", {
+      cloudinary.v2.uploader.upload_large("https://cloudinary.com/images/old_logo.png", {
         tags: UPLOAD_TAGS
       }, function (error, result) {
         if (error != null) {
@@ -1123,8 +1122,7 @@ describe("uploader", function () {
       });
     });
     it("should support metadata", function () {
-      const metadata_fields = METADATA_SAMPLE_DATA;
-      cloudinary.v2.uploader.explicit("cloudinary", { metadata: metadata_fields });
+      cloudinary.v2.uploader.explicit("cloudinary", { metadata: METADATA_SAMPLE_DATA });
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
     it("should support raw_convert", function () {

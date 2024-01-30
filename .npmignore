@@ -8,7 +8,6 @@ test/
 .env
 .travis.yml
 !lib/**
-!lib-es5/**
 !package.json
 !babel.config.js
 !.npmignore

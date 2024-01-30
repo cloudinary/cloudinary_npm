@@ -3,7 +3,7 @@ const { setupCache } = require("../../spechelper");
 
 const { extend, isEmpty } = cloudinary.utils;
 const BREAKPOINTS = [5, 3, 7, 5];
-const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
+const UPLOAD_PATH = "https://res.cloudinary.com/test123/image/upload";
 const Cache = cloudinary.Cache;
 const srcRegExp = function (name, path) {
   return RegExp(`${name}=["']${UPLOAD_PATH}/${path}["']`.replace("/", "\/"));

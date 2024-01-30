@@ -2,7 +2,7 @@
 const cloudinary = require('../../../cloudinary');
 
 const extend = cloudinary.utils.extend;
-const UPLOAD_PATH = "http://res.cloudinary.com/test123/image/upload";
+const UPLOAD_PATH = "https://res.cloudinary.com/test123/image/upload";
 const createTestConfig = require('../../testUtils/createTestConfig');
 
 describe('source helper', function () {
@@ -49,7 +49,7 @@ describe('source helper', function () {
     var tag = cloudinary.source(FULL_PUBLIC_ID, {
       srcset: common_srcset
     });
-    expect(tag).to.eql("<source srcset='" + "http://res.cloudinary.com/test123/image/upload/c_scale,w_100/sample.jpg 100w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_200/sample.jpg 200w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_300/sample.jpg 300w, " + "http://res.cloudinary.com/test123/image/upload/c_scale,w_399/sample.jpg 399w" + "'>");
+    expect(tag).to.eql("<source srcset='" + "https://res.cloudinary.com/test123/image/upload/c_scale,w_100/sample.jpg 100w, " + "https://res.cloudinary.com/test123/image/upload/c_scale,w_200/sample.jpg 200w, " + "https://res.cloudinary.com/test123/image/upload/c_scale,w_300/sample.jpg 300w, " + "https://res.cloudinary.com/test123/image/upload/c_scale,w_399/sample.jpg 399w" + "'>");
   });
   it("should generate picture tag", function () {
     var exp_tag, tag;
@@ -82,7 +82,7 @@ describe('source helper', function () {
         }
       ]
     }, fill_transformation));
-    exp_tag = "<picture>" + "<source media='(max-width: 100px)' srcset='http://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/a_17,e_sepia,w_100/sample.jpg'>" + "<source media='(min-width: 100px) and (max-width: 399px)' srcset='http://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/a_18,e_colorize,w_399/sample.jpg'>" + "<source media='(min-width: 399px)' srcset='http://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/a_19,e_blur,w_399/sample.jpg'>" + "<img src='http://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/sample.jpg' height='399' width='399'/>" + "</picture>";
+    exp_tag = "<picture>" + "<source media='(max-width: 100px)' srcset='https://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/a_17,e_sepia,w_100/sample.jpg'>" + "<source media='(min-width: 100px) and (max-width: 399px)' srcset='https://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/a_18,e_colorize,w_399/sample.jpg'>" + "<source media='(min-width: 399px)' srcset='https://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/a_19,e_blur,w_399/sample.jpg'>" + "<img src='https://res.cloudinary.com/test123/image/upload/c_fill,h_399,w_399/sample.jpg' height='399' width='399'/>" + "</picture>";
     expect(tag).to.eql(exp_tag);
   });
 });
