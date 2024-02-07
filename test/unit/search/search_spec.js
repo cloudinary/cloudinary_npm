@@ -1,3 +1,4 @@
+const assert = require('assert');
 const cloudinary = require('../../../cloudinary');
 
 describe('Search', () => {
@@ -65,6 +66,14 @@ describe('Search', () => {
     expect(query).to.eql({
       with_field: ['context', 'tags']
     });
+  });
+
+  it('should run without an expression', function () {
+    assert.doesNotThrow(
+      () => {
+        cloudinary.v2.search.execute();
+      }
+    );
   });
 
   describe('to_url', () => {
