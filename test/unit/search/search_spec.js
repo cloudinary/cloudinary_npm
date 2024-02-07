@@ -70,7 +70,7 @@ describe('Search', () => {
 
   it('should run without an expression', function () {
     assert.doesNotThrow(
-      () => { 
+      () => {
         cloudinary.v2.search.execute();
       }
     );
