@@ -1,3 +1,11 @@
+2.0.1 / 2024-02-07
+==================
+
+  * fix: search expression not required
+  * chore: proxy-agent not needed any more
+  * chore: cleanup
+  * feat: supporting new analytics options, changed analytics algorithm
+
 2.0.0 / 2024-01-29
 ==================
 
