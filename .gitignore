@@ -13,3 +13,4 @@ coverage
 # contains temporary cloudianry_url for test accounts
 tools/cloudinary_url.sh
 package-lock.json
+npm-debug.log

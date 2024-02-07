@@ -11,7 +11,7 @@ const cloudinary = require("../cloudinary");
 
 const { utils, config, Cache } = cloudinary;
 
-const libPath = Number(process.versions.node.split('.')[0]) < 8 ? 'lib-es5' : 'lib';
+const libPath = 'lib';
 const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
 const KeyValueCacheAdapter = require(`../${libPath}/cache/KeyValueCacheAdapter`);
 exports.libPath = libPath;
@@ -24,8 +24,8 @@ exports.LARGE_VIDEO = "test/.resources/CloudBookStudy-HD.mp4";
 exports.EMPTY_IMAGE = "test/.resources/empty.gif";
 exports.RAW_FILE = "test/.resources/docx.docx";
 exports.ICON_FILE = "test/.resources/favicon.ico";
-exports.VIDEO_URL = "http://res.cloudinary.com/demo/video/upload/dog.mp4";
-exports.IMAGE_URL = "http://res.cloudinary.com/demo/image/upload/sample";
+exports.VIDEO_URL = "https://res.cloudinary.com/demo/video/upload/dog.mp4";
+exports.IMAGE_URL = "https://res.cloudinary.com/demo/image/upload/sample";
 
 const ADDON_ALL = 'all'; // Test all addons.
 exports.ADDON_ASPOSE = 'aspose'; // Aspose document conversion.

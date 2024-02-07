@@ -1,3 +1,25 @@
+2.0.0 / 2024-01-29
+==================
+
+
+
+2.0.0-rc.1 / 2024-01-18
+==================
+
+
+
+2.0.0-rc / 2024-01-08
+==================
+
+* feat!: secure option from config set to true by default
+* feat!: url analytics enabled by default
+* feat!: dropped Node@6 and Node@8
+
+1.41.1 / 2023-12-18
+==================
+
+ * fix: sending restrictions when creating or updating metadata fields
+
 1.41.0 / 2023-09-26
 ==================
 

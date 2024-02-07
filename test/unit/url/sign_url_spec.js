@@ -27,7 +27,7 @@ describe("URL for authenticated asset", () => {
       sign_url: true
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/v1234/image.jpg');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/v1234/image.jpg');
   });
 
   it('should have signature for version', () => {
@@ -36,7 +36,7 @@ describe("URL for authenticated asset", () => {
       sign_url: true
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/upload/s----SjmNDA--/v1234/image.jpg');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/upload/s----SjmNDA--/v1234/image.jpg');
   });
 
   it('should have signature for transformation', () => {
@@ -49,7 +49,7 @@ describe("URL for authenticated asset", () => {
       sign_url: true
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/upload/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg');
   });
 
   it('should have signature for authenticated asset with transformation', () => {
@@ -63,7 +63,7 @@ describe("URL for authenticated asset", () => {
       sign_url: true
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/authenticated/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/authenticated/s--Ai4Znfl3--/c_crop,h_20,w_10/image.jpg');
   });
 
   it('should have signature for fetched asset', () => {
@@ -73,7 +73,7 @@ describe("URL for authenticated asset", () => {
       sign_url: true
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/fetch/s--hH_YcbiS--/v1234/http://google.com/path/to/image.png');
   });
 
   it('should have signature for authenticated asset with text overlay transformation including encoded emoji', () => {
@@ -91,7 +91,7 @@ describe("URL for authenticated asset", () => {
       }
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
   });
 
   it('should have signature for raw transformation string', () => {
@@ -103,6 +103,6 @@ describe("URL for authenticated asset", () => {
       }
     });
 
-    assert.strictEqual(signedUrl, 'http://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
+    assert.strictEqual(signedUrl, 'https://res.cloudinary.com/test123/image/authenticated/s--Uqk1a-5W--/co_red,l_text:Times_70_bold:Cool%25F0%259F%2598%258D/image.jpg');
   });
 })
