@@ -7,9 +7,8 @@ cloudinary.config({
     api_secret: '<api_secret>'
 });
 
-
-// register to auto tagging https://cloudinary.com/documentation/google_auto_tagging_addon
-// register to background removal https://cloudinary.com/documentation/cloudinary_ai_background_removal_addon
+// Ensure that you're registered to auto tagging https://cloudinary.com/documentation/google_auto_tagging_addon
+// Ensure that you're registered to background removal https://cloudinary.com/documentation/cloudinary_ai_background_removal_addon
 //Upload an image with auto tag
 cloudinary.uploader.upload(
     "https://res.cloudinary.com/demo/image/upload/v1707306308/cld-docs-hp/walking_woman",
@@ -33,8 +32,7 @@ const url = cloudinary.url("walking_woman", {
     transformation: [
         { effect: "background_removal" },
         { gravity: "auto", crop: "auto", width: 450 },
-        { underlay: "street" },
-        { format: "auto", quality: "auto"},
+        { underlay: "street"},
         {if: "!Overcoat!_in_tags"},
         {
             overlay:
@@ -42,6 +40,7 @@ const url = cloudinary.url("walking_woman", {
             color: "white"
         },
         {if: "end"},
+        { format: "auto", quality: "auto"}
     ]
 });
 
