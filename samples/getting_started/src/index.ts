@@ -10,9 +10,14 @@ cloudinary.config({
 // Ensure that you're registered to auto tagging https://cloudinary.com/documentation/google_auto_tagging_addon
 // Ensure that you're registered to background removal https://cloudinary.com/documentation/cloudinary_ai_background_removal_addon
 //Upload an image with auto tag
+//apply eager transformation
 cloudinary.uploader.upload(
     "https://res.cloudinary.com/demo/image/upload/v1707306308/cld-docs-hp/walking_woman",
-    { public_id: "walking_woman", categorization: "google_tagging" })
+    {
+        public_id: "walking_woman",
+        categorization: "google_tagging",
+        eager: [{effect: "background_removal"}]
+    })
     .then((result)=>{
         console.log(result.info.categorization.google_tagging)}).catch((error)=> {console.log(error)});
 
