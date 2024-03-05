@@ -1,3 +1,8 @@
+2.0.3 / 2024-03-05
+==================
+
+* fix: file and field encoding fixed for next.js production build
+
 2.0.2 / 2024-03-01
 ==================
 
