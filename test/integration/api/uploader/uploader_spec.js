@@ -190,6 +190,12 @@ describe("uploader", function () {
       expect(renameResult).to.have.property('tags');
       expect(renameResult).to.have.property('context');
     });
+    it('should include notification_url in rename response if included in the request', async () => {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        const renameResult = cloudinary.v2.uploader.rename('irrelevant', 'irrelevant', { notification_url: 'https://notification-url.com' });
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('notification_url', 'https://notification-url.com')));
+      });
+    });
     return context(":invalidate", function () {
       var spy, xhr;
       spy = void 0;
@@ -226,6 +232,12 @@ describe("uploader", function () {
         expect().fail();
       }).catch(function (error) {
         expect(error).to.be.ok();
+      });
+    });
+    it('should pass notification_url', async () => {
+      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        const renameResult = cloudinary.v2.uploader.destroy('irrelevant', { notification_url: 'https://notification-url.com' });
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('notification_url', 'https://notification-url.com')));
       });
     });
   });
