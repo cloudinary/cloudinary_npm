@@ -1148,6 +1148,15 @@ cloudinary.v2.provisioning.account.user_group_users(
 
     });
 
+// $ExpectType Promise<AnalyzeResponse>
+cloudinary.v2.analysis.analyze('https://example.com', 'custom', {
+    analyze_parameters: {
+        custom: {
+            model_name: 'my_model',
+            model_version: 1
+        }
+    }
+});
 
 // $ExpectType string
 cloudinary.v2.utils.private_download_url('foo', 'foo', {
