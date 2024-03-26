@@ -713,6 +713,12 @@ declare module 'cloudinary' {
         metadata_fields: MetadataFieldApiResponse[]
     }
 
+    export interface DatasourceEntry {
+        external_id?: string;
+        value: string;
+        state?: 'active' | 'inactive'
+    }
+
     export interface DatasourceChange {
         values: Array<DatasourceEntry>
     }
