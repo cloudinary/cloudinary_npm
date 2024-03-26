@@ -26,9 +26,7 @@ describe('Analyze API', () => {
     });
 
     it('should call analyze endpoint with non-custom analysis_type', () => {
-      cloudinary.analysis.analyze_uri('https://example.com', {
-        analysis_type: 'captioning'
-      });
+      cloudinary.analysis.analyze_uri('https://example.com', 'captioning');
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match(new RegExp(`/v2/${config.cloud_name}/analysis/analyze/uri`)),
@@ -39,8 +37,7 @@ describe('Analyze API', () => {
     });
 
     it('should call analyze endpoint with custom analysis_type', () => {
-      cloudinary.analysis.analyze_uri('https://example.com', {
-        analysis_type: 'custom',
+      cloudinary.analysis.analyze_uri('https://example.com', 'custom', {
         model_name: 'my_model',
         model_version: 1
       });
@@ -61,9 +58,7 @@ describe('Analyze API', () => {
 
     it('should not allow calling analyze endpoint with incorrect custom analysis parameters', () => {
       assert.throws(() => {
-        cloudinary.analysis.analyze_uri('https://example.com', {
-          analysis_type: 'custom'
-        })
+        cloudinary.analysis.analyze_uri('https://example.com', 'custom');
       }, {
         message: 'Setting analysis_type to "custom" requires additional params: "model_name" and "model_version"'
       });

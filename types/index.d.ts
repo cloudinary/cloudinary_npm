@@ -836,20 +836,9 @@ declare module 'cloudinary' {
         value: string;
     }
 
-    export type AnalysisType = CustomizableAnalysisType | NonCustomizableAnalysisType;
+    export type AnalysisType = 'custom' | 'captioning' | 'cld_fashion' | 'cld_text' | 'coco' | 'google_tagging' | 'human_anatomy' | 'lvis' | 'shop_classifier' | 'unidet';
 
-    export type CustomizableAnalysisType = 'custom';
-
-    export type NonCustomizableAnalysisType = 'captioning' | 'cld_fashion' | 'cld_text' | 'coco' | 'google_tagging' | 'human_anatomy' | 'lvis' | 'shop_classifier' | 'unidet';
-
-    export type AnalyzeOptions = NonCustomizableAnalyzeOptions | CustomizableAnalyzeOptions;
-
-    export interface NonCustomizableAnalyzeOptions {
-        analysis_type: NonCustomizableAnalysisType
-    }
-
-    export interface CustomizableAnalyzeOptions {
-        analysis_type: CustomizableAnalysisType,
+    export type CustomAnalysisOptions = {
         model_name: string,
         model_version: number
     }
@@ -1462,7 +1451,7 @@ declare module 'cloudinary' {
         }
 
         namespace analysis {
-            function analyze_uri(uri: string, analyze_options: AnalyzeOptions, options?: ConfigOptions): Promise<AnalyzeResponse>
+            function analyze_uri(uri: string, analysis_type: AnalysisType, options?: ConfigOptions & CustomAnalysisOptions): Promise<AnalyzeResponse>
         }
     }
 }
