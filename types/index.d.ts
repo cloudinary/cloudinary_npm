@@ -702,7 +702,9 @@ declare module 'cloudinary' {
         mandatory: boolean;
         default_value: number;
         validation: object; //there are 4 types, we need to discuss documentation team about it before implementing.
-        datasource: DatasourceEntry;
+        datasource: {
+            values: Array<DatasourceEntry>
+        };
 
         [futureKey: string]: any;
     }
@@ -830,11 +832,6 @@ declare module 'cloudinary' {
     }
 
     export type SignApiOptions = Record<string, any>;
-
-    export interface DatasourceEntry {
-        external_id?: string;
-        value: string;
-    }
 
     export namespace v2 {
 
