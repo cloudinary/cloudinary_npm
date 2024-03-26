@@ -1149,13 +1149,15 @@ cloudinary.v2.provisioning.account.user_group_users(
     });
 
 // $ExpectType Promise<AnalyzeResponse>
-cloudinary.v2.analysis.analyze('https://example.com', 'custom', {
-    analyze_parameters: {
-        custom: {
-            model_name: 'my_model',
-            model_version: 1
-        }
-    }
+cloudinary.v2.analysis.analyze_uri('https://example.com', {
+    analysis_type: 'captioning'
+});
+
+// $ExpectType Promise<AnalyzeResponse>
+cloudinary.v2.analysis.analyze_uri('https://example.com', {
+    analysis_type: 'custom',
+    model_name: 'my_name',
+    model_version: 1
 });
 
 // $ExpectType string

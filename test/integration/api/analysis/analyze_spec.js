@@ -1,3 +1,4 @@
+const assert = require('assert');
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
 const api_http = require('https');
@@ -25,7 +26,9 @@ describe('Analyze API', () => {
     });
 
     it('should call analyze endpoint with non-custom analysis_type', () => {
-      cloudinary.analysis.analyze('https://example.com', 'captioning');
+      cloudinary.analysis.analyze_uri('https://example.com', {
+        analysis_type: 'captioning'
+      });
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match(new RegExp(`/v2/${config.cloud_name}/analysis/analyze/uri`)),
@@ -36,13 +39,10 @@ describe('Analyze API', () => {
     });
 
     it('should call analyze endpoint with custom analysis_type', () => {
-      cloudinary.analysis.analyze('https://example.com', 'custom', {
-        analyze_parameters: {
-          custom: {
-            model_name: 'custom_model',
-            model_version: 1
-          }
-        }
+      cloudinary.analysis.analyze_uri('https://example.com', {
+        analysis_type: 'custom',
+        model_name: 'my_model',
+        model_version: 1
       });
 
       sinon.assert.calledWith(mocked.request, sinon.match({
@@ -53,10 +53,20 @@ describe('Analyze API', () => {
       sinon.assert.calledWith(mocked.write, sinon.match(helper.apiJsonParamMatcher('analysis_type', 'custom')));
       sinon.assert.calledWith(mocked.write, sinon.match(helper.apiJsonParamMatcher('parameters', {
         custom: {
-          model_name: 'custom_model',
+          model_name: 'my_model',
           model_version: 1
         }
       })));
+    });
+
+    it('should not allow calling analyze endpoint with incorrect custom analysis parameters', () => {
+      assert.throws(() => {
+        cloudinary.analysis.analyze_uri('https://example.com', {
+          analysis_type: 'custom'
+        })
+      }, {
+        message: 'Setting analysis_type to "custom" requires additional params: "model_name" and "model_version"'
+      });
     });
   });
 });

@@ -836,7 +836,23 @@ declare module 'cloudinary' {
         value: string;
     }
 
-    export type AnalysisType = 'captioning' | 'cld_fashion' | 'cld_text' | 'coco' | 'google_tagging' | 'human_anatomy' | 'lvis' | 'shop_classifier' | 'unidet' | 'custom';
+    export type AnalysisType = CustomizableAnalysisType | NonCustomizableAnalysisType;
+
+    export type CustomizableAnalysisType = 'custom';
+
+    export type NonCustomizableAnalysisType = 'captioning' | 'cld_fashion' | 'cld_text' | 'coco' | 'google_tagging' | 'human_anatomy' | 'lvis' | 'shop_classifier' | 'unidet';
+
+    export type AnalyzeOptions = NonCustomizableAnalyzeOptions | CustomizableAnalyzeOptions;
+
+    export interface NonCustomizableAnalyzeOptions {
+        analysis_type: NonCustomizableAnalysisType
+    }
+
+    export interface CustomizableAnalyzeOptions {
+        analysis_type: CustomizableAnalysisType,
+        model_name: string,
+        model_version: number
+    }
 
     export interface AnalyzeResponse {
         data: {
@@ -844,15 +860,6 @@ declare module 'cloudinary' {
             analysis: Record<string, Record<string, string> | Array<string> | string>
         },
         request_id: string,
-    }
-
-    export interface AnalyzeOptions {
-        analyze_parameters: {
-            custom: {
-                model_name: string,
-                model_version: number,
-            }
-        }
     }
 
     export namespace v2 {
@@ -1455,7 +1462,7 @@ declare module 'cloudinary' {
         }
 
         namespace analysis {
-            function analyze(uri: string, analysis_type: AnalysisType, options?: AnalyzeOptions & ConfigOptions): Promise<AnalyzeResponse>
+            function analyze_uri(uri: string, analyze_options: AnalyzeOptions, options?: ConfigOptions): Promise<AnalyzeResponse>
         }
     }
 }
