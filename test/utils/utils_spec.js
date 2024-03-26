@@ -458,7 +458,7 @@ describe("utils", function () {
     });
     it('should escape api urls', function () {
       const folderName = "sub^folder's test";
-      const url = utils.base_api_url(['folders', folderName]);
+      const url = utils.base_api_url_v1()(['folders', folderName]);
       expect(url).to.match(/folders\/sub%5Efolder%27s%20test$/);
     });
   });

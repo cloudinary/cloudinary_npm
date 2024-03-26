@@ -836,6 +836,21 @@ declare module 'cloudinary' {
         value: string;
     }
 
+    export type AnalysisType = 'custom' | 'captioning' | 'cld_fashion' | 'cld_text' | 'coco' | 'google_tagging' | 'human_anatomy' | 'lvis' | 'shop_classifier' | 'unidet';
+
+    export type CustomAnalysisOptions = {
+        model_name: string,
+        model_version: number
+    }
+
+    export interface AnalyzeResponse {
+        data: {
+            entity: string,
+            analysis: Record<string, Record<string, string> | Array<string> | string>
+        },
+        request_id: string,
+    }
+
     export namespace v2 {
 
         /****************************** Global Utils *************************************/
@@ -1433,6 +1448,10 @@ declare module 'cloudinary' {
 
                 function user_group_users(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
             }
+        }
+
+        namespace analysis {
+            function analyze_uri(uri: string, analysis_type: AnalysisType, options?: ConfigOptions & CustomAnalysisOptions): Promise<AnalyzeResponse>
         }
     }
 }
