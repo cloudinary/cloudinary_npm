@@ -654,6 +654,9 @@ cloudinary.v2.api.add_metadata_field({
 
 cloudinary.v2.api.list_metadata_fields().then((result) => {
     console.log(result.metadata_fields[0].datasource);
+    console.log(result.metadata_fields[0].datasource.values[0].value);
+    console.log(result.metadata_fields[0].datasource.values[0].external_id);
+    console.log(result.metadata_fields[0].datasource.values[0].state);
 });
 
 cloudinary.v2.api.delete_metadata_field('EXTERNAL_ID_GET_LIST').then((res) => {
