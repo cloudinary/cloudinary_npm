@@ -1,3 +1,11 @@
+2.1.0 / 2024-03-29
+==================
+
+  * feat: added support for new api in beta - analyze api
+  * chore: added state to datasource entry type
+  * fix: metadata field api response datasource type improved
+  * feat: notification-url for rename and destroy methods
+
 2.0.3 / 2024-03-05
 ==================
 
