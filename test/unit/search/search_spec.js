@@ -15,7 +15,8 @@ describe('Search', () => {
       'max_results',
       'next_cursor',
       'aggregate',
-      'with_field'
+      'with_field',
+      'fields'
     ].forEach(method => expect(instance).to.eql(instance[method]('emptyarg')));
   });
 
@@ -65,6 +66,13 @@ describe('Search', () => {
     var query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
     expect(query).to.eql({
       with_field: ['context', 'tags']
+    });
+  });
+
+  it('should add fields to query', function () {
+    var query = cloudinary.v2.search.fields('context').fields('tags').to_query();
+    expect(query).to.eql({
+      fields: ['context', 'tags']
     });
   });
 
