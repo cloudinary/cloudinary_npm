@@ -193,7 +193,7 @@ describe("search_api", function () {
             const additionallyIncluded = ['context'];
             const expectedKeys = [...alwaysIncluded, ...additionallyIncluded];
             const actualKeys = Object.keys(res);
-            assert.deepStrictEqual(actualKeys, expectedKeys);
+            assert.deepStrictEqual(actualKeys.sort(), expectedKeys.sort());
           });
         });
     });

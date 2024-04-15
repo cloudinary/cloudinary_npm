@@ -429,30 +429,30 @@ describe("api", function () {
     });
 
     describe('selective response', () => {
-      const expectedKeys = ['public_id', 'asset_id', 'folder', 'tags'];
+      const expectedKeys = ['public_id', 'asset_id', 'folder', 'tags'].sort();
 
       it('should allow listing', async () => {
         const {resources} = await cloudinary.v2.api.resources({fields: ['tags']})
         const actualKeys = Object.keys(resources[0]);
-        assert.deepStrictEqual(actualKeys, expectedKeys);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
 
       it('should allow listing by public_ids', async () => {
         const {resources} = await cloudinary.v2.api.resources_by_ids([PUBLIC_ID], {fields: ['tags']})
         const actualKeys = Object.keys(resources[0]);
-        assert.deepStrictEqual(actualKeys, expectedKeys);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
 
       it('should allow listing by tag', async () => {
         const {resources} = await cloudinary.v2.api.resources_by_tag(TEST_TAG, {fields: ['tags']})
         const actualKeys = Object.keys(resources[0]);
-        assert.deepStrictEqual(actualKeys, expectedKeys);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
 
       it('should allow listing by context', async () => {
         const {resources} = await cloudinary.v2.api.resources_by_context(contextKey, "test", {fields: ['tags']})
         const actualKeys = Object.keys(resources[0]);
-        assert.deepStrictEqual(actualKeys, expectedKeys);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
 
       it('should allow listing by moderation', async () => {
@@ -462,14 +462,14 @@ describe("api", function () {
         });
         const {resources} = await cloudinary.v2.api.resources_by_moderation('manual', 'pending', {fields: ['tags']})
         const actualKeys = Object.keys(resources[0]);
-        assert.deepStrictEqual(actualKeys, expectedKeys);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
 
       it('should allow listing by asset_ids', async () => {
         const {asset_id} = await uploadImage();
         const {resources} = await cloudinary.v2.api.resources_by_asset_ids([asset_id], {fields: ['tags']})
         const actualKeys = Object.keys(resources[0]);
-        assert.deepStrictEqual(actualKeys, expectedKeys);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
     });
   });
