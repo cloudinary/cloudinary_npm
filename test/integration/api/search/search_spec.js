@@ -146,7 +146,8 @@ describe("search_api", function () {
         .to_query();
 
       expect(search_query.aggregate.length).to.be(2);
-      expect(search_query.with_field.length).to.be(2);
+      expect(search_query.with_field.length).to.be(3);
+      expect(search_query.fields.length).to.be(3);
       expect(search_query.sort_by.length).to.be(1);
 
       expect(search_query.aggregate[0]).to.be('foo');

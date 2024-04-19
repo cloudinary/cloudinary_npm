@@ -77,9 +77,12 @@ describe('Search', () => {
   });
 
   it('should remove duplicates with_field values from query', () => {
-    const query = cloudinary.v2.search.with_field(['field1', 'field1', 'field2']).to_query();
+    const search = cloudinary.v2.search.with_field(['field1', 'field1', 'field2']);
+    search.with_field('field1');
+    search.with_field('field3');
+    const query = search.to_query();
     expect(query).to.eql({
-      with_field: ['field1', 'field2']
+      with_field: ['field1', 'field2', 'field3']
     });
   });
 
@@ -98,9 +101,12 @@ describe('Search', () => {
   });
 
   it('should remove duplicates fields values from query', () => {
-    const query = cloudinary.v2.search.fields(['field1', 'field1', 'field2']).to_query();
+    const search = cloudinary.v2.search.fields(['field1', 'field1', 'field2']);
+    search.fields('field1');
+    search.fields('field3');
+    const query = search.to_query();
     expect(query).to.eql({
-      fields: ['field1', 'field2']
+      fields: ['field1', 'field2', 'field3']
     });
   });
 

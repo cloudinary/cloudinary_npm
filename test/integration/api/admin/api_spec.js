@@ -1577,5 +1577,26 @@ describe("api", function () {
         arg => arg.agent instanceof https.Agent
       ));
     });
-  })
+  });
+  describe('config hide_sensitive', () => {
+    it("should hide API key and secret upon error when `hide_sensitive` is true", async function () {
+      try {
+        cloudinary.config({hide_sensitive: true});
+        const result = await cloudinary.v2.api.resource("?");
+        expect(result).fail();
+      } catch (err) {
+        expect(err.request_options).not.to.have.property("auth");
+      }
+    });
+
+    it("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
+      try {
+        cloudinary.config({hide_sensitive: true});
+        const result = await cloudinary.v2.api.resource("?", { oauth_token: 'irrelevant' });
+        expect(result).fail();
+      } catch (err) {
+        expect(err.request_options.headers).not.to.have.property("Authorization");
+      }
+    });
+  });
 });
