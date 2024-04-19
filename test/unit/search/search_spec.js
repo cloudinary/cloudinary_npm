@@ -63,16 +63,44 @@ describe('Search', () => {
   });
 
   it('should add with_field to query', function () {
-    var query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
+    const query = cloudinary.v2.search.with_field('context').with_field('tags').to_query();
     expect(query).to.eql({
       with_field: ['context', 'tags']
     });
   });
 
+  it('should allow adding multiple with_field values to query', function () {
+    const query = cloudinary.v2.search.with_field(['context', 'tags']).to_query();
+    expect(query).to.eql({
+      with_field: ['context', 'tags']
+    });
+  });
+
+  it('should remove duplicates with_field values from query', () => {
+    const query = cloudinary.v2.search.with_field(['field1', 'field1', 'field2']).to_query();
+    expect(query).to.eql({
+      with_field: ['field1', 'field2']
+    });
+  });
+
   it('should add fields to query', function () {
-    var query = cloudinary.v2.search.fields('context').fields('tags').to_query();
+    const query = cloudinary.v2.search.fields('context').fields('tags').to_query();
     expect(query).to.eql({
       fields: ['context', 'tags']
+    });
+  });
+
+  it('should allow adding multiple fields values to query', function () {
+    const query = cloudinary.v2.search.fields(['context', 'tags']).to_query();
+    expect(query).to.eql({
+      fields: ['context', 'tags']
+    });
+  });
+
+  it('should remove duplicates fields values from query', () => {
+    const query = cloudinary.v2.search.fields(['field1', 'field1', 'field2']).to_query();
+    expect(query).to.eql({
+      fields: ['field1', 'field2']
     });
   });
 

@@ -138,9 +138,11 @@ describe("search_api", function () {
         .with_field('foo')
         .with_field('foo')
         .with_field('foo2')
+        .with_field(['foo', 'foo2', 'foo3'])
         .fields('foo')
         .fields('foo')
         .fields('foo2')
+        .fields(['foo', 'foo2', 'foo3'])
         .to_query();
 
       expect(search_query.aggregate.length).to.be(2);
@@ -151,8 +153,10 @@ describe("search_api", function () {
       expect(search_query.aggregate[1]).to.be('foo2');
       expect(search_query.with_field[0]).to.be('foo');
       expect(search_query.with_field[1]).to.be('foo2');
+      expect(search_query.with_field[2]).to.be('foo3');
       expect(search_query.fields[0]).to.be('foo');
       expect(search_query.fields[1]).to.be('foo2');
+      expect(search_query.fields[2]).to.be('foo3');
 
       expect(search_query.sort_by[0].public_id).to.be('desc');
     });
