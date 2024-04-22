@@ -30,26 +30,6 @@ describe("config", function () {
     expect(config.hide_sensitive).to.eql(true)
   });
 
-  it("should hide API key and secret upon error when `hide_sensitive` is true", async function () {
-    try {
-      cloudinary.config({hide_sensitive: true});
-      const result = await cloudinary.v2.api.resource("?");
-      expect(result).fail();
-    } catch (err) {
-      expect(err.request_options).not.to.have.property("auth");
-    }
-  });
-
-  it("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
-    try {
-      cloudinary.config({hide_sensitive: true});
-      const result = await cloudinary.v2.api.resource("?", { oauth_token: 'irrelevant' });
-      expect(result).fail();
-    } catch (err) {
-      expect(err.request_options.headers).not.to.have.property("Authorization");
-    }
-  });
-
   it("should allow nested values in CLOUDINARY_URL", function () {
     process.env.CLOUDINARY_URL = "cloudinary://key:secret@test123?foo[bar]=value";
     cloudinary.config(true);

@@ -17,6 +17,8 @@ const retry = require('../../../testUtils/helpers/retry');
 const {shouldTestFeature} = require("../../../spechelper");
 const API_V2 = cloudinary.v2.api;
 const DYNAMIC_FOLDERS = helper.DYNAMIC_FOLDERS;
+const assert = require('assert');
+const {only} = require("../../../../lib/utils");
 
 const {
   TIMEOUT,
@@ -423,6 +425,51 @@ describe("api", function () {
         return sinon.assert.calledWith(requestSpy, sinon.match({
           query: sinon.match(helper.apiParamMatcher("accessibility_analysis", "true"))
         }));
+      });
+    });
+
+    describe('selective response', () => {
+      const expectedKeys = ['public_id', 'asset_id', 'folder', 'tags'].sort();
+
+      it('should allow listing', async () => {
+        const {resources} = await cloudinary.v2.api.resources({fields: ['tags']})
+        const actualKeys = Object.keys(resources[0]);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
+      });
+
+      it('should allow listing by public_ids', async () => {
+        const {resources} = await cloudinary.v2.api.resources_by_ids([PUBLIC_ID], {fields: ['tags']})
+        const actualKeys = Object.keys(resources[0]);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
+      });
+
+      it('should allow listing by tag', async () => {
+        const {resources} = await cloudinary.v2.api.resources_by_tag(TEST_TAG, {fields: ['tags']})
+        const actualKeys = Object.keys(resources[0]);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
+      });
+
+      it('should allow listing by context', async () => {
+        const {resources} = await cloudinary.v2.api.resources_by_context(contextKey, "test", {fields: ['tags']})
+        const actualKeys = Object.keys(resources[0]);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
+      });
+
+      it('should allow listing by moderation', async () => {
+        await uploadImage({
+          moderation: 'manual',
+          tags: [TEST_TAG]
+        });
+        const {resources} = await cloudinary.v2.api.resources_by_moderation('manual', 'pending', {fields: ['tags']})
+        const actualKeys = Object.keys(resources[0]);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
+      });
+
+      it('should allow listing by asset_ids', async () => {
+        const {asset_id} = await uploadImage();
+        const {resources} = await cloudinary.v2.api.resources_by_asset_ids([asset_id], {fields: ['tags']})
+        const actualKeys = Object.keys(resources[0]);
+        assert.deepStrictEqual(actualKeys.sort(), expectedKeys);
       });
     });
   });
@@ -1530,5 +1577,26 @@ describe("api", function () {
         arg => arg.agent instanceof https.Agent
       ));
     });
-  })
+  });
+  describe('config hide_sensitive', () => {
+    it("should hide API key and secret upon error when `hide_sensitive` is true", async function () {
+      try {
+        cloudinary.config({hide_sensitive: true});
+        const result = await cloudinary.v2.api.resource("?");
+        expect(result).fail();
+      } catch (err) {
+        expect(err.request_options).not.to.have.property("auth");
+      }
+    });
+
+    it("should hide Authorization header upon error when `hide_sensitive` is true", async function () {
+      try {
+        cloudinary.config({hide_sensitive: true});
+        const result = await cloudinary.v2.api.resource("?", { oauth_token: 'irrelevant' });
+        expect(result).fail();
+      } catch (err) {
+        expect(err.request_options.headers).not.to.have.property("Authorization");
+      }
+    });
+  });
 });

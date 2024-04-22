@@ -5,6 +5,7 @@ const testConstants = require('../../../testUtils/testConstants');
 const describe = require('../../../testUtils/suite');
 const exp = require("constants");
 const cluster = require("cluster");
+const assert = require("assert");
 const {
   TIMEOUT,
   TAGS,
@@ -122,7 +123,7 @@ describe("search_api", function () {
         });
     });
 
-    it('Should eliminate duplicate fields when using sort_by, aggregate or with_fields', function () {
+    it('Should eliminate duplicate fields when using sort_by, aggregate, with_field or fields', function () {
       // This test ensures we can't push duplicate values into sort_by, aggregate or with_fields
       const search_query = cloudinary.v2.search.max_results(10).expression(`tags:${SEARCH_TAG}`)
         .sort_by('public_id', 'asc')
@@ -137,16 +138,26 @@ describe("search_api", function () {
         .with_field('foo')
         .with_field('foo')
         .with_field('foo2')
+        .with_field(['foo', 'foo2', 'foo3'])
+        .fields('foo')
+        .fields('foo')
+        .fields('foo2')
+        .fields(['foo', 'foo2', 'foo3'])
         .to_query();
 
       expect(search_query.aggregate.length).to.be(2);
-      expect(search_query.with_field.length).to.be(2);
+      expect(search_query.with_field.length).to.be(3);
+      expect(search_query.fields.length).to.be(3);
       expect(search_query.sort_by.length).to.be(1);
 
       expect(search_query.aggregate[0]).to.be('foo');
       expect(search_query.aggregate[1]).to.be('foo2');
       expect(search_query.with_field[0]).to.be('foo');
       expect(search_query.with_field[1]).to.be('foo2');
+      expect(search_query.with_field[2]).to.be('foo3');
+      expect(search_query.fields[0]).to.be('foo');
+      expect(search_query.fields[1]).to.be('foo2');
+      expect(search_query.fields[2]).to.be('foo3');
 
       expect(search_query.sort_by[0].public_id).to.be('desc');
     });
@@ -173,6 +184,21 @@ describe("search_api", function () {
             expect(Object.keys(res.context)).to.eql(['stage']);
             expect(res.image_metadata).to.be.ok();
             expect(res.tags.length).to.eql(4);
+          });
+        });
+    });
+
+    it('should only include selected keys when using fields', function () {
+      return cloudinary.v2.search.expression(`tags:${SEARCH_TAG}`).fields('context')
+        .execute()
+        .then(function (results) {
+          expect(results.resources.length).to.eql(3);
+          results.resources.forEach(function (res) {
+            const alwaysIncluded = ['public_id', 'asset_id', 'created_at', 'status', 'type', 'resource_type', 'folder'];
+            const additionallyIncluded = ['context'];
+            const expectedKeys = [...alwaysIncluded, ...additionallyIncluded];
+            const actualKeys = Object.keys(res);
+            assert.deepStrictEqual(actualKeys.sort(), expectedKeys.sort());
           });
         });
     });

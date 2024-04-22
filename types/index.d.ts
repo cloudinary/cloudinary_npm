@@ -1395,7 +1395,9 @@ declare module 'cloudinary' {
 
             to_query(value?: string): search;
 
-            with_field(value?: string): search;
+            with_field(value?: string | Array<string>): search;
+
+            fields(value?: string | Array<string>): search;
 
             to_url(newTtl?: number, next_cursor?: string, options?: ConfigOptions): string;
 
@@ -1413,7 +1415,9 @@ declare module 'cloudinary' {
 
             static ttl(newTtl: number): search;
 
-            static with_field(args?: string): search;
+            static with_field(args?: string | Array<string>): search;
+
+            static fields(args?: string | Array<string>): search;
         }
 
         /****************************** Provisioning API *************************************/
