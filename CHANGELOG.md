@@ -1,3 +1,9 @@
+2.2.0 / 2024-04-22
+==================
+
+* feat: selective response for admin and search api
+* feat: multiple values support for fields and with_field methods in search api
+
 2.1.0 / 2024-03-29
 ==================
 
