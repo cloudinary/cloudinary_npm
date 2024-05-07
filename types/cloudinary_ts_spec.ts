@@ -1179,6 +1179,9 @@ cloudinary.v2.api.delete_folder('foo', {
     agent: new Http.Agent()
 });
 
+// $ExpectType Promise<RenameFolderResponse>
+cloudinary.v2.api.rename_folder('old/path', 'new/path');
+
 // $ExpectType Promise<NewAssetRelationResponse>
 cloudinary.v2.api.add_related_assets('public-id', 'public-id-to-relate');
 

@@ -859,6 +859,17 @@ declare module 'cloudinary' {
         request_id: string,
     }
 
+    export interface RenameFolderResponse {
+        from: {
+            name: string,
+            path: string,
+        }
+        to: {
+            name: string,
+            path: string,
+        }
+    }
+
     export namespace v2 {
 
         /****************************** Global Utils *************************************/
@@ -1159,6 +1170,8 @@ declare module 'cloudinary' {
             function create_folder(path: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
 
             function delete_folder(path: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
+
+            function rename_folder(old_path: string, new_path: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<RenameFolderResponse>;
 
             function add_related_assets(public_id: string, public_ids_to_relate: string | Array<string>, options?: AdminApiOptions, callback?: ResponseCallback): Promise<NewAssetRelationResponse>;
 
