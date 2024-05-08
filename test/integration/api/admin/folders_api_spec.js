@@ -22,14 +22,14 @@ describe('Admin API - Folders', () => {
     mocked.xhr.restore();
   });
 
-  describe('update_folder', () => {
-    it('should send a request with correct parameters', () => {
-      cloudinary.v2.api.update_folder('old/path', 'new/path');
+  describe('rename_folder', () => {
+    it('should send a request to update folder endpoint with correct parameters', () => {
+      cloudinary.v2.api.rename_folder('old/path', 'new/path');
 
-      // sinon.assert.calledWith(xhr, sinon.match({
-      //   pathname: sinon.match('old/path'),
-      //   method: sinon.match('PUT')
-      // }));
+      sinon.assert.calledWith(mocked.request, sinon.match({
+        pathname: sinon.match('old%2Fpath'),
+        method: sinon.match('PUT')
+      }));
       sinon.assert.calledWith(mocked.write, sinon.match(helper.apiJsonParamMatcher('to_folder', 'new/path')));
     });
   });
