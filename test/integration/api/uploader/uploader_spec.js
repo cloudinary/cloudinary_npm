@@ -91,6 +91,12 @@ describe("uploader", function () {
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
   });
+  it('should upload a file with correctly encoded transformation string', async () => {
+    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      const renameResult = cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test %2F 火')));
+    });
+  });
   it("should successfully upload url", function () {
     return cloudinary.v2.uploader.upload("https://cloudinary.com/images/old_logo.png", {
       tags: UPLOAD_TAGS
