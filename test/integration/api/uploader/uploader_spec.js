@@ -93,7 +93,7 @@ describe("uploader", function () {
   });
   it('should upload a file with correctly encoded transformation string', () => {
     return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      const renameResult = cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } });
+      const uploadResult = cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } });
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test %2F 火')));
     });
   });
