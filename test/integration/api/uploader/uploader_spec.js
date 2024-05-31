@@ -91,6 +91,21 @@ describe("uploader", function () {
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
   });
+  it('should upload a file with correctly encoded transformation string', () => {
+    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      const uploadResult = cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test %2F 火')));
+    });
+  });
+  it('should upload a file with correctly encoded transformation string incl 4bytes characters', () => {
+    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test 𩸽 🍺' } } })
+        .then((uploadResult) => {
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test 𩸽 🍺')));
+          expect(uploadResult).to.have.key("created_at");
+        });
+    });
+  });
   it("should successfully upload url", function () {
     return cloudinary.v2.uploader.upload("https://cloudinary.com/images/old_logo.png", {
       tags: UPLOAD_TAGS
