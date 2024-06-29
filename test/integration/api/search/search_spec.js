@@ -1,10 +1,7 @@
-const Q = require('q');
 const cloudinary = require('../../../../cloudinary');
 const helper = require("../../../spechelper");
 const testConstants = require('../../../testUtils/testConstants');
 const describe = require('../../../testUtils/suite');
-const exp = require("constants");
-const cluster = require("cluster");
 const assert = require("assert");
 const {
   TIMEOUT,
@@ -30,7 +27,7 @@ describe("search_api", function () {
   describe("integration", function () {
     this.timeout(TIMEOUT.LONG);
     before(function () {
-      return Q.allSettled([
+      return Promise.allSettled([
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_1,
