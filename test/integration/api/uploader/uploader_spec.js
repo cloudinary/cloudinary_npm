@@ -2,9 +2,9 @@ const https = require('https');
 const http = require('http');
 const sinon = require('sinon');
 const fs = require('fs');
-const Q = require('q');
 const path = require('path');
 const at = require('lodash/at');
+const { promisify } = require('util')
 const uniq = require('lodash/uniq');
 const ClientRequest = require('_http_client').ClientRequest;
 const cloudinary = require("../../../../cloudinary");
@@ -57,7 +57,7 @@ describe("uploader", function () {
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
-    return Q.allSettled([
+    return Promise.allSettled([
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG) : void 0,
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG,
         {
@@ -425,7 +425,7 @@ describe("uploader", function () {
   describe("context", function () {
     this.timeout(TIMEOUT.MEDIUM);
     before(function () {
-      return Q.all([uploadImage(), uploadImage()]).spread((result1, result2) => {
+      return Promise.all([uploadImage(), uploadImage()]).spread((result1, result2) => {
         this.first_id = result1.public_id;
         this.second_id = result2.public_id;
       });
@@ -791,7 +791,7 @@ describe("uploader", function () {
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       stat = fs.statSync(LARGE_VIDEO);
       expect(stat).to.be.ok();
-      return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
+      return promisify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
         timeout: TIMEOUT.LONG * 10,
@@ -815,7 +815,7 @@ describe("uploader", function () {
     });
     it("should update timestamp for each chunk", function () {
       var writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-      return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
+      return promisify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
         timeout: TIMEOUT.LONG * 10,
@@ -1385,7 +1385,7 @@ describe("uploader", function () {
       let resource_1;
       let resource_2;
 
-      return Q.allSettled(
+      return Promise.allSettled(
         [
           uploadImage({
             tags: UPLOAD_TAGS
