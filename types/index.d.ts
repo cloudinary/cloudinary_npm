@@ -500,6 +500,19 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
+    export interface UpdatePartialOverridesOptions {
+        transformation_prefix: string;
+        asset_override_uri: string;
+        overrides: Array<{
+            action: 'gen_fill';
+            params: {
+                seed: string;
+                prompt: string;
+                ignore_foreground: boolean;
+            }
+        }>;
+    }
+
     export interface UploadApiOptions {
         access_mode?: AccessMode;
         allowed_formats?: Array<VideoFormat> | Array<ImageFormat>;
@@ -1214,6 +1227,10 @@ declare module 'cloudinary' {
             function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], options?: AdminApiOptions, callback?: ResponseCallback): Promise<DatasourceChange>;
 
             function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
+
+            function update_partial_overrides(public_id: string, options: UpdatePartialOverridesOptions, callback?: ResponseCallback): Promise<any>;
+
+            function update_partial_overrides(public_id: string, callback?: ResponseCallback): Promise<any>;
 
             /****************************** Structured Metadata Rules API V2 Methods *************************************/
             function add_metadata_rule(rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;
