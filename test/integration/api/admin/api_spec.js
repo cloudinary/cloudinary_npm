@@ -1609,8 +1609,8 @@ describe("api", function () {
             asset_override_uri: 'snapshot_url',
             overrides: [{ action: 'gen_fill', params: { seed: 'seed', prompt: 'prompt', ignore_foreground: true } }]
           });
-          sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('transformation_prefix', 'tx_prefix')));
-          sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('asset_override_uri', 'snapshot_url')));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('transformation_prefix', 'tx_prefix')));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('asset_override_uri', 'snapshot_url')));
           return sinon.assert.calledWith(requestSpy, sinon.match({
             pathname: sinon.match("resources/ASSET_ID_MOCK/partial_overrides"),
             method: sinon.match("PUT")
