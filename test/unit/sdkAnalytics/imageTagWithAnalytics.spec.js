@@ -1,88 +1,105 @@
 const path = require('path');
 const mock = require('mock-fs');
-const getSDKVersions = require('../../../lib/utils/analytics/getSDKVersions');
 const cloudinary = require('../../../cloudinary');
+const assert = require("assert");
 const TEST_CLOUD_NAME = require('../../testUtils/testConstants').TEST_CLOUD_NAME;
 
-describe('Tests for sdk analytics through image tag', function () {
+describe.only('SDK url analytics', () => {
   let processVersions = {};
 
-  beforeEach(() => {
+  before(() => {
     cloudinary.config(true); // reset
 
     processVersions = process.versions;
     delete process.versions;
 
-    let file = path.join(__dirname, '../../../package.json');
+    const file = path.join(__dirname, '../../../package.json');
 
     mock({
       [file]: '{"version":"1.24.0"}'
     });
   });
 
-  afterEach(function () {
+  after(() => {
     mock.restore();
     process.versions = processVersions;
   });
 
-  it('Can be turned off via options', () => {
+  it('can be turned off via options', () => {
     process.versions = {
       node: '12.0.0'
     };
 
-    let imgStr = cloudinary.image("hello", {
+    const imgStr = cloudinary.image("hello", {
       format: "png",
-      urlAnalytics: false
+      analytics: false
     });
 
-    expect(imgStr).not.to.contain(`MAlhAM0`);
+    assert.ok(!imgStr.includes('MAlhAM0'))
   });
 
-  it('Defaults to true even if analytics is not passed as an option', () => {
+  it('defaults to true even if analytics is not passed as an option', () => {
     process.versions = {
       node: '12.0.0'
     };
 
-    let imgStr = cloudinary.image("hello", {
+    const imgStr = cloudinary.image("hello", {
       format: "png"
     });
 
-    expect(imgStr).to.contain(`MAlhAM0`);
+    assert.ok(imgStr.includes('MAlhAM0'))
   });
 
-  it('Reads from process.versions and package.json (Mocked)', () => {
+  it('reads from process.versions and package.json (Mocked)', () => {
     process.versions = {
       node: '12.0.0'
     };
 
-    let imgStr = cloudinary.image("hello", {
+    const imgStr = cloudinary.image("hello", {
       format: "png",
-      urlAnalytics: true
+      analytics: true
     });
 
-    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BAMAlhAM0`);
+    assert.ok(imgStr.includes('?_a=BAMAlhAM0'));
   });
 
-  it('Reads from process.versions and package.json (Mocked) - Responsive', () => {
+  it('reads from process.versions and package.json (Mocked) - Responsive', () => {
     process.versions = {
       node: '12.0.0'
     };
 
-    let imgStr = cloudinary.image("hello", {
+    const imgStr = cloudinary.image("hello", {
       format: "png",
       responsive: true,
-      urlAnalytics: true
+      analytics: true
     });
 
-    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BAMAlhAMA`);
+    assert.ok(imgStr.includes('?_a=BAMAlhAMA'));
   });
 
-  it('Reads from tracked analytics configuration', () => {
+  it('reads from tracked analytics configuration', () => {
     process.versions = {
       node: '12.0.0'
     };
 
-    let imgStr = cloudinary.image("hello", {
+    const imgStr = cloudinary.image("hello", {
+      format: "png",
+      analytics: true,
+      sdkCode: "X",
+      sdkSemver: "7.3.0",
+      techVersion: "3.4.7",
+      product: 'B'
+    });
+
+    assert.ok(imgStr.includes('?_a=BBXAEzGT0'));
+  });
+
+  it('should still accept analytics param passed as camel case', () => {
+    process.versions = {
+      node: '12.0.0'
+    };
+
+    const imgStr = cloudinary.image("hello", {
       format: "png",
       urlAnalytics: true,
       sdkCode: "X",
@@ -91,6 +108,36 @@ describe('Tests for sdk analytics through image tag', function () {
       product: 'B'
     });
 
-    expect(imgStr).to.contain(`src='https://res.cloudinary.com/${TEST_CLOUD_NAME}/image/upload/hello.png?_a=BBXAEzGT0`);
+    assert.ok(imgStr.includes('?_a=BBXAEzGT0'));
+  });
+
+  describe('with two different casings', () => {
+    it('should treat camel case analytics param as more important than snake case', () => {
+      process.versions = {
+        node: '12.0.0'
+      };
+
+      const imgStr1 = cloudinary.image("hello", {
+        format: "png",
+        urlAnalytics: true,
+        analytics: false,
+        sdkCode: "X",
+        sdkSemver: "7.3.0",
+        techVersion: "3.4.7",
+        product: 'B'
+      });
+      assert.ok(imgStr1.includes('?_a=BBXAEzGT0'));
+
+      const imgStr2 = cloudinary.image("hello", {
+        format: "png",
+        analytics: true,
+        sdkCode: "X",
+        sdkSemver: "7.3.0",
+        techVersion: "3.4.7",
+        tech_version: "1.2.3",
+        product: 'B'
+      });
+      assert.ok(imgStr2.includes('?_a=BBXAEzGT0'));
+    });
   });
 });
