@@ -1228,9 +1228,9 @@ declare module 'cloudinary' {
 
             function restore_metadata_field_datasource(field_external_id: string, entries_external_id: string[], callback?: ResponseCallback): Promise<DatasourceChange>;
 
-            function update_partial_overrides(public_id: string, options: UpdatePartialOverridesOptions, callback?: ResponseCallback): Promise<any>;
+            function set_partial_override(public_id: string, options: UpdatePartialOverridesOptions, callback?: ResponseCallback): Promise<any>;
 
-            function update_partial_overrides(public_id: string, callback?: ResponseCallback): Promise<any>;
+            function set_partial_override(public_id: string, callback?: ResponseCallback): Promise<any>;
 
             /****************************** Structured Metadata Rules API V2 Methods *************************************/
             function add_metadata_rule(rule: MetadataRule, options?: AdminApiOptions, callback?: ResponseCallback): Promise<MetadataRuleResponse>;

@@ -1599,12 +1599,12 @@ describe("api", function () {
       }
     });
   });
-  describe('update_partial_overrides', () => {
+  describe('set_partial_override', () => {
     it("should call the PUT /resources/:asset_id/partial_overrides endpoint", async () => {
       this.timeout(TIMEOUT.LONG);
       await retry(async function () {
         return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-          cloudinary.v2.api.update_partial_overrides('ASSET_ID_MOCK', {
+          cloudinary.v2.api.set_partial_override('ASSET_ID_MOCK', {
             transformation_prefix: 'tx_prefix',
             asset_override_uri: 'snapshot_url',
             overrides: [{ action: 'gen_fill', params: { seed: 'seed', prompt: 'prompt', ignore_foreground: true } }]
