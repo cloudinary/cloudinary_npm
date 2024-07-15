@@ -85,9 +85,9 @@ describe.only('SDK url analytics', () => {
     const imgStr = cloudinary.image("hello", {
       format: "png",
       analytics: true,
-      sdkCode: "X",
-      sdkSemver: "7.3.0",
-      techVersion: "3.4.7",
+      sdk_code: "X",
+      sdk_semver: "7.3.0",
+      tech_version: "3.4.7",
       product: 'B'
     });
 
