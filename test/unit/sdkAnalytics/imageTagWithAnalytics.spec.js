@@ -4,7 +4,7 @@ const cloudinary = require('../../../cloudinary');
 const assert = require("assert");
 const TEST_CLOUD_NAME = require('../../testUtils/testConstants').TEST_CLOUD_NAME;
 
-describe.only('SDK url analytics', () => {
+describe('SDK url analytics', () => {
   let processVersions = {};
 
   before(() => {
