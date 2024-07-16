@@ -1,3 +1,11 @@
+2.3.0 / 2024-07-16
+==================
+
+  * fix: url analytics property name
+  * fix: dependencies explicit version (fix for CI)
+  * fix: decoding transformation string before sending in upload payload
+  * feat: update folders
+
 2.2.0 / 2024-04-22
 ==================
 
