@@ -253,7 +253,7 @@ exports.provideMockObjects = function (providedFunction) {
     requestSpy.restore();
     writeSpy.restore();
     mockXHR.restore();
-  }).done();
+  });
 };
 
 exports.setupCache = function () {
