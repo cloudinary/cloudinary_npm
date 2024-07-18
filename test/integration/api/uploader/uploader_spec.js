@@ -14,6 +14,7 @@ const cloneDeep = require('lodash/cloneDeep');
 const assert = require('assert');
 
 const IMAGE_FILE = helper.IMAGE_FILE;
+const LARGE_IMAGE_FILE = helper.LARGE_IMAGE_FILE;
 const LARGE_RAW_FILE = helper.LARGE_RAW_FILE;
 const LARGE_VIDEO = helper.LARGE_VIDEO;
 const EMPTY_IMAGE = helper.EMPTY_IMAGE;
@@ -31,6 +32,7 @@ const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const testConstants = require('../../../testUtils/testConstants');
 const {shouldTestFeature, DYNAMIC_FOLDERS} = require("../../../spechelper");
+const {Readable} = require("stream");
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
@@ -1002,9 +1004,8 @@ describe("uploader", function () {
     });
   });
   it("should successfully upload with pipes", function (done) {
-    var file_reader, upload;
     this.timeout(TIMEOUT.LONG);
-    upload = cloudinary.v2.uploader.upload_stream({
+    const upload = cloudinary.v2.uploader.upload_stream({
       tags: UPLOAD_TAGS
     }, function (error, result) {
       var expected_signature;
@@ -1017,8 +1018,32 @@ describe("uploader", function () {
       expect(result.signature).to.eql(expected_signature);
       done();
     });
-    file_reader = fs.createReadStream(IMAGE_FILE);
-    file_reader.pipe(upload);
+    fs.createReadStream(IMAGE_FILE).pipe(upload);
+  });
+  it("should successfully upload in chunks with pipes", (done) => {
+    this.timeout(TIMEOUT.LONG);
+    const upload = cloudinary.v2.uploader.upload_chunked_stream({
+      chunk_size: 7000000,
+      timeout: TIMEOUT.LONG
+    }, (error, result) => {
+      assert.strictEqual(error, undefined);
+      assert.ok(result.public_id);
+      done();
+    });
+    fs.createReadStream(LARGE_IMAGE_FILE).pipe(upload);
+  });
+  it("should successfully upload in chunks with pipes from Buffer", (done) => {
+    this.timeout(TIMEOUT.LONG);
+    const upload = cloudinary.v2.uploader.upload_chunked_stream({
+      chunk_size: 7000000,
+      timeout: TIMEOUT.LONG
+    }, (error, result) => {
+      assert.strictEqual(error, undefined);
+      assert.ok(result.public_id);
+      done();
+    });
+    const file = fs.readFileSync(LARGE_IMAGE_FILE);
+    Readable.from(Buffer.from(file)).pipe(upload);
   });
   it("should fail with http.Agent (non secure)", function () {
     this.timeout(TIMEOUT.LONG);
