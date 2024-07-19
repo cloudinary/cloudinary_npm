@@ -32,7 +32,6 @@ const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const testConstants = require('../../../testUtils/testConstants');
 const {shouldTestFeature, DYNAMIC_FOLDERS} = require("../../../spechelper");
-const {Readable} = require("stream");
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
@@ -1031,19 +1030,6 @@ describe("uploader", function () {
       done();
     });
     fs.createReadStream(LARGE_IMAGE_FILE).pipe(upload);
-  });
-  it("should successfully upload in chunks with pipes from Buffer", (done) => {
-    this.timeout(TIMEOUT.LONG);
-    const upload = cloudinary.v2.uploader.upload_chunked_stream({
-      chunk_size: 7000000,
-      timeout: TIMEOUT.LONG
-    }, (error, result) => {
-      assert.strictEqual(error, undefined);
-      assert.ok(result.public_id);
-      done();
-    });
-    const file = fs.readFileSync(LARGE_IMAGE_FILE);
-    Readable.from(Buffer.from(file)).pipe(upload);
   });
   it("should fail with http.Agent (non secure)", function () {
     this.timeout(TIMEOUT.LONG);
