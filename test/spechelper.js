@@ -19,6 +19,7 @@ exports.libPath = libPath;
 const api_http = String(config().upload_prefix).startsWith('http:') ? http : https;
 
 exports.IMAGE_FILE = "test/.resources/logo.png";
+exports.LARGE_IMAGE_FILE = "test/.resources/big-image.jpg";
 exports.LARGE_RAW_FILE = "test/.resources/TheCompleteWorksOfShakespeare.mobi";
 exports.LARGE_VIDEO = "test/.resources/CloudBookStudy-HD.mp4";
 exports.EMPTY_IMAGE = "test/.resources/empty.gif";
