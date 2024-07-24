@@ -908,6 +908,16 @@ cloudinary.v2.utils.download_zip_url(
     }
 );
 
+// $ExpectType string
+cloudinary.v2.utils.download_folder(
+    'my-folder',
+    {
+        resource_type: 'image',
+        prefix: 'photos/'
+    }
+);
+
+
 // $ExpectType { [key: string]: any; signature: string; api_key: string; }
 cloudinary.v2.utils.sign_request(
     {}
