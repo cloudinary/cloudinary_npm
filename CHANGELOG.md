@@ -1,3 +1,9 @@
+2.3.1 / 2024-07-25
+==================
+
+* fix: use 0.0.0 as fallback when package.json unavailable
+* fix: upload_chunked_stream works properly with more than 2 chunks
+
 2.3.0 / 2024-07-16
 ==================
 
