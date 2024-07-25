@@ -916,7 +916,7 @@ cloudinary.v2.utils.download_folder(
     'my-folder',
     {
         resource_type: 'image',
-        prefix: 'photos/'
+        prefixes: 'photos/'
     }
 );
 
