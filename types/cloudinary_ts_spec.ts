@@ -1206,6 +1206,12 @@ cloudinary.v2.api.delete_related_assets_by_asset_id('asset-id', 'public-id-to-un
 // $ExpectType Promise<DeleteAssetRelation>
 cloudinary.v2.api.delete_related_assets_by_asset_id('asset-id', ['public-id-to-unrelate-1', 'public-id-to-unrelate-2']);
 
+// $ExpectType Promise<ConfigResponse>
+cloudinary.v2.api.config();
+
+// $ExpectType Promise<ConfigResponse>
+cloudinary.v2.api.config({ settings: true });
+
 // $ExpectType Promise<any>
 cloudinary.v2.uploader.create_slideshow({
     manifest_json: {
