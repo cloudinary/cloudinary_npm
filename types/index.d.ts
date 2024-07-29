@@ -949,7 +949,7 @@ declare module 'cloudinary' {
         /****************************** Admin API V2 Methods *************************************/
 
         namespace api {
-            function config(options: AdminApiOptions | { settings: boolean }, callback?: ResponseCallback): Promise<ConfigResponse>
+            function config(options?: AdminApiOptions | { settings: boolean }, callback?: ResponseCallback): Promise<ConfigResponse>
 
             function create_streaming_profile(name: string, options: AdminApiOptions | {
                 display_name?: string,
