@@ -1,3 +1,17 @@
+2.3.1 / 2024-07-25
+==================
+
+* fix: use 0.0.0 as fallback when package.json unavailable
+* fix: upload_chunked_stream works properly with more than 2 chunks
+
+2.3.0 / 2024-07-16
+==================
+
+  * fix: url analytics property name
+  * fix: dependencies explicit version (fix for CI)
+  * fix: decoding transformation string before sending in upload payload
+  * feat: update folders
+
 2.2.0 / 2024-04-22
 ==================
 
