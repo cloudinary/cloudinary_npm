@@ -871,6 +871,14 @@ declare module 'cloudinary' {
         }
     }
 
+    export interface ConfigResponse {
+        cloud_name: string
+        created_at: string
+        settings?: {
+            folder_mode: 'fixed' | 'dynamic'
+        }
+    }
+
     export namespace v2 {
 
         /****************************** Global Utils *************************************/
@@ -944,6 +952,8 @@ declare module 'cloudinary' {
         /****************************** Admin API V2 Methods *************************************/
 
         namespace api {
+            function config(options?: AdminApiOptions | { settings: boolean }, callback?: ResponseCallback): Promise<ConfigResponse>
+
             function create_streaming_profile(name: string, options: AdminApiOptions | {
                 display_name?: string,
                 representations: TransformationOptions
