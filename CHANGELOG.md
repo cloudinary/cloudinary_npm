@@ -1,3 +1,11 @@
+2.4.0 / 2024-07-30
+==================
+
+* feat: exposing config endpoint from admin api
+* fix: update metadata field added missing param default_disabled
+* fix: types definitions
+
+
 2.3.1 / 2024-07-25
 ==================
 
