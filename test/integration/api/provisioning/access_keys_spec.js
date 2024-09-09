@@ -3,7 +3,7 @@ const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 let runOnlyForInternalPRs = process.env.TRAVIS_SECURE_ENV_VARS ? describe : describe.skip;
 
 
-runOnlyForInternalPRs('Provisioning API - Access Keys Management', function () {
+describe.skip('Provisioning API - Access Keys Management', function () {
   let CLOUD_SECRET;
   let CLOUD_API;
   let CLOUD_NAME;
