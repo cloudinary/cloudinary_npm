@@ -557,6 +557,24 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
+    export interface AccessKeyDetails {
+        name: string,
+        api_key: string,
+        api_secret: string,
+        created_at: string,
+        updated_at: string,
+        enabled: boolean
+    }
+
+    export interface AccessKeysListResponse {
+        access_keys: Array<AccessKeyDetails>,
+        total: number
+    }
+
+    export interface DeleteAccessKeyResponse {
+        message: 'ok' | 'not_found'
+    }
+
     export interface AuthTokenApiOptions {
         key: string;
         acl: string;
@@ -1485,6 +1503,29 @@ declare module 'cloudinary' {
                 function user_groups(options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
                 function user_group_users(groupId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+
+                function access_keys(subAccountId: string, options?: ProvisioningApiOptions | {
+                    page_size?: number,
+                    page?: number,
+                    sort_by?: string,
+                    sort_order?: 'desc' | 'asc'
+                }, callback?: ResponseCallback): Promise<AccessKeysListResponse>;
+
+                function generate_access_key(subAccountId: string, options?: ProvisioningApiOptions | {
+                    name?: string,
+                    enabled?: boolean
+                }, callback?: ResponseCallback): Promise<AccessKeyDetails>;
+
+                function update_access_key(subAccountId: string, apiKey: string, options?: ProvisioningApiOptions | {
+                    name?: string,
+                    enabled?: boolean
+                }, callback?: ResponseCallback): Promise<AccessKeyDetails>;
+
+                function delete_access_key(subAccountId: string, apiKey: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<DeleteAccessKeyResponse>;
+
+                function delete_access_key_by_name(subAccountId: string, options: ProvisioningApiOptions | {
+                    name: string,
+                }, callback?: ResponseCallback): Promise<DeleteAccessKeyResponse>;
             }
         }
 
