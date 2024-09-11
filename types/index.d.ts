@@ -506,9 +506,9 @@ declare module 'cloudinary' {
         overrides: Array<{
             action: 'gen_fill';
             params: {
-                seed: string;
-                prompt: string;
-                ignore_foreground: boolean;
+                seed?: string;
+                prompt?: string;
+                ignore_foreground?: boolean;
             }
         }>;
     }
