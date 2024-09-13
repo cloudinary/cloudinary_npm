@@ -542,6 +542,7 @@ declare module 'cloudinary' {
         use_asset_folder_as_public_id_prefix?: boolean;
         regions?: Record<string, [RegionCoordinate, RegionCoordinate, ...Array<RegionCoordinate>]>;
         auto_chaptering?: boolean;
+        auto_transcription?: boolean | { translate: Array<string>; };
 
         [futureKey: string]: any;
     }
