@@ -1,3 +1,10 @@
+2.5.0 / 2024-09-15
+==================
+
+* feat: auto_transcription on upload and explicit support (#690)
+* feat: auto_chaptering on upload and explicit support (#689)
+* feat: access key management via provisioning api (#687)
+
 2.4.0 / 2024-07-30
 ==================
 
