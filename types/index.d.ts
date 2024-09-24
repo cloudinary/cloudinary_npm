@@ -710,7 +710,9 @@ declare module 'cloudinary' {
         mandatory?: boolean;
         default_value?: number;
         validation?: object; //there are 4 types, we need to discuss documentation team about it before implementing.
-        datasource?: DatasourceEntry;
+        datasource?: {
+            values: Array<DatasourceEntry>
+        };
         default_disabled?: boolean;
 
         [futureKey: string]: any;
