@@ -986,6 +986,11 @@ cloudinary.v2.uploader.upload_stream(
         console.log(result);
     });
 
+// $ExpectType UploadStream
+cloudinary.v2.uploader.upload_chunked_stream({template: "https://www.example.com/images/"});
+
+// $ExpectType UploadStream
+cloudinary.v2.uploader.upload_large_stream({template: "https://www.example.com/images/"});
 
 // $ExpectType Promise<any>
 cloudinary.v2.provisioning.account.sub_accounts(
