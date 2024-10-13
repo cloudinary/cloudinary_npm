@@ -1,14 +1,15 @@
 {
   "name": "basic",
   "version": "0.0.0",
-  "description": "basic node sample of cloudinary npm",
+  "description": "Basic node sample of Cloudinary npm",
   "main": "basic.js",
   "dependencies": {
-    "cloudinary": "^1.3.0",
-    "dotenv": "1.x"
+    "cloudinary": "^2.5.1",
+    "dotenv": "16.x"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node basic.js"
   },
   "author": "",
   "license": "ISC"
