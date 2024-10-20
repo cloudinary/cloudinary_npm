@@ -1,8 +1,8 @@
-var Schema = require('jugglingdb').Schema;
+const Schema = require('jugglingdb').Schema;
 
-var schema = new Schema('memory');
+const schema = new Schema('memory');
 // Uncomment if you want to use mongodb adapter
-// var schema = new Schema('mongodb');
+// const schema = new Schema('mongodb');
 
 // Define models
 schema.define('Photo', {

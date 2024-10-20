@@ -1,11 +1,12 @@
-var cloudinary = require('cloudinary').v2;
-var crypto = require('crypto');
-var multipart = require('connect-multiparty');
-var schema = require('../config/schema');
+const cloudinary = require('cloudinary').v2;
+const crypto = require('crypto');
+const multer = require('multer');
+const schema = require('../config/schema');
 
-var Photo = schema.models.Photo;
+const Photo = schema.models.Photo;
 
-var multipartMiddleware = multipart();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 function index(req, res) {
   Photo.all().then(function (photos) {
@@ -15,11 +16,11 @@ function index(req, res) {
 
 function add_through_server(req, res) {
   // Create a new photo model and set it's default title
-  var photo = new Photo();
-  Photo.count().then(function (amount) {
+  let photo = new Photo();
+  Photo.count().then((amount) => {
     photo.title = "My Photo #" + (amount + 1);
   })
-    .finally(function () {
+    .finally(() => {
       res.render('photos/add', {
         photo: photo
       });
@@ -33,40 +34,42 @@ function create_through_server(req, res) {
   // and then saved to the database.
 
   // file was not uploaded redirecting to upload
-  if (req.files.image.ws.bytesWritten === 0) {
+  if (!req.file) {
     res.redirect('/photos/add');
     return;
   }
 
-  var photo = new Photo(req.body);
-  // Get temp file path
-  var imageFile = req.files.image.path;
+  let photo = new Photo(req.body);
+  // Get buffer from multer
+  const imageBuffer = req.file.buffer;
   // Upload file to Cloudinary
-  cloudinary.uploader.upload(imageFile, { tags: 'express_sample' })
-    .then(function (image) {
-      console.log('** file uploaded to Cloudinary service');
-      console.dir(image);
-      photo.image = image;
-      // Save photo with image metadata
-      return photo.save();
-    })
-    .then(function () {
+  cloudinary.uploader.upload_stream({ tags: 'express_sample' }, function (error, result) {
+    if (error) {
+      console.error('** file upload to Cloudinary failed');
+      console.error(error);
+      res.redirect('/photos/add');
+      return;
+    }
+    console.log('** file uploaded to Cloudinary service');
+    console.dir(result);
+    photo.image = result;
+    // Save photo with image metadata
+    photo.save().then( () => {
       console.log('** photo saved');
-    })
-    .finally(function () {
       res.render('photos/create_through_server', { photo: photo, upload: photo.image });
     });
+  }).end(imageBuffer);
 }
 
 function add_direct(req, res) {
   // Configuring cloudinary_cors direct upload to support old IE versions
-  var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
+  const cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
   // Create a new photo model and set it's default title
-  var photo = new Photo();
-  Photo.count().then(function (amount) {
+  let photo = new Photo();
+  Photo.count().then((amount) => {
     photo.title = "My Photo #" + (amount + 1) + " (direct)";
   })
-    .finally(function () {
+    .finally(() => {
       res.render('photos/add_direct', {
         photo: photo,
         cloudinary_cors: cloudinary_cors
@@ -76,30 +79,29 @@ function add_direct(req, res) {
 
 function add_direct_unsigned(req, res) {
   // Configuring cloudinary_cors direct upload to support old IE versions
-  var cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
+  const cloudinary_cors = "http://" + req.headers.host + "/cloudinary_cors.html";
 
   // Set a unique unsigned upload preset name (for demo purposes only).
-  // In 'real life' scenario the preset name will be meaningful and will be set
-  // via online console or API not related to the actual upload
-  var sha1 = crypto.createHash('sha1');
+  // In 'real life' scenario the preset name will be meaningful and will be set via online console or API not related to the actual upload
+  let sha1 = crypto.createHash('sha1');
   sha1.update(cloudinary.config('api_key') + cloudinary.config('api_secret'));
-  var preset_name = "sample_" + sha1.digest('hex');
+  let preset_name = "sample_" + sha1.digest('hex');
 
   // Create a new photo model and set it's default title
-  var photo = new Photo();
-  Photo.count().then(function (amount) {
+  let photo = new Photo();
+  Photo.count().then((amount) => {
     photo.title = "My Photo #" + (amount + 1) + " (direct unsigned)";
   })
-    .then(function () {
+    .then(() => {
       return cloudinary.api.upload_preset(preset_name);
     })
-    .then(function (preset) {
+    .then((preset) => {
       if (!preset.settings.return_delete_token) {
         return cloudinary.api.update_upload_preset(preset_name, { return_delete_token: true });
       }
       return undefined;
     })
-    .catch(function (err) {
+    .catch((err) => {
       // Creating an upload preset is done here only for demo purposes.
       // Usually it is created outside the upload flow via api or
       // online console (https://cloudinary.com/console/settings/upload)
@@ -110,7 +112,7 @@ function add_direct_unsigned(req, res) {
         return_delete_token: true
       });
     })
-    .finally(function (preset) {
+    .finally((preset) => {
       res.render('photos/add_direct_unsigned',
         {
           photo: photo,
@@ -123,8 +125,8 @@ function add_direct_unsigned(req, res) {
 function create_direct(req, res) {
   // In direct mode, the image is uploaded to Cloudinary by the browser,
   // and upload metadata is available in JavaScript (see add_direct.ejs).
-  var result = {};
-  var photo = new Photo(req.body);
+  let result = {};
+  let photo = new Photo(req.body);
   result.photo = photo;
   // image was not uploaded, returning to edit form
   if (!req.body.image_id) {
@@ -135,20 +137,20 @@ function create_direct(req, res) {
     }
     return;
   }
-  var image = new cloudinary.PreloadedFile(req.body.image_id);
+  let image = new cloudinary.PreloadedFile(req.body.image_id);
   // check that image resolved from image_id is valid
   if (image.is_valid()) {
     photo.image = image.toJSON();
     console.dir(photo.image);
   }
-  photo.save().then(function () {
+  photo.save().then(() => {
     console.log('** photo saved');
   })
-    .catch(function (err) {
+    .catch((err) => {
       result.error = err;
       console.log('** error while uploading file');
       console.dir(err);
-    }).finally(function () {
+    }).finally(() => {
       res.render('photos/create_direct', { photo: photo, upload: photo.image });
     });
 }
@@ -160,7 +162,7 @@ module.exports.wire = function (app) {
 
   // upload to server example
   app.get('/photos/add', add_through_server);
-  app.post('/photos', multipartMiddleware, create_through_server);
+  app.post('/photos', upload.single('image'), create_through_server);
 
   // direct photo upload examples
   app.get('/photos/add_direct', add_direct);
