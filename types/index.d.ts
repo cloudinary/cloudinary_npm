@@ -504,12 +504,8 @@ declare module 'cloudinary' {
         transformation_prefix: string;
         asset_override_uri: string;
         overrides: Array<{
-            action: 'gen_fill';
-            params: {
-                seed?: string;
-                prompt?: string;
-                ignore_foreground?: boolean;
-            }
+            action: string;
+            params: Record<string, unknown>
         }>;
     }
 
