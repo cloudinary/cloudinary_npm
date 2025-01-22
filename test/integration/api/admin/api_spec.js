@@ -921,6 +921,67 @@ describe("api", function () {
       });
     });
   });
+  describe('delete_backed_up_assets', function () {
+    it('should delete specific version IDs', async function () {
+      this.timeout(TIMEOUT.LARGE);
+
+      // Process:
+      // - Upload to the same public ID three times
+      // - Delete a single version (string)
+      // - Delete a two versions (array)
+      // - Cleanup
+
+      // Perform three uploads
+      const firstUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true
+      });
+      await wait(1000)();
+
+      const secondUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true,
+        angle: '0', // To create a unique version
+        overwrite: true
+      });
+      await wait(1000)();
+
+      const thirdUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true,
+        angle: '100', // To create a unique version
+        overwrite: true
+      });
+      await wait(1000)();
+
+      // Ensure all files were uploaded correctly
+      expect(firstUpload).not.to.be(null);
+      expect(secondUpload).not.to.be(null);
+      expect(thirdUpload).not.to.be(null);
+
+      // Get the asset ID and versions of the uploaded asset
+      const resourceResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
+      const assetId = resourceResp.asset_id;
+      const firstAssetVersion = resourceResp.versions[0].version_id;
+      const secondAssetVersion = resourceResp.versions[1].version_id;
+      const thirdAssetVersion = resourceResp.versions[2].version_id;
+
+      // Delete the first version
+      const removeSingleVersion = await cloudinary.v2.api.delete_backed_up_assets(assetId, firstAssetVersion);
+      const removeSingleVersionResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
+      expect(removeSingleVersionResp.versions).not.to.contain(firstAssetVersion);
+
+      // Delete the remaining two versions
+      const removeMultipleVersions = await cloudinary.v2.api.delete_backed_up_assets(assetId, [secondAssetVersion, thirdAssetVersion]);
+      const removeMultipleVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
+      expect(removeMultipleVersionsResp.versions).not.to.contain(secondAssetVersion);
+      expect(removeMultipleVersionsResp.versions).not.to.contain(thirdAssetVersion);
+      
+      // Cleanup,
+      const finalDeleteResp = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
+      expect(finalDeleteResp).to.have.property("deleted");
+    });
+  });
   describe("update", function () {
     describe("notification url", function () {
       var writeSpy, xhr;
