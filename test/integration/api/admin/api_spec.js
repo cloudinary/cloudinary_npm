@@ -936,7 +936,6 @@ describe("api", function () {
         public_id: PUBLIC_ID_BACKUP_1,
         backup: true
       });
-      await wait(1000)();
 
       const secondUpload = await uploadImage({
         public_id: PUBLIC_ID_BACKUP_1,
@@ -944,7 +943,6 @@ describe("api", function () {
         angle: '0', // To create a unique version
         overwrite: true
       });
-      await wait(1000)();
 
       const thirdUpload = await uploadImage({
         public_id: PUBLIC_ID_BACKUP_1,
@@ -952,7 +950,6 @@ describe("api", function () {
         angle: '100', // To create a unique version
         overwrite: true
       });
-      await wait(1000)();
 
       // Ensure all files were uploaded correctly
       expect(firstUpload).not.to.be(null);
@@ -976,10 +973,6 @@ describe("api", function () {
       const removeMultipleVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
       expect(removeMultipleVersionsResp.versions).not.to.contain(secondAssetVersion);
       expect(removeMultipleVersionsResp.versions).not.to.contain(thirdAssetVersion);
-      
-      // Cleanup,
-      const finalDeleteResp = await API_V2.delete_resources([PUBLIC_ID_BACKUP_1]);
-      expect(finalDeleteResp).to.have.property("deleted");
     });
   });
   describe("update", function () {
