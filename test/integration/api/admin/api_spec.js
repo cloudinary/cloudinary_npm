@@ -582,6 +582,26 @@ describe("api", function () {
         expect(error.http_code).to.eql(404);
       });
     });
+    it.only("should allow deleting resources by asset_ids", function () {
+      this.timeout(TIMEOUT.MEDIUM);
+      return uploadImage({
+        public_id: PUBLIC_ID_3,
+        tags: UPLOAD_TAGS
+      }).then(
+        () => cloudinary.v2.api.resource(PUBLIC_ID_3)
+      ).then(function (resource) {
+        expect(resource).not.to.eql(void 0);
+        console.log(resource);
+        return cloudinary.v2.api.delete_resources_by_asset_ids([resource.asset_id]);
+      }).then(
+        () => cloudinary.v2.api.resource(PUBLIC_ID_3)
+      ).then(() => {
+        expect().fail();
+      }).catch(function ({error}) {
+        expect(error).to.be.an(Object);
+        expect(error.http_code).to.eql(404);
+      });
+    });
     describe("delete_resources_by_prefix", function () {
       callReusableTest("accepts next_cursor", cloudinary.v2.api.delete_resources_by_prefix, "prefix_foobar");
       return it("should allow deleting resources by prefix", function () {
