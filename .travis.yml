@@ -1,15 +1,23 @@
 language: node_js
 dist: focal
-node_js:
-  - "9"
-  - "10"
-  - "12"
-  - "14"
-  - "16"
-  - "18"
-  - "20"
-  - "22"
-script: npm run test-with-temp-cloud
+matrix:
+  include:
+    - node_js: "9"
+      script: npm run test-with-temp-cloud
+    - node_js: "10"
+      script: npm run test-with-temp-cloud
+    - node_js: "12"
+      script: npm run test-with-temp-cloud
+    - node_js: "14"
+      script: npm run test-with-temp-cloud
+    - node_js: "16"
+      script: npm run test-with-temp-cloud
+    - node_js: "18"
+      script: npm run test-with-temp-cloud
+    - node_js: "20"
+      script: npm run test-with-temp-cloud
+    - node_js: "22"
+      script: npm run test-with-temp-cloud
 
 
 notifications:
