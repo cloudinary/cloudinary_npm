@@ -14,7 +14,7 @@
   <div class="upload_details">
     <h2>Upload metadata:</h2>
     <table>
-      <% for (var attr in upload){%>
+      <% for (let attr in upload){%>
         <tr><td><%= attr %></td><td><%= JSON.stringify(upload[attr])%></td></tr>
       <% }%>
     </table>

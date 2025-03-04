@@ -76,7 +76,7 @@
     })
     .off("cloudinarydone").on("cloudinarydone", function (e, data) {
       $(".status").text("");
-      var preview = $(".preview").html('');
+      let preview = $(".preview").html('');
       $.cloudinary.image(data.result.public_id, {
         format: data.result.format, width: 50, height: 50, crop: "fit"
       }).appendTo(preview);
@@ -104,7 +104,7 @@
 
   function view_upload_details(upload) {
     // Build an html table out of the upload object
-    var rows = [];
+    let rows = [];
     $.each(upload, function(k,v){
       rows.push(
         $("<tr>")
