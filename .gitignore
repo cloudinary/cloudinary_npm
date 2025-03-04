@@ -14,3 +14,4 @@ coverage
 tools/cloudinary_url.sh
 package-lock.json
 npm-debug.log
+.vscode/

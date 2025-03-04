@@ -3,7 +3,7 @@ require('dotenv').load({
 });
 
 if (!process.env.CLOUDINARY_URL) {
-  throw 'Could not start tests - Cloudianry URL is undefined'
+  throw 'Could not start tests - Cloudinary URL is undefined'
 }
 
 global.expect = require('expect.js');
