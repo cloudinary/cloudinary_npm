@@ -16,31 +16,25 @@ describe('Asset relations API', () => {
     describe('using public id', () => {
       it('should allow passing a single public id to create a relation', () => {
         return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-          cloudinary.v2.api.add_related_assets(testPublicId, singleRelatedPublicId, {
-            resource_type: 'image',
-            type: 'upload'
-          });
+          cloudinary.v2.api.add_related_assets(testPublicId, singleRelatedPublicId);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/test-public-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_relate\":[\"related-public-id\"]}"]);
         });
       });
 
       it('should allow passing multiple public ids to create a relation', () => {
         return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-          cloudinary.v2.api.add_related_assets(testPublicId, multipleRelatedPublicId, {
-            resource_type: 'image',
-            type: 'upload'
-          });
+          cloudinary.v2.api.add_related_assets(testPublicId, multipleRelatedPublicId);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/${testPublicId}`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id-1&assets_to_relate=related-public-id-2']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_relate\":[\"related-public-id-1\",\"related-public-id-2\"]}"]);
         });
       });
     });
@@ -54,7 +48,7 @@ describe('Asset relations API', () => {
           strictEqual(calledWithUrl.method, 'POST');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_relate\":[\"related-public-id\"]}"]);
         });
       });
 
@@ -66,7 +60,7 @@ describe('Asset relations API', () => {
           strictEqual(calledWithUrl.method, 'POST');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_relate=related-public-id-1&assets_to_relate=related-public-id-2']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_relate\":[\"related-public-id-1\",\"related-public-id-2\"]}"]);
         });
       });
     });
@@ -76,31 +70,25 @@ describe('Asset relations API', () => {
     describe('using public id', () => {
       it('should allow passing a single public id to delete a relation', () => {
         return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-          cloudinary.v2.api.delete_related_assets(testPublicId, singleRelatedPublicId, {
-            resource_type: 'image',
-            type: 'upload'
-          });
+          cloudinary.v2.api.delete_related_assets(testPublicId, singleRelatedPublicId);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/test-public-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_unrelate\":[\"related-public-id\"]}"]);
         });
       });
 
       it('should allow passing multiple public ids to delete a relation', () => {
         return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-          cloudinary.v2.api.delete_related_assets(testPublicId, multipleRelatedPublicId, {
-            resource_type: 'image',
-            type: 'upload'
-          });
+          cloudinary.v2.api.delete_related_assets(testPublicId, multipleRelatedPublicId);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/image/upload/test-public-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id-1&assets_to_unrelate=related-public-id-2']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_unrelate\":[\"related-public-id-1\",\"related-public-id-2\"]}"]);
         });
       });
     });
@@ -114,7 +102,7 @@ describe('Asset relations API', () => {
           strictEqual(calledWithUrl.method, 'DELETE');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_unrelate\":[\"related-public-id\"]}"]);
         });
       });
 
@@ -126,7 +114,7 @@ describe('Asset relations API', () => {
           strictEqual(calledWithUrl.method, 'DELETE');
           strictEqual(calledWithUrl.path, `/v1_1/${TEST_CLOUD_NAME}/resources/related_assets/test-asset-id`);
           const callApiArguments = writeSpy.firstCall.args;
-          deepStrictEqual(callApiArguments, ['assets_to_unrelate=related-public-id-1&assets_to_unrelate=related-public-id-2']);
+          deepStrictEqual(callApiArguments, ["{\"assets_to_unrelate\":[\"related-public-id-1\",\"related-public-id-2\"]}"]);
         });
       });
     });
