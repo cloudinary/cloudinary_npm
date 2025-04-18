@@ -1461,6 +1461,8 @@ describe("api", function () {
     this.timeout(TIMEOUT.MEDIUM);
 
     const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
+    let uploadedAssetId;
+
     before(() => uploadImage({
       public_id: publicId,
       backup: true,
@@ -1469,6 +1471,7 @@ describe("api", function () {
       .then(wait(2000))
       .then(() => cloudinary.v2.api.resource(publicId))
       .then((resource) => {
+        uploadedAssetId = resource.asset_id;
         expect(resource).not.to.be(null);
         expect(resource.bytes).to.eql(3381);
         return cloudinary.v2.api.delete_resources(publicId);
@@ -1480,17 +1483,19 @@ describe("api", function () {
         expect(resource.placeholder).to.eql(true);
       })
     );
+
     it("should restore a deleted resource when passed an asset ID", () => cloudinary.v2.api
-      .restore(assetId)
+      .restore_by_asset_id([uploadedAssetId])
       .then((response) => {
-        let info = response[assetId];
+        let info = response[uploadedAssetId];
         expect(info).not.to.be(null);
         expect(info.bytes).to.eql(3381);
-        return cloudinary.v2.api.resource(assetId);
+        return cloudinary.v2.api.resources_by_asset_ids([uploadedAssetId]);
       })
-      .then((resource) => {
-        expect(resource).not.to.be(null);
-        expect(resource.bytes).to.eql(3381);
+      .then((response) => {
+        const { resources } = response;
+        expect(resources[0]).not.to.be(null);
+        expect(resources[0].bytes).to.eql(3381);
       }));
 
     it("should restore different versions of a deleted asset when passed an asset ID", async function () {
@@ -1544,16 +1549,17 @@ describe("api", function () {
 
       // Restore first version by passing in the asset ID, ensure it's equal to the upload size
       await wait(1000)();
-      const firstVerRestore = await API_V2.restore([assetId], {
+      const firstVerRestore = await API_V2.restore_by_asset_id([assetId], {
         versions: [firstAssetVersion]
       });
+
       expect(firstVerRestore[assetId].bytes).to.eql(
         firstUpload.bytes
       );
 
       // Restore second version by passing in the asset ID, ensure it's equal to the upload size
       await wait(1000)();
-      const secondVerRestore = await API_V2.restore(
+      const secondVerRestore = await API_V2.restore_by_asset_id(
         [assetId],
         { versions: [secondAssetVersion] }
       );
@@ -1594,7 +1600,7 @@ describe("api", function () {
         PUBLIC_ID_BACKUP_1,
         { versions: true }
       );
-      
+
       const getSecondAssetVersion = await API_V2.resource(
         PUBLIC_ID_BACKUP_2,
         { versions: true }
@@ -1611,7 +1617,7 @@ describe("api", function () {
       const IDS_TO_RESTORE = [firstAssetId, secondAssetId];
       const VERSIONS_TO_RESTORE = [firstAssetVersion, secondAssetVersion];
 
-      const restore = await API_V2.restore(IDS_TO_RESTORE, {
+      const restore = await API_V2.restore_by_asset_id(IDS_TO_RESTORE, {
         versions: VERSIONS_TO_RESTORE
       });
 
@@ -1634,7 +1640,7 @@ describe("api", function () {
     });
   });
 
-  
+
   describe('mapping', function () {
     before(function () {
       this.mapping = `api_test_upload_mapping${Math.floor(Math.random() * 100000)}`;
