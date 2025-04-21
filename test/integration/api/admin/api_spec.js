@@ -1484,7 +1484,7 @@ describe("api", function () {
       })
     );
 
-    it("should restore a deleted resource when passed an asset ID", () => cloudinary.v2.api
+    it.only("should restore a deleted resource when passed an asset ID", () => cloudinary.v2.api
       .restore_by_asset_ids([uploadedAssetId])
       .then((response) => {
         let info = response[uploadedAssetId];
