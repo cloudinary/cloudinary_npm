@@ -1457,7 +1457,7 @@ describe("api", function () {
     });
   });
 
-  describe("restore_by_asset_id", function () {
+  describe("restore_by_asset_ids", function () {
     this.timeout(TIMEOUT.MEDIUM);
 
     const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
@@ -1485,7 +1485,7 @@ describe("api", function () {
     );
 
     it("should restore a deleted resource when passed an asset ID", () => cloudinary.v2.api
-      .restore_by_asset_id([uploadedAssetId])
+      .restore_by_asset_ids([uploadedAssetId])
       .then((response) => {
         let info = response[uploadedAssetId];
         expect(info).not.to.be(null);
@@ -1549,7 +1549,7 @@ describe("api", function () {
 
       // Restore first version by passing in the asset ID, ensure it's equal to the upload size
       await wait(1000)();
-      const firstVerRestore = await API_V2.restore_by_asset_id([assetId], {
+      const firstVerRestore = await API_V2.restore_by_asset_ids([assetId], {
         versions: [firstAssetVersion]
       });
 
@@ -1559,7 +1559,7 @@ describe("api", function () {
 
       // Restore second version by passing in the asset ID, ensure it's equal to the upload size
       await wait(1000)();
-      const secondVerRestore = await API_V2.restore_by_asset_id(
+      const secondVerRestore = await API_V2.restore_by_asset_ids(
         [assetId],
         { versions: [secondAssetVersion] }
       );
@@ -1617,7 +1617,7 @@ describe("api", function () {
       const IDS_TO_RESTORE = [firstAssetId, secondAssetId];
       const VERSIONS_TO_RESTORE = [firstAssetVersion, secondAssetVersion];
 
-      const restore = await API_V2.restore_by_asset_id(IDS_TO_RESTORE, {
+      const restore = await API_V2.restore_by_asset_ids(IDS_TO_RESTORE, {
         versions: VERSIONS_TO_RESTORE
       });
 
