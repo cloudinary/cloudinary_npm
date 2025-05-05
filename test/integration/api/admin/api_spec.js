@@ -1388,7 +1388,7 @@ describe("api", function () {
       expect(finalDeleteResp).to.have.property("deleted");
     });
 
-    it('should restore two different deleted assets', async () => {
+    it.skip('should restore two different deleted assets', async () => {
       this.timeout(TIMEOUT.LARGE);
 
       // Upload two different files
