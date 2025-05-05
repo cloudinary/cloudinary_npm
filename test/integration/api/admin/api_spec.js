@@ -1389,6 +1389,8 @@ describe("api", function () {
     });
 
     it('should restore two different deleted assets', async () => {
+      this.timeout(TIMEOUT.LARGE);
+
       // Upload two different files
       const firstUpload = await uploadImage({
         public_id: PUBLIC_ID_BACKUP_1,
