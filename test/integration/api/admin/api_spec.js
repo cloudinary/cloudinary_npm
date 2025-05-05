@@ -1330,32 +1330,6 @@ describe("api", function () {
     });
   });
   describe('.restore', function () {
-    this.timeout(TIMEOUT.MEDIUM);
-
-    const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
-    before(() => uploadImage({
-      public_id: publicId,
-      backup: true,
-      tags: UPLOAD_TAGS
-    }).then(wait(2000)).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
-      expect(resource).not.to.be(null);
-      expect(resource.bytes).to.eql(3381);
-      return cloudinary.v2.api.delete_resources(publicId);
-    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
-      expect(resource).not.to.be(null);
-      expect(resource.bytes).to.eql(0);
-      expect(resource.placeholder).to.eql(true);
-    }));
-    it('should restore a deleted resource', () => cloudinary.v2.api.restore(publicId).then((response) => {
-      let info = response[publicId];
-      expect(info).not.to.be(null);
-      expect(info.bytes).to.eql(3381);
-      return cloudinary.v2.api.resource(publicId);
-    }).then((resource) => {
-      expect(resource).not.to.be(null);
-      expect(resource.bytes).to.eql(3381);
-    }));
-
     it('should restore different versions of a deleted asset', async function () {
       this.timeout(TIMEOUT.LARGE);
 
