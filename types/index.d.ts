@@ -1393,17 +1393,17 @@ declare module 'cloudinary' {
 
             function upload(file: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_chunked(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_chunked(path: string, callback?: UploadResponseCallback): UploadStream;
 
             function upload_chunked_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
             function upload_large_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_large(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_large(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse> | UploadStream;
 
-            function upload_large(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_large(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse> | UploadStream;
 
             function upload_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 

@@ -886,7 +886,7 @@ cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
         console.log(result, error);
     });
 
-// $ExpectType Promise<UploadApiResponse>
+// $ExpectType Promise<UploadApiResponse> | UploadStream
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {
         resource_type: "video",
@@ -896,7 +896,7 @@ cloudinary.v2.uploader.upload_large("my_large_video.mp4",
         console.log(result, error);
     });
 
-// $ExpectType Promise<UploadApiResponse>
+// $ExpectType Promise<UploadApiResponse> | UploadStream
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {resource_type: "video"},
     function (error, result) {
