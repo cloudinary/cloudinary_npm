@@ -137,7 +137,7 @@ describe("uploader", function () {
     });
   });
   it('should allow uploading with parameters containing &', function () {
-    const publicId = `ampersant-test-${Date.now()}`;
+    const publicId = `ampersand-test-${Date.now()}`;
     return cloudinary.v2.uploader.upload('https://cloudinary.com/images/old_logo.png', {
       notification_url: 'https://example.com?exampleparam1=aaa&exampleparam2=bbb',
       public_id: publicId
