@@ -1400,12 +1400,12 @@ describe("api", function () {
       const secondAssetVersion = getVersionsResp.versions[1].version_id;
 
       // Restore first version, ensure it's equal to the upload size
-      await wait(1000)();
+      await wait(1500)();
       const firstVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], {versions: [firstAssetVersion]});
       expect(firstVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(firstUpload.bytes);
 
       // Restore second version, ensure it's equal to the upload size
-      await wait(1000)();
+      await wait(1500)();
       const secondVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], {versions: [secondAssetVersion]});
       expect(secondVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(secondUpload.bytes);
 
