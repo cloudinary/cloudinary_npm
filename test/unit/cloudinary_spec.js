@@ -203,9 +203,9 @@ describe("cloudinary", function () {
       })).to.eql(`${upload_path}/g_center,p_a,q_auto:good,r_3,x_1,y_2/test`);
     });
   });
-  describe(":radius", function() {
+  describe(":radius", function () {
     const upload_path = 'https://res.cloudinary.com/test123/image/upload';
-    it("should support a single value", function() {
+    it("should support a single value", function () {
       expect(cloudinary.utils.url("test", {
         radius: 10
       })).to.eql(`${upload_path}/r_10/test`);
@@ -217,7 +217,7 @@ describe("cloudinary", function () {
         radius: '$v'
       })).to.eql(`${upload_path}/$v_10,r_$v/test`);
     });
-    it("should support an array of values", function() {
+    it("should support an array of values", function () {
       expect(cloudinary.utils.url("test", {
         radius: [10, 20, 30]
       })).to.eql(`${upload_path}/r_10:20:30/test`);
@@ -230,7 +230,7 @@ describe("cloudinary", function () {
         radius: [10, 20, '$v', 40]
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v:40/test`);
     })
-    it("should support colon separated values", function() {
+    it("should support colon separated values", function () {
       expect(cloudinary.utils.url("test", {
         radius: "10:20"
       })).to.eql(`${upload_path}/r_10:20/test`);
@@ -240,7 +240,7 @@ describe("cloudinary", function () {
       })).to.eql(`${upload_path}/$v_10,r_10:20:$v:40/test`);
     })
   })
-  it("should support named transformation", function() {
+  it("should support named transformation", function () {
     var options, result;
     options = {
       transformation: "blip"
@@ -495,6 +495,24 @@ describe("cloudinary", function () {
       timestamp: 1568810420,
       cloud_name: "dn6ot3ged"
     }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("45ddaa4fa01f0c2826f32f669d2e4514faf275fe6df053f1a150e7beae58a3bd");
+  });
+  it("should prevent parameter injection via ampersand in parameter values", function () {
+    const maliciousPublicId = "myname&tags=injected";
+    const params = {
+      public_id: maliciousPublicId,
+      timestamp: 1234567890
+    };
+
+    const signature1 = cloudinary.utils.api_sign_request(params, "secret");
+
+    const attackParams = {
+      public_id: "myname",
+      tags: "injected",
+      timestamp: 1234567890
+    };
+    const signature2 = cloudinary.utils.api_sign_request(attackParams, "secret");
+
+    expect(signature1).to.not.eql(signature2);
   });
   it("should correctly build signed preloaded image", function () {
     expect(cloudinary.utils.signed_preloaded_image({
@@ -866,18 +884,20 @@ describe("cloudinary", function () {
     expect(result).to.eql('https://res.cloudinary.com/test123/image/upload/s--2hbrSMPO--/sample.jpg');
   });
 
-  it("should not affect user variable names containing predefined names", function() {
-    const options = { transformation: [
-      {
-        $mywidth: "100",
-        $aheight: 300
-      },
-      {
-        width: "3 + $mywidth * 3 + 4 / 2 * initialWidth * $mywidth",
-        height: "3 * initialHeight + $aheight",
-        crop: 'scale'
-      }
-    ]};
+  it("should not affect user variable names containing predefined names", function () {
+    const options = {
+      transformation: [
+        {
+          $mywidth: "100",
+          $aheight: 300
+        },
+        {
+          width: "3 + $mywidth * 3 + 4 / 2 * initialWidth * $mywidth",
+          height: "3 * initialHeight + $aheight",
+          crop: 'scale'
+        }
+      ]
+    };
     const result = cloudinary.utils.url("sample", options);
     expect(result).to.contain("$aheight_300,$mywidth_100/c_scale,h_3_mul_ih_add_$aheight,w_3_add_$mywidth_mul_3_add_4_div_2_mul_iw_mul_$mywidth");
   });
