@@ -136,6 +136,18 @@ describe("uploader", function () {
       tags: UPLOAD_TAGS
     });
   });
+  it.only('should allow uploading with parameters containing &', function () {
+    const publicId = `ampersant-test-${Date.now()}`;
+    return cloudinary.v2.uploader.upload('https://cloudinary.com/images/old_logo.png', {
+      notification_url: 'https://example.com?exampleparam1=aaa&exampleparam2=bbb',
+      public_id: publicId
+    }).then((result) => {
+      expect(result).to.have.property('public_id');
+      expect(result.public_id).to.equal(publicId);
+    }).catch((error) => {
+      expect(error).to.be(null);
+    });
+  });
   it('should allow upload with url safe base64 in overlay', function () {
     const overlayUrl = 'https://res.cloudinary.com/demo/image/upload/logos/cloudinary_full_logo_white_small.png';
     const baseImageUrl = 'https://cloudinary.com/images/old_logo.png';
