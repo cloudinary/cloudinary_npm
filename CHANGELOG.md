@@ -1,3 +1,8 @@
+2.7.0 / 2025-06-18
+==================
+
+* fix: prevent parameter injection via ampersand in parameter values (#709)
+
 2.6.1 / 2025-05-05
 ==================
 
