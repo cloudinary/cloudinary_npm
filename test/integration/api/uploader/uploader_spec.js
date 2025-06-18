@@ -1620,4 +1620,27 @@ describe("uploader", function () {
       ));
     });
   })
+  describe("signature_version parameter support", function () {
+    it("should use signature_version from config when not specified", function () {
+      const original_signature_version = cloudinary.config().signature_version;
+      cloudinary.config({ signature_version: 1 });
+      let upload_result;
+      return uploadImage()
+        .then(function (result) {
+          upload_result = result;
+          const public_id = result.public_id;
+          const version = result.version;
+          const expected_signature_v1 = cloudinary.utils.api_sign_request(
+            { public_id: public_id, version: version },
+            cloudinary.config().api_secret,
+            null,
+            1
+          );
+          expect(result.signature).to.eql(expected_signature_v1);
+        })
+        .finally(function () {
+          cloudinary.config({ signature_version: original_signature_version });
+        });
+    });
+  });
 });

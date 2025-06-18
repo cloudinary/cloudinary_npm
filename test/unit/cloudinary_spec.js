@@ -4,7 +4,6 @@ const createTestConfig = require('../testUtils/createTestConfig');
 const API_SIGN_REQUEST_TEST_SECRET = "hdcixPpR2iKERPwqvH6sHdK9cyac";
 const API_SIGN_REQUEST_CLOUD_NAME = "dn6ot3ged";
 
-// Helper for the last test (stub, matches Ruby logic)
 function verify_api_response_signature(public_id, version, signature) {
   // Always uses signature_version 1 for backward compatibility
   const params = { public_id, version };
@@ -953,5 +952,42 @@ describe("api_sign_request", function () {
     expect(expected_signature_v1).to.not.eql(expected_signature_v2);
     expect(verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v1)).to.be.true;
     expect(verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v2)).to.be.false;
+  });
+});
+
+describe("Response signature verification fixes", function () {
+  const public_id = 'tests/logo.png';
+  const test_version = 1234;
+  const test_api_secret = "testsecret";
+
+  describe("api_sign_request signature_version parameter support", function () {
+    it("should support signature_version parameter in api_sign_request", function () {
+      const params = { public_id: public_id, version: test_version };
+      const signature_v1 = cloudinary.utils.api_sign_request(params, test_api_secret, null, 1);
+      const signature_v2 = cloudinary.utils.api_sign_request(params, test_api_secret, null, 2);
+      expect(signature_v1).to.be.a('string');
+      expect(signature_v2).to.be.a('string');
+      expect(signature_v1).to.eql(signature_v2); // No & in values, so should be the same
+    });
+
+    it("should use default signature_version from config", function () {
+      const original_signature_version = cloudinary.config().signature_version;
+      cloudinary.config({ signature_version: 2 });
+      const params = { public_id: public_id, version: test_version };
+      const signature_with_nil = cloudinary.utils.api_sign_request(params, test_api_secret, null, null);
+      const signature_with_v2 = cloudinary.utils.api_sign_request(params, test_api_secret, null, 2);
+      expect(signature_with_nil).to.eql(signature_with_v2);
+      cloudinary.config({ signature_version: original_signature_version });
+    });
+
+    it("should default to version 2 when no config is set", function () {
+      const original_signature_version = cloudinary.config().signature_version;
+      cloudinary.config({ signature_version: null });
+      const params = { public_id: public_id, version: test_version };
+      const signature_with_nil = cloudinary.utils.api_sign_request(params, test_api_secret, null, null);
+      const signature_with_v2 = cloudinary.utils.api_sign_request(params, test_api_secret, null, 2);
+      expect(signature_with_nil).to.eql(signature_with_v2);
+      cloudinary.config({ signature_version: original_signature_version });
+    });
   });
 });
