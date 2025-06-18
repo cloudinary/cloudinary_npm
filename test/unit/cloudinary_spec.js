@@ -991,3 +991,24 @@ describe("Response signature verification fixes", function () {
     });
   });
 });
+
+describe("verify_api_response_signature", function () {
+  const public_id = 'tests/logo.png';
+  const version = 1234;
+  const test_api_secret = "testsecret";
+  before(function () {
+    cloudinary.config({ api_secret: test_api_secret });
+  });
+  it("should return true for a valid signature (number version)", function () {
+    const signature = cloudinary.utils.api_sign_request({ public_id, version }, test_api_secret, null, 1);
+    expect(cloudinary.utils.verify_api_response_signature(public_id, version, signature)).to.be(true);
+  });
+  it("should return true for a valid signature (string version)", function () {
+    const version_str = version.toString();
+    const signature = cloudinary.utils.api_sign_request({ public_id, version: version_str }, test_api_secret, null, 1);
+    expect(cloudinary.utils.verify_api_response_signature(public_id, version_str, signature)).to.be(true);
+  });
+  it("should return false for an invalid signature", function () {
+    expect(cloudinary.utils.verify_api_response_signature(public_id, version, "invalidsignature")).to.be(false);
+  });
+});
