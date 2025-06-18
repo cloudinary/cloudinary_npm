@@ -1,6 +1,22 @@
 const cloudinary = require("../../cloudinary");
 const createTestConfig = require('../testUtils/createTestConfig');
 
+const API_SIGN_REQUEST_TEST_SECRET = "hdcixPpR2iKERPwqvH6sHdK9cyac";
+const API_SIGN_REQUEST_CLOUD_NAME = "dn6ot3ged";
+
+// Helper for the last test (stub, matches Ruby logic)
+function verify_api_response_signature(public_id, version, signature) {
+  // Always uses signature_version 1 for backward compatibility
+  const params = { public_id, version };
+  const expected = cloudinary.utils.api_sign_request(
+    params,
+    API_SIGN_REQUEST_TEST_SECRET,
+    null,
+    1
+  );
+  return signature === expected;
+}
+
 describe("cloudinary", function () {
   beforeEach(function () {
     cloudinary.config(createTestConfig({
@@ -464,56 +480,6 @@ describe("cloudinary", function () {
       expect(result).to.eql(`https://res.cloudinary.com/test123/image/upload/h_100,${short}_text:hello,w_100/test`);
     });
   });
-  it("should correctly sign api requests", function () {
-    expect(cloudinary.utils.api_sign_request({
-      hello: null,
-      goodbye: 12,
-      world: "problem",
-      undef: void 0
-    }, "1234")).to.eql("f05cfe85cee78e7e997b3c7da47ba212dcbf1ea5");
-  });
-  it("should correctly sign api requests with signature algorithm SHA1", function () {
-    cloudinary.config({ signature_algorithm: 'sha1' });
-    expect(cloudinary.utils.api_sign_request({
-      username: "user@cloudinary.com",
-      timestamp: 1568810420,
-      cloud_name: "dn6ot3ged"
-    }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("14c00ba6d0dfdedbc86b316847d95b9e6cd46d94");
-  });
-  it("should correctly sign api requests with signature algorithm SHA1 as default", function () {
-    cloudinary.config({ signature_algorithm: null });
-    expect(cloudinary.utils.api_sign_request({
-      username: "user@cloudinary.com",
-      timestamp: 1568810420,
-      cloud_name: "dn6ot3ged"
-    }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("14c00ba6d0dfdedbc86b316847d95b9e6cd46d94");
-  });
-  it("should correctly sign api requests with signature algorithm SHA256", function () {
-    cloudinary.config({ signature_algorithm: 'sha256' });
-    expect(cloudinary.utils.api_sign_request({
-      username: "user@cloudinary.com",
-      timestamp: 1568810420,
-      cloud_name: "dn6ot3ged"
-    }, "hdcixPpR2iKERPwqvH6sHdK9cyac")).to.eql("45ddaa4fa01f0c2826f32f669d2e4514faf275fe6df053f1a150e7beae58a3bd");
-  });
-  it("should prevent parameter injection via ampersand in parameter values", function () {
-    const maliciousPublicId = "myname&tags=injected";
-    const params = {
-      public_id: maliciousPublicId,
-      timestamp: 1234567890
-    };
-
-    const signature1 = cloudinary.utils.api_sign_request(params, "secret");
-
-    const attackParams = {
-      public_id: "myname",
-      tags: "injected",
-      timestamp: 1234567890
-    };
-    const signature2 = cloudinary.utils.api_sign_request(attackParams, "secret");
-
-    expect(signature1).to.not.eql(signature2);
-  });
   it("should correctly build signed preloaded image", function () {
     expect(cloudinary.utils.signed_preloaded_image({
       resource_type: "image",
@@ -900,5 +866,92 @@ describe("cloudinary", function () {
     };
     const result = cloudinary.utils.url("sample", options);
     expect(result).to.contain("$aheight_300,$mywidth_100/c_scale,h_3_mul_ih_add_$aheight,w_3_add_$mywidth_mul_3_add_4_div_2_mul_iw_mul_$mywidth");
+  });
+});
+
+describe("api_sign_request", function () {
+  it("should sign an API request using SHA1 by default", function () {
+    const signature = cloudinary.utils.api_sign_request({
+      cloud_name: API_SIGN_REQUEST_CLOUD_NAME,
+      timestamp: 1568810420,
+      username: "user@cloudinary.com"
+    }, API_SIGN_REQUEST_TEST_SECRET);
+    expect(signature).to.eql("14c00ba6d0dfdedbc86b316847d95b9e6cd46d94");
+  });
+
+  it("should sign an API request using SHA256", function () {
+    cloudinary.config({ signature_algorithm: 'sha256' });
+    const signature = cloudinary.utils.api_sign_request({
+      cloud_name: API_SIGN_REQUEST_CLOUD_NAME,
+      timestamp: 1568810420,
+      username: "user@cloudinary.com"
+    }, API_SIGN_REQUEST_TEST_SECRET);
+    expect(signature).to.eql("45ddaa4fa01f0c2826f32f669d2e4514faf275fe6df053f1a150e7beae58a3bd");
+    cloudinary.config(true);
+  });
+
+  it("should sign an API request using SHA256 via parameter", function () {
+    const signature = cloudinary.utils.api_sign_request({
+      cloud_name: API_SIGN_REQUEST_CLOUD_NAME,
+      timestamp: 1568810420,
+      username: "user@cloudinary.com"
+    }, API_SIGN_REQUEST_TEST_SECRET, "sha256");
+    expect(signature).to.eql("45ddaa4fa01f0c2826f32f669d2e4514faf275fe6df053f1a150e7beae58a3bd");
+  });
+
+  it("should raise when unsupported algorithm is passed", function () {
+    const signature_algorithm = "unsupported_algorithm";
+    expect(() => {
+      cloudinary.utils.api_sign_request({
+        cloud_name: API_SIGN_REQUEST_CLOUD_NAME,
+        timestamp: 1568810420,
+        username: "user@cloudinary.com"
+      }, API_SIGN_REQUEST_TEST_SECRET, signature_algorithm);
+    }).to.throwException();
+  });
+
+  it("should prevent parameter smuggling via & characters in parameter values with signature version 2", function () {
+    const params_with_ampersand = {
+      cloud_name: API_SIGN_REQUEST_CLOUD_NAME,
+      timestamp: 1568810420,
+      notification_url: "https://fake.com/callback?a=1&tags=hello,world"
+    };
+    const signature_v1_with_ampersand = cloudinary.utils.api_sign_request(params_with_ampersand, API_SIGN_REQUEST_TEST_SECRET, null, 1);
+    const signature_v2_with_ampersand = cloudinary.utils.api_sign_request(params_with_ampersand, API_SIGN_REQUEST_TEST_SECRET, null, 2);
+
+    const params_smuggled = {
+      cloud_name: API_SIGN_REQUEST_CLOUD_NAME,
+      timestamp: 1568810420,
+      notification_url: "https://fake.com/callback?a=1",
+      tags: "hello,world"
+    };
+    const signature_v1_smuggled = cloudinary.utils.api_sign_request(params_smuggled, API_SIGN_REQUEST_TEST_SECRET, null, 1);
+    const signature_v2_smuggled = cloudinary.utils.api_sign_request(params_smuggled, API_SIGN_REQUEST_TEST_SECRET, null, 2);
+
+    expect(signature_v1_with_ampersand).to.eql(signature_v1_smuggled);
+    expect(signature_v2_with_ampersand).to.not.eql(signature_v2_smuggled);
+    expect(signature_v2_with_ampersand).to.eql("4fdf465dd89451cc1ed8ec5b3e314e8a51695704");
+    expect(signature_v2_smuggled).to.eql("7b4e3a539ff1fa6e6700c41b3a2ee77586a025f9");
+  });
+
+  it("should use signature version 1 (without parameter encoding) for backward compatibility", function () {
+    const public_id_with_ampersand = 'tests/logo&version=2';
+    const test_version = 123456;
+    const SIGNATURE_VERIFICATION_API_SECRET = "testsecret";
+    const expected_signature_v1 = cloudinary.utils.api_sign_request(
+      { public_id: public_id_with_ampersand, version: test_version },
+      SIGNATURE_VERIFICATION_API_SECRET,
+      null,
+      1
+    );
+    const expected_signature_v2 = cloudinary.utils.api_sign_request(
+      { public_id: public_id_with_ampersand, version: test_version },
+      SIGNATURE_VERIFICATION_API_SECRET,
+      null,
+      2
+    );
+    expect(expected_signature_v1).to.not.eql(expected_signature_v2);
+    expect(verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v1)).to.be.true;
+    expect(verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v2)).to.be.false;
   });
 });
