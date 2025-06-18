@@ -4,18 +4,6 @@ const createTestConfig = require('../testUtils/createTestConfig');
 const API_SIGN_REQUEST_TEST_SECRET = "hdcixPpR2iKERPwqvH6sHdK9cyac";
 const API_SIGN_REQUEST_CLOUD_NAME = "dn6ot3ged";
 
-function verify_api_response_signature(public_id, version, signature) {
-  // Always uses signature_version 1 for backward compatibility
-  const params = { public_id, version };
-  const expected = cloudinary.utils.api_sign_request(
-    params,
-    API_SIGN_REQUEST_TEST_SECRET,
-    null,
-    1
-  );
-  return signature === expected;
-}
-
 describe("cloudinary", function () {
   beforeEach(function () {
     cloudinary.config(createTestConfig({
@@ -950,8 +938,8 @@ describe("api_sign_request", function () {
       2
     );
     expect(expected_signature_v1).to.not.eql(expected_signature_v2);
-    expect(verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v1)).to.be.true;
-    expect(verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v2)).to.be.false;
+    expect(cloudinary.utils.verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v1)).to.be.true;
+    expect(cloudinary.utils.verify_api_response_signature(public_id_with_ampersand, test_version, expected_signature_v2)).to.be.false;
   });
 });
 
