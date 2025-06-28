@@ -1,4 +1,3 @@
-const Q = require('q');
 const cloudinary = require('../../../../cloudinary');
 const helper = require("../../../spechelper");
 const testConstants = require('../../../testUtils/testConstants');
@@ -30,7 +29,7 @@ describe("search_api", function () {
   describe("integration", function () {
     this.timeout(TIMEOUT.LONG);
     before(function () {
-      return Q.allSettled([
+      return Promise.allSettled([
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_1,
@@ -71,7 +70,7 @@ describe("search_api", function () {
       return cloudinary.v2.search.expression(`tags:${SEARCH_TAG}`)
         .execute()
         .then(function (results) {
-          expect(results.resources.length).to.eql(3);
+          expect(results.resources.length).to.eQl(3);
         });
     });
     it(`should return resource ${PUBLIC_ID_1}`, function () {

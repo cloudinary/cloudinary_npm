@@ -1,5 +1,4 @@
 const assert = require('assert');
-const Q = require('q');
 const sinon = require('sinon');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
@@ -95,7 +94,7 @@ describe("structured metadata api", function () {
 
   before(function () {
     // Create the metadata fields required for the tests
-    return Q.allSettled(
+    return Promise.allSettled(
       metadata_fields_to_create.map(field => createMetadataFieldForTest(field))
     ).finally(function () {
     });
@@ -103,7 +102,7 @@ describe("structured metadata api", function () {
 
   after(function () {
     // Delete all metadata fields created during testing
-    return Q.allSettled(
+    return Promise.allSettled(
       metadata_fields_external_ids.map(field => api.delete_metadata_field(field))
     ).finally(function () {
     });

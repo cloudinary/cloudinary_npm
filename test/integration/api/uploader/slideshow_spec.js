@@ -1,4 +1,3 @@
-const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
 const describe = require('../../../testUtils/suite');
 const TEST_ID = Date.now();
@@ -26,7 +25,7 @@ describe("create slideshow tests", function () {
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
-    return Q.allSettled([
+    return Promise.allSettled([
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG) : void 0,
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG,
         {
