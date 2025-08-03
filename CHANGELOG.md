@@ -1,3 +1,18 @@
+2.7.0 / 2025-06-18
+==================
+
+* fix: prevent parameter injection via ampersand in parameter values (#709)
+
+2.6.1 / 2025-05-05
+==================
+
+
+
+2.6.1-rc.1 / 2025-05-05
+==================
+
+* fix: uploader interface
+
 2.6.0 / 2025-03-11
 ==================
 
