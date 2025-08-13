@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         node: ["9", "10"]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: node:${{ matrix.node }}
     steps:
@@ -46,7 +46,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: npm
 
       - name: Print Node & npm versions
         run: |
