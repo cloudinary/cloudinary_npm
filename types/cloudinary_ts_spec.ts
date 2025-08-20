@@ -520,7 +520,21 @@ cloudinary.v2.api.resources_by_tag("mytag",
         console.log(result, error);
     });
 
+// $ExpectType Promise<ResourceApiResponse>
 cloudinary.v2.api.restore(["image1", "image2"],
+    function (error, result) {
+        console.log(result, error);
+    });
+
+// $ExpectType Promise<ResourceApiResponse>
+cloudinary.v2.api.restore_by_asset_ids(["abcd1234", "defg5678"],
+    { content_type: 'json' },
+    function (error, result) {
+        console.log(result, error);
+    });
+
+// $ExpectType Promise<ResourceApiResponse>
+cloudinary.v2.api.restore_by_asset_ids(["abcd1234", "defg5678"],
     function (error, result) {
         console.log(result, error);
     });

@@ -1104,6 +1104,8 @@ declare module 'cloudinary' {
 
             function restore_by_asset_ids(asset_ids: string[], options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
+            function restore_by_asset_ids(asset_ids: string[], callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
             function root_folders(callback?: ResponseCallback, options?: AdminApiOptions): Promise<any>;
 
             function search(params: string, options?: AdminApiOptions, callback?: ResponseCallback): Promise<any>;
