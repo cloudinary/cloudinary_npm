@@ -7,39 +7,7 @@ on:
     branches: ["**"]
 
 jobs:
-  test-legacy:
-    name: Legacy Node ${{ matrix.node }} • tests
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ["9", "10"]
-    runs-on: ubuntu-20.04
-    timeout-minutes: 30
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js (legacy)
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Print Node & npm versions
-        run: |
-          node -v
-          npm -v
-
-      - name: Install dependencies (legacy compatible)
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm install --no-package-lock --legacy-peer-deps || npm install --no-package-lock
-
-      - name: Run tests with timeout
-        timeout-minutes: 25
-        run: npm run test-with-temp-cloud
-
-  test-modern:
+  test:
     name: Node ${{ matrix.node }} • tests
     strategy:
       fail-fast: false

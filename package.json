@@ -55,6 +55,6 @@
     "docs": "tools/scripts/docs.sh"
   },
   "engines": {
-    "node": ">=9"
+    "node": ">=12"
   }
 }
