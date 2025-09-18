@@ -74,7 +74,7 @@ cloudinary.v2.uploader.upload("/home/my_image.jpg", {upload_preset: "my_preset"}
 
 ## Contributions
 - Ensure tests run locally (add test command)
-- Open a PR and ensure Travis tests pass
+- Open a PR and ensure tests pass
 
 
 ## Get Help
