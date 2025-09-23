@@ -1098,9 +1098,9 @@ declare module 'cloudinary' {
             function restore(public_ids: string[], options?: AdminApiOptions | {
                 resource_type: ResourceType,
                 type: DeliveryType
-            }, callback?: ResponseCallback): Promise<any>;
+            }, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
-            function restore(public_ids: string[], callback?: ResponseCallback): Promise<any>;
+            function restore(public_ids: string[], callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
             function restore_by_asset_ids(asset_ids: string[], options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
 
