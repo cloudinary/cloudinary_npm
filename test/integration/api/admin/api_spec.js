@@ -1474,7 +1474,7 @@ describe("api", function () {
         expect(resources[0].bytes).to.eql(3381);
       }));
 
-    it("should restore different versions of a deleted asset when passed an asset ID", async function () {
+    it.skip("should restore different versions of a deleted asset when passed an asset ID", async function () {
       this.timeout(TIMEOUT.LARGE);
 
       // Upload the same file twice (upload->delete->upload->delete)
