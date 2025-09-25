@@ -31,7 +31,7 @@ const METADATA_SAMPLE_DATA_ENCODED = "metadata_color=red|metadata_shape=dodecahe
 const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const testConstants = require('../../../testUtils/testConstants');
-const {shouldTestFeature, DYNAMIC_FOLDERS} = require("../../../spechelper");
+const { shouldTestFeature, DYNAMIC_FOLDERS } = require("../../../spechelper");
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
@@ -136,11 +136,23 @@ describe("uploader", function () {
       tags: UPLOAD_TAGS
     });
   });
+  it('should allow uploading with parameters containing &', function () {
+    const publicId = `ampersand-test-${Date.now()}`;
+    return cloudinary.v2.uploader.upload('https://cloudinary.com/images/old_logo.png', {
+      notification_url: 'https://example.com?exampleparam1=aaa&exampleparam2=bbb',
+      public_id: publicId
+    }).then((result) => {
+      expect(result).to.have.property('public_id');
+      expect(result.public_id).to.equal(publicId);
+    }).catch((error) => {
+      expect(error).to.be(null);
+    });
+  });
   it('should allow upload with url safe base64 in overlay', function () {
     const overlayUrl = 'https://res.cloudinary.com/demo/image/upload/logos/cloudinary_full_logo_white_small.png';
-    const baseImageUrl ='https://cloudinary.com/images/old_logo.png';
+    const baseImageUrl = 'https://cloudinary.com/images/old_logo.png';
 
-    const options = {transformation: {overlay: { url: overlayUrl }}};
+    const options = { transformation: { overlay: { url: overlayUrl } } };
     return cloudinary.v2.uploader.upload(baseImageUrl, options)
       .then((result) => {
         expect(result).to.have.key("created_at");
@@ -201,7 +213,7 @@ describe("uploader", function () {
     it('should include tags in rename response if requested explicitly', async () => {
       const uploadResult = await cloudinary.v2.uploader.upload(IMAGE_FILE, { context: 'alt=Example|class=Example', tags: ['test-tag'] });
 
-      const renameResult = await cloudinary.v2.uploader.rename(uploadResult.public_id, `${uploadResult.public_id}-renamed`, {tags: true, context: true});
+      const renameResult = await cloudinary.v2.uploader.rename(uploadResult.public_id, `${uploadResult.public_id}-renamed`, { tags: true, context: true });
 
       expect(renameResult).to.have.property('tags');
       expect(renameResult).to.have.property('context');
@@ -941,7 +953,7 @@ describe("uploader", function () {
   it("should reject with promise rejection if disable_promises: false", function (done) {
     const spy = sinon.spy();
 
-    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: false }, () => {});
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: false }, () => { });
 
     function unhandledRejection() {
       spy();
@@ -959,7 +971,7 @@ describe("uploader", function () {
   it("should reject with promise rejection by default", function (done) {
     const spy = sinon.spy();
 
-    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, () => {});
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, () => { });
 
     function unhandledRejection() {
       spy();
@@ -977,7 +989,7 @@ describe("uploader", function () {
   it("should reject without promise rejection if disable_promises: true", function (done) {
     const spy = sinon.spy();
 
-    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: true }, () => {});
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: true }, () => { });
 
     function unhandledRejection() {
       spy();
@@ -1035,7 +1047,7 @@ describe("uploader", function () {
     this.timeout(TIMEOUT.LONG);
     expect(cloudinary.v2.uploader.upload_stream).withArgs({
       agent: new http.Agent()
-    }, function (error, result) {}).to.throwError();
+    }, function (error, result) { }).to.throwError();
   });
   it("should successfully override https agent", function () {
     var file_reader, upload;
@@ -1285,7 +1297,7 @@ describe("uploader", function () {
         this.skip();
       }
       // Upload an image and request ocr details in the response
-      const result = await UPLOADER_V2.upload(IMAGE_FILE, {ocr: ocrType, tags: [TEST_TAG]});
+      const result = await UPLOADER_V2.upload(IMAGE_FILE, { ocr: ocrType, tags: [TEST_TAG] });
 
       // Ensure result includes properly structured ocr details
       expect(result).not.to.be.empty();
@@ -1325,11 +1337,11 @@ describe("uploader", function () {
         external_id: METADATA_FIELD_UNIQUE_EXTERNAL_ID,
         label: METADATA_FIELD_UNIQUE_EXTERNAL_ID,
         type: "string"
-      }).finally(function () {});
+      }).finally(function () { });
     });
     after(function () {
       return cloudinary.v2.api.delete_metadata_field(METADATA_FIELD_UNIQUE_EXTERNAL_ID)
-        .finally(function () {});
+        .finally(function () { });
     });
     it("should be set when calling upload with metadata", function () {
       return uploadImage({
@@ -1501,8 +1513,8 @@ describe("uploader", function () {
     before(async function () {
       // Upload images to be used by sprite and multi
       const uploads = await Promise.all([
-        uploadImage({tags: [SPRITE_TEST_TAG, ...UPLOAD_TAGS]}),
-        uploadImage({tags: [SPRITE_TEST_TAG, ...UPLOAD_TAGS]})
+        uploadImage({ tags: [SPRITE_TEST_TAG, ...UPLOAD_TAGS] }),
+        uploadImage({ tags: [SPRITE_TEST_TAG, ...UPLOAD_TAGS] })
       ]);
       uploaded_url_1 = uploads[0].url;
       uploaded_url_2 = uploads[1].url;
@@ -1515,23 +1527,23 @@ describe("uploader", function () {
     });
     it("should generate a sprite by tag with raw transformation", async function () {
       const result = await UPLOADER_V2.generate_sprite(SPRITE_TEST_TAG, {
-        transformation: {raw_transformation: 'w_100'}
+        transformation: { raw_transformation: 'w_100' }
       });
       expect(result).to.beASprite();
       expect(result.css_url).to.contain('w_100');
     });
     it("should generate a sprite by tag with transformation params", async function () {
-      const result = await UPLOADER_V2.generate_sprite(SPRITE_TEST_TAG, {width: 100, format: 'jpg'});
+      const result = await UPLOADER_V2.generate_sprite(SPRITE_TEST_TAG, { width: 100, format: 'jpg' });
       expect(result).to.beASprite('jpg');
       expect(result.css_url).to.contain('f_jpg,w_100');
     });
     it("should generate a sprite by URLs array", async function () {
-      const result = await UPLOADER_V2.generate_sprite({'urls': [uploaded_url_1, uploaded_url_2]});
+      const result = await UPLOADER_V2.generate_sprite({ 'urls': [uploaded_url_1, uploaded_url_2] });
       expect(result).to.beASprite();
       expect(Object.entries(result.image_infos).length).to.eql(2);
     });
     it("should generate an url to download a sprite by URLs array", function () {
-      const url = UPLOADER_V2.download_generated_sprite({'urls': [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2]});
+      const url = UPLOADER_V2.download_generated_sprite({ 'urls': [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2] });
       expect(url).to.beASignedDownloadUrl("image/sprite", { urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2] });
     });
     it("should generate an url to download a sprite by tag", async function () {
@@ -1547,34 +1559,34 @@ describe("uploader", function () {
     before(async function () {
       // Upload images to be used by sprite and multi
       const uploads = await Promise.all([
-        uploadImage({tags: [MULTI_TEST_TAG, ...UPLOAD_TAGS]}),
-        uploadImage({tags: [MULTI_TEST_TAG, ...UPLOAD_TAGS]})
+        uploadImage({ tags: [MULTI_TEST_TAG, ...UPLOAD_TAGS] }),
+        uploadImage({ tags: [MULTI_TEST_TAG, ...UPLOAD_TAGS] })
       ]);
       uploaded_url_1 = uploads[0].url;
       uploaded_url_2 = uploads[1].url;
     });
 
     it("should create a pdf by tag", async function () {
-      const result = await UPLOADER_V2.multi(MULTI_TEST_TAG, {format: "pdf"});
+      const result = await UPLOADER_V2.multi(MULTI_TEST_TAG, { format: "pdf" });
       expect(result).to.beAMulti();
       expect(result.url).to.match(new RegExp(`\.pdf$`));
     });
     it("should create a gif with a transformation by tag", async function () {
       const options = { width: 0.5, crop: "crop" };
       const transformation = cloudinary.utils.generate_transformation_string(Object.assign({}, options));
-      const result = await UPLOADER_V2.multi(MULTI_TEST_TAG, {transformation: options });
+      const result = await UPLOADER_V2.multi(MULTI_TEST_TAG, { transformation: options });
       expect(result).to.beAMulti();
       expect(result.url).to.match(new RegExp(`/image/multi/${transformation}/.*\.gif$`));
     });
     it("should generate a gif with a transformation by URLs array", async function () {
       const options = { width: 0.5, crop: "crop" };
       const transformation = cloudinary.utils.generate_transformation_string(Object.assign({}, options));
-      const result = await UPLOADER_V2.multi({ urls: [uploaded_url_1, uploaded_url_2], transformation: options});
+      const result = await UPLOADER_V2.multi({ urls: [uploaded_url_1, uploaded_url_2], transformation: options });
       expect(result).to.beAMulti();
       expect(result.url).to.match(new RegExp(`/image/multi/${transformation}/.*\.gif$`));
     });
     it("should generate a download URL for a gif by URLs array", function () {
-      const url = UPLOADER_V2.download_multi({ urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2]});
+      const url = UPLOADER_V2.download_multi({ urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2] });
       expect(url).to.beASignedDownloadUrl("image/multi", { urls: [SAMPLE_IMAGE_URL_1, SAMPLE_IMAGE_URL_2] });
     });
     it("should generate a download URL for a gif by tag", function () {
@@ -1586,26 +1598,49 @@ describe("uploader", function () {
     const mocked = helper.mockTest();
     const proxy = "https://myuser:mypass@example.com"
     it("should support proxy for upload calls", function () {
-      cloudinary.config({api_proxy: proxy});
-      UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG]});
+      cloudinary.config({ api_proxy: proxy });
+      UPLOADER_V2.upload(IMAGE_FILE, { "tags": [TEST_TAG] });
       sinon.assert.calledWith(mocked.request, sinon.match(
         arg => arg.agent instanceof https.Agent
       ));
     });
     it("should prioritize custom agent", function () {
-      cloudinary.config({api_proxy: proxy});
+      cloudinary.config({ api_proxy: proxy });
       const custom_agent = https.Agent()
-      UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG], agent: custom_agent});
+      UPLOADER_V2.upload(IMAGE_FILE, { "tags": [TEST_TAG], agent: custom_agent });
       sinon.assert.calledWith(mocked.request, sinon.match(
         arg => arg.agent === custom_agent
       ));
     });
     it("should support api_proxy as options key", function () {
       cloudinary.config({});
-      UPLOADER_V2.upload(IMAGE_FILE, {"tags": [TEST_TAG], api_proxy: proxy});
+      UPLOADER_V2.upload(IMAGE_FILE, { "tags": [TEST_TAG], api_proxy: proxy });
       sinon.assert.calledWith(mocked.request, sinon.match(
         arg => arg.agent instanceof https.Agent
       ));
     });
   })
+  describe("signature_version parameter support", function () {
+    it("should use signature_version from config when not specified", function () {
+      const original_signature_version = cloudinary.config().signature_version;
+      cloudinary.config({ signature_version: 1 });
+      let upload_result;
+      return uploadImage()
+        .then(function (result) {
+          upload_result = result;
+          const public_id = result.public_id;
+          const version = result.version;
+          const expected_signature_v1 = cloudinary.utils.api_sign_request(
+            { public_id: public_id, version: version },
+            cloudinary.config().api_secret,
+            null,
+            1
+          );
+          expect(result.signature).to.eql(expected_signature_v1);
+        })
+        .finally(function () {
+          cloudinary.config({ signature_version: original_signature_version });
+        });
+    });
+  });
 });

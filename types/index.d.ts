@@ -710,7 +710,9 @@ declare module 'cloudinary' {
         mandatory?: boolean;
         default_value?: number;
         validation?: object; //there are 4 types, we need to discuss documentation team about it before implementing.
-        datasource?: DatasourceEntry;
+        datasource?: {
+            values: Array<DatasourceEntry>
+        };
         default_disabled?: boolean;
 
         [futureKey: string]: any;
@@ -1391,17 +1393,17 @@ declare module 'cloudinary' {
 
             function upload(file: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_chunked(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_chunked(path: string, callback?: UploadResponseCallback): UploadStream;
 
             function upload_chunked_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
             function upload_large_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
-            function upload_large(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_large(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse> | UploadStream;
 
-            function upload_large(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload_large(path: string, callback?: UploadResponseCallback): Promise<UploadApiResponse> | UploadStream;
 
             function upload_stream(options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 

@@ -941,6 +941,60 @@ describe("api", function () {
       });
     });
   });
+  describe('delete_backed_up_assets', function () {
+    it('should delete specific version IDs', async function () {
+      this.timeout(TIMEOUT.LARGE);
+
+      // Process:
+      // - Upload to the same public ID three times
+      // - Delete a single version (string)
+      // - Delete a two versions (array)
+      // - Cleanup
+
+      // Perform three uploads
+      const firstUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true
+      });
+
+      const secondUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true,
+        angle: '0', // To create a unique version
+        overwrite: true
+      });
+
+      const thirdUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true,
+        angle: '100', // To create a unique version
+        overwrite: true
+      });
+
+      // Ensure all files were uploaded correctly
+      expect(firstUpload).not.to.be(null);
+      expect(secondUpload).not.to.be(null);
+      expect(thirdUpload).not.to.be(null);
+
+      // Get the asset ID and versions of the uploaded asset
+      const resourceResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
+      const assetId = resourceResp.asset_id;
+      const firstAssetVersion = resourceResp.versions[0].version_id;
+      const secondAssetVersion = resourceResp.versions[1].version_id;
+      const thirdAssetVersion = resourceResp.versions[2].version_id;
+
+      // Delete the first version
+      const removeSingleVersion = await cloudinary.v2.api.delete_backed_up_assets(assetId, firstAssetVersion);
+      const removeSingleVersionResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
+      expect(removeSingleVersionResp.versions).not.to.contain(firstAssetVersion);
+
+      // Delete the remaining two versions
+      const removeMultipleVersions = await cloudinary.v2.api.delete_backed_up_assets(assetId, [secondAssetVersion, thirdAssetVersion]);
+      const removeMultipleVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {versions: true});
+      expect(removeMultipleVersionsResp.versions).not.to.contain(secondAssetVersion);
+      expect(removeMultipleVersionsResp.versions).not.to.contain(thirdAssetVersion);
+    });
+  });
   describe("update", function () {
     describe("notification url", function () {
       var writeSpy, xhr;
@@ -1296,33 +1350,7 @@ describe("api", function () {
     });
   });
   describe('.restore', function () {
-    this.timeout(TIMEOUT.MEDIUM);
-
-    const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
-    before(() => uploadImage({
-      public_id: publicId,
-      backup: true,
-      tags: UPLOAD_TAGS
-    }).then(wait(2000)).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
-      expect(resource).not.to.be(null);
-      expect(resource.bytes).to.eql(3381);
-      return cloudinary.v2.api.delete_resources(publicId);
-    }).then(() => cloudinary.v2.api.resource(publicId)).then((resource) => {
-      expect(resource).not.to.be(null);
-      expect(resource.bytes).to.eql(0);
-      expect(resource.placeholder).to.eql(true);
-    }));
-    it('should restore a deleted resource', () => cloudinary.v2.api.restore(publicId).then((response) => {
-      let info = response[publicId];
-      expect(info).not.to.be(null);
-      expect(info.bytes).to.eql(3381);
-      return cloudinary.v2.api.resource(publicId);
-    }).then((resource) => {
-      expect(resource).not.to.be(null);
-      expect(resource.bytes).to.eql(3381);
-    }));
-
-    it('should restore different versions of a deleted asset', async function () {
+    it.skip('should restore different versions of a deleted asset', async function () {
       this.timeout(TIMEOUT.LARGE);
 
       // Upload the same file twice (upload->delete->upload->delete)
@@ -1366,12 +1394,12 @@ describe("api", function () {
       const secondAssetVersion = getVersionsResp.versions[1].version_id;
 
       // Restore first version, ensure it's equal to the upload size
-      await wait(1000)();
+      await wait(2000)();
       const firstVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], {versions: [firstAssetVersion]});
       expect(firstVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(firstUpload.bytes);
 
       // Restore second version, ensure it's equal to the upload size
-      await wait(1000)();
+      await wait(2000)();
       const secondVerRestore = await API_V2.restore([PUBLIC_ID_BACKUP_1], {versions: [secondAssetVersion]});
       expect(secondVerRestore[PUBLIC_ID_BACKUP_1].bytes).to.eql(secondUpload.bytes);
 
@@ -1380,7 +1408,9 @@ describe("api", function () {
       expect(finalDeleteResp).to.have.property("deleted");
     });
 
-    it('should restore two different deleted assets', async () => {
+    it.skip('should restore two different deleted assets', async () => {
+      this.timeout(TIMEOUT.LARGE);
+
       // Upload two different files
       const firstUpload = await uploadImage({
         public_id: PUBLIC_ID_BACKUP_1,

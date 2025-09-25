@@ -1,3 +1,29 @@
+2.7.0 / 2025-06-18
+==================
+
+* fix: prevent parameter injection via ampersand in parameter values (#709)
+
+2.6.1 / 2025-05-05
+==================
+
+
+
+2.6.1-rc.1 / 2025-05-05
+==================
+
+* fix: uploader interface
+
+2.6.0 / 2025-03-11
+==================
+
+  * chore: bumped jsdoc
+  * fix: defaults for related asset methods and proper content_type
+  * chore: Updated Sample Projects (#698)
+  * fix: metadata field datasource type (#693)
+  * feat: Add support for DELETE /resources/backup/:asset_id (#700)
+  * chore: dev dependencies cleanup
+  * chore: new node version support in CI
+
 2.5.1 / 2024-10-08
 ==================
 

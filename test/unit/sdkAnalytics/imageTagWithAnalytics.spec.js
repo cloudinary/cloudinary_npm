@@ -1,5 +1,4 @@
 const path = require('path');
-const mock = require('mock-fs');
 const assert = require("assert");
 const sinon = require("sinon");
 const fs = require('fs');
@@ -11,35 +10,21 @@ const TEST_CLOUD_NAME = require('../../testUtils/testConstants').TEST_CLOUD_NAME
 describe('SDK url analytics', () => {
   let processVersions = {};
 
-  before(() => {
+  beforeEach(() => {
     cloudinary.config(true); // reset
-
-    processVersions = process.versions;
-    delete process.versions;
-  });
-
-  after(() => {
-    process.versions = processVersions;
+    cloudinary.config({
+      techVersion: '12.0.0'
+    });
   });
 
   describe('when package json is available', () => {
-    before(() => {
-      const file = path.join(__dirname, '../../../package.json');
-
-      mock({
-        [file]: '{"version":"1.24.0"}'
+    beforeEach(() => {
+      cloudinary.config({
+        sdkSemver: '1.24.0'
       });
     });
 
-    after(() => {
-      mock.restore();
-    });
-
     it('can be turned off via options', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
-
       const imgStr = cloudinary.image("hello", {
         format: "png",
         analytics: false
@@ -49,10 +34,6 @@ describe('SDK url analytics', () => {
     });
 
     it('defaults to true even if analytics is not passed as an option', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
-
       const imgStr = cloudinary.image("hello", {
         format: "png"
       });
@@ -61,10 +42,6 @@ describe('SDK url analytics', () => {
     });
 
     it('reads from process.versions and package.json (Mocked)', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
-
       const imgStr = cloudinary.image("hello", {
         format: "png",
         analytics: true
@@ -74,12 +51,8 @@ describe('SDK url analytics', () => {
     });
 
     it('reads from process.versions and package.json (Mocked) - Responsive', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
-
       const imgStr = cloudinary.image("hello", {
-        format: "png",
+        format: 'png',
         responsive: true,
         analytics: true
       });
@@ -88,9 +61,7 @@ describe('SDK url analytics', () => {
     });
 
     it('reads from tracked analytics configuration', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
+      cloudinary.config(true); // reset
 
       const imgStr = cloudinary.image("hello", {
         format: "png",
@@ -105,10 +76,6 @@ describe('SDK url analytics', () => {
     });
 
     it('should still accept analytics param passed as camel case', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
-
       const imgStr = cloudinary.image("hello", {
         format: "png",
         urlAnalytics: true,
@@ -123,10 +90,6 @@ describe('SDK url analytics', () => {
 
     describe('with two different casings', () => {
       it('should treat camel case analytics param as more important than snake case', () => {
-        process.versions = {
-          node: '12.0.0'
-        };
-
         const imgStr1 = cloudinary.image("hello", {
           format: "png",
           urlAnalytics: true,
@@ -157,6 +120,8 @@ describe('SDK url analytics', () => {
       const enoent = new Error('ENOENT');
       enoent.code = 'ENOENT';
       sinon.stub(fs, 'readFileSync').throws(enoent);
+
+      cloudinary.config(true); // reset
     });
 
     after(() => {
@@ -164,10 +129,6 @@ describe('SDK url analytics', () => {
     });
 
     it('uses 0.0.0 as fallback sdk semver', () => {
-      process.versions = {
-        node: '12.0.0'
-      };
-
       const urlWithToken = cloudinary.url("hello", {
         format: "png",
         analytics: true
