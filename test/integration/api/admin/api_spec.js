@@ -1,3 +1,4 @@
+/* eslint-disable no-tabs */
 const sinon = require('sinon');
 const formatDate = require("date-fns").format;
 const subDate = require("date-fns").sub;
@@ -1431,6 +1432,191 @@ describe("api", function () {
       expect(finalDelete.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
     });
   });
+
+  describe("restore_by_asset_ids", function () {
+    this.timeout(TIMEOUT.MEDIUM);
+
+    const publicId = "api_test_restore" + UNIQUE_JOB_SUFFIX_ID;
+    let uploadedAssetId;
+
+    before(() => uploadImage({
+      public_id: publicId,
+      backup: true,
+      tags: UPLOAD_TAGS
+    })
+      .then(wait(2000))
+      .then(() => cloudinary.v2.api.resource(publicId))
+      .then((resource) => {
+        uploadedAssetId = resource.asset_id;
+        expect(resource).not.to.be(null);
+        expect(resource.bytes).to.eql(3381);
+        return cloudinary.v2.api.delete_resources(publicId);
+      })
+      .then(() => cloudinary.v2.api.resource(publicId))
+      .then((resource) => {
+        expect(resource).not.to.be(null);
+        expect(resource.bytes).to.eql(0);
+        expect(resource.placeholder).to.eql(true);
+      })
+    );
+
+    it("should restore a deleted resource when passed an asset ID", () => cloudinary.v2.api
+      .restore_by_asset_ids([uploadedAssetId])
+      .then((response) => {
+        let info = response[uploadedAssetId];
+        expect(info).not.to.be(null);
+        expect(info.bytes).to.eql(3381);
+        return cloudinary.v2.api.resources_by_asset_ids([uploadedAssetId]);
+      })
+      .then((response) => {
+        const { resources } = response;
+        expect(resources[0]).not.to.be(null);
+        expect(resources[0].bytes).to.eql(3381);
+      }));
+
+    it.skip("should restore different versions of a deleted asset when passed an asset ID", async function () {
+      this.timeout(TIMEOUT.LARGE);
+
+      // Upload the same file twice (upload->delete->upload->delete)
+
+      // Upload and delete a file
+      const firstUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true
+      });
+      await wait(1000)();
+
+      const firstDelete = await API_V2.delete_resources([
+        PUBLIC_ID_BACKUP_1
+      ]);
+
+      // Upload and delete it again, this time add angle to create a different 'version'
+      const secondUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true,
+        angle: "0"
+      });
+      await wait(1000)();
+
+      const secondDelete = await API_V2.delete_resources([
+        PUBLIC_ID_BACKUP_1
+      ]);
+      await wait(1000)();
+
+      // Sanity, ensure these uploads are different before we continue
+      expect(firstUpload.bytes).not.to.equal(secondUpload.bytes);
+
+      // Ensure all files were uploaded correctly
+      expect(firstUpload).not.to.be(null);
+      expect(secondUpload).not.to.be(null);
+
+      // Ensure all files were deleted correctly
+      expect(firstDelete).to.have.property("deleted");
+      expect(secondDelete).to.have.property("deleted");
+
+      // Get the asset ID and versions of the deleted asset
+      const getVersionsResp = await API_V2.resource(PUBLIC_ID_BACKUP_1, {
+        versions: true
+      });
+      const assetId = getVersionsResp.asset_id;
+
+      const firstAssetVersion = getVersionsResp.versions[0].version_id;
+      const secondAssetVersion = getVersionsResp.versions[1].version_id;
+
+      // Restore first version by passing in the asset ID, ensure it's equal to the upload size
+      await wait(1000)();
+      const firstVerRestore = await API_V2.restore_by_asset_ids([assetId], {
+        versions: [firstAssetVersion]
+      });
+
+      expect(firstVerRestore[assetId].bytes).to.eql(
+        firstUpload.bytes
+      );
+
+      // Restore second version by passing in the asset ID, ensure it's equal to the upload size
+      await wait(1000)();
+      const secondVerRestore = await API_V2.restore_by_asset_ids(
+        [assetId],
+        { versions: [secondAssetVersion] }
+      );
+      expect(secondVerRestore[assetId].bytes).to.eql(
+        secondUpload.bytes
+      );
+
+      // Cleanup,
+      const finalDeleteResp = await API_V2.delete_resources([
+        PUBLIC_ID_BACKUP_1
+      ]);
+      expect(finalDeleteResp).to.have.property("deleted");
+    });
+
+    it("should restore two different deleted assets when passed asset IDs", async () => {
+      // Upload two different files
+      const firstUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_1,
+        backup: true
+      });
+      const secondUpload = await uploadImage({
+        public_id: PUBLIC_ID_BACKUP_2,
+        backup: true,
+        angle: "0"
+      });
+
+      // delete both resources
+      const deleteAll = await API_V2.delete_resources([
+        PUBLIC_ID_BACKUP_1,
+        PUBLIC_ID_BACKUP_2
+      ]);
+
+      // Expect correct deletion of the assets
+      expect(deleteAll.deleted[PUBLIC_ID_BACKUP_1]).to.be("deleted");
+      expect(deleteAll.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
+
+      const getFirstAssetVersion = await API_V2.resource(
+        PUBLIC_ID_BACKUP_1,
+        { versions: true }
+      );
+
+      const getSecondAssetVersion = await API_V2.resource(
+        PUBLIC_ID_BACKUP_2,
+        { versions: true }
+      );
+
+      const firstAssetId = getFirstAssetVersion.asset_id;
+      const secondAssetId = getSecondAssetVersion.asset_id;
+
+      const firstAssetVersion =
+				getFirstAssetVersion.versions[0].version_id;
+      const secondAssetVersion =
+				getSecondAssetVersion.versions[0].version_id;
+
+      const IDS_TO_RESTORE = [firstAssetId, secondAssetId];
+      const VERSIONS_TO_RESTORE = [firstAssetVersion, secondAssetVersion];
+
+      const restore = await API_V2.restore_by_asset_ids(IDS_TO_RESTORE, {
+        versions: VERSIONS_TO_RESTORE
+      });
+
+      // Expect correct restorations
+      expect(restore[firstAssetId].bytes).to.equal(
+        firstUpload.bytes
+      );
+      expect(restore[secondAssetId].bytes).to.equal(
+        secondUpload.bytes
+      );
+
+      // Cleanup
+      const finalDelete = await API_V2.delete_resources([
+        PUBLIC_ID_BACKUP_1,
+        PUBLIC_ID_BACKUP_2
+      ]);
+      // Expect correct deletion of the assets
+      expect(finalDelete.deleted[PUBLIC_ID_BACKUP_1]).to.be("deleted");
+      expect(finalDelete.deleted[PUBLIC_ID_BACKUP_2]).to.be("deleted");
+    });
+  });
+
+
   describe('mapping', function () {
     before(function () {
       this.mapping = `api_test_upload_mapping${Math.floor(Math.random() * 100000)}`;
