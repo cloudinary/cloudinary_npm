@@ -1011,6 +1011,10 @@ declare module 'cloudinary' {
 
             function delete_resources(value: string[], options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
 
+             function delete_resources_by_asset_ids(asset_ids: string[], callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
+            function delete_resources_by_asset_ids(asset_ids: string[], options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<ResourceApiResponse>;
+
             function delete_resources_by_prefix(prefix: string, options?: AdminAndResourceOptions, callback?: ResponseCallback): Promise<any>;
 
             function delete_resources_by_prefix(prefix: string, callback?: ResponseCallback): Promise<any>;
