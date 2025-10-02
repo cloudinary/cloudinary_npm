@@ -428,6 +428,7 @@ declare module 'cloudinary' {
         tags?: string | string[];
         target_format?: TargetArchiveFormat;
         target_public_id?: string;
+        target_asset_folder?: string;
         target_tags?: string[];
         timestamp?: number;
         transformations?: TransformationOptions;

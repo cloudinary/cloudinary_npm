@@ -37,7 +37,7 @@ const PUBLIC_ID2 = ARCHIVE_TAG + "_2";
 const PUBLIC_ID_RAW = ARCHIVE_TAG + "_3";
 const FULLY_QUALIFIED_IMAGE = "image/upload/sample";
 const FULLY_QUALIFIED_VIDEO = "video/upload/dog";
-
+const TARGET_ASSET_FOLDER = 'test-folder';
 
 describe("archive", function () {
   this.timeout(TIMEOUT.LONG);
@@ -155,12 +155,14 @@ describe("archive", function () {
             tags: TEST_TAG,
             public_ids: [PUBLIC_ID_RAW, "non-existing-resource"],
             resource_type: "raw",
-            allow_missing: true
+            allow_missing: true,
+            target_asset_folder: TARGET_ASSET_FOLDER
           });
           sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("tags[]", TEST_TAG)));
           sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", PUBLIC_ID_RAW)));
           sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("public_ids[]", "non-existing-resource")));
           sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("allow_missing", 1)));
+          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("target_asset_folder", TARGET_ASSET_FOLDER)));
           sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("target_format", "zip")));
         });
       });
