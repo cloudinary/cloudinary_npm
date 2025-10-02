@@ -2,7 +2,6 @@ const https = require('https');
 const last = require('lodash/last');
 const sinon = require("sinon");
 const execSync = require('child_process').execSync;
-const Q = require('q');
 const fs = require('fs');
 const os = require('os');
 const describe = require('../../../testUtils/suite');
@@ -43,7 +42,7 @@ describe("archive", function () {
   this.timeout(TIMEOUT.LONG);
 
   before(function () {
-    return Q.all([
+    return Promise.all([
       uploader.upload(IMAGE_URL,
         {
           public_id: PUBLIC_ID1,

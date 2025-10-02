@@ -4,7 +4,6 @@ const formatDate = require("date-fns").format;
 const subDate = require("date-fns").sub;
 const https = require('https');
 const ClientRequest = require('_http_client').ClientRequest;
-const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
@@ -103,7 +102,7 @@ describe("api", function () {
       default_value: METADATA_DEFAULT_VALUE
     });
 
-    await Q.all([
+    await Promise.all([
       uploadImage({
         public_id: PUBLIC_ID,
         tags: UPLOAD_TAGS,
@@ -139,7 +138,7 @@ describe("api", function () {
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
-    return Q.allSettled([
+    return Promise.allSettled([
       cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID),
       cloudinary.v2.api.delete_resources_by_tag(TEST_TAG),
       cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1),
@@ -353,7 +352,7 @@ describe("api", function () {
     });
     it("should allow listing resources specifying direction", function () {
       this.timeout(TIMEOUT.LONG);
-      Q.all(
+      Promise.all(
         cloudinary.v2.api.resources_by_tag(TEST_TAG, {
           type: "upload",
           max_results: 500,
@@ -533,7 +532,7 @@ describe("api", function () {
     });
     it("should allow deleting derived resources by transformations", function () {
       this.timeout(TIMEOUT.LARGE);
-      return Q.all([
+      return Promise.all([
         uploadImage({
           public_id: PUBLIC_ID_1,
           tags: UPLOAD_TAGS,
@@ -692,7 +691,7 @@ describe("api", function () {
     callReusableTest("a list with a cursor", cloudinary.v2.api.transformations);
     transformationName = "api_test_transformation3" + UNIQUE_JOB_SUFFIX_ID;
     after(function () {
-      return Q.allSettled(
+      return Promise.allSettled(
         [
           cloudinary.v2.api.delete_transformation(transformationName),
           cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION),
@@ -1185,7 +1184,7 @@ describe("api", function () {
     // Replace `it` with  `it.skip` below if you want to disable it.
     it("should list folders in cloudinary", function () {
       this.timeout(TIMEOUT.LONG);
-      return Q.all([
+      return Promise.all([
         uploadImage({
           public_id: 'test_folder1/item',
           tags: UPLOAD_TAGS
@@ -1208,7 +1207,7 @@ describe("api", function () {
         })
       ]).then(wait(TIMEOUT.SHORT))
         .then(function (results) {
-          return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
+          return Promise.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
         }).then(function (results) {
           var folder, root, root_folders, sub_1;
           root = results[0];
