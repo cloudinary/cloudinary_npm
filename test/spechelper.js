@@ -2,7 +2,6 @@ const isFunction = require('lodash/isFunction');
 const querystring = require('querystring');
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
-const Q = require('q');
 const http = require('http');
 const https = require('https');
 // Load all our custom assertions
@@ -236,7 +235,7 @@ A test block
 exports.provideMockObjects = function (providedFunction) {
   let requestSpy, writeSpy, mockXHR;
 
-  return Q.Promise(function (resolve, reject, notify) {
+  return new Promise(function (resolve, reject) {
     var result;
 
     mockXHR = sinon.useFakeXMLHttpRequest();
