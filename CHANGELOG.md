@@ -1,3 +1,10 @@
+2.8.0 / 2025-10-20
+==================
+
+  * support target_asset_folder for generate archive (#717)
+  * feat: allow deleting resources by asset_ids (#701)
+  * feat: Add support for restoring asset(s) by asset id (#707)
+
 2.7.0 / 2025-06-18
 ==================
 
