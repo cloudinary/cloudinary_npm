@@ -2,7 +2,6 @@ const https = require('https');
 const http = require('http');
 const sinon = require('sinon');
 const fs = require('fs');
-const Q = require('q');
 const path = require('path');
 const at = require('lodash/at');
 const uniq = require('lodash/uniq');
@@ -32,6 +31,8 @@ const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const testConstants = require('../../../testUtils/testConstants');
 const { shouldTestFeature, DYNAMIC_FOLDERS } = require("../../../spechelper");
+const { NOP } = require('../../../../lib/utils');
+const allSettled = require('../../../testUtils/helpers/allSettled');
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
 const {
@@ -58,7 +59,7 @@ describe("uploader", function () {
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
-    return Q.allSettled([
+    return allSettled([
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG) : void 0,
       !cloudinary.config().keep_test_products ? cloudinary.v2.api.delete_resources_by_tag(TEST_TAG,
         {
@@ -84,8 +85,8 @@ describe("uploader", function () {
     });
   });
   it("should successfully upload with metadata", function () {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      uploadImage({ metadata: METADATA_SAMPLE_DATA });
+    return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+      await uploadImage({ metadata: METADATA_SAMPLE_DATA }).catch(NOP);
       sinon.assert.calledWith(requestSpy, sinon.match({
         method: sinon.match("POST")
       }));
@@ -93,18 +94,15 @@ describe("uploader", function () {
     });
   });
   it('should upload a file with correctly encoded transformation string', () => {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      const uploadResult = cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } });
+    return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+      await cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } }).catch(NOP);
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test %2F 火')));
     });
   });
   it('should upload a file with correctly encoded transformation string incl 4bytes characters', () => {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test 𩸽 🍺' } } })
-        .then((uploadResult) => {
-          sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test 𩸽 🍺')));
-          expect(uploadResult).to.have.key("created_at");
-        });
+    return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+      await cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test 𩸽 🍺' } } }).catch(NOP);
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test 𩸽 🍺')));
     });
   });
   it("should successfully upload url", function () {
@@ -160,23 +158,23 @@ describe("uploader", function () {
   });
   describe("remote urls ", function () {
     const mocked = helper.mockTest();
-    it("should send s3:// URLs to server", function () {
-      cloudinary.v2.uploader.upload("s3://test/1.jpg", {
+    it("should send s3:// URLs to server", async function () {
+      await cloudinary.v2.uploader.upload("s3://test/1.jpg", {
         tags: UPLOAD_TAGS
-      });
+      }).catch(NOP);
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "s3://test/1.jpg")));
     });
-    it("should send gs:// URLs to server", function () {
-      cloudinary.v2.uploader.upload("gs://test/1.jpg", {
+    it("should send gs:// URLs to server", async function () {
+      await cloudinary.v2.uploader.upload("gs://test/1.jpg", {
         tags: UPLOAD_TAGS
-      });
+      }).catch(NOP);
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "gs://test/1.jpg")));
     });
-    it("should send ftp:// URLs to server", function () {
-      cloudinary.v2.uploader.upload("ftp://example.com/1.jpg", {
+    it("should send ftp:// URLs to server", async function () {
+      await cloudinary.v2.uploader.upload("ftp://test/1.jpg", {
         tags: UPLOAD_TAGS
-      });
-      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "ftp://example.com/1.jpg")));
+      }).catch(NOP);
+      sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "ftp://test/1.jpg")));
     });
   });
   describe("rename", function () {
@@ -219,8 +217,8 @@ describe("uploader", function () {
       expect(renameResult).to.have.property('context');
     });
     it('should include notification_url in rename response if included in the request', async () => {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        const renameResult = cloudinary.v2.uploader.rename('irrelevant', 'irrelevant', { notification_url: 'https://notification-url.com' });
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.uploader.rename('irrelevant', 'irrelevant', { notification_url: 'https://notification-url.com' }).catch(NOP);
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('notification_url', 'https://notification-url.com')));
       });
     });
@@ -236,10 +234,10 @@ describe("uploader", function () {
         spy.restore();
         return xhr.restore();
       });
-      it("should pass the invalidate value in rename to the server", function () {
-        cloudinary.v2.uploader.rename("first_id", "second_id", {
+      it("should pass the invalidate value in rename to the server", async function () {
+        await cloudinary.v2.uploader.rename("first_id", "second_id", {
           invalidate: true
-        });
+        }).catch(NOP);
         expect(spy.calledWith(sinon.match(function (arg) {
           return arg.toString().match(/name="invalidate"/);
         }))).to.be.ok();
@@ -263,8 +261,8 @@ describe("uploader", function () {
       });
     });
     it('should pass notification_url', async () => {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        const renameResult = cloudinary.v2.uploader.destroy('irrelevant', { notification_url: 'https://notification-url.com' });
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.uploader.destroy('irrelevant', { notification_url: 'https://notification-url.com' }).catch(NOP);
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('notification_url', 'https://notification-url.com')));
       });
     });
@@ -320,12 +318,12 @@ describe("uploader", function () {
   });
   describe("extra headers", function () {
     it("should support extra headers in object format e.g. {Link: \"1\"}", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.uploader.upload(IMAGE_FILE, {
           extra_headers: {
             Link: "1"
           }
-        });
+        }).catch(NOP);
         assert.ok(requestSpy.args[0][0].headers.Link);
         assert.equal(requestSpy.args[0][0].headers.Link, "1");
       });
@@ -437,11 +435,10 @@ describe("uploader", function () {
   });
   describe("context", function () {
     this.timeout(TIMEOUT.MEDIUM);
-    before(function () {
-      return Q.all([uploadImage(), uploadImage()]).spread((result1, result2) => {
-        this.first_id = result1.public_id;
-        this.second_id = result2.public_id;
-      });
+    before(async function () {
+      const [result1, result2] = await Promise.all([uploadImage(), uploadImage()]);
+      this.first_id = result1.public_id;
+      this.second_id = result2.public_id;
     });
     it("should add context to existing resources", function () {
       return cloudinary.v2.uploader
@@ -704,10 +701,10 @@ describe("uploader", function () {
       return xhr.restore();
     });
 
-    it('should pass its value to the upload api', () => {
-      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+    it('should pass its value to the upload api', async () => {
+      await cloudinary.v2.uploader.upload(IMAGE_FILE, {
         on_success: 'current_asset.update({tags: ["autocaption"]});'
-      });
+      }).catch(NOP);
 
       expect(spy.calledWith(sinon.match((arg) => {
         return arg.toString().match(/on_success='current_asset.update({tags: ["autocaption"]});'/);
@@ -737,7 +734,8 @@ describe("uploader", function () {
       fs.stat(LARGE_RAW_FILE, function (err, stat) {
         cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
           chunk_size: 40000,
-          tags: UPLOAD_TAGS
+          tags: UPLOAD_TAGS,
+          disable_promises: true
         }, function (error, result) {
           expect(error.message).to.eql("All parts except EOF-chunk must be larger than 5mb");
           done();
@@ -798,42 +796,45 @@ describe("uploader", function () {
         });
       });
     });
-    it("should support uploading large video files", function () {
+    it("should support uploading large video files", function (done) {
       var stat, writeSpy;
       this.timeout(TIMEOUT.LONG * 10);
       writeSpy = sinon.spy(ClientRequest.prototype, 'write');
       stat = fs.statSync(LARGE_VIDEO);
       expect(stat).to.be.ok();
-      return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
+      cloudinary.v2.uploader.upload_chunked(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
         timeout: TIMEOUT.LONG * 10,
         tags: UPLOAD_TAGS
-      }).then(function (result) {
+      }, function (err, result) {
         var timestamps;
-        expect(result.bytes).to.eql(stat.size);
-        expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571");
-        timestamps = writeSpy.args.map(function (a) {
-          return a[0].toString();
-        }).filter(function (p) {
-          return p.match(/timestamp/);
-        }).map(function (p) {
-          return p.match(/"timestamp"\s+(\d+)/)[1];
-        });
-        expect(timestamps.length).to.be.greaterThan(1);
-        expect(uniq(timestamps)).to.eql(uniq(timestamps)); // uniq b/c last timestamp may be duplicated
-      }).finally(function () {
-        writeSpy.restore();
+        try {
+          expect(result.bytes).to.eql(stat.size);
+          expect(result.etag).to.eql("ff6c391d26be0837ee5229885b5bd571");
+          timestamps = writeSpy.args.map(function (a) {
+            return a[0].toString();
+          }).filter(function (p) {
+            return p.match(/timestamp/);
+          }).map(function (p) {
+            return p.match(/"timestamp"\s+(\d+)/)[1];
+          });
+          expect(timestamps.length).to.be.greaterThan(1);
+          expect(uniq(timestamps)).to.eql(uniq(timestamps)); // uniq b/c last timestamp may be duplicated
+        } finally {
+          writeSpy.restore();
+          done();
+        }
       });
     });
-    it("should update timestamp for each chunk", function () {
+    it("should update timestamp for each chunk", function (done) {
       var writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-      return Q.denodeify(cloudinary.v2.uploader.upload_chunked)(LARGE_VIDEO, {
+      cloudinary.v2.uploader.upload_chunked(LARGE_VIDEO, {
         chunk_size: 6000000,
         resource_type: 'video',
         timeout: TIMEOUT.LONG * 10,
         tags: UPLOAD_TAGS
-      }).then(function () {
+      }, function () {
         var timestamps = writeSpy.args.map(function (a) {
           return a[0].toString();
         }).filter(function (p) {
@@ -841,10 +842,13 @@ describe("uploader", function () {
         }).map(function (p) {
           return p.match(/"timestamp"\s+(\d+)/)[1];
         });
-        expect(timestamps.length).to.be.greaterThan(1);
-        expect(uniq(timestamps)).to.eql(uniq(timestamps));
-      }).finally(function () {
-        writeSpy.restore();
+        try {
+          expect(timestamps.length).to.be.greaterThan(1);
+          expect(uniq(timestamps)).to.eql(uniq(timestamps));
+        } finally {
+          writeSpy.restore();
+          done();
+        }
       });
     });
     it("should support uploading based on a url", function (done) {
@@ -862,19 +866,19 @@ describe("uploader", function () {
   });
   describe("dynamic folders", () => {
     const mocked = helper.mockTest();
-    it('should pass dynamic folder params', () => {
+    it('should pass dynamic folder params', async () => {
       const public_id_prefix = "fd_public_id_prefix";
       const asset_folder = "asset_folder";
       const display_name = "display_name";
       const use_filename_as_display_name = true;
       const folder = "folder/test";
-      UPLOADER_V2.upload(IMAGE_FILE, {
+      await UPLOADER_V2.upload(IMAGE_FILE, {
         public_id_prefix,
         asset_folder,
         display_name,
         use_filename_as_display_name,
         folder
-      });
+      }).catch(NOP);
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("public_id_prefix", public_id_prefix));
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("asset_folder", asset_folder));
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("display_name", display_name));
@@ -951,55 +955,46 @@ describe("uploader", function () {
   });
 
   it("should reject with promise rejection if disable_promises: false", function (done) {
-    const spy = sinon.spy();
+    const unhandledRejectionSpy = sinon.spy();
 
+    process.on('unhandledRejection', unhandledRejectionSpy);
+    
     cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: false }, () => { });
-
-    function unhandledRejection() {
-      spy();
-    }
-    process.on('unhandledRejection', unhandledRejection);
 
     // Promises are not disabled meaning we should throw unhandledRejection
     setTimeout(() => {
-      expect(sinon.assert.called(spy));
-      process.removeListener('unhandledRejection', unhandledRejection);
+      expect(sinon.assert.called(unhandledRejectionSpy));
+      process.removeListener('unhandledRejection', unhandledRejectionSpy);
       done();
     }, 2000);
   });
 
   it("should reject with promise rejection by default", function (done) {
-    const spy = sinon.spy();
+    const unhandledRejectionSpy = sinon.spy();
+
+    
+    process.on('unhandledRejection', unhandledRejectionSpy);
 
     cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, () => { });
 
-    function unhandledRejection() {
-      spy();
-    }
-    process.on('unhandledRejection', unhandledRejection);
-
     // Promises are not disabled meaning we should throw unhandledRejection
     setTimeout(() => {
-      expect(sinon.assert.called(spy));
-      process.removeListener('unhandledRejection', unhandledRejection);
+      expect(sinon.assert.called(unhandledRejectionSpy));
+      process.removeListener('unhandledRejection', unhandledRejectionSpy);
       done();
     }, 2000);
   });
 
   it("should reject without promise rejection if disable_promises: true", function (done) {
-    const spy = sinon.spy();
-
+    const unhandledRejectionSpy = sinon.spy();
+    
+    process.on('unhandledRejection', unhandledRejectionSpy);
     cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: true }, () => { });
-
-    function unhandledRejection() {
-      spy();
-    }
-    process.on('unhandledRejection', unhandledRejection);
 
     // Promises are  disabled meaning unhandledRejection was not called
     setTimeout(() => {
-      expect(sinon.assert.notCalled(spy));
-      process.removeListener('unhandledRejection', unhandledRejection);
+      expect(sinon.assert.notCalled(unhandledRejectionSpy));
+      process.removeListener('unhandledRejection', unhandledRejectionSpy);
       done();
     }, 2000);
   });
@@ -1125,8 +1120,8 @@ describe("uploader", function () {
   });
   describe("async upload", function () {
     var mocked = helper.mockTest();
-    it("should pass `async` value to the server", function () {
-      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+    it("should pass `async` value to the server", async function () {
+      await cloudinary.v2.uploader.upload(IMAGE_FILE, {
         async: true,
         transformation: {
           effect: "sepia"
@@ -1136,9 +1131,9 @@ describe("uploader", function () {
     });
   });
   it("should pass `accessibility_analysis` option to the server", function () {
-    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-      cloudinary.v2.uploader.upload(IMAGE_FILE, { accessibility_analysis: true });
-      return sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("accessibility_analysis", 1)));
+    return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+      await cloudinary.v2.uploader.upload(IMAGE_FILE, { accessibility_analysis: true });
+      sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher("accessibility_analysis", 1)));
     });
   });
   describe("explicit", function () {
@@ -1154,8 +1149,8 @@ describe("uploader", function () {
       xhr.restore();
     });
     describe(":invalidate", function () {
-      it("should pass the invalidate value to the server", function () {
-        cloudinary.v2.uploader.explicit("cloudinary", {
+      it("should pass the invalidate value to the server", async function () {
+        await cloudinary.v2.uploader.explicit("cloudinary", {
           type: "twitter_name",
           eager: [
             {
@@ -1166,24 +1161,24 @@ describe("uploader", function () {
           invalidate: true,
           quality_analysis: true,
           tags: [TEST_TAG]
-        });
+        }).catch(NOP);
         sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('invalidate', 1)));
         sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('quality_analysis', 1)));
       });
     });
-    it("should support metadata", function () {
-      cloudinary.v2.uploader.explicit("cloudinary", { metadata: METADATA_SAMPLE_DATA });
+    it("should support metadata", async function () {
+      await cloudinary.v2.uploader.explicit("cloudinary", { metadata: METADATA_SAMPLE_DATA }).catch(NOP);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
-    it("should support raw_convert", function () {
-      cloudinary.v2.uploader.explicit("cloudinary", {
+    it("should support raw_convert", async function () {
+      await cloudinary.v2.uploader.explicit("cloudinary", {
         raw_convert: "google_speech",
         tags: [TEST_TAG]
-      });
+      }).catch(NOP);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('raw_convert', 'google_speech')));
     });
-    it("should pass `accessibility_analysis` to server", function () {
-      cloudinary.v2.uploader.explicit("cloudinary", { accessibility_analysis: true });
+    it("should pass `accessibility_analysis` to server", async function () {
+      await cloudinary.v2.uploader.explicit("cloudinary", { accessibility_analysis: true }).catch(NOP);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('accessibility_analysis', 1)));
     });
   });
@@ -1211,18 +1206,18 @@ describe("uploader", function () {
     const mocked = helper.mockTest();
     const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
     function testValue(quality) {
-      return it("should pass '" + quality + "'", function () {
-        cloudinary.v2.uploader.upload(IMAGE_FILE, {
+      return it("should pass '" + quality + "'", async function () {
+        await cloudinary.v2.uploader.upload(IMAGE_FILE, {
           "quality_override": quality
-        });
+        }).catch(NOP);
         sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", quality));
       });
     }
     qualityValues.forEach(value => testValue(value));
-    it("should be supported by explicit api", function () {
-      cloudinary.v2.uploader.explicit("cloudinary", {
+    it("should be supported by explicit api", async function () {
+      await cloudinary.v2.uploader.explicit("cloudinary", {
         "quality_override": "auto:best"
-      });
+      }).catch(NOP);
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", "auto:best"));
     });
   });
@@ -1230,8 +1225,8 @@ describe("uploader", function () {
     it("should update metadata of existing resources", function () {
       const metadata_fields = { metadata_color: "red", metadata_shape: "" };
       const public_ids = ["test_id_1", "test_id_2"];
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids);
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids).catch(NOP);
         sinon.assert.calledWith(requestSpy, sinon.match({
           method: sinon.match("POST")
         }));
@@ -1243,8 +1238,8 @@ describe("uploader", function () {
     it("should support updating metadata with clear_invalid", function () {
       const metadata_fields = { metadata_color: "red" };
       const public_ids = ["test_id_1"];
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids, { clear_invalid: true });
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids, { clear_invalid: true }).catch(NOP);
         sinon.assert.calledWith(requestSpy, sinon.match({
           method: sinon.match("POST")
         }));
@@ -1337,11 +1332,10 @@ describe("uploader", function () {
         external_id: METADATA_FIELD_UNIQUE_EXTERNAL_ID,
         label: METADATA_FIELD_UNIQUE_EXTERNAL_ID,
         type: "string"
-      }).finally(function () { });
+      });
     });
     after(function () {
-      return cloudinary.v2.api.delete_metadata_field(METADATA_FIELD_UNIQUE_EXTERNAL_ID)
-        .finally(function () { });
+      return cloudinary.v2.api.delete_metadata_field(METADATA_FIELD_UNIQUE_EXTERNAL_ID);
     });
     it("should be set when calling upload with metadata", function () {
       return uploadImage({
@@ -1363,31 +1357,30 @@ describe("uploader", function () {
           expect(result.metadata[METADATA_FIELD_UNIQUE_EXTERNAL_ID]).to.eql(METADATA_FIELD_VALUE);
         });
     });
-    it('should allow passing both string and a number for a number smd field', () => {
+    it('should allow passing both string and a number for a number smd field', async () => {
       const smdNumberField = 'smd_number_field';
-      cloudinary.v2.api.add_metadata_field({
+      await cloudinary.v2.api.add_metadata_field({
         external_id: smdNumberField,
         label: smdNumberField,
-        type: 'number'
-      }).then(() => {
-        return Promise.all([
-          uploadImage({
-            tags: UPLOAD_TAGS,
-            metadata: {
-              [smdNumberField]: 123
-            }
-          }),
-          uploadImage({
-            tags: UPLOAD_TAGS,
-            metadata: {
-              [smdNumberField]: '123'
-            }
-          })
-        ]);
-      }).then(([firstUpload, secondUpload]) => {
-        expect(firstUpload.metadata[smdNumberField]).to.eql(123);
-        expect(secondUpload.metadata[smdNumberField]).to.eql(123);
-      });
+        type: 'integer'
+      })
+      
+      const [firstUpload, secondUpload] = await Promise.all([
+        uploadImage({
+          tags: UPLOAD_TAGS,
+          metadata: {
+            [smdNumberField]: 123
+          }
+        }),
+        uploadImage({
+          tags: UPLOAD_TAGS,
+          metadata: {
+            [smdNumberField]: '123'
+          }
+        })
+      ]);
+      expect(firstUpload.metadata[smdNumberField]).to.eql(123);
+      expect(secondUpload.metadata[smdNumberField]).to.eql(123);
     });
     it("should be updatable with uploader.update_metadata on an existing resource", function () {
       let publicId;
@@ -1408,18 +1401,16 @@ describe("uploader", function () {
       let resource_1;
       let resource_2;
 
-      return Q.allSettled(
-        [
-          uploadImage({
-            tags: UPLOAD_TAGS
-          }),
-          uploadImage({
-            tags: UPLOAD_TAGS
-          })
-        ]
-      ).then(function ([result_1, result_2]) {
-        resource_1 = result_1.value;
-        resource_2 = result_2.value;
+      return Promise.all([
+        uploadImage({
+          tags: UPLOAD_TAGS
+        }),
+        uploadImage({
+          tags: UPLOAD_TAGS
+        })
+      ]).then(function ([result_1, result_2]) {
+        resource_1 = result_1;
+        resource_2 = result_2;
         return cloudinary.v2.uploader.update_metadata(metadata_fields, [resource_1.public_id, resource_2.public_id]);
       })
         .then((result) => {
@@ -1460,13 +1451,13 @@ describe("uploader", function () {
       cloudinary.config(configBck2);
       writeSpy.restore();
     });
-    it("should allow a signature and timestamp parameter on uploads", function () {
-      cloudinary.v2.uploader.upload(IMAGE_FILE, {
+    it("should allow a signature and timestamp parameter on uploads", async function () {
+      await cloudinary.v2.uploader.upload(IMAGE_FILE, {
         public_id: 'folder/file',
         version: '1234',
         timestamp: 1569707219,
         signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e'
-      });
+      }).catch(NOP);
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
     });

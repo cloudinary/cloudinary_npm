@@ -2,7 +2,6 @@ const isFunction = require('lodash/isFunction');
 const querystring = require('querystring');
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
-const Q = require('q');
 const http = require('http');
 const https = require('https');
 // Load all our custom assertions
@@ -233,29 +232,23 @@ A test block
   @param {function} providedFunction  test function, accepting (mockXHR, writeSpy, requestSpy)
   @return {Promise}
 */
-exports.provideMockObjects = function (providedFunction) {
+exports.provideMockObjects = async function (providedFunction) {
   let requestSpy, writeSpy, mockXHR;
 
-  return Q.Promise(function (resolve, reject, notify) {
-    var result;
+  var result;
 
-    mockXHR = sinon.useFakeXMLHttpRequest();
-    writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-    requestSpy = sinon.spy(api_http, 'request');
+  mockXHR = sinon.useFakeXMLHttpRequest();
+  writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+  requestSpy = sinon.spy(api_http, 'request');
 
-    result = providedFunction(mockXHR, writeSpy, requestSpy);
-
-
-    if (result && isFunction(result.then)) {
-      return result.then(resolve);
-    } else {
-      return resolve(result);
-    }
-  }).finally(function () {
+  try {
+    result = await providedFunction(mockXHR, writeSpy, requestSpy);
+  } finally {
     requestSpy.restore();
     writeSpy.restore();
     mockXHR.restore();
-  }).done();
+  }
+  return result;
 };
 
 exports.setupCache = function () {
