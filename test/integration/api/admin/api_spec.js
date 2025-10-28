@@ -4,7 +4,6 @@ const formatDate = require("date-fns").format;
 const subDate = require("date-fns").sub;
 const https = require('https');
 const ClientRequest = require('_http_client').ClientRequest;
-const Q = require('q');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
@@ -19,7 +18,8 @@ const {shouldTestFeature} = require("../../../spechelper");
 const API_V2 = cloudinary.v2.api;
 const DYNAMIC_FOLDERS = helper.DYNAMIC_FOLDERS;
 const assert = require('assert');
-const {only} = require("../../../../lib/utils");
+const {only, NOP} = require("../../../../lib/utils");
+const allSettled = require('../../../testUtils/helpers/allSettled');
 
 const {
   TIMEOUT,
@@ -103,7 +103,7 @@ describe("api", function () {
       default_value: METADATA_DEFAULT_VALUE
     });
 
-    await Q.all([
+    await Promise.all([
       uploadImage({
         public_id: PUBLIC_ID,
         tags: UPLOAD_TAGS,
@@ -139,7 +139,7 @@ describe("api", function () {
     if (!(config.api_key && config.api_secret)) {
       expect().fail("Missing key and secret. Please set CLOUDINARY_URL.");
     }
-    return Q.allSettled([
+    return allSettled([
       cloudinary.v2.api.delete_metadata_field(METADATA_EXTERNAL_ID),
       cloudinary.v2.api.delete_resources_by_tag(TEST_TAG),
       cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET1),
@@ -351,9 +351,9 @@ describe("api", function () {
         expect(result.resources.map(e => e.context.custom.key)).to.contain("value");
       });
     });
-    it("should allow listing resources specifying direction", function () {
+    it("should allow listing resources specifying direction", async function () {
       this.timeout(TIMEOUT.LONG);
-      Q.all(
+      await Promise.all([
         cloudinary.v2.api.resources_by_tag(TEST_TAG, {
           type: "upload",
           max_results: 500,
@@ -364,15 +364,15 @@ describe("api", function () {
           max_results: 500,
           direction: "desc"
         })
-      ).then(([resultAsc, resultDesc]) => [
+      ]).then(([resultAsc, resultDesc]) => [
         resultAsc.resources.map(r => r.public_id),
         resultDesc.resources.map(r => r.public_id)
       ]).then(([asc, desc]) => expect(asc.reverse()).to.eql(desc));
     });
     it("should allow listing resources by start_at", function () {
       let start_at = new Date().toString();
-      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-        cloudinary.v2.api.resources({
+      return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        await cloudinary.v2.api.resources({
           type: "upload",
           start_at: start_at,
           direction: "asc"
@@ -411,9 +411,9 @@ describe("api", function () {
     });
     describe("derived pagination", function () {
       it("should send the derived_next_cursor to the server", function () {
-        return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-          cloudinary.v2.api.resource(PUBLIC_ID, {derived_next_cursor: 'aaa'});
-          return sinon.assert.calledWith(
+        return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+          await cloudinary.v2.api.resource(PUBLIC_ID, {derived_next_cursor: 'aaa'});
+          sinon.assert.calledWith(
             requestSpy, sinon.match(sinon.match({
               query: sinon.match('derived_next_cursor=aaa')
             }, 'derived_next_cursor=aaa')));
@@ -421,9 +421,9 @@ describe("api", function () {
       });
     });
     it("should send `accessibility_analysis` param to the server", function () {
-      return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-        cloudinary.v2.api.resource(PUBLIC_ID, {accessibility_analysis: true});
-        return sinon.assert.calledWith(requestSpy, sinon.match({
+      return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        await cloudinary.v2.api.resource(PUBLIC_ID, {accessibility_analysis: true});
+        sinon.assert.calledWith(requestSpy, sinon.match({
           query: sinon.match(helper.apiParamMatcher("accessibility_analysis", "true"))
         }));
       });
@@ -533,7 +533,7 @@ describe("api", function () {
     });
     it("should allow deleting derived resources by transformations", function () {
       this.timeout(TIMEOUT.LARGE);
-      return Q.all([
+      return Promise.all([
         uploadImage({
           public_id: PUBLIC_ID_1,
           tags: UPLOAD_TAGS,
@@ -592,7 +592,7 @@ describe("api", function () {
         () => cloudinary.v2.api.resource(PUBLIC_ID_3)
       ).then(function (resource) {
         expect(resource).not.to.eql(void 0);
-        console.log(resource);
+        // console.log(resource);
         return cloudinary.v2.api.delete_resources_by_asset_ids([resource.asset_id]);
       }).then(
         () => cloudinary.v2.api.resource(PUBLIC_ID_3)
@@ -692,14 +692,11 @@ describe("api", function () {
     callReusableTest("a list with a cursor", cloudinary.v2.api.transformations);
     transformationName = "api_test_transformation3" + UNIQUE_JOB_SUFFIX_ID;
     after(function () {
-      return Q.allSettled(
-        [
-          cloudinary.v2.api.delete_transformation(transformationName),
-          cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION),
-          cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION2)
-        ]
-      ).finally(function () {
-      });
+      return allSettled([
+        cloudinary.v2.api.delete_transformation(transformationName),
+        cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION),
+        cloudinary.v2.api.delete_transformation(NAMED_TRANSFORMATION2)
+      ]);
     });
     it("should allow listing transformations", function () {
       this.timeout(TIMEOUT.MEDIUM);
@@ -782,11 +779,11 @@ describe("api", function () {
         });
       });
       it("should allow listing of named transformations", function () {
-        return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-          cloudinary.v2.api.transformations({
+        return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+          await cloudinary.v2.api.transformations({
             named: true
           });
-          return sinon.assert.calledWith(requestSpy, sinon.match({
+          sinon.assert.calledWith(requestSpy, sinon.match({
             query: sinon.match('named=true')
           }, "named=true"));
         });
@@ -837,43 +834,43 @@ describe("api", function () {
   describe("upload_preset", function () {
     callReusableTest("a list with a cursor", cloudinary.v2.api.upload_presets);
     it("should allow listing upload_presets", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.api.upload_presets();
-        return sinon.assert.calledWith(requestSpy, sinon.match({
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.api.upload_presets();
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(/.*\/upload_presets$/)
         }, "upload_presets"));
       });
     });
     it("should allow getting a single upload_preset", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET1);
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.api.upload_preset(API_TEST_UPLOAD_PRESET1).catch(NOP);
         var expectedPath = "/.*\/upload_presets/" + API_TEST_UPLOAD_PRESET1 + "$";
-        return sinon.assert.calledWith(requestSpy, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("GET")
         }));
       });
     });
     it("should allow deleting upload_presets", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2);
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.api.delete_upload_preset(API_TEST_UPLOAD_PRESET2).catch(NOP);
         var expectedPath = "/.*\/upload_presets/" + API_TEST_UPLOAD_PRESET2 + "$";
-        return sinon.assert.calledWith(requestSpy, sinon.match({
+        sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("DELETE")
         }))
       });
     });
     it("should allow updating upload_presets", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.api.update_upload_preset(API_TEST_UPLOAD_PRESET3,
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.api.update_upload_preset(API_TEST_UPLOAD_PRESET3,
           {
             colors: true,
             unsigned: true,
             disallow_public_id: true,
             live: true,
             eval: TEST_EVAL_STR
-          });
+          }).catch(NOP);
         var expectedPath = "/.*\/upload_presets/" + API_TEST_UPLOAD_PRESET3 + "$";
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
@@ -887,15 +884,15 @@ describe("api", function () {
       });
     });
     it("should allow creating upload_presets", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        cloudinary.v2.api.create_upload_preset({
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await cloudinary.v2.api.create_upload_preset({
           folder: "upload_folder",
           unsigned: true,
           tags: UPLOAD_TAGS,
           live: true,
           eval: TEST_EVAL_STR
         }).then((preset) => {
-          cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
+          return cloudinary.v2.api.delete_upload_preset(preset.name).catch((err) => {
             console.log(err);
             // we don't fail the test if the delete fails
           });
@@ -916,8 +913,8 @@ describe("api", function () {
       });
   });
   it("should return usage values for a specific date", function () {
-    const yesterday = formatDate(subDate(new Date(), {days: 1}), "dd-MM-yyyy");
-    return cloudinary.v2.api.usage({date: yesterday})
+    const twoDaysAgo = formatDate(subDate(new Date(), {days: 2}), "dd-MM-yyyy");
+    return cloudinary.v2.api.usage({date: twoDaysAgo})
       .then(usage => {
         expect(usage).to.be.an("object");
         expect(usage).to.have.keys("plan", "last_updated", "transformations", "objects", "bandwidth", "storage", "requests", "resources", "derived_resources", "media_limits");
@@ -929,11 +926,11 @@ describe("api", function () {
     callReusableTest("accepts next_cursor", cloudinary.v2.api.delete_all_resources);
     describe("keep_original: yes", function () {
       it("should allow deleting all derived resources", function () {
-        return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+        return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
           let options = {
             keep_original: true
           };
-          cloudinary.v2.api.delete_all_resources(options);
+          await cloudinary.v2.api.delete_all_resources(options).catch(NOP);
           sinon.assert.calledWith(requestSpy, sinon.match(arg => new RegExp("/resources/image/upload$").test(arg.pathname), "/resources/image/upload"));
           sinon.assert.calledWith(requestSpy, sinon.match(arg => arg.method === "DELETE", "DELETE"));
           sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('keep_original', 'true'), "keep_original=true"));
@@ -1050,8 +1047,8 @@ describe("api", function () {
       const mocked = helper.mockTest();
       const qualityValues = ["auto:advanced", "auto:best", "80:420", "none"];
       qualityValues.forEach(quality => {
-        it("should support '" + quality + "' in update", function () {
-          cloudinary.v2.api.update("sample", {quality_override: quality});
+        it("should support '" + quality + "' in update", async function () {
+          await cloudinary.v2.api.update("sample", {quality_override: quality}).catch(NOP);
           sinon.assert.calledWith(mocked.write, sinon.match(helper.apiParamMatcher("quality_override", quality)));
         });
       });
@@ -1152,40 +1149,43 @@ describe("api", function () {
         tags: [...UPLOAD_TAGS, 'access_control_test']
       };
       it("should allow the user to define ACL in the update parameters2", function () {
-        return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
+        return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
           options.access_control = [acl];
-          cloudinary.v2.api.update("id", options);
-          return sinon.assert.calledWith(
+          await cloudinary.v2.api.update("id", options).catch(NOP);
+          sinon.assert.calledWith(
             writeSpy, sinon.match(arg => helper.apiParamMatcher('access_control', `[${acl_string}]`)(arg))
           );
         });
       });
     });
   });
-  it("should support listing by moderation kind and value", function () {
-    callReusableTest("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
-    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => ["approved", "pending", "rejected"].forEach((stat) => {
-      var status, status2;
-      status = stat;
-      status2 = status;
-      requestSpy.resetHistory();
-      cloudinary.v2.api.resources_by_moderation("manual", status2, {
-        moderations: true
+  callReusableTest("a list with a cursor", cloudinary.v2.api.resources_by_moderation, "manual", "approved");
+  it("should support listing by moderation kind and value", async function () {
+    for (const stat of ["approved", "pending", "rejected"]) {
+      // eslint-disable-next-line no-await-in-loop
+      await helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        var status, status2;
+        status = stat;
+        status2 = status;
+        requestSpy.resetHistory();
+        await cloudinary.v2.api.resources_by_moderation("manual", status2, {
+          moderations: true
+        });
+        sinon.assert.calledWith(requestSpy, sinon.match(
+          arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : void 0), `/resources/image/moderations/manual/${status}`
+        ));
+        sinon.assert.calledWith(requestSpy, sinon.match(
+          arg => (arg != null ? arg.query : void 0) === "moderations=true", "moderations=true"
+        ));
       });
-      sinon.assert.calledWith(requestSpy, sinon.match(
-        arg => new RegExp(`/resources/image/moderations/manual/${status2}$`).test(arg != null ? arg.pathname : void 0), `/resources/image/moderations/manual/${status}`
-      ));
-      sinon.assert.calledWith(requestSpy, sinon.match(
-        arg => (arg != null ? arg.query : void 0) === "moderations=true", "moderations=true"
-      ));
-    }));
+    }
   });
   describe("folders", function () {
     // For this test to work, "Auto-create folders" should be enabled in the Upload Settings.
     // Replace `it` with  `it.skip` below if you want to disable it.
     it("should list folders in cloudinary", function () {
       this.timeout(TIMEOUT.LONG);
-      return Q.all([
+      return Promise.all([
         uploadImage({
           public_id: 'test_folder1/item',
           tags: UPLOAD_TAGS
@@ -1207,8 +1207,8 @@ describe("api", function () {
           tags: UPLOAD_TAGS
         })
       ]).then(wait(TIMEOUT.SHORT))
-        .then(function (results) {
-          return Q.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
+        .then(function () {
+          return Promise.all([cloudinary.v2.api.root_folders(), cloudinary.v2.api.sub_folders('test_folder1')]);
         }).then(function (results) {
           var folder, root, root_folders, sub_1;
           root = results[0];
@@ -1228,7 +1228,7 @@ describe("api", function () {
           expect(sub_1.folders[0].path).to.eql('test_folder1/test_subfolder1');
           expect(sub_1.folders[1].path).to.eql('test_folder1/test_subfolder2');
           return cloudinary.v2.api.sub_folders('test_folder_not_exists');
-        }).then(wait(TIMEOUT.LONG)).then((result) => {
+        }).then(wait(TIMEOUT.LONG)).then(() => {
           console.log('error test_folder_not_exists should not pass to "then" handler but "catch"');
           expect().fail('error test_folder_not_exists should not pass to "then" handler but "catch"');
         }).catch(({error}) => expect(error.message).to.eql('Can\'t find folder with path test_folder_not_exists'));
@@ -1237,8 +1237,8 @@ describe("api", function () {
       it("should create a new folder", function () {
         const folderPath = `${UNIQUE_TEST_FOLDER}`;
         const expectedPath = `folders/${folderPath}`;
-        return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-          cloudinary.v2.api.create_folder(folderPath);
+        return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+          await cloudinary.v2.api.create_folder(folderPath);
           sinon.assert.calledWith(requestSpy, sinon.match({
             pathname: sinon.match(expectedPath),
             method: sinon.match("POST")
@@ -1253,7 +1253,7 @@ describe("api", function () {
         return uploadImage({
           folder: folderPath,
           tags: UPLOAD_TAGS
-        }).delay(2 * 1000).then(function () {
+        }).then(wait(2 * 1000)).then(function () {
           return cloudinary.v2.api.delete_resources_by_prefix(folderPath)
             .then(() => cloudinary.v2.api.sub_folders(folderPath).then(folder => {
               expect(folder).not.to.be(null);
@@ -1266,7 +1266,7 @@ describe("api", function () {
         this.timeout(TIMEOUT.MEDIUM);
         return cloudinary.v2.api.delete_folder(
           folderPath
-        ).delay(2 * 1000).then(() => cloudinary.v2.api.sub_folders(folderPath)
+        ).then(wait(2 * 1000)).then(() => cloudinary.v2.api.sub_folders(folderPath)
         ).then(() => expect().fail()
         ).catch(({error}) => expect(error.message).to.contain("Can't find folder with path"));
       });
@@ -1323,16 +1323,13 @@ describe("api", function () {
       });
     });
 
-    it('should update asset_folder with unique_display_name', () => {
-      return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-        uploadImage().then(result => {
-          cloudinary.v2.api.update(result.public_id, {
-            unique_display_name: true
-          })
-          return sinon.assert.calledWith(requestSpy, sinon.match({
-            query: sinon.match(helper.apiParamMatcher("unique_display_name", "true"))
-          }));
-        });
+    it('should update asset_folder with unique_display_name', async () => {
+      const result = await uploadImage()
+      return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        await cloudinary.v2.api.update(result.public_id, {
+          unique_display_name: true
+        })
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiParamMatcher('unique_display_name', true, "unique_display_name=true")));
       });
     });
 
@@ -1508,24 +1505,24 @@ describe("api", function () {
   });
   describe("proxy support", function () {
     const mocked = helper.mockTest();
-    it("should support proxy for api calls", function () {
+    it("should support proxy for api calls", async function () {
       cloudinary.config({api_proxy: "https://myuser:mypass@example.com"});
-      cloudinary.v2.api.resources({});
+      await cloudinary.v2.api.resources({}).catch(NOP);
       sinon.assert.calledWith(mocked.request, sinon.match(
         arg => arg.agent instanceof https.Agent
       ));
     });
-    it("should prioritize custom agent", function () {
+    it("should prioritize custom agent", async function () {
       cloudinary.config({api_proxy: "https://myuser:mypass@example.com"});
       const custom_agent = https.Agent()
-      cloudinary.v2.api.resources({agent: custom_agent});
+      await cloudinary.v2.api.resources({agent: custom_agent}).catch(NOP);
       sinon.assert.calledWith(mocked.request, sinon.match(
         arg => arg.agent === custom_agent
       ));
     });
-    it("should support api_proxy as options key", function () {
+    it("should support api_proxy as options key", async function () {
       cloudinary.config({});
-      cloudinary.v2.api.resources({api_proxy: "https://myuser:mypass@example.com"});
+      await cloudinary.v2.api.resources({api_proxy: "https://myuser:mypass@example.com"}).catch(NOP);
       sinon.assert.calledWith(mocked.request, sinon.match(
         arg => arg.agent instanceof https.Agent
       ));

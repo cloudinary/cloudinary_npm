@@ -12,4 +12,7 @@ function makeSuite(name, tests) {
   });
 }
 
+makeSuite.only = describe.only;
+makeSuite.skip = describe.skip;
+
 module.exports = makeSuite;
