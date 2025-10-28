@@ -24,6 +24,6 @@ module.exports = async function retry(fn, limit = RETRY.LIMIT, delay= RETRY.DELA
     }
 
     // eslint-disable-next-line no-await-in-loop
-    await wait(delay)
+    await wait(delay)();
   }
 }

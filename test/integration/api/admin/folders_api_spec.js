@@ -5,6 +5,7 @@ const cloudinary = require('../../../../lib/cloudinary');
 const createTestConfig = require('../../../testUtils/createTestConfig');
 const helper = require('../../../spechelper');
 const api_http = require("https");
+const { NOP } = require('../../../../lib/utils');
 const ClientRequest = require('_http_client').ClientRequest;
 
 describe('Admin API - Folders', () => {
@@ -23,8 +24,8 @@ describe('Admin API - Folders', () => {
   });
 
   describe('rename_folder', () => {
-    it('should send a request to update folder endpoint with correct parameters', () => {
-      cloudinary.v2.api.rename_folder('old/path', 'new/path');
+    it('should send a request to update folder endpoint with correct parameters', async () => {
+      await cloudinary.v2.api.rename_folder('old/path', 'new/path').catch(NOP);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('old%2Fpath'),

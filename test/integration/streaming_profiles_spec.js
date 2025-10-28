@@ -1,9 +1,9 @@
 let describe = require('../testUtils/suite');
 const keys = require('lodash/keys');
-const Q = require('q');
 const cloudinary = require("../../cloudinary");
 const helper = require("../spechelper");
 const TIMEOUT = require('../testUtils/testConstants').TIMEOUT;
+const allSettled = require('../testUtils/helpers/allSettled');
 const api = cloudinary.v2.api;
 
 describe('Cloudinary::Api', function () {
@@ -17,9 +17,9 @@ describe('Cloudinary::Api', function () {
   after(function () {
     cloudinary.config(true);
     if (cloudinary.config().keep_test_products) {
-      return Q.resolve();
+      return;
     }
-    return Q.allSettled([
+    return allSettled([
       cloudinary.v2.api.delete_streaming_profile(test_id_1),
       cloudinary.v2.api.delete_streaming_profile(test_id_1 + 'a'),
       cloudinary.v2.api.delete_streaming_profile(test_id_3)

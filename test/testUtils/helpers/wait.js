@@ -4,10 +4,10 @@
  * @return {function(...item): Promise<...item>}
  */
 function wait(ms = 0) {
-  return (...rest) => {
+  return (value) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(...rest);
+        resolve(value);
       }, ms);
     });
   }

@@ -1,11 +1,10 @@
-const Q = require('q');
 const cloudinary = require('../../../../cloudinary');
 const helper = require("../../../spechelper");
 const testConstants = require('../../../testUtils/testConstants');
 const describe = require('../../../testUtils/suite');
-const exp = require("constants");
-const cluster = require("cluster");
 const assert = require("assert");
+const allSettled = require('../../../testUtils/helpers/allSettled');
+const wait = require('../../../testUtils/helpers/wait');
 const {
   TIMEOUT,
   TAGS,
@@ -30,7 +29,7 @@ describe("search_api", function () {
   describe("integration", function () {
     this.timeout(TIMEOUT.LONG);
     before(function () {
-      return Q.allSettled([
+      return allSettled([
         cloudinary.v2.uploader.upload(helper.IMAGE_FILE,
           {
             public_id: PUBLIC_ID_1,
@@ -52,7 +51,8 @@ describe("search_api", function () {
               SEARCH_TAG],
             context: "stage=validated"
           })
-      ]).delay(10000)
+      ])
+        .then(wait(10000))
         .then((uploadResults) => {
           uploadResults.forEach(({value}) => {
             ASSET_IDS.push(value.asset_id);
@@ -60,11 +60,11 @@ describe("search_api", function () {
         });
     });
 
-    after(function () {
+    after(async function () {
       if (!cloudinary.config().keep_test_products) {
         let config = cloudinary.config();
 
-        cloudinary.v2.api.delete_resources_by_tag(SEARCH_TAG);
+        await cloudinary.v2.api.delete_resources_by_tag(SEARCH_TAG);
       }
     });
     it(`should return all images tagged with ${SEARCH_TAG}`, function () {
