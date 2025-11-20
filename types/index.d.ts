@@ -706,6 +706,7 @@ declare module 'cloudinary' {
 
     export interface MetadataFieldApiOptions {
         external_id?: string;
+        allow_dynamic_list_values?: boolean;
         type?: string;
         label?: string;
         mandatory?: boolean;

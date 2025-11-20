@@ -211,7 +211,8 @@ describe("structured metadata api", function () {
         },
         external_id: EXTERNAL_ID_SET,
         label: EXTERNAL_ID_SET,
-        type: 'set'
+        type: 'set',
+        allow_dynamic_list_values: true
       };
       return api.add_metadata_field(metadata).then((result) => {
         expect(result).to.beAMetadataField();
@@ -221,7 +222,8 @@ describe("structured metadata api", function () {
           external_id: EXTERNAL_ID_SET,
           label: EXTERNAL_ID_SET,
           type: 'set',
-          mandatory: false
+          mandatory: false,
+          allow_dynamic_list_values: true
         }]).to.beAMetadataField();
       });
     });
