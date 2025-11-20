@@ -1,9 +1,11 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* eslint-disable no-tabs */
 const cloudinary = require("../../../../cloudinary");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 let runOnlyForInternalPRs = process.env.TRAVIS_SECURE_ENV_VARS ? describe : describe.skip;
 
 
-describe.skip('Provisioning API - Access Keys Management', function () {
+describe('Provisioning API - Access Keys Management', function () {
   let CLOUD_SECRET;
   let CLOUD_API;
   let CLOUD_NAME;
@@ -11,7 +13,7 @@ describe.skip('Provisioning API - Access Keys Management', function () {
   let CLOUD_NAME_PREFIX = `justaname${process.hrtime()[1] % 10000}`;
   this.timeout(TIMEOUT.LONG);
 
-  before("Setup the required test", async () => {
+  before("Setup the required test", async function (){
     let config = cloudinary.config(true);
     if (!(config.provisioning_api_key && config.provisioning_api_secret && config.account_id)) {
       // For external PRs the env variables are not availble, so we skip the provisioning API
@@ -86,16 +88,45 @@ describe.skip('Provisioning API - Access Keys Management', function () {
     expect(Object.keys(accessKeys.access_keys[0])).to.eql(['name', 'api_key', 'api_secret', 'created_at', 'updated_at', 'enabled']);
   });
 
-  it('Update access key', async () => {
-    const keyName = `test-access-key-${Date.now()}`
-    const newAccessKey = await cloudinary.provisioning.account.generate_access_key(CLOUD_ID, { name: keyName });
-    expect(Object.keys(newAccessKey)).to.eql(['name', 'api_key', 'api_secret', 'created_at', 'updated_at', 'enabled']);
+  it("Update access key", async () => {
+    const keyName = `test-access-key-${Date.now()}`;
+    const newAccessKey =
+			await cloudinary.provisioning.account.generate_access_key(
+			  CLOUD_ID,
+			  { name: keyName, enabled: false }
+			);
+    expect(Object.keys(newAccessKey)).to.eql([
+      "name",
+      "api_key",
+      "api_secret",
+      "created_at",
+      "updated_at",
+      "enabled"
+    ]);
     expect(newAccessKey.name).to.eql(keyName);
+    expect(newAccessKey.enabled).to.eql(false);
 
     const newName = `${keyName}-updated`;
-    const updatedAccessKey = await cloudinary.provisioning.account.update_access_key(CLOUD_ID, newAccessKey.api_key, { name: newName });
-    expect(Object.keys(newAccessKey)).to.eql(['name', 'api_key', 'api_secret', 'created_at', 'updated_at', 'enabled']);
+    const updatedAccessKey =
+			await cloudinary.provisioning.account.update_access_key(
+			  CLOUD_ID,
+			  newAccessKey.api_key,
+			  { name: newName, enabled: true, dedicated_for: "webhooks" }
+			);
+    expect(Object.keys(updatedAccessKey)).to.eql([
+      "name",
+      "api_key",
+      "api_secret",
+      "created_at",
+      "updated_at",
+      "enabled",
+      "dedicated_for"
+    ]);
     expect(updatedAccessKey.name).to.eql(newName);
+    expect(updatedAccessKey.enabled).to.eql(true);
+    expect(updatedAccessKey.dedicated_for).to.be.an("array");
+    expect(updatedAccessKey.dedicated_for.length).to.eql(1);
+    expect(updatedAccessKey.dedicated_for[0]).to.eql("webhooks");
   });
 
   it('Delete access keys', async () => {
