@@ -199,6 +199,29 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
     expect(result.users.length).to.eql(1);
   });
 
+  it("Gets users by last login", async () => {
+    const today = new Date();
+    const result1 = await cloudinary.provisioning.account.users(
+      null,
+      [USER_ID_1],
+      null,
+      null,
+      true,
+      today,
+      today
+    );
+    expect(result1.users.length).to.eql(0);
+
+    const result2 = await cloudinary.provisioning.account.users(
+      null,
+      [USER_ID_1],
+      null,
+      null,
+      false
+    );
+    expect(result2.users.length).to.eql(1);
+  });
+
   it('Should throw an error when attempting to get users by a nonexistent sub_account_id', async () => {
     const random_id = Math.floor(Math.random() * 100000);
     try {
