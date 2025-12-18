@@ -231,28 +231,30 @@ describe("structured metadata api", function () {
 
   describe("update_metadata_field", function () {
     it("should update metadata field by external id", function () {
-      const newLabel = 'update_metadata_test_new_label' + EXTERNAL_ID_GENERAL;
-      const newDefaultValue = 'update_metadata_test_new_default_value' + EXTERNAL_ID_GENERAL;
+      const newLabel = 'update_metadata_test_new_label' + EXTERNAL_ID_SET;
       const updatedMetadata = {
         external_id: EXTERNAL_ID_SET,
         label: newLabel,
-        type: 'integer',
-        mandatory: true,
-        default_value: newDefaultValue
+        type: "set",
+        mandatory: false,
+        allow_dynamic_list_values: true
       };
-      return api.update_metadata_field(EXTERNAL_ID_GENERAL, updatedMetadata)
+      return api.update_metadata_field(EXTERNAL_ID_SET, updatedMetadata)
         .then((result) => {
           expect(result).to.beAMetadataField();
-          return api.metadata_field_by_field_id(EXTERNAL_ID_GENERAL);
+          return api.metadata_field_by_field_id(EXTERNAL_ID_SET);
         })
         .then((result) => {
-          expect([result, {
-            external_id: EXTERNAL_ID_GENERAL,
-            label: newLabel,
-            type: 'string',
-            mandatory: true,
-            default_value: newDefaultValue
-          }]).to.beAMetadataField();
+          expect([
+            result,
+            {
+              external_id: EXTERNAL_ID_SET,
+              label: newLabel,
+              type: "set",
+              mandatory: false,
+              allow_dynamic_list_values: true
+            }
+          ]).to.beAMetadataField();
         });
     });
   });
