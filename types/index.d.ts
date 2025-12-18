@@ -1534,7 +1534,7 @@ declare module 'cloudinary' {
                 function update_access_key(subAccountId: string, apiKey: string, options?: ProvisioningApiOptions | {
                     name?: string,
                     enabled?: boolean,
-                    dedicated_for?: string
+                    dedicated_for?: 'webhooks',
                 }, callback?: ResponseCallback): Promise<AccessKeyDetails>;
 
                 function delete_access_key(subAccountId: string, apiKey: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<DeleteAccessKeyResponse>;

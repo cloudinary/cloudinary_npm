@@ -1,5 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
-/* eslint-disable no-tabs */
 const cloudinary = require("../../../../cloudinary");
 const expect = require('expect.js');
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
