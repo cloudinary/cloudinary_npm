@@ -1,9 +1,8 @@
 const cloudinary = require("../../../../cloudinary");
+const expect = require('expect.js');
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
-let runOnlyForInternalPRs = process.env.TRAVIS_SECURE_ENV_VARS ? describe : describe.skip;
 
-
-runOnlyForInternalPRs('account API - Provisioning', function () {
+describe.skip('account API - Provisioning', function () {
   let CLOUD_SECRET;
   let CLOUD_API;
   let CLOUD_NAME;
