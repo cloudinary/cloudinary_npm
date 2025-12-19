@@ -231,31 +231,39 @@ describe("structured metadata api", function () {
 
   describe("update_metadata_field", function () {
     it("should update metadata field by external id", function () {
-      const newLabel = 'update_metadata_test_new_label' + EXTERNAL_ID_SET;
-      const updatedMetadata = {
-        external_id: EXTERNAL_ID_SET,
-        label: newLabel,
-        type: "set",
-        mandatory: false,
+      const timestamp = Date.now();
+      const externalId = `${EXTERNAL_ID_SET}_${timestamp}`;
+      const metadata = {
+        datasource: {
+          values: datasource_multiple
+        },
+        external_id: externalId,
+        label: externalId,
+        type: 'set',
         allow_dynamic_list_values: true
       };
-      return api.update_metadata_field(EXTERNAL_ID_SET, updatedMetadata)
-        .then((result) => {
-          expect(result).to.beAMetadataField();
-          return api.metadata_field_by_field_id(EXTERNAL_ID_SET);
-        })
-        .then((result) => {
-          expect([
-            result,
-            {
-              external_id: EXTERNAL_ID_SET,
-              label: newLabel,
-              type: "set",
-              mandatory: false,
-              allow_dynamic_list_values: true
-            }
-          ]).to.beAMetadataField();
-        });
+      const newLabel = `${externalId}_updated`;
+      return api.add_metadata_field(metadata).then((result) => {
+        const updatedMetadata = {
+          label: newLabel,
+          allow_dynamic_list_values: true
+        };
+        return api.update_metadata_field(externalId, updatedMetadata)
+      }).then((result) => {
+        expect(result).to.beAMetadataField();
+        return api.metadata_field_by_field_id(externalId);
+      }).then((result) => {
+        expect([
+          result,
+          {
+            external_id: externalId,
+            label: newLabel,
+            type: "set",
+            mandatory: false,
+            allow_dynamic_list_values: true
+          }
+        ]).to.beAMetadataField();
+      });
     });
   });
 
