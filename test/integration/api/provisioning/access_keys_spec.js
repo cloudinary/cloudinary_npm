@@ -88,10 +88,10 @@ describe.skip('Provisioning API - Access Keys Management', function () {
   it("Update access key", async () => {
     const keyName = `test-access-key-${Date.now()}`;
     const newAccessKey =
-			await cloudinary.provisioning.account.generate_access_key(
-			  CLOUD_ID,
-			  { name: keyName, enabled: false }
-			);
+      await cloudinary.provisioning.account.generate_access_key(
+        CLOUD_ID,
+        { name: keyName, enabled: false }
+      );
     expect(Object.keys(newAccessKey)).to.eql([
       'name',
       'api_key',
@@ -106,11 +106,11 @@ describe.skip('Provisioning API - Access Keys Management', function () {
 
     const newName = `${keyName}-updated`;
     const updatedAccessKey =
-			await cloudinary.provisioning.account.update_access_key(
-			  CLOUD_ID,
-			  newAccessKey.api_key,
-			  { name: newName, enabled: true, dedicated_for: "webhooks" }
-			);
+      await cloudinary.provisioning.account.update_access_key(
+        CLOUD_ID,
+        newAccessKey.api_key,
+        { name: newName, enabled: true, dedicated_for: "webhooks" }
+      );
     expect(Object.keys(updatedAccessKey)).to.eql([
       'name',
       'api_key',
