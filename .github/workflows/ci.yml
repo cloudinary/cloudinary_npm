@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches: 
+      - master
   pull_request:
-    branches: ["**"]
 
 jobs:
   test:
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ["9", "10", "12", "14", "16", "18", "20", "22"]
+        node: ["9", "10", "12", "14", "16", "18", "20", "22", "24"]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
