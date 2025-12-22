@@ -4,7 +4,6 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 const allSettled = require('../../../testUtils/helpers/allSettled');
-const {promises} = require("node:fs");
 
 const TEST_ID = Date.now();
 
