@@ -5,7 +5,6 @@ const {
   deepStrictEqual
 } = require('assert');
 const {TEST_CLOUD_NAME} = require('../../../testUtils/testConstants');
-const { NOP } = require('../../../../lib/utils');
 
 describe('Asset relations API', () => {
   const testPublicId = 'test-public-id';
@@ -17,7 +16,7 @@ describe('Asset relations API', () => {
     describe('using public id', () => {
       it('should allow passing a single public id to create a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.add_related_assets(testPublicId, singleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.add_related_assets(testPublicId, singleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
@@ -29,7 +28,7 @@ describe('Asset relations API', () => {
 
       it('should allow passing multiple public ids to create a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.add_related_assets(testPublicId, multipleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.add_related_assets(testPublicId, multipleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
@@ -43,7 +42,7 @@ describe('Asset relations API', () => {
     describe('using asset id', () => {
       it('should allow passing a single public id to create a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.add_related_assets_by_asset_id(testAssetId, singleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.add_related_assets_by_asset_id(testAssetId, singleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
@@ -55,7 +54,7 @@ describe('Asset relations API', () => {
 
       it('should allow passing multiple public ids to create a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.add_related_assets_by_asset_id(testAssetId, multipleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.add_related_assets_by_asset_id(testAssetId, multipleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'POST');
@@ -71,7 +70,7 @@ describe('Asset relations API', () => {
     describe('using public id', () => {
       it('should allow passing a single public id to delete a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.delete_related_assets(testPublicId, singleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.delete_related_assets(testPublicId, singleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
@@ -83,7 +82,7 @@ describe('Asset relations API', () => {
 
       it('should allow passing multiple public ids to delete a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.delete_related_assets(testPublicId, multipleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.delete_related_assets(testPublicId, multipleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
@@ -97,7 +96,7 @@ describe('Asset relations API', () => {
     describe('and using asset id', () => {
       it('should allow passing a single public id to delete a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.delete_related_assets_by_asset_id(testAssetId, singleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.delete_related_assets_by_asset_id(testAssetId, singleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');
@@ -109,7 +108,7 @@ describe('Asset relations API', () => {
 
       it('should allow passing multiple public ids to delete a relation', () => {
         return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-          await cloudinary.v2.api.delete_related_assets_by_asset_id(testAssetId, multipleRelatedPublicId).catch(NOP);
+          await cloudinary.v2.api.delete_related_assets_by_asset_id(testAssetId, multipleRelatedPublicId).catch(helper.ignoreApiFailure);
 
           const [calledWithUrl] = requestSpy.firstCall.args;
           strictEqual(calledWithUrl.method, 'DELETE');

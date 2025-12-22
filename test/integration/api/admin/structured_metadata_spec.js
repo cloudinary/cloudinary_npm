@@ -3,7 +3,6 @@ const sinon = require('sinon');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
-const { NOP } = require('../../../../lib/utils');
 const allSettled = require('../../../testUtils/helpers/allSettled');
 
 const TEST_ID = Date.now();
@@ -88,7 +87,7 @@ function createMetadataFieldForTest(field) {
   if (!field.label) {
     field.label = field.external_id;
   }
-  return api.add_metadata_field(field).catch(NOP);
+  return api.add_metadata_field(field).catch(helper.ignoreApiFailure);
 }
 
 describe("structured metadata api", function () {
@@ -281,7 +280,7 @@ describe("structured metadata api", function () {
     it("should delete metadata field by external id", function () {
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const expectedPath = `/metadata_fields/${EXTERNAL_ID_DELETE}$`;
-        await api.delete_metadata_field(EXTERNAL_ID_DELETE).catch(NOP);
+        await api.delete_metadata_field(EXTERNAL_ID_DELETE).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("DELETE")
@@ -531,7 +530,7 @@ describe("structured metadata api", function () {
     it('should allow listing metadata rules', () => {
       const expectedPath = '/metadata_rules';
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-        await api.list_metadata_rules().catch(NOP);
+        await api.list_metadata_rules().catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match('GET')
@@ -548,7 +547,7 @@ describe("structured metadata api", function () {
           condition: {},
           result: {}
         };
-        await api.add_metadata_rule(newMetadataRule).catch(NOP);
+        await api.add_metadata_rule(newMetadataRule).catch(helper.ignoreApiFailure);
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
@@ -577,7 +576,7 @@ describe("structured metadata api", function () {
           result: {},
           state: 'inactive'
         };
-        await api.update_metadata_rule('some-metadata-rule-id', ruleUpdate).catch(NOP);
+        await api.update_metadata_rule('some-metadata-rule-id', ruleUpdate).catch(helper.ignoreApiFailure);
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
@@ -600,7 +599,7 @@ describe("structured metadata api", function () {
     it('should allow removing existing metadata rules', () => {
       const expectedPath = '/metadata_rules/some-metadata-rule-id';
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-        await api.delete_metadata_rule('some-metadata-rule-id').catch(NOP);
+        await api.delete_metadata_rule('some-metadata-rule-id').catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match('DELETE')

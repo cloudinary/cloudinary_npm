@@ -2,7 +2,7 @@ const sinon = require('sinon');
 
 const cloudinary = require('../../../../lib/cloudinary');
 const api_http = require("https");
-const { NOP } = require('../../../../lib/utils');
+const helper = require('../../../spechelper');
 const ClientRequest = require('_http_client').ClientRequest;
 
 describe('Admin API - Config', () => {
@@ -22,7 +22,7 @@ describe('Admin API - Config', () => {
 
   describe('config', () => {
     it('should send a request to config endpoint', async () => {
-      await cloudinary.v2.api.config().catch(NOP);
+      await cloudinary.v2.api.config().catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('config'),
@@ -32,7 +32,7 @@ describe('Admin API - Config', () => {
     });
 
     it('should send a request to config endpoint with optional parameters', async () => {
-      await cloudinary.v2.api.config({ settings: true }).catch(NOP);
+      await cloudinary.v2.api.config({ settings: true }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('config'),

@@ -31,7 +31,6 @@ const createTestConfig = require('../../../testUtils/createTestConfig');
 
 const testConstants = require('../../../testUtils/testConstants');
 const { shouldTestFeature, DYNAMIC_FOLDERS } = require("../../../spechelper");
-const { NOP } = require('../../../../lib/utils');
 const allSettled = require('../../../testUtils/helpers/allSettled');
 const UPLOADER_V2 = cloudinary.v2.uploader;
 
@@ -86,7 +85,7 @@ describe("uploader", function () {
   });
   it("should successfully upload with metadata", function () {
     return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-      await uploadImage({ metadata: METADATA_SAMPLE_DATA }).catch(NOP);
+      await uploadImage({ metadata: METADATA_SAMPLE_DATA }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy, sinon.match({
         method: sinon.match("POST")
       }));
@@ -95,13 +94,13 @@ describe("uploader", function () {
   });
   it('should upload a file with correctly encoded transformation string', () => {
     return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-      await cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } }).catch(NOP);
+      await cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test / 火' } } }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test %2F 火')));
     });
   });
   it('should upload a file with correctly encoded transformation string incl 4bytes characters', () => {
     return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-      await cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test 𩸽 🍺' } } }).catch(NOP);
+      await cloudinary.v2.uploader.upload('irrelevant', { transformation: { overlay: { text: 'test 𩸽 🍺' } } }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('transformation', 'l_text:test 𩸽 🍺')));
     });
   });
@@ -161,19 +160,19 @@ describe("uploader", function () {
     it("should send s3:// URLs to server", async function () {
       await cloudinary.v2.uploader.upload("s3://test/1.jpg", {
         tags: UPLOAD_TAGS
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "s3://test/1.jpg")));
     });
     it("should send gs:// URLs to server", async function () {
       await cloudinary.v2.uploader.upload("gs://test/1.jpg", {
         tags: UPLOAD_TAGS
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "gs://test/1.jpg")));
     });
     it("should send ftp:// URLs to server", async function () {
       await cloudinary.v2.uploader.upload("ftp://test/1.jpg", {
         tags: UPLOAD_TAGS
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(mocked.write, sinon.match(helper.uploadParamMatcher('file', "ftp://test/1.jpg")));
     });
   });
@@ -218,7 +217,7 @@ describe("uploader", function () {
     });
     it('should include notification_url in rename response if included in the request', async () => {
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-        await cloudinary.v2.uploader.rename('irrelevant', 'irrelevant', { notification_url: 'https://notification-url.com' }).catch(NOP);
+        await cloudinary.v2.uploader.rename('irrelevant', 'irrelevant', { notification_url: 'https://notification-url.com' }).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('notification_url', 'https://notification-url.com')));
       });
     });
@@ -237,7 +236,7 @@ describe("uploader", function () {
       it("should pass the invalidate value in rename to the server", async function () {
         await cloudinary.v2.uploader.rename("first_id", "second_id", {
           invalidate: true
-        }).catch(NOP);
+        }).catch(helper.ignoreApiFailure);
         expect(spy.calledWith(sinon.match(function (arg) {
           return arg.toString().match(/name="invalidate"/);
         }))).to.be.ok();
@@ -262,7 +261,7 @@ describe("uploader", function () {
     });
     it('should pass notification_url', async () => {
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-        await cloudinary.v2.uploader.destroy('irrelevant', { notification_url: 'https://notification-url.com' }).catch(NOP);
+        await cloudinary.v2.uploader.destroy('irrelevant', { notification_url: 'https://notification-url.com' }).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('notification_url', 'https://notification-url.com')));
       });
     });
@@ -323,7 +322,7 @@ describe("uploader", function () {
           extra_headers: {
             Link: "1"
           }
-        }).catch(NOP);
+        }).catch(helper.ignoreApiFailure);
         assert.ok(requestSpy.args[0][0].headers.Link);
         assert.equal(requestSpy.args[0][0].headers.Link, "1");
       });
@@ -704,7 +703,7 @@ describe("uploader", function () {
     it('should pass its value to the upload api', async () => {
       await cloudinary.v2.uploader.upload(IMAGE_FILE, {
         on_success: 'current_asset.update({tags: ["autocaption"]});'
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
 
       expect(spy.calledWith(sinon.match((arg) => {
         return arg.toString().match(/on_success='current_asset.update({tags: ["autocaption"]});'/);
@@ -878,7 +877,7 @@ describe("uploader", function () {
         display_name,
         use_filename_as_display_name,
         folder
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("public_id_prefix", public_id_prefix));
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("asset_folder", asset_folder));
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("display_name", display_name));
@@ -958,7 +957,7 @@ describe("uploader", function () {
     const unhandledRejectionSpy = sinon.spy();
 
     process.on('unhandledRejection', unhandledRejectionSpy);
-    
+
     cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: false }, () => { });
 
     // Promises are not disabled meaning we should throw unhandledRejection
@@ -972,7 +971,7 @@ describe("uploader", function () {
   it("should reject with promise rejection by default", function (done) {
     const unhandledRejectionSpy = sinon.spy();
 
-    
+
     process.on('unhandledRejection', unhandledRejectionSpy);
 
     cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, () => { });
@@ -987,7 +986,7 @@ describe("uploader", function () {
 
   it("should reject without promise rejection if disable_promises: true", function (done) {
     const unhandledRejectionSpy = sinon.spy();
-    
+
     process.on('unhandledRejection', unhandledRejectionSpy);
     cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: true }, () => { });
 
@@ -1161,24 +1160,24 @@ describe("uploader", function () {
           invalidate: true,
           quality_analysis: true,
           tags: [TEST_TAG]
-        }).catch(NOP);
+        }).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('invalidate', 1)));
         sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('quality_analysis', 1)));
       });
     });
     it("should support metadata", async function () {
-      await cloudinary.v2.uploader.explicit("cloudinary", { metadata: METADATA_SAMPLE_DATA }).catch(NOP);
+      await cloudinary.v2.uploader.explicit("cloudinary", { metadata: METADATA_SAMPLE_DATA }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
     });
     it("should support raw_convert", async function () {
       await cloudinary.v2.uploader.explicit("cloudinary", {
         raw_convert: "google_speech",
         tags: [TEST_TAG]
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('raw_convert', 'google_speech')));
     });
     it("should pass `accessibility_analysis` to server", async function () {
-      await cloudinary.v2.uploader.explicit("cloudinary", { accessibility_analysis: true }).catch(NOP);
+      await cloudinary.v2.uploader.explicit("cloudinary", { accessibility_analysis: true }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('accessibility_analysis', 1)));
     });
   });
@@ -1209,7 +1208,7 @@ describe("uploader", function () {
       return it("should pass '" + quality + "'", async function () {
         await cloudinary.v2.uploader.upload(IMAGE_FILE, {
           "quality_override": quality
-        }).catch(NOP);
+        }).catch(helper.ignoreApiFailure);
         sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", quality));
       });
     }
@@ -1217,7 +1216,7 @@ describe("uploader", function () {
     it("should be supported by explicit api", async function () {
       await cloudinary.v2.uploader.explicit("cloudinary", {
         "quality_override": "auto:best"
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWithMatch(mocked.write, helper.uploadParamMatcher("quality_override", "auto:best"));
     });
   });
@@ -1226,7 +1225,7 @@ describe("uploader", function () {
       const metadata_fields = { metadata_color: "red", metadata_shape: "" };
       const public_ids = ["test_id_1", "test_id_2"];
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-        await cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids).catch(NOP);
+        await cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           method: sinon.match("POST")
         }));
@@ -1239,7 +1238,7 @@ describe("uploader", function () {
       const metadata_fields = { metadata_color: "red" };
       const public_ids = ["test_id_1"];
       return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
-        await cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids, { clear_invalid: true }).catch(NOP);
+        await cloudinary.v2.uploader.update_metadata(metadata_fields, public_ids, { clear_invalid: true }).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           method: sinon.match("POST")
         }));
@@ -1364,7 +1363,7 @@ describe("uploader", function () {
         label: smdNumberField,
         type: 'integer'
       })
-      
+
       const [firstUpload, secondUpload] = await Promise.all([
         uploadImage({
           tags: UPLOAD_TAGS,
@@ -1457,7 +1456,7 @@ describe("uploader", function () {
         version: '1234',
         timestamp: 1569707219,
         signature: 'b77fc0b0dffbf7e74bdad36b615225fb6daff81e'
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('signature', "b77fc0b0dffbf7e74bdad36b615225fb6daff81e")));
       sinon.assert.calledWith(writeSpy, sinon.match(helper.uploadParamMatcher('timestamp', '1569707219')));
     });

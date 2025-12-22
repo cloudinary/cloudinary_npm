@@ -5,7 +5,6 @@ const api_http = require('https');
 
 const cloudinary = require('../../../../cloudinary');
 const helper = require('../../../spechelper');
-const { NOP } = require('../../../../lib/utils');
 
 describe('Analyze API', () => {
   describe('uri analysis', () => {
@@ -27,7 +26,7 @@ describe('Analyze API', () => {
     });
 
     it('should call analyze endpoint with non-custom analysis_type', async () => {
-      await cloudinary.analysis.analyze_uri('https://example.com', 'captioning').catch(NOP);
+      await cloudinary.analysis.analyze_uri('https://example.com', 'captioning').catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match(new RegExp(`/v2/${config.cloud_name}/analysis/analyze/uri`)),
@@ -41,7 +40,7 @@ describe('Analyze API', () => {
       await cloudinary.analysis.analyze_uri('https://example.com', 'custom', {
         model_name: 'my_model',
         model_version: 1
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match(new RegExp(`/v2/${config.cloud_name}/analysis/analyze/uri`)),

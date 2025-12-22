@@ -4,7 +4,6 @@ const sinon = require('sinon');
 const cloudinary = require('../../../../lib/cloudinary');
 const createTestConfig = require('../../../testUtils/createTestConfig');
 const helper = require('../../../spechelper');
-const { NOP } = require('../../../../lib/utils');
 const ClientRequest = require('_http_client').ClientRequest;
 
 describe('Uploader', () => {
@@ -28,7 +27,7 @@ describe('Uploader', () => {
           'box_1': [[1, 2], [3, 4]],
           'box_2': [[5, 6], [7, 8]]
         }
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'box_1': [[1, 2], [3, 4]],
@@ -42,7 +41,7 @@ describe('Uploader', () => {
           'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
           'custom_2': [[10, 11], [12, 13], [14, 15]]
         }
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
@@ -58,7 +57,7 @@ describe('Uploader', () => {
           'box_1': [[1, 2], [3, 4]],
           'box_2': [[5, 6], [7, 8]]
         }
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'box_1': [[1, 2], [3, 4]],
@@ -72,7 +71,7 @@ describe('Uploader', () => {
           'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
           'custom_2': [[10, 11], [12, 13], [14, 15]]
         }
-      }).catch(NOP);
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],

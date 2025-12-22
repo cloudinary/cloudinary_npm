@@ -3,14 +3,13 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const describe = require('../../../testUtils/suite');
 const testConstants = require('../../../testUtils/testConstants');
-const { NOP } = require('../../../../lib/utils');
 const { PUBLIC_IDS } = testConstants;
 const { PUBLIC_ID } = PUBLIC_IDS;
 
 describe("oauth_token", function(){
   it("should send the oauth_token option to the server (admin_api)", function() {
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-      await cloudinary.v2.api.resource(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' }).catch(NOP);
+      await cloudinary.v2.api.resource(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy,
         sinon.match.has("headers",
           sinon.match.has("Authorization", "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4")
@@ -25,7 +24,7 @@ describe("oauth_token", function(){
         api_secret: undefined,
         oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4'
       });
-      await cloudinary.v2.api.resource(PUBLIC_ID).catch(NOP);
+      await cloudinary.v2.api.resource(PUBLIC_ID).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy,
         sinon.match.has("headers",
           sinon.match.has("Authorization", "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4")
@@ -40,7 +39,7 @@ describe("oauth_token", function(){
       oauth_token: undefined
     });
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-      await cloudinary.v2.api.resource(PUBLIC_ID).catch(NOP);
+      await cloudinary.v2.api.resource(PUBLIC_ID).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy, sinon.match({ auth: "1234:1234" }));
     });
   });
@@ -69,7 +68,7 @@ describe("oauth_token", function(){
 
   it("should send the oauth_token option to the server (upload_api)", function() {
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-      await cloudinary.v2.uploader.upload(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' }).catch(NOP);
+      await cloudinary.v2.uploader.upload(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy,
         sinon.match.has("headers",
           sinon.match.has("Authorization", "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4")
@@ -84,7 +83,7 @@ describe("oauth_token", function(){
         api_secret: undefined,
         oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4'
       });
-      await cloudinary.v2.uploader.upload(PUBLIC_ID).catch(NOP);
+      await cloudinary.v2.uploader.upload(PUBLIC_ID).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy,
         sinon.match.has("headers",
           sinon.match.has("Authorization", "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4")
@@ -99,7 +98,7 @@ describe("oauth_token", function(){
       oauth_token: undefined
     });
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-      await cloudinary.v2.uploader.upload(PUBLIC_ID).catch(NOP);
+      await cloudinary.v2.uploader.upload(PUBLIC_ID).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy, sinon.match({ auth: null }));
     });
   });
@@ -122,7 +121,7 @@ describe("oauth_token", function(){
       oauth_token: undefined
     });
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
-      await cloudinary.v2.uploader.unsigned_upload(PUBLIC_ID, 'preset').catch(NOP);
+      await cloudinary.v2.uploader.unsigned_upload(PUBLIC_ID, 'preset').catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy, sinon.match({ auth: null }));
     });
   });
