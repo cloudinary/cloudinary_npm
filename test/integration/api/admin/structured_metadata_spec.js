@@ -4,6 +4,7 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
 const allSettled = require('../../../testUtils/helpers/allSettled');
+const {promises} = require("node:fs");
 
 const TEST_ID = Date.now();
 
@@ -93,15 +94,14 @@ function createMetadataFieldForTest(field) {
 describe("structured metadata api", function () {
   this.timeout(TIMEOUT.LARGE);
 
-  before(function () {
-    // Create the metadata fields required for the tests
-    return allSettled(
-      metadata_fields_to_create.map(field => createMetadataFieldForTest(field))
-    );
+  before(async function () {
+    await Promise.all(metadata_fields_to_create.map(field => createMetadataFieldForTest(field))).catch(error => {
+      console.error('Error creating metadata fields:', error);
+    });
   });
 
   after(function () {
-    // Delete all metadata fields created during testing
+    // allSettled finishes successfully if all promises finish, even if some reject
     return allSettled(
       metadata_fields_external_ids.map(field => api.delete_metadata_field(field))
     );
@@ -124,7 +124,7 @@ describe("structured metadata api", function () {
     it("should return metadata field by external id", function () {
       return api.metadata_field_by_field_id(EXTERNAL_ID_GENERAL)
         .then((result) => {
-          expect([result, {label: EXTERNAL_ID_GENERAL}]).to.beAMetadataField();
+          expect([result, { label: EXTERNAL_ID_GENERAL }]).to.beAMetadataField();
         });
     });
   });
@@ -199,7 +199,7 @@ describe("structured metadata api", function () {
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_ENUM)));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('type', 'enum')));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_ENUM)));
-        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', {values: datasource_single})));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', { values: datasource_single })));
       });
     });
     it("should create set metadata field", function () {
@@ -267,7 +267,7 @@ describe("structured metadata api", function () {
 
   describe("update_metadata_field_datasource", function () {
     it("should update metadata field datasource by external id", function () {
-      return api.update_metadata_field_datasource(EXTERNAL_ID_ENUM_2, {values: datasource_single})
+      return api.update_metadata_field_datasource(EXTERNAL_ID_ENUM_2, { values: datasource_single })
         .then(() => api.metadata_field_by_field_id(EXTERNAL_ID_ENUM_2))
         .then((result) => {
           expect(result.datasource).to.beADatasource();
@@ -299,7 +299,7 @@ describe("structured metadata api", function () {
           expect(result.message).to.eql("ok");
           return api.add_metadata_field(metadata);
         })
-        .catch(({error}) => {
+        .catch(({ error }) => {
           expect(error).not.to.be(void 0);
           expect(error.http_code).to.eql(400);
           expect(error.message).to.contain(`external id ${EXTERNAL_ID_DELETE_2} already exists`);
@@ -409,7 +409,7 @@ describe("structured metadata api", function () {
         .then((result) => {
           expect(result).to.beAMetadataField();
           return api.metadata_field_by_field_id(EXTERNAL_ID_INT_VALIDATION_2);
-        }).catch(({error}) => {
+        }).catch(({ error }) => {
           expect(error).not.to.be(void 0);
           expect(error.http_code).to.eql(400);
           expect(error.message).to.contain(`default_value is invalid`);
@@ -518,7 +518,7 @@ describe("structured metadata api", function () {
     };
 
     api.add_metadata_field(metadata, (res, res2) => {
-      cloudinary.v2.uploader.update_metadata({[EXTERNAL_ID_SET_4]: [1]}, ['sample'], (err, result) => {
+      cloudinary.v2.uploader.update_metadata({ [EXTERNAL_ID_SET_4]: [1] }, ['sample'], (err, result) => {
         expect(typeof err).to.be('undefined');
         expect(result.public_ids[0]).to.equal('sample');
         done();
