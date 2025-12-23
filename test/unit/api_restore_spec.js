@@ -24,14 +24,14 @@ describe('api restore handlers', function () {
   });
 
   describe('.restore', function () {
-    it('sends public_ids and versions with JSON payload', function () {
+    it('sends public_ids and versions with JSON payload', async function () {
       const options = {
         resource_type: 'video',
         type: 'authenticated',
         versions: ['ver-1', 'ver-2']
       };
 
-      cloudinary.v2.api.restore(['pub-1', 'pub-2'], options);
+      await cloudinary.v2.api.restore(['pub-1', 'pub-2'], options).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('resources/video/authenticated/restore'),
@@ -44,11 +44,11 @@ describe('api restore handlers', function () {
   });
 
   describe('.restore_by_asset_ids', function () {
-    it('sends asset_ids and versions with JSON payload', function () {
+    it('sends asset_ids and versions with JSON payload', async function () {
       const options = { versions: ['ver-3'] };
       const assetIds = ['asset-1', 'asset-2'];
 
-      cloudinary.v2.api.restore_by_asset_ids(assetIds, options);
+      await cloudinary.v2.api.restore_by_asset_ids(assetIds, options).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('resources/restore'),
@@ -59,8 +59,8 @@ describe('api restore handlers', function () {
       sinon.assert.calledWith(mocked.write, sinon.match(helper.apiJsonParamMatcher('versions', ['ver-3'])));
     });
 
-    it('wraps a single asset id into an array before calling the API', function () {
-      cloudinary.v2.api.restore_by_asset_ids('single-asset-id');
+    it('wraps a single asset id into an array before calling the API', async function () {
+      await cloudinary.v2.api.restore_by_asset_ids('single-asset-id').catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('resources/restore'),

@@ -4,10 +4,10 @@ const helper = require("../../../spechelper");
 
 registerReusableTest("a list with a cursor", function (testFunc, ...args) {
   it("Cursor has max results", function () {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      testFunc(...args, {
+    return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+      await testFunc(...args, {
         max_results: 10
-      });
+      }).catch(helper.ignoreApiFailure);
 
       // TODO why don't we know what is used?
       if (writeSpy.called) {
@@ -20,10 +20,10 @@ registerReusableTest("a list with a cursor", function (testFunc, ...args) {
     });
   });
   it("Cursor has next cursor", function () {
-    return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-      testFunc(...args, {
+    return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+      await testFunc(...args, {
         next_cursor: 23452342
-      });
+      }).catch(helper.ignoreApiFailure);
 
       // TODO why don't we know what is used?
       if (writeSpy.called) {

@@ -25,8 +25,8 @@ describe('Analyze API', () => {
       mocked.xhr.restore();
     });
 
-    it('should call analyze endpoint with non-custom analysis_type', () => {
-      cloudinary.analysis.analyze_uri('https://example.com', 'captioning');
+    it('should call analyze endpoint with non-custom analysis_type', async () => {
+      await cloudinary.analysis.analyze_uri('https://example.com', 'captioning').catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match(new RegExp(`/v2/${config.cloud_name}/analysis/analyze/uri`)),
@@ -36,11 +36,11 @@ describe('Analyze API', () => {
       sinon.assert.calledWith(mocked.write, sinon.match(helper.apiJsonParamMatcher('analysis_type', 'captioning')));
     });
 
-    it('should call analyze endpoint with custom analysis_type', () => {
-      cloudinary.analysis.analyze_uri('https://example.com', 'custom', {
+    it('should call analyze endpoint with custom analysis_type', async () => {
+      await cloudinary.analysis.analyze_uri('https://example.com', 'custom', {
         model_name: 'my_model',
         model_version: 1
-      });
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match(new RegExp(`/v2/${config.cloud_name}/analysis/analyze/uri`)),

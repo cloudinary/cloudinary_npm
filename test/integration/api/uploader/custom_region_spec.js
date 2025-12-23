@@ -21,13 +21,13 @@ describe('Uploader', () => {
   });
 
   describe('upload', () => {
-    it('should send a request with encoded custom region gravity that represents a box', () => {
-      cloudinary.v2.uploader.upload('irrelevant', {
+    it('should send a request with encoded custom region gravity that represents a box', async () => {
+      await cloudinary.v2.uploader.upload('irrelevant', {
         regions: {
           'box_1': [[1, 2], [3, 4]],
           'box_2': [[5, 6], [7, 8]]
         }
-      });
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'box_1': [[1, 2], [3, 4]],
@@ -35,13 +35,13 @@ describe('Uploader', () => {
       }))));
     });
 
-    it('should send a request with encoded custom region gravity that represents a custom shape', () => {
-      cloudinary.v2.uploader.upload('irrelevant', {
+    it('should send a request with encoded custom region gravity that represents a custom shape', async () => {
+      await cloudinary.v2.uploader.upload('irrelevant', {
         regions: {
           'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
           'custom_2': [[10, 11], [12, 13], [14, 15]]
         }
-      });
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
@@ -51,13 +51,13 @@ describe('Uploader', () => {
   });
 
   describe('explicit', () => {
-    it('should send a request with encoded custom region gravity that represents a box', () => {
-      cloudinary.v2.uploader.explicit('irrelevant', {
+    it('should send a request with encoded custom region gravity that represents a box', async () => {
+      await cloudinary.v2.uploader.explicit('irrelevant', {
         regions: {
           'box_1': [[1, 2], [3, 4]],
           'box_2': [[5, 6], [7, 8]]
         }
-      });
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'box_1': [[1, 2], [3, 4]],
@@ -65,13 +65,13 @@ describe('Uploader', () => {
       }))));
     });
 
-    it('should send a request with encoded custom region gravity that represents a custom shape', () => {
-      cloudinary.v2.uploader.explicit('irrelevant', {
+    it('should send a request with encoded custom region gravity that represents a custom shape', async () => {
+      await cloudinary.v2.uploader.explicit('irrelevant', {
         regions: {
           'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],
           'custom_2': [[10, 11], [12, 13], [14, 15]]
         }
-      });
+      }).catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('regions', JSON.stringify({
         'custom_1': [[1, 2], [3, 4], [5, 6], [7, 8]],

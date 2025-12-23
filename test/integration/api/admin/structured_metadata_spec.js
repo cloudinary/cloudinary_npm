@@ -1,9 +1,9 @@
 const assert = require('assert');
-const Q = require('q');
 const sinon = require('sinon');
 const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 const TIMEOUT = require('../../../testUtils/testConstants').TIMEOUT;
+const allSettled = require('../../../testUtils/helpers/allSettled');
 
 const TEST_ID = Date.now();
 
@@ -87,33 +87,30 @@ function createMetadataFieldForTest(field) {
   if (!field.label) {
     field.label = field.external_id;
   }
-  return api.add_metadata_field(field);
+  return api.add_metadata_field(field).catch(helper.ignoreApiFailure);
 }
 
 describe("structured metadata api", function () {
   this.timeout(TIMEOUT.LARGE);
 
-  before(function () {
-    // Create the metadata fields required for the tests
-    return Q.allSettled(
-      metadata_fields_to_create.map(field => createMetadataFieldForTest(field))
-    ).finally(function () {
+  before(async function () {
+    await Promise.all(metadata_fields_to_create.map(field => createMetadataFieldForTest(field))).catch(error => {
+      console.error('Error creating metadata fields:', error);
     });
   });
 
   after(function () {
-    // Delete all metadata fields created during testing
-    return Q.allSettled(
+    // allSettled finishes successfully if all promises finish, even if some reject
+    return allSettled(
       metadata_fields_external_ids.map(field => api.delete_metadata_field(field))
-    ).finally(function () {
-    });
+    );
   });
 
   describe("list_metadata_fields", function () {
     it("should return all metadata field definitions", function () {
       const expectedPath = `/metadata_fields$`;
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        api.list_metadata_fields();
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await api.list_metadata_fields();
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("GET")
@@ -126,7 +123,7 @@ describe("structured metadata api", function () {
     it("should return metadata field by external id", function () {
       return api.metadata_field_by_field_id(EXTERNAL_ID_GENERAL)
         .then((result) => {
-          expect([result, {label: EXTERNAL_ID_GENERAL}]).to.beAMetadataField();
+          expect([result, { label: EXTERNAL_ID_GENERAL }]).to.beAMetadataField();
         });
     });
   });
@@ -134,13 +131,13 @@ describe("structured metadata api", function () {
   describe("add_metadata_field", function () {
     const expectedPath = "/metadata_fields$";
     it("should create string metadata field", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const metadata = {
           external_id: EXTERNAL_ID_STRING,
           label: EXTERNAL_ID_STRING,
           type: 'string'
         };
-        api.add_metadata_field(metadata);
+        await api.add_metadata_field(metadata);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("POST")
@@ -151,13 +148,13 @@ describe("structured metadata api", function () {
       });
     });
     it("should create integer metadata field", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const metadata = {
           external_id: EXTERNAL_ID_INT,
           label: EXTERNAL_ID_INT,
           type: 'integer'
         };
-        api.add_metadata_field(metadata);
+        await api.add_metadata_field(metadata);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("POST")
@@ -184,7 +181,7 @@ describe("structured metadata api", function () {
       });
     });
     it("should create enum metadata field", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const metadata = {
           datasource: {
             values: datasource_single
@@ -193,7 +190,7 @@ describe("structured metadata api", function () {
           label: EXTERNAL_ID_ENUM,
           type: 'enum'
         };
-        api.add_metadata_field(metadata);
+        await api.add_metadata_field(metadata);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("POST")
@@ -201,7 +198,7 @@ describe("structured metadata api", function () {
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('external_id', EXTERNAL_ID_ENUM)));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('type', 'enum')));
         sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('label', EXTERNAL_ID_ENUM)));
-        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', {values: datasource_single})));
+        sinon.assert.calledWith(writeSpy, sinon.match(helper.apiJsonParamMatcher('datasource', { values: datasource_single })));
       });
     });
     it("should create set metadata field", function () {
@@ -269,7 +266,7 @@ describe("structured metadata api", function () {
 
   describe("update_metadata_field_datasource", function () {
     it("should update metadata field datasource by external id", function () {
-      return api.update_metadata_field_datasource(EXTERNAL_ID_ENUM_2, {values: datasource_single})
+      return api.update_metadata_field_datasource(EXTERNAL_ID_ENUM_2, { values: datasource_single })
         .then(() => api.metadata_field_by_field_id(EXTERNAL_ID_ENUM_2))
         .then((result) => {
           expect(result.datasource).to.beADatasource();
@@ -280,9 +277,9 @@ describe("structured metadata api", function () {
 
   describe("delete_metadata_field", function () {
     it("should delete metadata field by external id", function () {
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const expectedPath = `/metadata_fields/${EXTERNAL_ID_DELETE}$`;
-        api.delete_metadata_field(EXTERNAL_ID_DELETE);
+        await api.delete_metadata_field(EXTERNAL_ID_DELETE).catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match("DELETE")
@@ -301,7 +298,7 @@ describe("structured metadata api", function () {
           expect(result.message).to.eql("ok");
           return api.add_metadata_field(metadata);
         })
-        .catch(({error}) => {
+        .catch(({ error }) => {
           expect(error).not.to.be(void 0);
           expect(error.http_code).to.eql(400);
           expect(error.message).to.contain(`external id ${EXTERNAL_ID_DELETE_2} already exists`);
@@ -411,7 +408,7 @@ describe("structured metadata api", function () {
         .then((result) => {
           expect(result).to.beAMetadataField();
           return api.metadata_field_by_field_id(EXTERNAL_ID_INT_VALIDATION_2);
-        }).catch(({error}) => {
+        }).catch(({ error }) => {
           expect(error).not.to.be(void 0);
           expect(error.http_code).to.eql(400);
           expect(error.message).to.contain(`default_value is invalid`);
@@ -446,8 +443,8 @@ describe("structured metadata api", function () {
     const method = /^PUT$/
 
     it("should reorder the metadata fields for label order by asc", function () {
-      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-        api.reorder_metadata_fields("label", "asc");
+      return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        await api.reorder_metadata_fields("label", "asc");
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(pathname),
@@ -460,8 +457,8 @@ describe("structured metadata api", function () {
     });
 
     it("should reorder the metadata fields for external_id order by desc", function () {
-      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-        api.reorder_metadata_fields("external_id", "desc");
+      return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        await api.reorder_metadata_fields("external_id", "desc");
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(pathname),
@@ -474,8 +471,8 @@ describe("structured metadata api", function () {
     });
 
     it("should reorder the metadata fields for for created_at order by asc", function () {
-      helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-        api.reorder_metadata_fields("created_at", "asc");
+      return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+        await api.reorder_metadata_fields("created_at", "asc");
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(pathname),
@@ -520,7 +517,7 @@ describe("structured metadata api", function () {
     };
 
     api.add_metadata_field(metadata, (res, res2) => {
-      cloudinary.v2.uploader.update_metadata({[EXTERNAL_ID_SET_4]: [1]}, ['sample'], (err, result) => {
+      cloudinary.v2.uploader.update_metadata({ [EXTERNAL_ID_SET_4]: [1] }, ['sample'], (err, result) => {
         expect(typeof err).to.be('undefined');
         expect(result.public_ids[0]).to.equal('sample');
         done();
@@ -531,8 +528,8 @@ describe("structured metadata api", function () {
   describe('rules', () => {
     it('should allow listing metadata rules', () => {
       const expectedPath = '/metadata_rules';
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        api.list_metadata_rules();
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await api.list_metadata_rules().catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match('GET')
@@ -542,14 +539,14 @@ describe("structured metadata api", function () {
 
     it('should allow adding new metadata rules', () => {
       const expectedPath = '/metadata_rules';
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const newMetadataRule = {
           metadata_field_id: 'field_id',
           name: 'rule_name',
           condition: {},
           result: {}
         };
-        api.add_metadata_rule(newMetadataRule);
+        await api.add_metadata_rule(newMetadataRule).catch(helper.ignoreApiFailure);
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
@@ -570,7 +567,7 @@ describe("structured metadata api", function () {
 
     it('should allow editing metadata rules', () => {
       const expectedPath = '/metadata_rules/some-metadata-rule-id';
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
         const ruleUpdate = {
           metadata_field_id: 'new_field_id',
           name: 'new_rule_name',
@@ -578,7 +575,7 @@ describe("structured metadata api", function () {
           result: {},
           state: 'inactive'
         };
-        api.update_metadata_rule('some-metadata-rule-id', ruleUpdate);
+        await api.update_metadata_rule('some-metadata-rule-id', ruleUpdate).catch(helper.ignoreApiFailure);
 
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
@@ -600,8 +597,8 @@ describe("structured metadata api", function () {
 
     it('should allow removing existing metadata rules', () => {
       const expectedPath = '/metadata_rules/some-metadata-rule-id';
-      return helper.provideMockObjects(function (mockXHR, writeSpy, requestSpy) {
-        api.delete_metadata_rule('some-metadata-rule-id');
+      return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
+        await api.delete_metadata_rule('some-metadata-rule-id').catch(helper.ignoreApiFailure);
         sinon.assert.calledWith(requestSpy, sinon.match({
           pathname: sinon.match(new RegExp(expectedPath)),
           method: sinon.match('DELETE')

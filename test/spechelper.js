@@ -2,14 +2,17 @@ const isFunction = require('lodash/isFunction');
 const querystring = require('querystring');
 const sinon = require('sinon');
 const ClientRequest = require('_http_client').ClientRequest;
-const Q = require('q');
 const http = require('http');
 const https = require('https');
 // Load all our custom assertions
 
 const cloudinary = require("../cloudinary");
 
-const { utils, config, Cache } = cloudinary;
+const {
+  utils,
+  config,
+  Cache
+} = cloudinary;
 
 const libPath = 'lib';
 const FileKeyValueStorage = require(`../${libPath}/cache/FileKeyValueStorage`);
@@ -57,30 +60,30 @@ exports.DYNAMIC_FOLDERS = 'dynamic_folders'
 
 const ALL = 'all';
 
-const { TEST_TAG } = require('./testUtils/testConstants').TAGS;
+const {TEST_TAG} = require('./testUtils/testConstants').TAGS;
 
 exports.SAMPLE_VIDEO_SOURCES = [
   {
     type: 'mp4',
     codecs: 'hev1',
-    transformations: { video_codec: 'h265' }
+    transformations: {video_codec: 'h265'}
   },
   {
     type: 'webm',
     codecs: 'vp9',
-    transformations: { video_codec: 'vp9' }
+    transformations: {video_codec: 'vp9'}
   },
   {
     type: 'mp4',
-    transformations: { video_codec: 'auto' }
+    transformations: {video_codec: 'auto'}
   },
   {
     type: 'webm',
-    transformations: { video_codec: 'auto' }
+    transformations: {video_codec: 'auto'}
   }
 ];
 
-exports.test_cloudinary_url = function(public_id, options, expected_url, expected_options) {
+exports.test_cloudinary_url = function (public_id, options, expected_url, expected_options) {
   var url;
   url = utils.url(public_id, options);
   expect(url).to.eql(expected_url);
@@ -120,13 +123,13 @@ exports.itBehavesLike = function (name, ...args) {
 };
 
 /**
-Create a matcher method for upload parameters
-@private
-@function helper.paramMatcher
-@param {string} name the parameter name
-@param {*} value the parameter value
-@return {function} the matcher function with the signature (arg)->Boolean
-*/
+ Create a matcher method for upload parameters
+ @private
+ @function helper.paramMatcher
+ @param {string} name the parameter name
+ @param {*} value the parameter value
+ @return {function} the matcher function with the signature (arg)->Boolean
+ */
 exports.uploadParamMatcher = function (name, value) {
   return function (arg) {
     var return_part;
@@ -137,13 +140,13 @@ exports.uploadParamMatcher = function (name, value) {
 };
 
 /**
-  Create a matcher method for api parameters
-  @private
-  @function helper.apiParamMatcher
-  @param {string} name the parameter name
-  @param {*} value the parameter value
-  @return {function} the matcher function as (arg)->Boolean
-*/
+ Create a matcher method for api parameters
+ @private
+ @function helper.apiParamMatcher
+ @param {string} name the parameter name
+ @param {*} value the parameter value
+ @return {function} the matcher function as (arg)->Boolean
+ */
 exports.apiParamMatcher = function (name, value) {
   var expected, params;
   params = {};
@@ -173,34 +176,34 @@ exports.apiJsonParamMatcher = function (name, value) {
 };
 
 /**
-  Escape RegExp characters
-  @private
-  @param {string} s the string to escape
-  @return a new escaped string
-*/
+ Escape RegExp characters
+ @private
+ @param {string} s the string to escape
+ @return a new escaped string
+ */
 exports.escapeRegexp = function (s) {
   return s.replace(/[{\[\].*+()}]/g, c => '\\' + c);
 };
 
 /**
-@function mockTest
-@nodoc
-Provides a wrapper for mocked tests. Must be called in a `describe` context.
-@example
-<pre>
-const mockTest = require('./spechelper').mockTest
-describe("some topic", function() {
-  mocked = mockTest()
-  it("should do something" function() {
-    options.access_control = [acl];
-    cloudinary.v2.api.update("id", options);
-    sinon.assert.calledWith(mocked.writeSpy, sinon.match(function(arg) {
-      return helper.apiParamMatcher('access_control', "[" + acl_string + "]")(arg);
-  })
-);
-</pre>
-@return {object} the mocked objects: `xhr`, `write`, `request`
-*/
+ @function mockTest
+ @nodoc
+ Provides a wrapper for mocked tests. Must be called in a `describe` context.
+ @example
+ <pre>
+ const mockTest = require('./spechelper').mockTest
+ describe("some topic", function() {
+ mocked = mockTest()
+ it("should do something" function() {
+ options.access_control = [acl];
+ cloudinary.v2.api.update("id", options);
+ sinon.assert.calledWith(mocked.writeSpy, sinon.match(function(arg) {
+ return helper.apiParamMatcher('access_control', "[" + acl_string + "]")(arg);
+ })
+ );
+ </pre>
+ @return {object} the mocked objects: `xhr`, `write`, `request`
+ */
 exports.mockTest = function () {
   var mocked;
   mocked = {};
@@ -218,44 +221,55 @@ exports.mockTest = function () {
 };
 
 /**
-@callback mockBlock
-A test block
-@param xhr
-@param writeSpy
-@param requestSpy
-@return {*} a promise or a value
-*/
+ @callback mockBlock
+ A test block
+ @param xhr
+ @param writeSpy
+ @param requestSpy
+ @return {*} a promise or a value
+ */
 
 
 /**
-  @function provideMockObjects
-            Wraps the function to be mocked using a promise.
-  @param {function} providedFunction  test function, accepting (mockXHR, writeSpy, requestSpy)
-  @return {Promise}
-*/
-exports.provideMockObjects = function (providedFunction) {
+ @function provideMockObjects
+ Wraps the function to be mocked using a promise.
+ @param {function} providedFunction  test function, accepting (mockXHR, writeSpy, requestSpy)
+ @return {Promise}
+ */
+exports.provideMockObjects = async function (providedFunction) {
   let requestSpy, writeSpy, mockXHR;
 
-  return Q.Promise(function (resolve, reject, notify) {
-    var result;
+  var result;
 
-    mockXHR = sinon.useFakeXMLHttpRequest();
-    writeSpy = sinon.spy(ClientRequest.prototype, 'write');
-    requestSpy = sinon.spy(api_http, 'request');
+  // Restore any existing spies first (safety check for Node 9)
+  if (ClientRequest.prototype.write.restore) {
+    ClientRequest.prototype.write.restore();
+  }
+  if (api_http.request.restore) {
+    api_http.request.restore();
+  }
 
-    result = providedFunction(mockXHR, writeSpy, requestSpy);
+  mockXHR = sinon.useFakeXMLHttpRequest();
+  writeSpy = sinon.spy(ClientRequest.prototype, 'write');
+  requestSpy = sinon.spy(api_http, 'request');
 
-
-    if (result && isFunction(result.then)) {
-      return result.then(resolve);
-    } else {
-      return resolve(result);
-    }
-  }).finally(function () {
+  try {
+    result = await providedFunction(mockXHR, writeSpy, requestSpy);
+  } finally {
     requestSpy.restore();
     writeSpy.restore();
     mockXHR.restore();
-  }).done();
+  }
+  return result;
+};
+
+/**
+ * Ignore expected API failures in tests that only verify request construction.
+ * These tests use provideMockObjects to spy on HTTP requests but still make real API calls.
+ * The API calls may fail (404, auth errors, etc.) which is expected - we only care about
+ * verifying the request parameters, not the response.
+ */
+exports.ignoreApiFailure = () => {
 };
 
 exports.setupCache = function () {
@@ -310,7 +324,7 @@ exports.shouldTestAddOn = function (addOn) {
  *
  * @return boolean
  */
-exports.shouldTestFeature = function(feature){
+exports.shouldTestFeature = function (feature) {
   const cldTestFeatures = (process.env.CLD_TEST_FEATURES || '').toLowerCase();
   if (cldTestFeatures === ALL) {
     return true;

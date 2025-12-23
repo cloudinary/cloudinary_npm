@@ -21,15 +21,15 @@ describe('Uploader', () => {
   });
 
   describe('upload', () => {
-    it('should send a request with auto_chaptering set to true if requested', () => {
-      cloudinary.v2.uploader.upload('irrelevant', { auto_chaptering: true });
+    it('should send a request with auto_chaptering set to true if requested', async () => {
+      await cloudinary.v2.uploader.upload('irrelevant', { auto_chaptering: true }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('auto_chaptering', '1')));
     });
   });
 
   describe('explicit', () => {
-    it('should send a request with auto_chaptering set to true if requested', () => {
-      cloudinary.v2.uploader.explicit('irrelevant', { auto_chaptering: true });
+    it('should send a request with auto_chaptering set to true if requested', async () => {
+      await cloudinary.v2.uploader.explicit('irrelevant', { auto_chaptering: true }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('auto_chaptering', '1')));
     });
   });

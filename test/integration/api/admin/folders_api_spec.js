@@ -23,8 +23,8 @@ describe('Admin API - Folders', () => {
   });
 
   describe('rename_folder', () => {
-    it('should send a request to update folder endpoint with correct parameters', () => {
-      cloudinary.v2.api.rename_folder('old/path', 'new/path');
+    it('should send a request to update folder endpoint with correct parameters', async () => {
+      await cloudinary.v2.api.rename_folder('old/path', 'new/path').catch(helper.ignoreApiFailure);
 
       sinon.assert.calledWith(mocked.request, sinon.match({
         pathname: sinon.match('old%2Fpath'),

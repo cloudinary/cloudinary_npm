@@ -4,10 +4,10 @@ const helper = require("../../../spechelper");
 
 registerReusableTest("accepts next_cursor", function (testFunc, ...args) {
   it("Has a next cursor", function () {
-    return helper.provideMockObjects((mockXHR, writeSpy, requestSpy) => {
-      testFunc(...args, {
+    return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
+      await testFunc(...args, {
         next_cursor: 23452342
-      });
+      }).catch(helper.ignoreApiFailure);
 
       // TODO Why aren't we sure what's called here?
       if (writeSpy.called) {
