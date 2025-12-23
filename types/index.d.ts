@@ -664,9 +664,11 @@ declare module 'cloudinary' {
     }
 
     export interface UploadApiErrorResponse {
-        message: string;
-        name: string;
-        http_code: number;
+        error: {
+            message: string;
+            name: string;
+            http_code: number;
+        };
 
         [futureKey: string]: any;
     }
