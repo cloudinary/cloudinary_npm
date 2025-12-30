@@ -1060,7 +1060,7 @@ describe("utils", function () {
     });
     describe("text", function () {
       this.timeout(TIMEOUT.MEDIUM);
-      var text_encoded, text_layer;
+      var text_encoded, text_layer, overlay_base_public_id;
       text_layer = "Hello World, /Nice to meet you?";
       text_encoded = "Hello%20World%252C%20%252FNice%20to%20meet%20you%3F";
       before(async function () {
@@ -1068,9 +1068,10 @@ describe("utils", function () {
         // Reset, in case some other test mutated the config (which happens...)
         cloudinary.config(true);
 
-        // Upload sample image for overlay tests
+        // Upload a dedicated base image for overlay tests (do not rely on a shared "sample" resource).
+        overlay_base_public_id = `overlay_base_${utils.random_public_id()}`;
         await cloudinary.v2.uploader.upload(helper.IMAGE_FILE, {
-          public_id: "sample",
+          public_id: overlay_base_public_id,
           overwrite: true,
           tags: TEST_TAG
         });
@@ -1089,7 +1090,6 @@ describe("utils", function () {
 
         fs.writeFileSync(fileName, srt);
 
-        // Why do we need this?
         await cloudinary.v2.uploader.upload(fileName, {
           public_id: 'subtitles.srt',
           resource_type: 'raw',
@@ -1189,7 +1189,10 @@ describe("utils", function () {
           it(`should support ${name}`, function (done) {
             var opt = {};
             opt.overlay = options;
-            expect(["sample", opt]).to.produceUrl(`https://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/sample`).and.emptyOptions().and.beServedByCloudinary(done);
+            expect([overlay_base_public_id, opt])
+              .to.produceUrl(`https://res.cloudinary.com/${cloud_name}/image/upload/l_${result}/${overlay_base_public_id}`)
+              .and.emptyOptions()
+              .and.beServedByCloudinary(done);
           });
           if (!isString(options)) {
             itBehavesLike("a signed url", { overlay: options }, `l_${result}`);
@@ -1201,8 +1204,8 @@ describe("utils", function () {
             height: 100,
             width: 100
           };
-          expect(["sample", opt])
-            .produceUrl(`https://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/sample`)
+          expect([overlay_base_public_id, opt])
+            .produceUrl(`https://res.cloudinary.com/${cloud_name}/image/upload/h_100,l_text:test_text,w_100/${overlay_base_public_id}`)
             .and
             .emptyOptions();
         });

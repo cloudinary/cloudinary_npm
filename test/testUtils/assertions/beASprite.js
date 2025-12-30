@@ -1,5 +1,3 @@
-const url = require("url");
-
 const ERRORS = {
   FIELD_VERSION_MUST_BE_NUMBER: `expected sprite to contain mandatory field 'version' of type number`,
   FIELD_VERSION_MUST_NOT_BE_NUMBER: `expected sprite not to contain mandatory field 'version' of type number`,
@@ -13,8 +11,10 @@ const ERRORS = {
   FIELD_URL_MUST_NOT_BE_ACCORDING_TO_THE_SCHEME: (name, protocol, format) => `expected field '${name}' not to contain a URL with protocol '${protocol}' and format '${format}'`
 }
 
+const { URL } = require("url");
+
 function matchesSchema (urlStr, protocol, format) {
-  const urlObj = url.parse(urlStr);
+  const urlObj = new URL(urlStr);
   let isValid = urlObj.protocol === `${protocol}:`;
   if (format) {
     isValid = isValid && urlObj.pathname.endsWith(`.${format}`)

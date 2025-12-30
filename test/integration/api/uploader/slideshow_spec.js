@@ -17,10 +17,16 @@ const {
   TEST_TAG
 } = TAGS;
 
-require('jsdom-global')();
+const { URL: NodeURL, URLSearchParams: NodeURLSearchParams } = require('url');
+let cleanupJsdom;
 
 describe("create slideshow tests", function () {
   this.timeout(TIMEOUT.LONG);
+  before(function () {
+    cleanupJsdom = require('jsdom-global')();
+    global.URL = NodeURL;
+    global.URLSearchParams = NodeURLSearchParams;
+  });
   after(function () {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -32,7 +38,11 @@ describe("create slideshow tests", function () {
         {
           resource_type: "video"
         }) : void 0
-    ]);
+    ]).finally(function () {
+      if (typeof cleanupJsdom === 'function') cleanupJsdom();
+      global.URL = NodeURL;
+      global.URLSearchParams = NodeURLSearchParams;
+    });
   });
   beforeEach(function () {
     cloudinary.config(true);

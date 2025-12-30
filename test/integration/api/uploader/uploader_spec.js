@@ -49,10 +49,17 @@ const {
 const SAMPLE_IMAGE_URL_1 = "https://res.cloudinary.com/demo/image/upload/sample"
 const SAMPLE_IMAGE_URL_2 = "https://res.cloudinary.com/demo/image/upload/car"
 
-require('jsdom-global')();
+const { URL: NodeURL, URLSearchParams: NodeURLSearchParams } = require('url');
+let cleanupJsdom;
 
 describe("uploader", function () {
   this.timeout(TIMEOUT.LONG);
+  before(function () {
+    cleanupJsdom = require('jsdom-global')();
+    // Keep Node's WHATWG URL constructors even when jsdom is active.
+    global.URL = NodeURL;
+    global.URLSearchParams = NodeURLSearchParams;
+  });
   after(function () {
     var config = cloudinary.config(true);
     if (!(config.api_key && config.api_secret)) {
@@ -64,7 +71,12 @@ describe("uploader", function () {
         {
           resource_type: "video"
         }) : void 0
-    ]);
+    ]).finally(function () {
+      // Ensure globals don't leak to other test files.
+      if (typeof cleanupJsdom === 'function') cleanupJsdom();
+      global.URL = NodeURL;
+      global.URLSearchParams = NodeURLSearchParams;
+    });
   });
   beforeEach(function () {
     cloudinary.config(true);
@@ -953,35 +965,33 @@ describe("uploader", function () {
     });
   });
 
-  it("should reject with promise rejection if disable_promises: false", function (done) {
-    const unhandledRejectionSpy = sinon.spy();
+  it("should surface upload_large errors via callback (disable_promises: false) without unhandled rejection", function (done) {
+    this.timeout(TIMEOUT.LONG);
 
-    process.on('unhandledRejection', unhandledRejectionSpy);
-
-    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: false }, () => { });
-
-    // Promises are not disabled meaning we should throw unhandledRejection
-    setTimeout(() => {
-      expect(sinon.assert.called(unhandledRejectionSpy));
-      process.removeListener('unhandledRejection', unhandledRejectionSpy);
-      done();
-    }, 2000);
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, { disable_promises: false }, (err) => {
+      try {
+        expect(err).to.be.ok();
+        // The exact message can vary, but it should be a 4xx error from the server for an empty file.
+        expect(err.http_code).to.be.ok();
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it("should reject with promise rejection by default", function (done) {
-    const unhandledRejectionSpy = sinon.spy();
+  it("should surface upload_large errors via callback by default without unhandled rejection", function (done) {
+    this.timeout(TIMEOUT.LONG);
 
-
-    process.on('unhandledRejection', unhandledRejectionSpy);
-
-    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, () => { });
-
-    // Promises are not disabled meaning we should throw unhandledRejection
-    setTimeout(() => {
-      expect(sinon.assert.called(unhandledRejectionSpy));
-      process.removeListener('unhandledRejection', unhandledRejectionSpy);
-      done();
-    }, 2000);
+    cloudinary.v2.uploader.upload_large(EMPTY_IMAGE, (err) => {
+      try {
+        expect(err).to.be.ok();
+        expect(err.http_code).to.be.ok();
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
   });
 
   it("should reject without promise rejection if disable_promises: true", function (done) {

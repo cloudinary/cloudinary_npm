@@ -14,13 +14,25 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
   } else {
     callHttp = http;
   }
-  callHttp.get(actual, (res) => {
-    this.assert(res.statusCode === 200, function () {
-      return `Expected to get ${actual} but server responded with "${res.statusCode}: ${res.headers['x-cld-error']}"`;
-    }, function () {
-      return `Expeted not to get ${actual}.`;
+  const req = callHttp.get(actual, (res) => {
+    res.on('data', () => { });
+    res.on('end', () => {
+      this.assert(res.statusCode === 200, function () {
+        return `Expected to get ${actual} but server responded with "${res.statusCode}: ${res.headers['x-cld-error']}"`;
+      }, function () {
+        return `Expeted not to get ${actual}.`;
+      });
+      return done();
     });
-    return done();
+    res.on('error', (e) => done(e));
+    res.resume();
   });
+
+  req.setTimeout(30000, () => {
+    req.destroy(new Error(`Request timed out after 30000ms: ${actual}`));
+  });
+
+  req.on('error', (e) => done(e));
+
   return this;
 };

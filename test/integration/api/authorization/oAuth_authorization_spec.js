@@ -6,8 +6,8 @@ const testConstants = require('../../../testUtils/testConstants');
 const { PUBLIC_IDS } = testConstants;
 const { PUBLIC_ID } = PUBLIC_IDS;
 
-describe("oauth_token", function(){
-  it("should send the oauth_token option to the server (admin_api)", function() {
+describe("oauth_token", function () {
+  it("should send the oauth_token option to the server (admin_api)", function () {
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       await cloudinary.v2.api.resource(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy,
@@ -17,7 +17,7 @@ describe("oauth_token", function(){
     });
   });
 
-  it("should send the oauth_token config to the server (admin_api)", function() {
+  it("should send the oauth_token config to the server (admin_api)", function () {
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       cloudinary.config({
         api_key: undefined,
@@ -32,7 +32,7 @@ describe("oauth_token", function(){
     });
   });
 
-  it("should not fail when only providing api_key and secret (admin_api)", function() {
+  it("should not fail when only providing api_key and secret (admin_api)", function () {
     cloudinary.config({
       api_key: "1234",
       api_secret: "1234",
@@ -40,11 +40,11 @@ describe("oauth_token", function(){
     });
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       await cloudinary.v2.api.resource(PUBLIC_ID).catch(helper.ignoreApiFailure);
-      sinon.assert.calledWith(requestSpy, sinon.match({ auth: "1234:1234" }));
+      sinon.assert.calledWith(requestSpy, sinon.match.has("auth", "1234:1234"));
     });
   });
 
-  it("should fail when missing all credentials (admin_api)", function() {
+  it("should fail when missing all credentials (admin_api)", function () {
     cloudinary.config({
       api_key: undefined,
       api_secret: undefined,
@@ -55,18 +55,18 @@ describe("oauth_token", function(){
     }).to.throwError(/Must supply api_key/);
   });
 
-  it("oauth_token as option should take priority with secret and key (admin_api)", function() {
+  it("oauth_token as option should take priority with secret and key (admin_api)", function () {
     cloudinary.config({
       api_key: '1234',
       api_secret: '1234'
     });
-    return cloudinary.v2.api.resource(PUBLIC_ID, {oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4'})
+    return cloudinary.v2.api.resource(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' })
       .then(
         () => expect().fail()
       ).catch(({ error }) => expect(error.message).to.contain("Invalid token"));
   });
 
-  it("should send the oauth_token option to the server (upload_api)", function() {
+  it("should send the oauth_token option to the server (upload_api)", function () {
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       await cloudinary.v2.uploader.upload(PUBLIC_ID, { oauth_token: 'MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI4' }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(requestSpy,
@@ -76,7 +76,7 @@ describe("oauth_token", function(){
     });
   });
 
-  it("should send the oauth_token config to the server (upload_api)", function() {
+  it("should send the oauth_token config to the server (upload_api)", function () {
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       cloudinary.config({
         api_key: undefined,
@@ -91,7 +91,7 @@ describe("oauth_token", function(){
     });
   });
 
-  it("should not fail when only providing api_key and secret (upload_api)", function() {
+  it("should not fail when only providing api_key and secret (upload_api)", function () {
     cloudinary.config({
       api_key: "1234",
       api_secret: "1234",
@@ -99,11 +99,12 @@ describe("oauth_token", function(){
     });
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       await cloudinary.v2.uploader.upload(PUBLIC_ID).catch(helper.ignoreApiFailure);
-      sinon.assert.calledWith(requestSpy, sinon.match({ auth: null }));
+      const call = requestSpy.getCall(0);
+      expect(call.args[0]).not.to.have.property('auth');
     });
   });
 
-  it("should fail when missing all credentials (upload_api)", function() {
+  it("should fail when missing all credentials (upload_api)", function () {
     cloudinary.config({
       api_key: undefined,
       api_secret: undefined,
@@ -114,7 +115,7 @@ describe("oauth_token", function(){
     }).to.throwError(/Must supply api_key/);
   });
 
-  it("should not need credentials for unsigned upload", function() {
+  it("should not need credentials for unsigned upload", function () {
     cloudinary.config({
       api_key: undefined,
       api_secret: undefined,
@@ -122,7 +123,8 @@ describe("oauth_token", function(){
     });
     return helper.provideMockObjects(async (mockXHR, writeSpy, requestSpy) => {
       await cloudinary.v2.uploader.unsigned_upload(PUBLIC_ID, 'preset').catch(helper.ignoreApiFailure);
-      sinon.assert.calledWith(requestSpy, sinon.match({ auth: null }));
+      const call = requestSpy.getCall(0);
+      expect(call.args[0]).not.to.have.property('auth');
     });
   });
 });

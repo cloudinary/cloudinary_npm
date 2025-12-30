@@ -98,12 +98,14 @@ describe("archive", function () {
           var filename;
           filename = `${os.tmpdir()}/deleteme-${Math.floor(Math.random() * 100000)}.zip`;
           expect(this.archive_result).to.contain("expires_at");
-          https.get(this.archive_result, function (res) {
+          const req = https.get(this.archive_result, function (res) {
             var file;
             file = fs.createWriteStream(filename);
             if (res.statusCode === 200) {
               res.pipe(file);
             } else {
+              // Consume response so the socket can be released/closed.
+              res.resume();
               done(new Error(`${res.statusCode}: ${res.headers['x-cld-error']}`));
             }
             res.on('end', function () {
@@ -118,6 +120,10 @@ describe("archive", function () {
               });
             });
           });
+          req.setTimeout(30000, () => {
+            req.destroy(new Error(`Request timed out after 30000ms: ${this.archive_result}`));
+          });
+          req.on('error', (e) => done(e));
         });
       });
     });
@@ -175,35 +181,35 @@ describe("archive", function () {
       });
     });
   });
-  describe('download_folder', function(){
-    it('should return url with resource_type image', function(){
-      let download_folder_url = utils.download_folder('samples/', {resource_type: 'image'});
+  describe('download_folder', function () {
+    it('should return url with resource_type image', function () {
+      let download_folder_url = utils.download_folder('samples/', { resource_type: 'image' });
       expect(download_folder_url).to.contain('image');
     });
-    it('should return valid url', function(){
+    it('should return valid url', function () {
       let download_folder_url = utils.download_folder('folder/');
       expect(download_folder_url).not.to.be.empty();
       expect(download_folder_url).to.contain('generate_archive');
     });
 
-    it('should flatten folder', function(){
-      let download_folder_url = utils.download_folder('folder/', {flatten_folders: true});
+    it('should flatten folder', function () {
+      let download_folder_url = utils.download_folder('folder/', { flatten_folders: true });
       expect(download_folder_url).to.contain('flatten_folders');
     });
 
-    it('should expire_at folder', function(){
-      let download_folder_url = utils.download_folder('folder/', {expires_at: Date.now() / 1000 + 60});
+    it('should expire_at folder', function () {
+      let download_folder_url = utils.download_folder('folder/', { expires_at: Date.now() / 1000 + 60 });
       expect(download_folder_url).to.contain('expires_at');
     });
 
-    it('should use original file_name of folder', function(){
-      let download_folder_url = utils.download_folder('folder/', {use_original_filename: true});
+    it('should use original file_name of folder', function () {
+      let download_folder_url = utils.download_folder('folder/', { use_original_filename: true });
       expect(download_folder_url).to.contain('use_original_filename');
     });
   });
 
-  describe('download_backedup_asset', function(){
-    it('should return url with asset and version id', function(){
+  describe('download_backedup_asset', function () {
+    it('should return url with asset and version id', function () {
       let download_backedup_asset_url = utils.download_backedup_asset('b71b23d9c89a81a254b88a91a9dad8cd', '0e493356d8a40b856c4863c026891a4e');
       expect(download_backedup_asset_url).to.contain('asset_id');
       expect(download_backedup_asset_url).to.contain('version_id');
