@@ -2,6 +2,7 @@ const cloneDeep = require('lodash/cloneDeep');
 const http = require('http');
 const https = require('https');
 const cloudinary = require('../../../cloudinary');
+const { REQ_TIMEOUT_IN_TEST } = require('../constants');
 
 
 expect.Assertion.prototype.beServedByCloudinary = function (done) {
@@ -28,8 +29,8 @@ expect.Assertion.prototype.beServedByCloudinary = function (done) {
     res.resume();
   });
 
-  req.setTimeout(30000, () => {
-    req.destroy(new Error(`Request timed out after 30000ms: ${actual}`));
+  req.setTimeout(REQ_TIMEOUT_IN_TEST, () => {
+    req.destroy(new Error(`Request timed out after ${REQ_TIMEOUT_IN_TEST}ms: ${actual}`));
   });
 
   req.on('error', (e) => done(e));

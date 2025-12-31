@@ -9,6 +9,7 @@ const cloudinary = require("../../../../cloudinary");
 const helper = require("../../../spechelper");
 
 const testConstants = require('../../../testUtils/testConstants');
+const { REQ_TIMEOUT_IN_TEST } = require("../../../testUtils/constants");
 const callReusableTest = require('../../../testUtils/reusableTests/reusableTests').callReusableTest;
 const registerReusableTest = require('../../../testUtils/reusableTests/reusableTests').registerReusableTest;
 
@@ -120,8 +121,8 @@ describe("archive", function () {
               });
             });
           });
-          req.setTimeout(30000, () => {
-            req.destroy(new Error(`Request timed out after 30000ms: ${this.archive_result}`));
+          req.setTimeout(REQ_TIMEOUT_IN_TEST, () => {
+            req.destroy(new Error(`Request timed out after ${REQ_TIMEOUT_IN_TEST}ms: ${this.archive_result}`));
           });
           req.on('error', (e) => done(e));
         });

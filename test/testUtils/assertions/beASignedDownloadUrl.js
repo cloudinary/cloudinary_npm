@@ -13,34 +13,7 @@ const ERRORS = {
   FIELD_MUST_NOT_EQUAL_VALUE: (key, value) => `expected field ${key} not to equal ${value}`
 }
 
-/**
- * Asserts that a given string is a signed url.
- *
- * @param {string} [path]   Path that the url should end with
- * @param {Object} [params] Query paraneters that should be present in the url
- *
- * @returns {expect.Assertion}
- */
-expect.Assertion.prototype.beASignedDownloadUrl = function (path, params) {
-  const apiUrl = this.obj;
-
-  // `apiUrl` should be a string, but be defensive in case callers pass URL-like objects.
-  // eslint-disable-next-line no-nested-ternary
-  const urlString = (typeof apiUrl === "string") ? apiUrl : (apiUrl && apiUrl.href) ? apiUrl.href : String(apiUrl);
-  const urlOptions = new URL(urlString);
-  // NOTE: tests run with `jsdom-global()` (old jsdom version), whose URL implementation
-  // may not include `searchParams`. Parse the query string ourselves to stay compatible,
-  // and avoid using deprecated `url.parse()`.
-  const rawQuery = (urlOptions && typeof urlOptions.search === "string") ? urlOptions.search : "";
-  const queryParams = querystring.parse(rawQuery.startsWith("?") ? rawQuery.slice(1) : rawQuery);
-
-  const defaultParams = {
-    api_key: cloudinary.config().api_key,
-    mode: "download"
-  };
-  const expectedParams = Object.assign(defaultParams, params);
-
-  // Rename PHP-style multi-value params to strip '[]' from their names, e.g. urls[] -> urls
+function normalizePhpStyleArrayQueryParams(queryParams) {
   for (let param in queryParams) {
     if (param.endsWith("[]")) {
       const normalized = param.slice(0, -2);
@@ -63,6 +36,33 @@ expect.Assertion.prototype.beASignedDownloadUrl = function (path, params) {
       delete queryParams[param];
     }
   }
+}
+
+/**
+ * Asserts that a given string is a signed url.
+ *
+ * @param {string} [path]   Path that the url should end with
+ * @param {Object} [params] Query paraneters that should be present in the url
+ *
+ * @returns {expect.Assertion}
+ */
+expect.Assertion.prototype.beASignedDownloadUrl = function (path, params) {
+  const apiUrl = this.obj;
+
+  // `apiUrl` should be a string, but be defensive in case callers pass URL-like objects.
+  // eslint-disable-next-line no-nested-ternary
+  const urlString = (typeof apiUrl === "string") ? apiUrl : (apiUrl && apiUrl.href) ? apiUrl.href : String(apiUrl);
+  const urlOptions = new URL(urlString);
+  const rawQuery = (urlOptions && typeof urlOptions.search === "string") ? urlOptions.search : "";
+  const queryParams = querystring.parse(rawQuery.startsWith("?") ? rawQuery.slice(1) : rawQuery);
+
+  const defaultParams = {
+    api_key: cloudinary.config().api_key,
+    mode: "download"
+  };
+  const expectedParams = Object.assign(defaultParams, params);
+
+  normalizePhpStyleArrayQueryParams(queryParams);
 
   this.assert("timestamp" in queryParams, function () {
     return ERRORS.MUST_CONTAIN_QUERY_PARAMETER("timestamp");
