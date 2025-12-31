@@ -38,6 +38,16 @@ function normalizePhpStyleArrayQueryParams(queryParams) {
   }
 }
 
+function toUrlString(apiUrl) {
+  if (typeof apiUrl === "string") {
+    return apiUrl;
+  }
+  if (apiUrl && typeof apiUrl.href === "string") {
+    return apiUrl.href;
+  }
+  return String(apiUrl);
+}
+
 /**
  * Asserts that a given string is a signed url.
  *
@@ -49,9 +59,7 @@ function normalizePhpStyleArrayQueryParams(queryParams) {
 expect.Assertion.prototype.beASignedDownloadUrl = function (path, params) {
   const apiUrl = this.obj;
 
-  // `apiUrl` should be a string, but be defensive in case callers pass URL-like objects.
-  // eslint-disable-next-line no-nested-ternary
-  const urlString = (typeof apiUrl === "string") ? apiUrl : (apiUrl && apiUrl.href) ? apiUrl.href : String(apiUrl);
+  const urlString = toUrlString(apiUrl);
   const urlOptions = new URL(urlString);
   const rawQuery = (urlOptions && typeof urlOptions.search === "string") ? urlOptions.search : "";
   const queryParams = querystring.parse(rawQuery.startsWith("?") ? rawQuery.slice(1) : rawQuery);
