@@ -206,9 +206,11 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
       [USER_ID_1],
       null,
       null,
-      true,
-      today,
-      today
+      {
+        lastLogin: true,
+        fromDate: today,
+        toDate: today
+      }
     );
     expect(result1.users.length).to.eql(0);
 
@@ -217,7 +219,9 @@ runOnlyForInternalPRs('account API - Provisioning', function () {
       [USER_ID_1],
       null,
       null,
-      false
+      {
+        lastLogin: false
+      }
     );
     expect(result2.users.length).to.eql(1);
   });
