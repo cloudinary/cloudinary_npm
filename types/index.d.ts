@@ -360,6 +360,7 @@ declare module 'cloudinary' {
         provisioning_api_key?: string;
         provisioning_api_secret?: string;
         oauth_token?: string;
+        debug?: boolean;
 
         [futureKey: string]: any;
     }
@@ -633,6 +634,7 @@ declare module 'cloudinary' {
         rate_limit_allowed?: number;
         rate_limit_reset_at?: string;
         rate_limit_remaining?: number;
+        request_id?: string;
     }
 
     export interface UploadApiResponse {
@@ -667,6 +669,7 @@ declare module 'cloudinary' {
         message: string;
         name: string;
         http_code: number;
+        request_id?: string;
 
         [futureKey: string]: any;
     }
