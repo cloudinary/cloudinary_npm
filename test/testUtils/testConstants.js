@@ -1,4 +1,6 @@
-require('dotenv').load({
+const dotenv = require('dotenv');
+const dotenvInit = typeof dotenv.config === 'function' ? dotenv.config : dotenv.load;
+dotenvInit({
   silent: true
 });
 const UNIQUE_JOB_SUFFIX_ID = process.env.TRAVIS_JOB_ID || Math.floor(Math.random() * 999999);

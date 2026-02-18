@@ -1,4 +1,6 @@
-require('dotenv').load({
+const dotenv = require('dotenv');
+const dotenvInit = typeof dotenv.config === 'function' ? dotenv.config : dotenv.load;
+dotenvInit({
   silent: true
 });
 
