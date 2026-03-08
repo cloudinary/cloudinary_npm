@@ -95,6 +95,81 @@ describe("uploader", function () {
       expect(result.signature).to.eql(expected_signature);
     });
   });
+  describe("in-memory uploads", function () {
+    it("should successfully upload a Buffer", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      return cloudinary.v2.uploader.upload(buffer, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should successfully upload a Uint8Array", function () {
+      const uint8Array = new Uint8Array(fs.readFileSync(IMAGE_FILE));
+      return cloudinary.v2.uploader.upload(uint8Array, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should successfully upload an ArrayBuffer", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+      return cloudinary.v2.uploader.upload(arrayBuffer, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should successfully upload a Blob", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      const blob = new Blob([buffer], { type: "image/png" });
+      return cloudinary.v2.uploader.upload(blob, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should upload a raw buffer when resource_type is raw", function () {
+      const buffer = fs.readFileSync(RAW_FILE);
+      return cloudinary.v2.uploader.upload(buffer, {
+        resource_type: "raw",
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.resource_type).to.eql("raw");
+      });
+    });
+
+    it("should send buffer uploads without reading from the filesystem", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      return helper.provideMockObjects(async function (mockXHR, writeSpy) {
+        const createReadStreamSpy = sinon.spy(fs, "createReadStream");
+        try {
+          await cloudinary.v2.uploader.upload(buffer, {
+            filename: "buffer-upload.png",
+            tags: UPLOAD_TAGS
+          }).catch(helper.ignoreApiFailure);
+          sinon.assert.notCalled(createReadStreamSpy);
+          sinon.assert.calledWith(writeSpy, sinon.match((arg) => Buffer.isBuffer(arg) && arg.equals(buffer)));
+          sinon.assert.calledWith(writeSpy, sinon.match((arg) => Buffer.isBuffer(arg) && arg.toString("utf8").includes('filename="buffer-upload.png"')));
+        } finally {
+          createReadStreamSpy.restore();
+        }
+      });
+    });
+  });
   it("should successfully upload with metadata", function () {
     return helper.provideMockObjects(async function (mockXHR, writeSpy, requestSpy) {
       await uploadImage({ metadata: METADATA_SAMPLE_DATA }).catch(helper.ignoreApiFailure);
