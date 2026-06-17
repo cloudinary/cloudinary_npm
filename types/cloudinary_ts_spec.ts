@@ -900,6 +900,29 @@ cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
         console.log(result, error);
     });
 
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.generate({prompt: "A man with a hat"},
+    function (error, result) {
+        console.log(result, error);
+    });
+
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.generate(
+    {
+        prompt: "A photorealistic sunset over a mountain lake",
+        model_family: "flux",
+        quality_tier: "premium",
+        width: 1024,
+        height: 768
+    },
+    {
+        upload_preset: "my_preset",
+        tags: ["generated"]
+    },
+    function (error, result) {
+        console.log(result, error);
+    });
+
 // $ExpectType UploadStream | Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {
