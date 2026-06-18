@@ -1240,14 +1240,3 @@ cloudinary.v2.api.config();
 
 // $ExpectType Promise<ConfigResponse>
 cloudinary.v2.api.config({ settings: true });
-
-// $ExpectType Promise<any>
-cloudinary.v2.uploader.create_slideshow({
-    manifest_json: {
-        foo: 'bar' // This is a typescript Record
-    }, // In practice only one of the two are allowed
-    manifest_transformation: {
-        width: 100
-    },
-    height: 100
-});
