@@ -1,0 +1,8 @@
+---
+description: Cloudinary cloudinary_npm — agent guide
+alwaysApply: true
+---
+
+Read and follow `AGENTS.md` in the repository root. It is the single
+authoritative guide for this package: build/test commands, conventions,
+gotchas, and when to use this SDK versus a sibling Cloudinary package.
