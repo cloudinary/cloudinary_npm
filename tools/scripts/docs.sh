@@ -1,2 +1,2 @@
 #!/bin/bash
-jsdoc -d docs -r -p lib/*
+jsdoc -r -p lib/*
