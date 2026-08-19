@@ -3,8 +3,24 @@
 ## When to use
 
 Content uploaded by users must be reviewed before it is delivered. Moderation in
-Cloudinary is stateful: assets are `pending` until a decision is recorded, and your
-application is responsible for delivering approved assets only.
+Cloudinary is stateful: an asset carries a moderation status, and your application is
+responsible for delivering approved assets only.
+
+**By default, `pending` does not block delivery.** A moderated asset is deliverable and
+visible in the Media Library from the moment it is uploaded — the status is metadata you
+gate on in your own code.
+
+Blocking delivery of non-approved assets can be configured for your product environment.
+It is not an upload parameter — contact Cloudinary support. Gate on the status in your
+code regardless.
+
+Statuses are `queued`, `pending`, `approved`, `rejected`, and `aborted`. They appear in
+the `moderation` array on the asset, not as a top-level field:
+
+```js
+result.moderation[0].kind     // 'manual', 'aws_rek', ...
+result.moderation[0].status   // 'pending'
+```
 
 ## Complete flow (manual review queue)
 
@@ -43,26 +59,47 @@ main().catch((error) => {
 
 ## Automatic moderation
 
-Pass an add-on name instead of `manual` (for example `moderation: 'aws_rek'`) to get an
-automated verdict; the same pending/approved/rejected states apply, and you can still
-override a machine decision with `api.update` + `moderation_status` for human review.
-Automatic moderators require the matching add-on to be enabled on the account.
+Pass an add-on name instead of `manual` to get an automated verdict:
+
+| Value | Moderates | Add-on |
+|---|---|---|
+| `aws_rek` | images | Amazon Rekognition AI Moderation |
+| `aws_rek_video` | video | Amazon Rekognition Video Moderation |
+| `google_video_moderation` | video | Google AI Video Moderation |
+| `webpurify` | images | WebPurify Image Moderation |
+| `perception_point` | any asset | Perception Point Malware Detection |
+| `duplicate:<threshold>` | images | Cloudinary Duplicate Image Detection |
+
+Combine several with a pipe — the order is the order they run in, and `manual` must be
+last (`'aws_rek|duplicate:0.9|manual'`). The first moderation starts as `pending` and the
+rest as `queued`; if one rejects, the remaining become `aborted` and the asset's final
+status is `rejected`. Always set a `notification_url` when requesting several.
+
+The same statuses apply, and you can still override a machine decision with `api.update`
++ `moderation_status` for human review. Each moderator requires its add-on enabled on the
+account, and an asset may sit in `queued` before the add-on reaches it.
 
 ## Design rules
 
 - Model moderation as a state machine, not a boolean. Keep the pending state visible in
-  your product (placeholder image, "under review" label).
+  your product (placeholder image, "under review" label) — and remember the URL works
+  regardless, so the gate has to be in your code.
 - Keep human override even with automatic moderation — machine verdicts are drafts for
   anything with legal or brand consequences.
 - Rejected assets stay in storage unless you delete them; decide your retention policy.
 
-## Common failures
+## Troubleshooting
 
 - `Moderation kind not supported` — the add-on is not enabled for the account.
 - Delivering a pending asset — nothing blocks delivery by default; enforcement is your
-  application's responsibility (or use access control on the asset).
+  application's responsibility. It is not an upload parameter: contact Cloudinary support
+  to have it configured for your product environment.
+- Showing a rejected image — deliver `default_image` as a placeholder rather than
+  relying on the URL failing, because it will not.
 
 ## Related
 
 - Runnable example: `examples/moderate-upload.js`
-- Hosted reference: https://cloudinary.com/documentation/cloudinary_moderation
+- [Moderate assets](https://cloudinary.com/documentation/moderate_assets.md) — statuses,
+  delivery behavior, and the available moderation add-ons.
+- [Moderation guide](https://cloudinary.com/documentation/cloudinary_moderation.md)

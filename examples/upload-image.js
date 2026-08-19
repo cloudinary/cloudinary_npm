@@ -20,6 +20,7 @@ async function main(imageSource = 'https://res.cloudinary.com/demo/image/upload/
     secure: true
   });
 
+  console.log(`Stored reference: ${result.asset_id}`);
   console.log(`Uploaded: ${result.public_id} (${result.bytes} bytes, ${result.width}x${result.height})`);
   console.log(`Optimized delivery URL: ${optimizedUrl}`);
   return result;

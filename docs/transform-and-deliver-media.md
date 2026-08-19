@@ -2,7 +2,7 @@
 
 ## When to use
 
-Generate delivery URLs that resize, crop, overlay, or optimize images and video. URL
+Generate CDN-backed delivery URLs that resize, crop, overlay, or optimize images and video. URL
 generation is local — no network call, no secret required — and the derived asset is
 created by Cloudinary on first request, then served from CDN cache.
 
@@ -70,7 +70,7 @@ Server-supported generative transformations (background removal, generative fill
 similar) can be expressed as transformation strings — this package serializes them
 generically via `effect` or `raw_transformation`, without dedicated typed builders.
 Their availability is account- and plan-dependent; verify against
-https://cloudinary.com/documentation/generative_ai_transformations before relying on one.
+https://cloudinary.com/documentation/generative_ai_transformations.md before relying on one.
 
 ## Cache behavior
 
@@ -81,4 +81,6 @@ https://cloudinary.com/documentation/generative_ai_transformations before relyin
 ## Related
 
 - Runnable example: `examples/transform-and-deliver-image.js`
-- Hosted reference: https://cloudinary.com/documentation/node_image_manipulation
+- Every transformation parameter and its accepted values:
+  [Transformation reference](https://cloudinary.com/documentation/transformation_reference.md)
+- [Image manipulation guide](https://cloudinary.com/documentation/node_image_manipulation.md)

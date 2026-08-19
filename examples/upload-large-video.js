@@ -61,6 +61,7 @@ async function main(videoPath = './dog.mp4') {
   const localPath = await ensureVideoExists(videoPath);
   const result = await uploadLargeVideo(localPath);
 
+  console.log(`Stored reference: ${result.asset_id}`);
   console.log(`Uploaded video: ${result.public_id} (${result.bytes} bytes, ${result.duration}s)`);
   console.log(`Playback URL: ${result.secure_url}`);
   return result;

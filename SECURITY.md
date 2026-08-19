@@ -33,5 +33,5 @@ Use these private channels for anything security-sensitive; public GitHub issues
 - Your `api_secret` is a server-side credential. Keep it on your server; browsers, mobile binaries, and repositories should only ever hold delivery URLs or short-lived signatures.
 - Provide credentials through the `CLOUDINARY_URL` environment variable rather than hardcoding them.
 - For uploads initiated from a browser or mobile app, generate the signature on your server. See [docs/sign-browser-upload.md](docs/sign-browser-upload.md).
-- For unsigned uploads, use a deliberately restricted [unsigned upload preset](https://cloudinary.com/documentation/upload_presets).
+- For unsigned uploads, use a deliberately restricted [unsigned upload preset](https://cloudinary.com/documentation/upload_presets) ([md](https://cloudinary.com/documentation/upload_presets.md)).
 - Cloudinary platform security documentation: https://cloudinary.com/documentation/solution_overview#security

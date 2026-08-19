@@ -1,12 +1,22 @@
 /**
  * Upload an image into a manual moderation queue and approve it after review.
  *
- * Moderation is stateful: an asset is pending until a decision is recorded, and your
- * application should deliver only approved assets. This example uses manual
- * moderation; automatic moderators (for example aws_rek) follow the same states.
+ * Moderation is stateful: an asset carries a status until a decision is recorded, and
+ * your application should deliver only approved assets. A pending asset is still
+ * deliverable by default - the status is metadata to gate on, not an access control.
+ *
+ * This example uses 'manual' moderation. Automatic moderators follow the same states:
+ * aws_rek, aws_rek_video, google_video_moderation, webpurify, perception_point, and
+ * duplicate:<threshold>. Each needs its add-on enabled on the account. Combine several
+ * with a pipe, manual last: 'aws_rek|manual'.
  *
  * Prerequisites: set CLOUDINARY_URL. In your own project:
  *   const cloudinary = require('cloudinary').v2;
+ *
+ * Related:
+ * - Task doc: docs/moderate-upload.md
+ * - Statuses and delivery behavior:
+ *   https://cloudinary.com/documentation/moderate_assets.md
  */
 const cloudinary = require('../cloudinary').v2;
 
@@ -18,15 +28,17 @@ async function main(imageSource = 'https://res.cloudinary.com/demo/image/upload/
     moderation: 'manual'
   });
   const status = uploaded.moderation && uploaded.moderation[0].status;
-  console.log(`Uploaded ${uploaded.public_id}; moderation status: ${status}`);
+  const storedAssetId = uploaded.asset_id;
+  console.log(`Uploaded ${storedAssetId}; moderation status: ${status}`);
 
   // 2. List everything awaiting review (your review UI would read this queue).
   const pending = await cloudinary.api.resources_by_moderation('manual', 'pending', { max_results: 10 });
   console.log(`Assets pending manual review: ${pending.resources.length}`);
 
   // 3. Record the reviewer's decision ("approved" or "rejected").
-  const updated = await cloudinary.api.update(uploaded.public_id, { moderation_status: 'approved' });
-  console.log(`Decision recorded: ${uploaded.public_id} is now ${updated.moderation && updated.moderation[0].status}`);
+  const asset = await cloudinary.api.resource_by_asset_id(storedAssetId);
+  const updated = await cloudinary.api.update(asset.public_id, { moderation_status: 'approved' });
+  console.log(`Decision recorded: ${asset.public_id} is now ${updated.moderation && updated.moderation[0].status}`);
 
   return updated;
 }

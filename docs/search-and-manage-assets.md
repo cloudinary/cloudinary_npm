@@ -8,11 +8,15 @@ media library from the server. These use the Admin and Search APIs, which are
 
 ## Search with the query builder
 
+Expressions use Cloudinary's search syntax — fields, operators, ranges, and boolean
+combinations are listed in the
+[search expression reference](https://cloudinary.com/documentation/search_expressions.md).
+
 ```js
 const cloudinary = require('cloudinary').v2; // reads CLOUDINARY_URL
 
 async function main() {
-  // Assets created by the other bundled tasks live in the 'examples' folder
+  // Images created by the other bundled tasks live in the 'examples' folder
   const result = await cloudinary.search
     .expression('folder:examples AND resource_type:image')
     .sort_by('created_at', 'desc')
@@ -20,7 +24,7 @@ async function main() {
     .execute();
 
   for (const asset of result.resources) {
-    console.log(asset.public_id, asset.bytes, asset.created_at);
+    console.log(asset.asset_id, asset.public_id, asset.bytes, asset.created_at);
   }
 
   // Pagination: pass the cursor back until it is absent
@@ -39,14 +43,16 @@ main().catch(console.error);
 ## Read and update a single asset
 
 ```js
-// 'examples/uploaded-sample' is created by the "Upload an image" task
-const details = await cloudinary.api.resource('examples/uploaded-sample');
+const details = await cloudinary.api.resource_by_asset_id(storedAssetId);
 
-await cloudinary.api.update('examples/uploaded-sample', {
+await cloudinary.api.update(details.public_id, {
   tags: 'featured',
   context: 'alt=Sample image from the bundled upload example'
 });
 ```
+
+Bulk: `api.resources_by_asset_ids`, `api.restore_by_asset_ids`,
+`api.delete_resources_by_asset_ids`.
 
 ## Deletion — destructive, no undo without backups
 
@@ -59,13 +65,42 @@ await cloudinary.uploader.destroy('examples/uploaded-sample');   // one asset
 Prefer explicit ID lists over prefix deletion. Enable backups on the product
 environment if you need restore (`cloudinary.api.restore`).
 
-## Common failures
+## Handling errors
+
+API errors reject with `{ error: { message, http_code } }`. Network failures reject with
+an `Error` and no `http_code`. Unwrap with `error.error || error` and branch on
+`http_code`:
+
+```js
+try {
+  await cloudinary.api.resource('examples/does-not-exist');
+} catch (error) {
+  const { http_code, message } = error.error || error;
+
+  switch (http_code) {
+    case 404: /* asset is gone */ break;
+    case 401: /* credentials do not match the cloud */ break;
+    case 420: /* rate limited - back off and retry */ break;
+    case undefined: /* never reached the API - retriable */ break;
+    default: throw error;
+  }
+}
+```
+
+`cloudinary.config({ debug: true })` adds `request_id` to API errors — include it in
+support tickets.
+
+## Troubleshooting
 
 - `420 Rate limit exceeded` — the response includes reset time; back off and batch work.
 - Stale search results — the search index lags writes by a short interval; for
-  read-after-write flows, use `api.resource` with the known `public_id`.
+  read-after-write flows, use `api.resource_by_asset_id` instead of searching.
+- Zero results from an expression you expected to match — check the field name and
+  syntax against the
+  [search expression reference](https://cloudinary.com/documentation/search_expressions.md);
+  an unknown field is not an error, it simply matches nothing.
 
 ## Related
 
 - [Use structured metadata](use-structured-metadata.md)
-- Hosted reference: https://cloudinary.com/documentation/node_asset_administration
+- [Asset administration guide](https://cloudinary.com/documentation/node_asset_administration.md)

@@ -34,6 +34,13 @@ this way.
 ### `File size too large`
 Switch to [chunked upload](upload-large-video.md) (`upload_large`).
 
+### `423 Processing`
+The asset is still being processed and is not yet available for the operation you
+requested — common right after uploading a large video, or while an eager or
+add-on-driven transformation is still running. This is transient: retry with backoff
+rather than treating it as a failure. For long jobs, prefer `eager_async` with a
+`notification_url` over polling.
+
 ### Delivery URL returns `400` or `404`
 The reason is in the `X-Cld-Error` response header of the failing URL (lowercase
 `x-cld-error` over HTTP/2):
@@ -69,5 +76,7 @@ response, which changes the URL immediately. See
 
 ## Still stuck
 
+- Platform status: https://status.cloudinary.com — check this first. A widespread
+  incident explains failures that look like a bug in your code.
 - SDK bugs: https://github.com/cloudinary/cloudinary_npm/issues
 - Account issues: https://support.cloudinary.com (include the request ID from debug mode)

@@ -1,5 +1,5 @@
 /**
- * Sign a browser upload on your server.
+ * Sign an upload on your server.
  *
  * Your api_secret stays on the server. The server creates a short-lived
  * signature; the browser sends it (with the same parameters, your api_key, and the

@@ -4,9 +4,14 @@
 
 Do this once per process before any upload, admin, analysis, or URL-generation call.
 
+**Prerequisite:** a `cloud_name`, `api_key`, and `api_secret`. If you do not have them,
+see [Get Cloudinary credentials](get-credentials.md) — `npx @cloudinary/cloud` provisions
+a working cloud with no signup.
+
 ## Recommended: environment variable
 
-Set `CLOUDINARY_URL` (from Console > Settings > API Keys):
+Set `CLOUDINARY_URL` (from Console > Settings > API Keys, or written into `.env` for you
+by `npx @cloudinary/cloud`):
 
 ```bash
 export CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>
@@ -50,12 +55,13 @@ if (!cloud_name || !api_key || !api_secret) {
 }
 ```
 
-## Common failures
+## Troubleshooting
 
 - `Must supply cloud_name` — `CLOUDINARY_URL` is missing or malformed; it must start with `cloudinary://`.
 - `401 Unauthorized` — key/secret mismatch for the cloud name; re-copy from the console.
 
 ## Related
 
+- [Get Cloudinary credentials](get-credentials.md) — if you do not have an account yet.
 - [Sign a browser upload](sign-browser-upload.md) — keeping the secret server-side.
-- Hosted reference: https://cloudinary.com/documentation/node_integration
+- [Node SDK guide](https://cloudinary.com/documentation/node_integration.md)

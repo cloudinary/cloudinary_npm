@@ -53,10 +53,11 @@ main().catch((error) => {
 });
 ```
 
-Save as `quickstart.js` and run `node quickstart.js`. [Create a free account](https://cloudinary.com/users/register/free) if you don't have one.
+Save as `quickstart.js` and run `node quickstart.js`. [Create a free account](https://cloudinary.com/users/register_free) if you don't have one — or run `npx @cloudinary/cloud` to [provision one without signing up](docs/get-credentials.md).
 
 ## Common tasks
 
+- [Get Cloudinary credentials](docs/get-credentials.md)
 - [Upload an image](docs/upload-image.md)
 - [Upload a large video](docs/upload-large-video.md)
 - [Sign a browser upload](docs/sign-browser-upload.md)
@@ -75,13 +76,14 @@ administration, search, moderation, and delivery URL generation.
 
 For other jobs, better-fitting tools exist:
 
-- Browser or frontend framework rendering: [@cloudinary/url-gen](https://www.npmjs.com/package/@cloudinary/url-gen) and the [framework SDKs](https://cloudinary.com/documentation/cloudinary_sdks).
-- Complete in-browser upload UI: [Upload Widget](https://cloudinary.com/documentation/upload_widget).
-- Text-to-image generation and image-to-video: [platform APIs](https://cloudinary.com/documentation/image_generation_addon), not wrapped by this package.
-- Multi-step media workflow automation: [MediaFlows](https://cloudinary.com/documentation/mediaflows_user_guide).
-- Interactive agent-driven asset operations: [Cloudinary MCP servers and Skills](https://cloudinary.com/documentation/cloudinary_llm_mcp).
+- Browser or frontend framework rendering: [@cloudinary/url-gen](https://www.npmjs.com/package/@cloudinary/url-gen) and the [frontend SDKs](https://cloudinary.com/documentation/frontend_sdks) ([md](https://cloudinary.com/documentation/frontend_sdks.md)).
+- Complete in-browser upload UI: [Upload Widget](https://cloudinary.com/documentation/upload_widget) ([md](https://cloudinary.com/documentation/upload_widget.md)).
+- Text-to-image generation and image-to-video: [platform APIs](https://cloudinary.com/documentation/image_generation_addon) ([md](https://cloudinary.com/documentation/image_generation_addon.md)), not wrapped by this package.
+- Multi-step media workflow automation: [MediaFlows](https://cloudinary.com/documentation/mediaflows_user_guide) ([md](https://cloudinary.com/documentation/mediaflows_user_guide.md)).
+- Interactive agent-driven asset operations: [Cloudinary MCP servers and Skills](https://cloudinary.com/documentation/cloudinary_llm_mcp) ([md](https://cloudinary.com/documentation/cloudinary_llm_mcp.md)).
 
-The full capability map is in [docs/platform-capabilities.md](docs/platform-capabilities.md).
+The full capability map — plus the Skills, MCP servers, and CLI worth setting up first —
+is in [docs/platform-capabilities.md](docs/platform-capabilities.md).
 
 ## Status and compatibility
 
@@ -95,7 +97,12 @@ Stable, actively maintained. See [CHANGELOG.md](CHANGELOG.md).
 ## Documentation
 
 - [Bundled task docs](docs/README.md) — ship inside the package, version-matched.
-- [Node SDK guide](https://cloudinary.com/documentation/node_integration) — hosted documentation.
+- [Node SDK guide](https://cloudinary.com/documentation/node_integration) — the full documentation ([md](https://cloudinary.com/documentation/node_integration.md)).
+
+Documentation links in this README point at the browsable HTML page, with an `(md)`
+companion link that returns the same page as raw Markdown. Inside `docs/` and `examples/`
+the links are Markdown-only, since those files are written to be read by coding agents.
+Either form works for any page: add `.md` for Markdown, drop it for HTML.
 
 ## For AI coding agents
 

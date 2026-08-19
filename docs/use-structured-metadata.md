@@ -45,17 +45,20 @@ const result = await cloudinary.search
 
 ## Pattern: analysis to reviewed metadata
 
-The robust AI workflow is not "run a model, trust the output" — it is:
+A common pattern for turning model output into data you can rely on:
 
 1. Run AI analysis on the asset (captioning, tagging — for example the
-   [Analyze API](https://cloudinary.com/documentation/analyze_api_guide), subscription required).
-2. Have a human or business rule review/normalize the output.
-3. Write the **approved** values as structured metadata.
+   [Analyze API](https://cloudinary.com/documentation/analyze_api_guide.md), subscription required).
+2. Normalize the output against your schema — map free-form values onto your allowed
+   list, drop low-confidence results, apply business rules.
+3. Write the resulting values as structured metadata.
 4. Search, route, and deliver based on that metadata.
 
-This keeps model output out of your delivery path until it has been accepted.
+Step 2 is where the value is: structured metadata fields are typed and validated, so
+whatever you write has to conform. Automate it when the rules are clear and route to a
+person only for the cases your rules cannot decide.
 
-## Common failures
+## Troubleshooting
 
 - `external_id already exists` — field definitions are per-environment and permanent;
   reuse the existing field instead of re-creating it.
@@ -65,4 +68,4 @@ This keeps model output out of your delivery path until it has been accepted.
 ## Related
 
 - [Search and manage assets](search-and-manage-assets.md)
-- Hosted reference: https://cloudinary.com/documentation/structured_metadata
+- [Structured metadata guide](https://cloudinary.com/documentation/structured_metadata.md)
