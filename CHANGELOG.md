@@ -1,3 +1,9 @@
+2.10.1 / 2026-08-19
+==================
+
+  * chore: remove create_slideshow — slideshow API has been sunset
+  * docs: add agent-readable documentation and repository metadata
+
 2.10.0 / 2026-04-25
 ==================
 

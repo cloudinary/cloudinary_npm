@@ -2,7 +2,7 @@
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
   "description": "Upload, transform, optimize, and manage images and videos with Cloudinary from Node.js.",
-  "version": "2.10.0",
+  "version": "2.10.1",
   "homepage": "https://cloudinary.com",
   "license": "MIT",
   "repository": {
