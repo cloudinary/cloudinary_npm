@@ -55,7 +55,8 @@ if (require.main === module) {
   try {
     main(process.argv[2]);
   } catch (error) {
-    console.error(`URL generation failed: ${error.message}`);
+    const { message } = error.error || error;
+    console.error(`URL generation failed: ${message}`);
     console.error('Check that cloud_name is configured (CLOUDINARY_URL or cloudinary.config()).');
     process.exitCode = 1;
   }

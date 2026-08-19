@@ -7,8 +7,11 @@
  *
  * This example uses 'manual' moderation. Automatic moderators follow the same states:
  * aws_rek, aws_rek_video, google_video_moderation, webpurify, perception_point, and
- * duplicate:<threshold>. Each needs its add-on enabled on the account. Combine several
- * with a pipe, manual last: 'aws_rek|manual'.
+ * duplicate:<threshold>. Combine several with a pipe, manual last: 'aws_rek|manual'.
+ *
+ * Each of those needs its add-on registered on the account from the console Add-ons page
+ * first, and some third-party add-ons also require accepting the provider's terms of
+ * service. Neither can be done through the API. 'manual' requires neither.
  *
  * Prerequisites: set CLOUDINARY_URL. In your own project:
  *   const cloudinary = require('cloudinary').v2;
@@ -45,8 +48,9 @@ async function main(imageSource = 'https://res.cloudinary.com/demo/image/upload/
 
 if (require.main === module) {
   main(process.argv[2]).catch((error) => {
-    console.error(`Moderation workflow failed: ${(error.error && error.error.message) || error.message}`);
-    console.error('Check that CLOUDINARY_URL is set. Automatic moderators require the matching add-on to be enabled.');
+    const { message } = error.error || error;
+    console.error(`Moderation workflow failed: ${message}`);
+    console.error('Check that CLOUDINARY_URL is set. Automatic moderators require the matching add-on registered on the account, and its terms of service accepted where the provider asks for them.');
     process.exitCode = 1;
   });
 }

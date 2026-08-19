@@ -17,19 +17,19 @@ cloudinary.config({ debug: true }); // adds request IDs to errors and logs
 Configuration never loaded. Set `CLOUDINARY_URL` before the first call, or call
 `cloudinary.config({...})` explicitly. See [Configure Cloudinary](configure-cloudinary.md).
 
-### `401 Unauthorized`
-Key/secret pair does not match the cloud name. Re-copy from Console > Settings > API
-Keys. If you use multiple environments, check which one your process actually loaded.
+### `Invalid api_key` / `api_secret mismatch`
+Key and secret do not match the cloud name. Re-copy all three from Console > Settings >
+API Keys. If you use multiple environments, check which one your process actually loaded.
 
 ### `Invalid Signature`
 A signed request included parameters that were not part of the signature, or values
 changed after signing. Sign every parameter the client sends. See
 [Sign a browser upload](sign-browser-upload.md).
 
-### `420 Rate limit exceeded` (Admin/Search API)
-You are calling management APIs in a request path. Batch the work, cache results, and
-respect the reset time in the response headers. Delivery URLs are never rate-limited
-this way.
+### `Rate limit exceeded` (Admin/Search API)
+You are calling management APIs in a request path. Batch the work and cache results.
+Successful Admin responses carry `rate_limit_remaining`, so you can slow down before you
+are cut off. Delivery URLs are never rate-limited this way.
 
 ### `File size too large`
 Switch to [chunked upload](upload-large-video.md) (`upload_large`).

@@ -27,7 +27,8 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`Upload failed: ${error.message}`);
+  const { message } = error.error || error;
+  console.error(`Upload failed: ${message}`);
   process.exitCode = 1;
 });
 ```
@@ -71,7 +72,7 @@ it before uploading, or upgrade the plan.
 
 ## Troubleshooting
 
-- `Must supply api_key` / 401 — configuration missing; see [Configure Cloudinary](configure-cloudinary.md).
+- `Must supply api_key` — configuration missing; see [Configure Cloudinary](configure-cloudinary.md).
 - `File size too large` — see [Size limits](#size-limits); either the request exceeded
   the 100 MB single-request ceiling, or the asset exceeds your product environment's
   maximum.

@@ -28,7 +28,8 @@ async function main(imageSource = 'https://res.cloudinary.com/demo/image/upload/
 
 if (require.main === module) {
   main().catch((error) => {
-    console.error(`Upload failed: ${(error.error && error.error.message) || error.message}`);
+    const { message } = error.error || error;
+    console.error(`Upload failed: ${message}`);
     console.error('Check that CLOUDINARY_URL is set and the source file or URL is reachable.');
     process.exitCode = 1;
   });

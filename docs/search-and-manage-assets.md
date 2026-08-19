@@ -67,32 +67,29 @@ environment if you need restore (`cloudinary.api.restore`).
 
 ## Handling errors
 
-API errors reject with `{ error: { message, http_code } }`. Network failures reject with
-an `Error` and no `http_code`. Unwrap with `error.error || error` and branch on
-`http_code`:
+Failed calls reject with a `message` describing what went wrong. Read the message; there
+are no error classes to catch by type.
 
 ```js
 try {
   await cloudinary.api.resource('examples/does-not-exist');
 } catch (error) {
-  const { http_code, message } = error.error || error;
-
-  switch (http_code) {
-    case 404: /* asset is gone */ break;
-    case 401: /* credentials do not match the cloud */ break;
-    case 420: /* rate limited - back off and retry */ break;
-    case undefined: /* never reached the API - retriable */ break;
-    default: throw error;
-  }
+  const { message } = error.error || error;
+  console.error(message);
 }
 ```
 
-`cloudinary.config({ debug: true })` adds `request_id` to API errors — include it in
+Never log the whole error object from an Admin or Search call — it carries your
+`api_secret`. Log `message`.
+
+Set `cloudinary.config({ debug: true })` to add a `request_id` to failures; quote it in
 support tickets.
 
 ## Troubleshooting
 
-- `420 Rate limit exceeded` — the response includes reset time; back off and batch work.
+- `Rate limit exceeded` — too many Admin API calls. Batch your work and retry later.
+  Successful Admin responses carry `rate_limit_remaining`, so you can slow down before
+  you are cut off.
 - Stale search results — the search index lags writes by a short interval; for
   read-after-write flows, use `api.resource_by_asset_id` instead of searching.
 - Zero results from an expression you expected to match — check the field name and

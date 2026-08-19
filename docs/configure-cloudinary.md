@@ -57,8 +57,12 @@ if (!cloud_name || !api_key || !api_secret) {
 
 ## Troubleshooting
 
-- `Must supply cloud_name` — `CLOUDINARY_URL` is missing or malformed; it must start with `cloudinary://`.
-- `401 Unauthorized` — key/secret mismatch for the cloud name; re-copy from the console.
+- `Must supply cloud_name` / `Must supply api_key` — `CLOUDINARY_URL` is missing or
+  malformed; it must start with `cloudinary://`.
+- `Invalid api_key` / `api_secret mismatch` — the key and secret do not belong to this
+  cloud name; re-copy all three from the console.
+- `Invalid Signature` on uploads — the same cause as above: a wrong `api_secret`. Uploads
+  report it this way instead of naming the secret.
 
 ## Related
 

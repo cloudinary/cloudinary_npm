@@ -54,14 +54,15 @@ function uploadLargeVideo(videoPath) {
 }
 
 async function main() {
-  const localPath = await ensureVideoExists('./dog.mp4'); // or pass your own video path
+  const localPath = await ensureVideoExists('./dog.mp4');
   const result = await uploadLargeVideo(localPath);
   console.log(result.public_id, result.duration, result.bytes);
   console.log(result.secure_url); // playback URL
 }
 
 main().catch((error) => {
-  console.error(`Video upload failed: ${error.message}`);
+  const { message } = error.error || error;
+  console.error(`Video upload failed: ${message}`);
   process.exitCode = 1;
 });
 ```

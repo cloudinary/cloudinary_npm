@@ -57,8 +57,11 @@ function uploadLargeVideo(videoPath) {
   });
 }
 
-async function main(videoPath = './dog.mp4') {
-  const localPath = await ensureVideoExists(videoPath);
+async function main(videoPath) {
+  if (videoPath && !fs.existsSync(videoPath)) {
+    throw new Error(`No such file: ${videoPath}`);
+  }
+  const localPath = videoPath || await ensureVideoExists('./dog.mp4');
   const result = await uploadLargeVideo(localPath);
 
   console.log(`Stored reference: ${result.asset_id}`);
@@ -69,7 +72,8 @@ async function main(videoPath = './dog.mp4') {
 
 if (require.main === module) {
   main(process.argv[2]).catch((error) => {
-    console.error(`Video upload failed: ${(error.error && error.error.message) || error.message}`);
+    const { message } = error.error || error;
+    console.error(`Video upload failed: ${message}`);
     console.error('Check that CLOUDINARY_URL is set. Large or busy videos may finish processing asynchronously; pass eager_async: true and a notification_url for server-side processing callbacks.');
     process.exitCode = 1;
   });

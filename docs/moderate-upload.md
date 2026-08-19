@@ -52,14 +52,23 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`Moderation flow failed: ${error.message}`);
+  const { message } = error.error || error;
+  console.error(`Moderation flow failed: ${message}`);
   process.exitCode = 1;
 });
 ```
 
 ## Automatic moderation
 
-Pass an add-on name instead of `manual` to get an automated verdict:
+Pass an add-on name instead of `manual` to get an automated verdict.
+
+**Prerequisite — a human has to do this, not your code.** Every value below except
+`manual` requires its add-on to be registered on the account first, from the
+[Add-ons page](https://cloudinary.com/documentation/cloudinary_add_ons.md) in the console.
+Some third-party add-ons also require reviewing and accepting the provider's terms of
+service as part of registration. Neither step has an API; until both are done the add-on
+value is rejected at upload. `manual` needs no add-on and no terms accepted, which is why
+the flow above uses it.
 
 | Value | Moderates | Add-on |
 |---|---|---|
@@ -76,8 +85,8 @@ rest as `queued`; if one rejects, the remaining become `aborted` and the asset's
 status is `rejected`. Always set a `notification_url` when requesting several.
 
 The same statuses apply, and you can still override a machine decision with `api.update`
-+ `moderation_status` for human review. Each moderator requires its add-on enabled on the
-account, and an asset may sit in `queued` before the add-on reaches it.
++ `moderation_status` for human review. An asset may sit in `queued` before the add-on
+reaches it.
 
 ## Design rules
 
@@ -90,7 +99,11 @@ account, and an asset may sit in `queued` before the add-on reaches it.
 
 ## Troubleshooting
 
-- `Moderation kind not supported` — the add-on is not enabled for the account.
+- `You don't have an active subscription for <add-on name>` — register the add-on on the
+  Add-ons page in the console. Some third-party add-ons also require accepting the
+  provider's terms of service before they activate.
+- `Moderation <value> moderation is not valid` — the moderation value is misspelled; use
+  one of the values in the table above.
 - Delivering a pending asset — nothing blocks delivery by default; enforcement is your
   application's responsibility. It is not an upload parameter: contact Cloudinary support
   to have it configured for your product environment.

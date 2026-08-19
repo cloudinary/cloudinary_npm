@@ -45,7 +45,8 @@ if (require.main === module) {
     console.log('Send these fields to the browser (the api_secret stays on the server):');
     console.log(JSON.stringify(body, null, 2));
   } catch (error) {
-    console.error(`Signing failed: ${error.message}`);
+    const { message } = error.error || error;
+    console.error(`Signing failed: ${message}`);
     process.exitCode = 1;
   }
 }
