@@ -79,8 +79,9 @@ Cloudinary publishes agent-readable indexes. Fetch these instead of guessing at 
 
 | To do this | Use | Where to go |
 |---|---|---|
-| Build a resize, crop, overlay, or format-optimized URL | `url`, `image`, `video` | [Transform and deliver media](transform-and-deliver-media.md) |
-| Apply generative edits (gen fill, background removal, ...) | `effect` / `raw_transformation` — **generic strings only, no typed builders** | [Transform and deliver media](transform-and-deliver-media.md) |
+| Build a resize, crop, overlay, or format-optimized image URL | `url`, `image` | [Transform and deliver an image](transform-and-deliver-image.md) |
+| Build a video URL, player tag, poster frame, or HLS/DASH stream | `url` (with `resource_type: 'video'`), `video` | [Transform and deliver a video](transform-and-deliver-video.md) |
+| Apply generative edits (gen fill, background removal, ...) | `effect` / `raw_transformation` — **generic strings only, no typed builders** | [Transform and deliver an image](transform-and-deliver-image.md) |
 
 URL building is local: no network call, no `api_secret`.
 

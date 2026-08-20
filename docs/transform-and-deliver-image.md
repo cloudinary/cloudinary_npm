@@ -1,10 +1,12 @@
-# Transform and deliver media
+# Transform and deliver an image
 
 ## When to use
 
-Generate CDN-backed delivery URLs that resize, crop, overlay, or optimize images and video. URL
+Generate CDN-backed delivery URLs that resize, crop, overlay, or optimize an image. URL
 generation is local — no network call, no secret required — and the derived asset is
 created by Cloudinary on first request, then served from CDN cache.
+
+For video, see [Transform and deliver a video](transform-and-deliver-video.md).
 
 ## Optimized image URL
 
@@ -52,18 +54,6 @@ console.log(bannerUrl);
 Reordering components changes the output. When matching eagerly generated versions,
 the serialized transformation string must match exactly.
 
-## Video
-
-```js
-// 'examples/uploaded-large-video' is created by the "Upload a large video" task
-const clip = cloudinary.video('examples/uploaded-large-video', {
-  width: 640,
-  crop: 'scale',
-  quality: 'auto',
-  controls: true
-}); // returns an HTML <video> tag; cloudinary.url(..., {resource_type: 'video'}) returns just the URL
-```
-
 ## Generative editing on delivery
 
 Server-supported generative transformations (background removal, generative fill, and
@@ -81,6 +71,7 @@ https://cloudinary.com/documentation/generative_ai_transformations.md before rel
 ## Related
 
 - Runnable example: `examples/transform-and-deliver-image.js`
+- [Transform and deliver a video](transform-and-deliver-video.md)
 - Every transformation parameter and its accepted values:
   [Transformation reference](https://cloudinary.com/documentation/transformation_reference.md)
 - [Image manipulation guide](https://cloudinary.com/documentation/node_image_manipulation.md)

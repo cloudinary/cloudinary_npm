@@ -91,4 +91,6 @@ webhook; the response then includes a pending status until Cloudinary calls your
 
 - Runnable example: `examples/upload-large-video.js` — works with no arguments; it
   downloads a sample video from the Cloudinary demo account if none is supplied.
+- [Transform and deliver a video](transform-and-deliver-video.md) — what to do with it
+  once it is uploaded.
 - [Video upload guide](https://cloudinary.com/documentation/node_image_and_video_upload.md#node_js_video_upload)

@@ -81,5 +81,5 @@ it before uploading, or upgrade the plan.
 ## Related
 
 - Runnable example: `examples/upload-image.js`
-- [Transform and deliver media](transform-and-deliver-media.md)
+- [Transform and deliver an image](transform-and-deliver-image.md)
 - [Upload guide](https://cloudinary.com/documentation/node_image_and_video_upload.md)
