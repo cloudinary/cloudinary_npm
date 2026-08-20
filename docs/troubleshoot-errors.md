@@ -72,7 +72,8 @@ chunked upload; chunks retry independently.
 ### Stale delivery after re-upload
 CDN-cached URLs do not update instantly. Deliver with the new `version` from the upload
 response, which changes the URL immediately. See
-[Transform and deliver media](transform-and-deliver-media.md).
+[Transform and deliver an image](transform-and-deliver-image.md) or
+[a video](transform-and-deliver-video.md).
 
 ## Still stuck
 

@@ -7,7 +7,8 @@
  * In your own project: const cloudinary = require('cloudinary').v2;
  *
  * Related:
- * - Task doc: docs/transform-and-deliver-media.md
+ * - Task doc: docs/transform-and-deliver-image.md
+ * - For video: examples/transform-and-deliver-video.js
  * - Every transformation parameter and its accepted values:
  *   https://cloudinary.com/documentation/transformation_reference.md
  * - Building transformations from a plain-language description: the
