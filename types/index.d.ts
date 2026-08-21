@@ -502,6 +502,25 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
+    export interface GenerateImageOptions {
+        /** The text description of the image to generate. */
+        prompt: string;
+        /** The model family to use. */
+        model_family?: string;
+        /** The quality tier to use within the model family. */
+        quality_tier?: string;
+        /** A specific model identifier, overriding model_family/quality_tier. */
+        model_id?: string;
+        /** Desired image width in pixels. */
+        width?: number;
+        /** Desired image height in pixels. */
+        height?: number;
+        /** Seed for reproducible generation. */
+        seed?: number;
+
+        [futureKey: string]: any;
+    }
+
     export interface UploadApiOptions {
         access_mode?: AccessMode;
         allowed_formats?: Array<VideoFormat> | Array<ImageFormat>;
@@ -1405,6 +1424,10 @@ declare module 'cloudinary' {
             function upload(file: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
             function upload(file: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+
+            function generate(params: GenerateImageOptions, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+
+            function generate(params: GenerateImageOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
             function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 
