@@ -1,8 +1,8 @@
 {
   "author": "Cloudinary <info@cloudinary.com>",
   "name": "cloudinary",
-  "description": "Cloudinary NPM for node.js integration",
-  "version": "2.10.0",
+  "description": "Upload, transform, optimize, and manage images and videos with Cloudinary from Node.js.",
+  "version": "2.10.1",
   "homepage": "https://cloudinary.com",
   "license": "MIT",
   "repository": {
@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/expect.js": "^0.3.32",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.9.3",
+    "@types/node": "~22.18.0",
     "date-fns": "^2.30.0",
     "dotenv": "^8.2.0",
     "dtslint": "^2.0.6",
@@ -41,7 +41,11 @@
     "cloudinary.js",
     "babel.config.js",
     "package.json",
-    "types/index.d.ts"
+    "types/index.d.ts",
+    "docs/**/*.md",
+    "examples/**/*.js",
+    "SECURITY.md",
+    "CHANGELOG.md"
   ],
   "types": "types",
   "scripts": {
