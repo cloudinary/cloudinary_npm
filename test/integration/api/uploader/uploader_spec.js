@@ -1175,6 +1175,21 @@ describe("uploader", function () {
         sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher('quality_analysis', 1)));
       });
     });
+    describe(":clear_invalid", function () {
+      it("should pass the clear_invalid value to the server", async function () {
+        await cloudinary.v2.uploader
+          .explicit("cloudinary", {
+            type: "upload",
+            clear_invalid: true,
+            tags: [TEST_TAG]
+          })
+          .catch(helper.ignoreApiFailure);
+        sinon.assert.calledWith(
+          spy,
+          sinon.match(helper.uploadParamMatcher("clear_invalid", 1))
+        );
+      });
+    });
     it("should support metadata", async function () {
       await cloudinary.v2.uploader.explicit("cloudinary", { metadata: METADATA_SAMPLE_DATA }).catch(helper.ignoreApiFailure);
       sinon.assert.calledWith(spy, sinon.match(helper.uploadParamMatcher("metadata", METADATA_SAMPLE_DATA_ENCODED)));
