@@ -411,7 +411,7 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
-    export type VisualSearchParams = { image_url: string } | { image_asset_id: string } | { text: string };
+    export type VisualSearchParams = { image_url: string } | { image_asset_id: string } | { text: string } | { image_file: string | Buffer };
 
     export interface ArchiveApiOptions {
         allow_missing?: boolean;
