@@ -260,6 +260,12 @@ cloudinary.v2.api.delete_derived_resources(['image1', 'image2'], {keep_original:
     });
 
 // $ExpectType Promise<any>
+cloudinary.v2.api.delete_derived_resources(['image1', 'image2'], {invalidate: true},
+    function (err, res) {
+        console.log(err);
+    });
+
+// $ExpectType Promise<any>
 cloudinary.v2.api.delete_resources_by_prefix('sunday',
     function (error, result) {
         console.log(result, error);
