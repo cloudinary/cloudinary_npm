@@ -411,7 +411,7 @@ declare module 'cloudinary' {
         [futureKey: string]: any;
     }
 
-    export type VisualSearchParams = { image_url: string } | { image_asset_id: string } | { text: string };
+    export type VisualSearchParams = { image_url: string } | { image_asset_id: string } | { text: string } | { image_file: string | Buffer };
 
     export interface ArchiveApiOptions {
         allow_missing?: boolean;
@@ -1428,11 +1428,6 @@ declare module 'cloudinary' {
 
             function upload_url(options?: ConfigOptions): Promise<any>;
 
-            function create_slideshow(options?: ConfigOptions & {
-                manifest_transformation?: TransformationOptions,
-                manifest_json?: Record<string, any>
-            }, callback?: UploadResponseCallback): Promise<any>;
-
             /****************************** Structured Metadata API V2 Methods *************************************/
 
             function update_metadata(metadata: string | Record<any, any>, public_ids: string[], options?: UploadApiOptions, callback?: ResponseCallback): Promise<MetadataFieldApiResponse>;
@@ -1501,7 +1496,7 @@ declare module 'cloudinary' {
 
                 function user(userId: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 
-                function users(pending: boolean, userIds?: string[], prefix?: string, subAccountId?: string, options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
+                function users(pending: boolean, userIds?: string[], prefix?: string, subAccountId?: string, options?: ProvisioningApiOptions | { lastLogin?: boolean; fromDate?: Date | string; toDate?: Date | string }, callback?: ResponseCallback): Promise<any>;
 
                 function create_user(name: string, email: string, role: string, subAccountIds?: string[], options?: ProvisioningApiOptions, callback?: ResponseCallback): Promise<any>;
 

@@ -8,7 +8,7 @@ bin
 !lib
 test_cache/
 .nyc_output
-docs
+out/
 coverage
 # contains temporary cloudianry_url for test accounts
 tools/cloudinary_url.sh
