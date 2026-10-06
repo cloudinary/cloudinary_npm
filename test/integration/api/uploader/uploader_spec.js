@@ -132,6 +132,9 @@ describe("uploader", function () {
     });
 
     it("should successfully upload a Blob", function () {
+      if (typeof NodeBlob === "undefined") {
+        this.skip();
+      }
       const buffer = fs.readFileSync(IMAGE_FILE);
       // jsdom-global replaces global.Blob. Use the Node Blob.
       const blob = new NodeBlob([buffer], { type: "image/png" });
