@@ -900,6 +900,24 @@ cloudinary.v2.uploader.upload("ftp://user1:mypass@ftp.example.com/sample.jpg",
         console.log(result, error);
     });
 
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.upload(Buffer.from("sample"));
+
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.upload(new Uint8Array([1, 2, 3]));
+
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.upload(new ArrayBuffer(8));
+
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.upload(new Blob(["sample"], {type: "text/plain"}));
+
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.upload({arrayBuffer: async () => new ArrayBuffer(8), type: "text/csv", size: 8, name: "report.csv"});
+
+// $ExpectType Promise<UploadApiResponse>
+cloudinary.v2.uploader.upload(Buffer.from("a,b"), {resource_type: "raw", filename: "report.csv"});
+
 // $ExpectType UploadStream | Promise<UploadApiResponse>
 cloudinary.v2.uploader.upload_large("my_large_video.mp4",
     {

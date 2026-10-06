@@ -516,6 +516,11 @@ declare module 'cloudinary' {
         eval?: string;
         exif?: boolean;
         faces?: boolean;
+        /**
+         * The filename to send for a Buffer, Uint8Array, ArrayBuffer or Blob upload, for example 'report.csv'.
+         * The default is the File name, or "file". Raw assets get their extension from this name.
+         */
+        filename?: string;
         filename_override?: string;
         folder?: string;
         format?: VideoFormat | ImageFormat;
@@ -1285,6 +1290,16 @@ declare module 'cloudinary' {
         /****************************** Upload API V2 Methods *************************************/
 
         namespace uploader {
+            /** A Blob or File. The SDK finds it by its shape, so polyfill Blobs also work. */
+            interface UploadBlob {
+                arrayBuffer(): Promise<ArrayBuffer>;
+                type: string;
+                size: number;
+                name?: string;
+            }
+
+            type UploadFile = string | Buffer | Uint8Array | ArrayBuffer | UploadBlob;
+
             function add_context(context: string, public_ids: string[], options?: {
                 type?: DeliveryType,
                 resource_type?: ResourceType
@@ -1394,17 +1409,17 @@ declare module 'cloudinary' {
 
             function unsigned_image_upload_tag(field: string, upload_preset: string, options?: UploadApiOptions): Promise<any>;
 
-            function unsigned_upload(file: string, upload_preset: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
+            function unsigned_upload(file: UploadFile, upload_preset: string, options?: UploadApiOptions, callback?: ResponseCallback): Promise<any>;
 
-            function unsigned_upload(file: string, upload_preset: string, callback?: ResponseCallback): Promise<any>;
+            function unsigned_upload(file: UploadFile, upload_preset: string, callback?: ResponseCallback): Promise<any>;
 
             function unsigned_upload_stream(upload_preset: string, options?: UploadApiOptions, callback?: ResponseCallback): UploadStream;
 
             function unsigned_upload_stream(upload_preset: string, callback?: ResponseCallback): UploadStream;
 
-            function upload(file: string, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload(file: UploadFile, options?: UploadApiOptions, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
-            function upload(file: string, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
+            function upload(file: UploadFile, callback?: UploadResponseCallback): Promise<UploadApiResponse>;
 
             function upload_chunked(path: string, options?: UploadApiOptions, callback?: UploadResponseCallback): UploadStream;
 

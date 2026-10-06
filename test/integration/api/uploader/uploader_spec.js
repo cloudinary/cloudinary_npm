@@ -50,6 +50,7 @@ const SAMPLE_IMAGE_URL_1 = "https://res.cloudinary.com/demo/image/upload/sample"
 const SAMPLE_IMAGE_URL_2 = "https://res.cloudinary.com/demo/image/upload/car"
 
 const { URL: NodeURL, URLSearchParams: NodeURLSearchParams } = require('url');
+const { Blob: NodeBlob, File: NodeFile } = require('buffer');
 let cleanupJsdom;
 
 describe("uploader", function () {
@@ -93,6 +94,102 @@ describe("uploader", function () {
         version: result.version
       }, cloudinary.config().api_secret);
       expect(result.signature).to.eql(expected_signature);
+    });
+  });
+  describe("in-memory uploads", function () {
+    it("should successfully upload a Buffer", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      return cloudinary.v2.uploader.upload(buffer, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should successfully upload a Uint8Array", function () {
+      const uint8Array = new Uint8Array(fs.readFileSync(IMAGE_FILE));
+      return cloudinary.v2.uploader.upload(uint8Array, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should successfully upload an ArrayBuffer", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+      return cloudinary.v2.uploader.upload(arrayBuffer, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should successfully upload a Blob", function () {
+      if (typeof NodeBlob === "undefined") {
+        this.skip();
+      }
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      // jsdom-global replaces global.Blob. Use the Node Blob.
+      const blob = new NodeBlob([buffer], { type: "image/png" });
+      return cloudinary.v2.uploader.upload(blob, {
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.width).to.eql(241);
+        expect(result.height).to.eql(51);
+        expect(result.format).to.eql("png");
+      });
+    });
+
+    it("should upload a raw buffer when resource_type is raw", function () {
+      const buffer = fs.readFileSync(RAW_FILE);
+      return cloudinary.v2.uploader.upload(buffer, {
+        resource_type: "raw",
+        filename: "report.docx",
+        use_filename: true,
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.resource_type).to.eql("raw");
+        expect(result.original_filename).to.eql("report");
+        expect(result.public_id).to.match(/^report_\w+\.docx$/);
+      });
+    });
+
+    it("should keep a non-ASCII File name as original_filename", function () {
+      if (typeof NodeFile === "undefined") {
+        this.skip();
+      }
+      const file = new NodeFile([fs.readFileSync(IMAGE_FILE)], "zdjęcie.png", { type: "image/png" });
+      return cloudinary.v2.uploader.upload(file, {
+        use_filename: true,
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.original_filename).to.eql("zdjęcie");
+      });
+    });
+
+    it("should send buffer uploads without reading from the filesystem", function () {
+      const buffer = fs.readFileSync(IMAGE_FILE);
+      return helper.provideMockObjects(async function (mockXHR, writeSpy) {
+        const createReadStreamSpy = sinon.spy(fs, "createReadStream");
+        try {
+          await cloudinary.v2.uploader.upload(buffer, {
+            filename: "buffer-upload.png",
+            tags: UPLOAD_TAGS
+          }).catch(helper.ignoreApiFailure);
+          sinon.assert.notCalled(createReadStreamSpy);
+          sinon.assert.calledWith(writeSpy, sinon.match((arg) => Buffer.isBuffer(arg) && arg.equals(buffer)));
+          sinon.assert.calledWith(writeSpy, sinon.match((arg) => Buffer.isBuffer(arg) && arg.toString("utf8").includes('filename="buffer-upload.png"')));
+        } finally {
+          createReadStreamSpy.restore();
+        }
+      });
     });
   });
   it("should successfully upload with metadata", function () {
