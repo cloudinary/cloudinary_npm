@@ -37,14 +37,15 @@ function fakeErrorRequest(options, onResponse) {
   return request;
 }
 
+// Node before 15.7 has no global Blob. Run the Blob-like tests there to test the arrayBuffer() fallback.
+function skipWithoutBlob(test) {
+  if (typeof Blob === 'undefined') {
+    test.skip();
+  }
+}
+
 describe('upload of a Blob', function () {
   let requestStub;
-
-  before(function () {
-    if (typeof Blob === 'undefined') {
-      this.skip();
-    }
-  });
 
   beforeEach(function () {
     cloudinary.config(createTestConfig());
@@ -56,6 +57,7 @@ describe('upload of a Blob', function () {
   });
 
   it('should call the callback one time when the upload fails', async function () {
+    skipWithoutBlob(this);
     const callback = sinon.spy();
     const blob = new Blob(['sample'], { type: 'text/plain' });
 
@@ -66,6 +68,7 @@ describe('upload of a Blob', function () {
   });
 
   it('should use the options that were set when upload() was called', async function () {
+    skipWithoutBlob(this);
     const options = { public_id: 'first' };
     const promise = cloudinary.v2.uploader.upload(new Blob(['sample']), options);
     options.public_id = 'second';
@@ -98,16 +101,23 @@ describe('upload of a Blob', function () {
       type: ''
     };
 
-    await assert.rejects(cloudinary.v2.uploader.upload(blobLike, callback), (error) => error.error === readError);
+    // Node 9 has no assert.rejects.
+    const error = await cloudinary.v2.uploader.upload(blobLike, callback).then(() => null, (e) => e);
+    assert.strictEqual(error && error.error, readError);
     sinon.assert.calledOnce(callback);
     // The v2 callback gets the error itself, as for a file that cannot be read.
     sinon.assert.calledWith(callback, readError);
   });
 
   it('should throw synchronously when cloud_name is missing', function () {
+    const blobLike = {
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(1)),
+      size: 1,
+      type: ''
+    };
     delete cloudinary.config().cloud_name;
     try {
-      assert.throws(() => cloudinary.v2.uploader.upload(new Blob(['sample'])), /Must supply cloud_name/);
+      assert.throws(() => cloudinary.v2.uploader.upload(blobLike), /Must supply cloud_name/);
       assert.throws(() => cloudinary.v2.uploader.upload(Buffer.from('sample')), /Must supply cloud_name/);
     } finally {
       cloudinary.config(true);
@@ -130,7 +140,7 @@ describe('upload of a Blob', function () {
   });
 
   it('should stream a native Blob and send all of its bytes', async function () {
-    if (typeof Blob.prototype.stream !== 'function' || typeof Readable.fromWeb !== 'function') {
+    if (typeof Blob === 'undefined' || typeof Blob.prototype.stream !== 'function' || typeof Readable.fromWeb !== 'function') {
       this.skip();
     }
     const bytes = require('crypto').randomBytes(256 * 1024);
