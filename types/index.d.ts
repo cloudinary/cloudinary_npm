@@ -516,6 +516,11 @@ declare module 'cloudinary' {
         eval?: string;
         exif?: boolean;
         faces?: boolean;
+        /**
+         * The filename to send for a Buffer, Uint8Array, ArrayBuffer or Blob upload, for example 'report.csv'.
+         * The default is the File name, or "file". Raw assets get their extension from this name.
+         */
+        filename?: string;
         filename_override?: string;
         folder?: string;
         format?: VideoFormat | ImageFormat;
@@ -1285,7 +1290,15 @@ declare module 'cloudinary' {
         /****************************** Upload API V2 Methods *************************************/
 
         namespace uploader {
-            type UploadFile = string | Buffer | Uint8Array | ArrayBuffer | Blob;
+            /** A Blob or File. The SDK finds it by its shape, so polyfill Blobs also work. */
+            interface UploadBlob {
+                arrayBuffer(): Promise<ArrayBuffer>;
+                type: string;
+                size: number;
+                name?: string;
+            }
+
+            type UploadFile = string | Buffer | Uint8Array | ArrayBuffer | UploadBlob;
 
             function add_context(context: string, public_ids: string[], options?: {
                 type?: DeliveryType,

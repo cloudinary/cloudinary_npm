@@ -50,6 +50,7 @@ const SAMPLE_IMAGE_URL_1 = "https://res.cloudinary.com/demo/image/upload/sample"
 const SAMPLE_IMAGE_URL_2 = "https://res.cloudinary.com/demo/image/upload/car"
 
 const { URL: NodeURL, URLSearchParams: NodeURLSearchParams } = require('url');
+const { Blob: NodeBlob, File: NodeFile } = require('buffer');
 let cleanupJsdom;
 
 describe("uploader", function () {
@@ -132,7 +133,8 @@ describe("uploader", function () {
 
     it("should successfully upload a Blob", function () {
       const buffer = fs.readFileSync(IMAGE_FILE);
-      const blob = new Blob([buffer], { type: "image/png" });
+      // jsdom-global replaces global.Blob. Use the Node Blob.
+      const blob = new NodeBlob([buffer], { type: "image/png" });
       return cloudinary.v2.uploader.upload(blob, {
         tags: UPLOAD_TAGS
       }).then(function (result) {
@@ -146,9 +148,26 @@ describe("uploader", function () {
       const buffer = fs.readFileSync(RAW_FILE);
       return cloudinary.v2.uploader.upload(buffer, {
         resource_type: "raw",
+        filename: "report.docx",
+        use_filename: true,
         tags: UPLOAD_TAGS
       }).then(function (result) {
         expect(result.resource_type).to.eql("raw");
+        expect(result.original_filename).to.eql("report");
+        expect(result.public_id).to.match(/^report_\w+\.docx$/);
+      });
+    });
+
+    it("should keep a non-ASCII File name as original_filename", function () {
+      if (typeof NodeFile === "undefined") {
+        this.skip();
+      }
+      const file = new NodeFile([fs.readFileSync(IMAGE_FILE)], "zdjęcie.png", { type: "image/png" });
+      return cloudinary.v2.uploader.upload(file, {
+        use_filename: true,
+        tags: UPLOAD_TAGS
+      }).then(function (result) {
+        expect(result.original_filename).to.eql("zdjęcie");
       });
     });
 
