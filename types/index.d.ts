@@ -475,6 +475,7 @@ declare module 'cloudinary' {
         transformation?: TransformationOptions;
         transformations?: TransformationOptions;
         keep_original?: boolean;
+        invalidate?: boolean;
         next_cursor?: boolean | string;
         public_ids?: string[];
         prefix?: string;
