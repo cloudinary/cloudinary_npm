@@ -55,6 +55,15 @@ main().catch((error) => {
 
 Save as `quickstart.js` and run `node quickstart.js`. [Create a free account](https://cloudinary.com/users/register_free) if you don't have one — or run `npx @cloudinary/cloud` to [provision one without signing up](docs/get-credentials.md).
 
+`upload()` also accepts a `Buffer`, `Uint8Array`, `ArrayBuffer`, `Blob` or `File`. Pass `filename`
+so that raw uploads keep their extension and `original_filename` is useful (the default is the
+`File` name, or `"file"`):
+
+```js
+const csv = Buffer.from('id,name\n1,sample\n');
+await cloudinary.uploader.upload(csv, { resource_type: 'raw', filename: 'report.csv' });
+```
+
 ## Common tasks
 
 - [Get Cloudinary credentials](docs/get-credentials.md)
