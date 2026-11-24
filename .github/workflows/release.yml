@@ -36,9 +36,10 @@ permissions:
   contents: write
   id-token: write # npm provenance, and npm trusted publishing once it is configured on npmjs.com
 
+# PR dry runs get their own group so they never queue ahead of a real release.
 concurrency:
-  group: release
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('release-pr-{0}', github.event.pull_request.number) || 'release' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   release:
@@ -114,6 +115,8 @@ jobs:
           git tag "${PACKAGE_VERSION}" -am "Version ${PACKAGE_VERSION}"
 
       - name: Check npm auth
+        # Fork PRs don't get secrets
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         env:
           NODE_AUTH_TOKEN: ${{ secrets.SDK_NPM_AUTH_TOKEN }}
         run: |
