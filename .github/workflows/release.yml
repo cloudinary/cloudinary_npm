@@ -1,0 +1,165 @@
+# Release cloudinary to npm. Replaces the Jenkins sdk/sdk-release job for this repo.
+# Same steps as sdk-scripts (src/release/common + src/release/js/cloudinary_npm):
+# bump version, prepend CHANGELOG, test, commit, tag, push, publish, GitHub release.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version bump
+        type: choice
+        options: [patch, minor, major, prerelease]
+        default: patch
+      version_type:
+        description: npm dist-tag. "latest" for patch/minor/major, anything else (beta, rc...) for prerelease
+        type: string
+        default: latest
+      raw_version:
+        description: Exact version (e.g. 2.12.0). Overrides version and version_type
+        type: string
+        required: false
+      changes:
+        description: Changelog entry and GitHub release notes (one "* item" per line)
+        type: string
+        required: true
+      dry_run:
+        description: Dry run (no push, no npm publish, no GitHub release)
+        type: boolean
+        default: true
+  # A dry run on every PR that changes this workflow, so edits get exercised before they're used.
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+
+permissions:
+  contents: write
+  id-token: write # npm provenance, and npm trusted publishing once it is configured on npmjs.com
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      DRY_RUN: ${{ github.event_name == 'pull_request' || inputs.dry_run }}
+      VERSION: ${{ inputs.version || 'patch' }}
+      VERSION_TYPE: ${{ inputs.version_type || 'latest' }}
+      RAW_VERSION: ${{ inputs.raw_version }}
+      CHANGES: ${{ inputs.changes || '* Dry run from pull request' }}
+    steps:
+      - name: Refuse real releases outside master
+        if: env.DRY_RUN != 'true' && github.ref != 'refs/heads/master'
+        run: |
+          echo "::error::Real releases run from master only (got ${GITHUB_REF})"
+          exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24 # npm 11, needed for trusted publishing
+          registry-url: https://registry.npmjs.org
+
+      - run: npm install
+
+      - name: Update version
+        id: version
+        run: |
+          set -euo pipefail
+          if [[ -n "$RAW_VERSION" ]]; then
+            npm version "$RAW_VERSION" --no-git-tag-version
+            DIST_TAG=latest
+          elif [[ "$VERSION" == "prerelease" && "$VERSION_TYPE" != "latest" ]]; then
+            npm version prerelease --no-git-tag-version --preid="$VERSION_TYPE"
+            DIST_TAG="$VERSION_TYPE"
+          elif [[ "$VERSION" != "prerelease" && "$VERSION_TYPE" == "latest" ]]; then
+            npm version "$VERSION" --no-git-tag-version
+            DIST_TAG=latest
+          else
+            echo "::error::Invalid combination: version=$VERSION version_type=$VERSION_TYPE"
+            exit 1
+          fi
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          {
+            echo "package_version=$PACKAGE_VERSION"
+            echo "dist_tag=$DIST_TAG"
+            echo "prerelease=$([[ "$PACKAGE_VERSION" == *-* ]] && echo true || echo false)"
+          } >> "$GITHUB_OUTPUT"
+          echo "::notice::Version $PACKAGE_VERSION (npm dist-tag: $DIST_TAG)"
+
+      - name: Update changelog
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.package_version }}
+        run: |
+          printf '%s / %s\n==================\n\n%s\n\n' "$PACKAGE_VERSION" "$(date +%Y-%m-%d)" "$CHANGES" \
+            | cat - CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+          head -n 8 CHANGELOG.md
+
+      - name: Test
+        run: npm run test-with-temp-cloud
+
+      - name: Commit and tag
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.package_version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Version ${PACKAGE_VERSION}"
+          git tag "${PACKAGE_VERSION}" -am "Version ${PACKAGE_VERSION}"
+
+      - name: Check npm auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.SDK_NPM_AUTH_TOKEN }}
+        run: |
+          if ! user=$(npm whoami); then
+            echo "::error::npm auth failed: check the SDK_NPM_AUTH_TOKEN org secret"
+            exit 1
+          fi
+          echo "::notice::npm: authenticated as $user"
+
+      # Push before publishing: a rejected push (master moved) stops the run before
+      # anything reaches npm, and npm versions can't be reused.
+      - name: Push
+        if: env.DRY_RUN != 'true'
+        run: git push origin HEAD:master --follow-tags
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.SDK_NPM_AUTH_TOKEN }}
+          DIST_TAG: ${{ steps.version.outputs.dist_tag }}
+        run: |
+          args=(--access public --provenance --tag "$DIST_TAG")
+          [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
+          npm publish "${args[@]}"
+
+      - name: Create GitHub release
+        if: env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_VERSION: ${{ steps.version.outputs.package_version }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        run: |
+          flags=()
+          [[ "$PRERELEASE" == "true" ]] && flags+=(--prerelease)
+          gh release create "$PACKAGE_VERSION" --title "Version $PACKAGE_VERSION" --notes "$CHANGES" ${flags[@]+"${flags[@]}"}
+
+      - name: Summary
+        if: always()
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.package_version }}
+          DIST_TAG: ${{ steps.version.outputs.dist_tag }}
+        run: |
+          {
+            [[ "$DRY_RUN" == "true" ]] && suffix=" (dry run)" || suffix=""
+            echo "## cloudinary ${PACKAGE_VERSION}${suffix}"
+            echo "- npm dist-tag: \`${DIST_TAG}\`"
+            echo "- Changes:"
+            echo ""
+            echo "${CHANGES}"
+          } >> "$GITHUB_STEP_SUMMARY"
